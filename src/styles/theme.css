@@ -1,0 +1,192 @@
+/* ================================================================
+   DRAGON86 — DESIGN TOKENS
+   Colors, themes, and typography are lifted from
+   Dragon-Gaming-Platforms/Dragon-Gaming-Platforms (styles.css).
+   ================================================================ */
+
+:root {
+  /* Default: Dragon Red */
+  --theme-primary: #e60012;
+  --theme-bright: #ff1a2e;
+  --theme-glow: #ff0033;
+  --theme-dark: #8b0000;
+  --theme-dim: #4a0000;
+  --theme-accent: #ff4d5a;
+  --theme-rgb: 230, 0, 18;
+
+  --bg-darkest: #050505;
+  --bg-dark: #0a0a0a;
+  --bg-card: #0d0d0d;
+  --bg-card-hover: #141414;
+  --bg-surface: #121212;
+  --border-color: #1a1a1a;
+  --border-color-light: #2a2a2a;
+  --text-primary: #f0f0f0;
+  --text-secondary: #aaaaaa;
+  --text-dim: #666666;
+  --font-heading: "Orbitron", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-body: "Rajdhani", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "Cascadia Code", "Fira Code", Consolas, "Courier New", monospace;
+  --t-fast: 0.2s ease;
+  --t-med: 0.35s ease;
+  --t-bounce: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* ---------- Themes (data-theme on <html>) ---------- */
+[data-theme="cyberpunk"] {
+  --theme-primary: #00e5ff;
+  --theme-bright: #39ffea;
+  --theme-glow: #00f0ff;
+  --theme-dark: #006680;
+  --theme-dim: #003340;
+  --theme-accent: #ff007f;
+  --theme-rgb: 0, 229, 255;
+}
+
+[data-theme="purple"] {
+  --theme-primary: #9d4edd;
+  --theme-bright: #c77dff;
+  --theme-glow: #b5179e;
+  --theme-dark: #5a189a;
+  --theme-dim: #240046;
+  --theme-accent: #e0aaff;
+  --theme-rgb: 157, 78, 221;
+}
+
+[data-theme="matrix"] {
+  --theme-primary: #00ff66;
+  --theme-bright: #39ff14;
+  --theme-glow: #00ff41;
+  --theme-dark: #006622;
+  --theme-dim: #002b11;
+  --theme-accent: #a3ff00;
+  --theme-rgb: 0, 255, 102;
+}
+
+[data-theme="amoled"] {
+  --theme-primary: #e2e8f0;
+  --theme-bright: #ffffff;
+  --theme-glow: #94a3b8;
+  --theme-dark: #334155;
+  --theme-dim: #1e293b;
+  --theme-accent: #38bdf8;
+  --theme-rgb: 226, 232, 240;
+  --bg-darkest: #000000;
+  --bg-dark: #050505;
+  --bg-card: #080808;
+  --bg-card-hover: #101010;
+}
+
+[data-theme="sunset"] {
+  --theme-primary: #ff8c00;
+  --theme-bright: #ffa500;
+  --theme-glow: #ff4500;
+  --theme-dark: #b84500;
+  --theme-dim: #4a1c00;
+  --theme-accent: #ffd166;
+  --theme-rgb: 255, 140, 0;
+}
+
+/* ---------- Base ---------- */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--bg-darkest);
+  color: var(--text-primary);
+  font-size: 15px;
+  line-height: 1.5;
+  user-select: none;
+}
+
+::selection {
+  background: rgba(var(--theme-rgb), 0.35);
+  color: #fff;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-darkest);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--theme-dark);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--theme-primary);
+}
+
+/* ---------- Shared controls ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-family: var(--font-heading);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  background: rgba(var(--theme-rgb), 0.08);
+  border: 1px solid rgba(var(--theme-rgb), 0.25);
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: var(--t-fast);
+}
+.btn:hover {
+  color: var(--theme-bright);
+  background: rgba(var(--theme-rgb), 0.18);
+  border-color: var(--theme-primary);
+  box-shadow: 0 0 15px rgba(var(--theme-rgb), 0.2);
+}
+.btn.danger {
+  background: rgba(255, 68, 68, 0.08);
+  border-color: rgba(255, 68, 68, 0.3);
+  color: #ff8888;
+}
+.btn.danger:hover {
+  background: rgba(255, 68, 68, 0.2);
+  border-color: #ff4444;
+  color: #fff;
+  box-shadow: 0 0 15px rgba(255, 68, 68, 0.3);
+}
+
+.input {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  background: var(--bg-darkest);
+  border: 1px solid var(--border-color-light);
+  border-radius: 6px;
+  padding: 8px 12px;
+  outline: none;
+  transition: var(--t-fast);
+  width: 100%;
+}
+.input:focus {
+  border-color: var(--theme-primary);
+  box-shadow: 0 0 12px rgba(var(--theme-rgb), 0.25);
+}
+
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+}
