@@ -107,29 +107,36 @@ export function openTerminal(win: Win): void {
 
   let backend: TerminalBackend | null = null;
 
-  /* Output display filter.
-     The guest's TTY/readline layer (under CheerpX's emulated console)
-     emits a stray TAB at the start of the line before command output,
-     which makes every response look indented. Neither bridge injects it —
-     it arrives in the engine's byte stream. Drop TABs that occur at the
-     very start of a line (start of stream, or right after \r / \n);
-     tabs anywhere else (columnated output) pass through untouched. */
+  /* Output display filter — fixes the "staircase" output.
+     The guest sends bare \n (LF) and CheerpX's emulated console does NOT
+     perform the ONLCR translation a real TTY does (\n → \r\n). xterm.js
+     therefore moves the cursor down but never back to column 0, so every
+     line starts where the previous one ended and output stairs rightward
+     (looks like a growing tab indent — it isn't one). Here we do the ONLCR
+     job ourselves: a \n not immediately preceded by \r gets a \r inserted.
+     Stateful across chunks (a chunk may end with \r and start with \n).
+     Also drops a genuine leading TAB at line start, defensively. */
+  let prevChar = "";
   let atLineStart = true;
-  let tabNoticeShown = false;
+  let fixNoticeShown = false;
   const filterOutput = (data: string): string => {
     let out = "";
     for (const ch of data) {
       if (atLineStart && ch === "\t") {
-        if (!tabNoticeShown) {
-          tabNoticeShown = true;
+        continue; // stray leading tab — drop
+      }
+      if (ch === "\n" && prevChar !== "\r") {
+        out += "\r";
+        if (!fixNoticeShown) {
+          fixNoticeShown = true;
           logInfo(
             "terminal",
-            "stripping stray leading TAB from engine output (guest TTY quirk)",
+            "applying ONLCR fix: guest sends bare LF, inserting CR (staircase fix)",
           );
         }
-        continue;
       }
       out += ch;
+      prevChar = ch;
       atLineStart = ch === "\n" || ch === "\r";
     }
     return out;
