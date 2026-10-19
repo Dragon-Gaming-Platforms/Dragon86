@@ -64,6 +64,8 @@ export const ICONS: Record<string, string> = {
     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20l1-4L16.5 4.5a2.1 2.1 0 0 1 3 3L8 19z"/><path d="M14.5 6.5l3 3"/></svg>',
   settings:
     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3.2"/><path d="M19 12a7 7 0 0 0-.14-1.4l2.02-1.58-2-3.46-2.4.96a7 7 0 0 0-2.42-1.4L13.7 2.5h-4l-.36 2.62a7 7 0 0 0-2.42 1.4l-2.4-.96-2 3.46L4.14 10.6a7 7 0 0 0 0 2.8l-2.02 1.58 2 3.46 2.4-.96a7 7 0 0 0 2.42 1.4l.36 2.62h4l.36-2.62a7 7 0 0 0 2.42-1.4l2.4.96 2-3.46L18.86 13.4A7 7 0 0 0 19 12z"/></svg>',
+  browser:
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.5 3.9 5.6 3.9 9S14.6 18.5 12 21c-2.6-2.5-3.9-5.6-3.9-9S9.4 5.5 12 3z"/></svg>',
   home: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3.5 11L12 4l8.5 7"/><path d="M5.5 10v9.5h13V10"/><path d="M10 19.5v-5h4v5"/></svg>',
   download:
     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 4v11"/><path d="M7.5 11L12 15.5 16.5 11"/><path d="M4.5 19.5h15"/></svg>',

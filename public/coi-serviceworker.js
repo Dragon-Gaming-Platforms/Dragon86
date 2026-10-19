@@ -1,10 +1,17 @@
 /*! coi-serviceworker v0.1.7 - Guido Zuidhof and contributors, licensed under MIT
-    LOCAL MODIFICATION (Dragon86): in the worker half below, COOP/COEP/CORP
-    headers are stamped ONLY on navigation (document) responses — the only
-    responses cross-origin isolation is decided from. Subresources (scripts,
-    styles, images, fetch/XHR, workers) pass through completely untouched,
-    so future apps aren't forced to live under rewritten headers. Page-half
-    registration/reload logic is unmodified upstream. */
+    LOCAL MODIFICATIONS (Dragon86):
+    1. COOP/COEP/CORP headers are stamped ONLY on navigation (document)
+       responses — the only responses cross-origin isolation is decided
+       from. Other subresources are no longer header-rewritten.
+    2. A cache-first layer serves static assets (scripts, styles, images,
+       fonts, wasm…) from Cache Storage, stale-while-revalidate, to make
+       repeat loads as cache-driven as possible. EXCLUDED, always live:
+       the CheerpX hoster (any URL mentioning CheerpX-Bridge) and the
+       Scramjet proxy subtree (dynamic proxied content must never be
+       frozen into a cache). Navigations are never cached either.
+       NOTE: browsers allow only ONE service worker per scope, so this
+       cache layer lives in this worker rather than a second registration.
+    Page-half registration/reload logic is unmodified upstream. */
 
 let coepCredentialless = false;
 if (typeof window === 'undefined') {
@@ -46,6 +53,39 @@ if (typeof window === 'undefined') {
         // document, and it inherits SharedArrayBuffer from this page being
         // isolated, via allow="cross-origin-isolated".)
         if (r.mode !== "navigate") {
+            // Dragon86 cache layer (modification 2): cache-first for
+            // static assets, stale-while-revalidate. Never cached: the
+            // CheerpX hoster (live engine) and the Scramjet subtree
+            // (proxied web content). Cross-origin: only CORS-visible
+            // (non-opaque) responses are stored, so we never poison the
+            // cache with opaque error bodies.
+            if (r.method === "GET" && !r.headers.has("range")) {
+                let u;
+                try { u = new URL(r.url); } catch { return; }
+                const excluded =
+                    u.href.includes("CheerpX-Bridge") ||
+                    u.pathname.includes("/scramjet/");
+                const cacheableDest = ["script", "style", "image", "font", "worker", "manifest", ""].includes(r.destination);
+                if (!excluded && cacheableDest) {
+                    event.respondWith((async () => {
+                        const cache = await caches.open("dragon86-assets-v1");
+                        const hit = await cache.match(r, { ignoreSearch: false });
+                        const network = fetch(r).then((res) => {
+                            if (res && res.status === 200) {
+                                cache.put(r, res.clone()).catch(() => {});
+                            }
+                            return res;
+                        }).catch(() => null);
+                        if (hit) {
+                            // serve instantly, refresh in background
+                            network.catch(() => {});
+                            return hit;
+                        }
+                        const res = await network;
+                        return res ?? Response.error();
+                    })());
+                }
+            }
             return;
         }
 
