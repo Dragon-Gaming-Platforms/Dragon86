@@ -875,6 +875,12 @@
   padding: 14px 18px;
   tab-size: 4;
 }
+.editor-monaco {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
 .editor-path {
   font-family: var(--font-mono);
   font-size: 0.8rem;
