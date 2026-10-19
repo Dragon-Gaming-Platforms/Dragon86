@@ -20,7 +20,7 @@ export function buildTaskbar(wm: WindowManager, apps: AppShortcut[]): void {
 
   /* ---- start button ---- */
   const startBtn = el("button", "start-btn");
-  startBtn.innerHTML = `<span class="dragon">🐉</span><span>Dragon86</span>`;
+  startBtn.innerHTML = `<img class="dragon" src="${import.meta.env.BASE_URL}icons/dragon-gaming.png" alt="" draggable="false" /><span>Dragon86</span>`;
   bar.append(startBtn);
 
   /* ---- window buttons ---- */
