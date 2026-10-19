@@ -109,11 +109,11 @@ export function openTerminal(win: Win): void {
           b.resize(term.cols, term.rows);
           term.focus();
         } else {
-          setChip("offline", "Not connected");
-          term.writeln(`${RED}No answer from the engine yet.${RESET}`);
+          setChip("connecting", "Still starting…");
+          term.writeln(`${RED}The engine is still booting.${RESET}`);
           term.writeln(
-            `${DIM}It may still be cold-booting — this message can clear itself,` +
-              ` or hit Reconnect.\x1b[0m`,
+            `${DIM}Keep this window open — bash will appear here automatically` +
+              ` when the engine is ready (cold boot can take ~20 s), or hit Reconnect.\x1b[0m`,
           );
         }
       },
