@@ -2,36 +2,43 @@
  * v86 backend — the Terminal's compatibility engine.
  *
  * Runs the vendored v86 emulator (public/v86/: npm `v86`, SeaBIOS, Alpine
- * 6.12 kernel + our busybox initrd) directly in this page. Unlike CheerpX
- * it needs no cross-origin isolation and no service worker, so it works in
- * Android WebView and other locked-down browsers where the
- * coi-serviceworker trick can't.
+ * 6.12 kernel + our busybox/GNU-bash initrd) directly in this page. Unlike
+ * CheerpX it needs no cross-origin isolation and no service worker, so it
+ * works in Android WebView and other locked-down browsers.
  *
- * VFS wiring: Dragon86's /home/user IS the guest's /shared. At boot the OS
- * pushes its files into v86's 9p filesystem (guest mkdirs first, then
- * create_file); the guest mounts that share read-write; guest writes come
- * back on "9p-write-end" events and are read into the VFS. Not synced:
- * guest deletions/renames, and OS edits made while the engine runs (they
- * land on next boot/Reconnect).
+ * Files: the guest's /shared is not a copy or a sync — it *is* the OS
+ * filesystem. src/bridge/p9.ts speaks 9p2000.L straight to ZenFS via
+ * v86's `handle9p`, so guest and OS see the same live files (creates,
+ * deletes, renames included). Nothing is typed into the guest to set
+ * this up; the serial line carries only the user's shell session (its
+ * size is passed on the kernel cmdline, since serial has no winsize
+ * channel — see the guest /init).
+ *
+ * State: "Save State" (Terminal toolbar) snapshots the whole machine
+ * (v86 save_state) into IndexedDB, gzip-compressed — far beyond
+ * localStorage's ~5 MB, so IndexedDB is the on-device store used. On
+ * the next v86 start the snapshot is passed as initial_state and the
+ * session resumes where it left off; the 9p server treats unknown fids
+ * as the share root, so the restored guest's mount heals itself.
  */
 
 import * as vfs from "../core/vfs";
+import { createP9Handler } from "./p9";
 import { logInfo, logWarn } from "../core/log";
 import type { BackendHandlers, TerminalBackend } from "./hoster";
 
 interface V86Emulator {
-  add_listener(event: string, cb: (arg: number | string) => void): void;
+  add_listener(event: string, cb: (arg: number) => void): void;
   destroy(): void;
   serial0_send(data: string): void;
-  create_file(file: string, data: Uint8Array): Promise<void>;
-  read_file(file: string): Promise<Uint8Array>;
+  save_state(): Promise<ArrayBuffer>;
 }
 
 type V86Ctor = new (opts: Record<string, unknown>) => V86Emulator;
 
 const BASE = `${import.meta.env.BASE_URL}v86/`;
-const MAX_PUSH_FILE = 2 * 1024 * 1024; // skip giant OS files at boot push
-const MAX_PUSH_FILES = 400;
+const STATE_DB = "dragon86-v86state";
+const STATE_KEY = "latest";
 
 let libPromise: Promise<V86Ctor> | null = null;
 
@@ -50,51 +57,123 @@ function loadLib(): Promise<V86Ctor> {
   return libPromise;
 }
 
-const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+/* ---------- saved-state store (IndexedDB; see header) ---------- */
+
+function stateDb(): Promise<IDBDatabase> {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(STATE_DB, 1);
+    req.onupgradeneeded = () => req.result.createObjectStore("kv");
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+async function idbGet(key: string): Promise<unknown> {
+  const db = await stateDb();
+  return new Promise((resolve, reject) => {
+    const req = db.transaction("kv").objectStore("kv").get(key);
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+async function idbPut(key: string, value: unknown): Promise<void> {
+  const db = await stateDb();
+  return new Promise((resolve, reject) => {
+    const req = db.transaction("kv", "readwrite").objectStore("kv").put(value, key);
+    req.onsuccess = () => resolve();
+    req.onerror = () => reject(req.error);
+  });
+}
+
+interface SavedState { gzip: boolean; data: ArrayBuffer; savedAt: number }
+
+async function loadSavedState(): Promise<ArrayBuffer | null> {
+  try {
+    const rec = (await idbGet(STATE_KEY)) as SavedState | undefined;
+    if (!rec) return null;
+    if (!rec.gzip) return rec.data;
+    const stream = new Blob([rec.data]).stream().pipeThrough(new DecompressionStream("gzip"));
+    return await new Response(stream).arrayBuffer();
+  } catch (err) {
+    logWarn("v86", "saved state unreadable; cold-booting:", err);
+    return null;
+  }
+}
+
+/* ---------- backend ---------- */
 
 class V86Backend implements TerminalBackend {
   private emu: V86Emulator | null = null;
   private decoder = new TextDecoder();
   private byteBuf: number[] = [];
   private flushTimer: ReturnType<typeof setTimeout> | null = null;
-  private tail = ""; // rolling output tail for prompt detection
+  private tail = "";
   private booted = false;
   private disposed = false;
   private pendingInput = "";
   private cols = 80;
   private rows = 24;
-  private pullTimers = new Map<string, ReturnType<typeof setTimeout>>();
+  private startTimer: ReturnType<typeof setTimeout> | null = null;
+  private nudgeTimer: ReturnType<typeof setInterval> | null = null;
 
   constructor(private handlers: BackendHandlers) {}
 
   connect(): void {
-    void this.start();
+    /* The guest's serial size rides the kernel cmdline, so give the
+       terminal a beat to report its real size before we construct. */
+    this.startTimer = setTimeout(() => void this.start(), 300);
+  }
+
+  resize(cols: number, rows: number): void {
+    this.cols = cols;
+    this.rows = rows;
+    if (this.startTimer) {
+      clearTimeout(this.startTimer);
+      this.startTimer = setTimeout(() => void this.start(), 200);
+    }
   }
 
   private async start(): Promise<void> {
+    this.startTimer = null;
     try {
-      const V86 = await loadLib();
+      const [V86, saved] = await Promise.all([loadLib(), loadSavedState()]);
       if (this.disposed) return;
-      const emu = new V86({
+      const opts: Record<string, unknown> = {
         wasm_path: `${BASE}v86.wasm`,
         memory_size: 128 * 1024 * 1024,
         bios: { url: `${BASE}bios/seabios.bin` },
         vga_bios: { url: `${BASE}bios/vgabios.bin` },
-        bzimage: { url: `${BASE}bzImage` },
-        initrd: { url: `${BASE}initrd.gz` },
-        filesystem: {},
-        cmdline: "console=ttyS0 tsc=reliable",
+        filesystem: { handle9p: createP9Handler(vfs.HOME) },
         autostart: true,
         disable_keyboard: true,
         disable_mouse: true,
         disable_speaker: true,
-      });
+      };
+      if (saved) {
+        opts.initial_state = { buffer: saved };
+        logInfo("v86", "resuming from saved state");
+      } else {
+        opts.bzimage = { url: `${BASE}bzImage` };
+        opts.initrd = { url: `${BASE}initrd.gz` };
+        opts.cmdline = `console=ttyS0 tsc=reliable d86cols=${this.cols} d86rows=${this.rows}`;
+        logInfo("v86", "cold-booting guest");
+      }
+      const emu = new V86(opts);
       this.emu = emu;
-      emu.add_listener("serial0-output-byte", (b) => this.onByte(b as number));
-      emu.add_listener("9p-write-end", (name) => this.onGuestWrite(name as string));
-      logInfo("v86", "emulator started; waiting for guest shell prompt");
-      /* If no prompt in 90 s, report offline (terminal shows its
-         "still booting" state); a late prompt still completes below. */
+      emu.add_listener("serial0-output-byte", (b) => this.onByte(b));
+      if (saved) {
+        /* A restored machine is already at a prompt but prints nothing;
+           nudge it until the prompt shows up. */
+        this.nudgeTimer = setInterval(() => {
+          if (this.booted || this.disposed) {
+            if (this.nudgeTimer) clearInterval(this.nudgeTimer);
+            this.nudgeTimer = null;
+            return;
+          }
+          this.emu?.serial0_send("\n");
+        }, 2500);
+      }
       setTimeout(() => {
         if (!this.booted && !this.disposed) this.handlers.onStatus("offline");
       }, 90_000);
@@ -113,95 +192,21 @@ class V86Backend implements TerminalBackend {
       this.byteBuf = [];
       if (this.disposed) return;
       this.handlers.onData(text);
-      this.tail = (this.tail + text).slice(-512);
-      if (!this.booted && this.tail.includes("dragon86:")) {
-        this.booted = true;
-        void this.finishBoot();
-      }
-    }, 8);
-  }
-
-  /** Prompt is up: size the guest tty, push the OS files, then go ready. */
-  private async finishBoot(): Promise<void> {
-    try {
-      await this.pushVfs();
-    } catch (err) {
-      logWarn("v86", "VFS push failed (guest still usable):", err);
-    }
-    if (this.disposed) return;
-    this.emu?.serial0_send(`stty rows ${this.rows} cols ${this.cols}\n`);
-    if (this.pendingInput) {
-      this.emu?.serial0_send(this.pendingInput);
-      this.pendingInput = "";
-    }
-    logInfo("v86", "guest ready; /shared is the OS filesystem");
-    this.handlers.onStatus("ready");
-  }
-
-  /**
-   * OS → guest: create the OS directory tree inside the share (via the
-   * guest shell — the host API can only create files in existing dirs),
-   * then write every OS file into it. Files land relative to /shared,
-   * which the guest has mounted from this same 9p filesystem.
-   */
-  private async pushVfs(): Promise<void> {
-    const emu = this.emu;
-    if (!emu) return;
-    const dirs: string[] = [];
-    const files: string[] = [];
-    const walk = async (dir: string): Promise<void> => {
-      for (const e of await vfs.listDir(dir)) {
-        const rel = e.path.slice(vfs.HOME.length + 1);
-        if (e.isDirectory) {
-          dirs.push(rel);
-          await walk(e.path);
-        } else if (files.length < MAX_PUSH_FILES) {
-          files.push(rel);
+      if (!this.booted) {
+        this.tail = (this.tail + text).slice(-512);
+        if (this.tail.includes("dragon86:")) {
+          this.booted = true;
+          if (this.nudgeTimer) clearInterval(this.nudgeTimer);
+          this.nudgeTimer = null;
+          if (this.pendingInput) {
+            this.emu?.serial0_send(this.pendingInput);
+            this.pendingInput = "";
+          }
+          logInfo("v86", "guest shell ready (/shared is the OS filesystem)");
+          this.handlers.onStatus("ready");
         }
       }
-    };
-    await walk(vfs.HOME);
-    if (dirs.length) {
-      const quoted = dirs.map((d) => `'/shared/${d.replace(/'/g, "'\\''")}'`).join(" ");
-      emu.serial0_send(`stty -echo; mkdir -p ${quoted}; stty echo\n`);
-      await sleep(500); // let the guest create them before create_file
-    }
-    let pushed = 0;
-    for (const rel of files) {
-      try {
-        const data = await vfs.readBytes(`${vfs.HOME}/${rel}`);
-        if (data.length > MAX_PUSH_FILE) continue;
-        await emu.create_file(rel, data);
-        pushed++;
-      } catch {
-        /* unreadable/vanished file — skip, guest still gets the rest */
-      }
-    }
-    logInfo("v86", `pushed ${pushed}/${files.length} OS files into /shared`);
-  }
-
-  /** Guest → OS: a file was written in the guest; pull it into the VFS. */
-  private onGuestWrite(name: string): void {
-    const rel = name.replace(/^\/+/, "");
-    if (!rel) return;
-    const old = this.pullTimers.get(rel);
-    if (old) clearTimeout(old);
-    this.pullTimers.set(
-      rel,
-      setTimeout(() => {
-        this.pullTimers.delete(rel);
-        void (async () => {
-          try {
-            const data = await this.emu?.read_file(rel);
-            if (!data || this.disposed) return;
-            await vfs.writeBytes(`${vfs.HOME}/${rel}`, data);
-            logInfo("v86", `pulled guest write: /shared/${rel} (${data.length} B)`);
-          } catch {
-            /* deleted between event and read, or a directory — ignore */
-          }
-        })();
-      }, 200),
-    );
+    }, 8);
   }
 
   write(data: string): void {
@@ -212,17 +217,31 @@ class V86Backend implements TerminalBackend {
     this.emu?.serial0_send(data);
   }
 
-  resize(cols: number, rows: number): void {
-    /* Serial has no winsize channel; finishBoot applies the size once the
-       prompt is up (the terminal re-sends its size when we report ready). */
-    this.cols = cols;
-    this.rows = rows;
+  /** Snapshot the machine into IndexedDB (gzip; see header). */
+  async saveState(): Promise<void> {
+    if (!this.emu) throw new Error("engine not running");
+    const raw = await this.emu.save_state();
+    let data = raw;
+    let gzip = false;
+    try {
+      const stream = new Blob([raw]).stream().pipeThrough(new CompressionStream("gzip"));
+      data = await new Response(stream).arrayBuffer();
+      gzip = true;
+    } catch {
+      /* CompressionStream unavailable — store raw. */
+    }
+    const rec: SavedState = { gzip, data, savedAt: Date.now() };
+    await idbPut(STATE_KEY, rec);
+    logInfo(
+      "v86",
+      `state saved: ${(raw.byteLength / 1048576).toFixed(1)} MB raw → ${(data.byteLength / 1048576).toFixed(1)} MB stored`,
+    );
   }
 
   dispose(): void {
     this.disposed = true;
-    for (const t of this.pullTimers.values()) clearTimeout(t);
-    this.pullTimers.clear();
+    if (this.startTimer) clearTimeout(this.startTimer);
+    if (this.nudgeTimer) clearInterval(this.nudgeTimer);
     try {
       this.emu?.destroy();
     } catch {

@@ -31,6 +31,8 @@ export interface TerminalBackend {
   dispose(): void;
   /** Tab mode only: (re)open the separate engine tab. */
   openTab?: () => void;
+  /** v86 only: snapshot the machine to on-device storage. */
+  saveState?: () => Promise<void>;
 }
 
 export interface BackendHandlers {

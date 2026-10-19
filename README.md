@@ -91,12 +91,19 @@ and fast.
   that's a pending CheerpX-Bridge addition; until it lands, tab mode
   reports "still starting" while embedded mode keeps working.
 - **v86 (compatibility)**: a tiny Linux (vendored v86 emulator + Alpine
-  kernel + busybox, `public/v86/`) boots right inside the Dragon86 page —
-  no isolation, no hoster, no service worker, so it runs in Android
-  WebView and similar places the CheerpX modes can't. Slower and smaller
-  than CheerpX, but its `/shared` folder **is** the OS virtual
-  filesystem: OS files are pushed in at boot, guest writes sync back
-  live. Isolation is OFF in this mode, same as Separate tab.
+  kernel + busybox utilities + a genuine GNU bash shell, `public/v86/`)
+  boots right inside the Dragon86 page — no isolation, no hoster, no
+  service worker, so it runs in Android WebView and similar places the
+  CheerpX modes can't. Slower and smaller than CheerpX, but its
+  `/shared` folder **is** the OS virtual filesystem, live in both
+  directions: Dragon86 serves 9p straight from its own filesystem
+  (`src/bridge/p9.ts`), so guest creates/deletes/renames are OS
+  operations and vice versa — no copying, no sync step. The Terminal's
+  **Save State** button snapshots the machine to IndexedDB and the
+  next v86 start resumes from it. Isolation is OFF in this mode, same
+  as Separate tab. (A full Arch Linux guest would need a ~2 GB
+  archlinux32 disk image; see `public/v86/VENDORED.md` for why the
+  bash shell ships instead.)
 
 **Diagnostics:** the Terminal has a **Dev Console** button (Eruda, contained
 in the window). Watch the `[D86:bridge]` logs — especially the *iframe probe*
