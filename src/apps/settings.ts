@@ -108,32 +108,37 @@ export function openSettings(win: Win): void {
   modeRow.append(el("label", undefined, "Engine runs"));
   const embeddedBtn = el("button", "btn", "Embedded (in this page)");
   const tabBtn = el("button", "btn", "In a separate tab");
+  const v86Btn = el("button", "btn", "v86 (compatibility)");
   const refreshModeBtns = () => {
     const mode = getSettings().engineMode;
     embeddedBtn.classList.toggle("active", mode === "embedded");
     tabBtn.classList.toggle("active", mode === "tab");
+    v86Btn.classList.toggle("active", mode === "v86");
   };
-  const setMode = (mode: "embedded" | "tab") => {
+  const setMode = (mode: "embedded" | "tab" | "v86") => {
     if (getSettings().engineMode === mode) return;
     setSettings({ engineMode: mode });
     refreshModeBtns();
     modeNote.textContent =
       mode === "tab"
         ? "Saved. Reloading — cross-origin isolation will be turned OFF for Dragon86 (the engine tab isolates itself). The Terminal will talk to the engine tab directly; no terminal UI appears over there."
-        : "Saved. Reloading — cross-origin isolation will be turned ON for Dragon86 so the embedded engine can run…";
+        : mode === "v86"
+          ? "Saved. Reloading — cross-origin isolation will be turned OFF for Dragon86 (v86 doesn't need it). The Terminal will boot a tiny Linux right here in the page; your Files folder shows up in it as /shared."
+          : "Saved. Reloading — cross-origin isolation will be turned ON for Dragon86 so the embedded engine can run…";
     /* Isolation is decided when the document loads, so applying a mode
        change IS a reload: on the next load index.html tells the coi
-       worker to register (embedded) or deregister (tab). */
+       worker to register (embedded) or deregister (tab/v86). */
     setTimeout(() => location.reload(), 900);
   };
   embeddedBtn.addEventListener("click", () => setMode("embedded"));
   tabBtn.addEventListener("click", () => setMode("tab"));
+  v86Btn.addEventListener("click", () => setMode("v86"));
   refreshModeBtns();
-  modeRow.append(embeddedBtn, tabBtn);
+  modeRow.append(embeddedBtn, tabBtn, v86Btn);
   const modeNote = el(
     "div",
     "settings-note",
-    "Embedded: engine hidden inside Dragon86 (default; needs isolation ON for this page). Separate tab: the engine opens as its own browser tab with no terminal UI in it — the Dragon86 Terminal still renders everything — and Dragon86 isolation turns OFF, leaving this page unrestricted for other apps. Switching reloads the page.",
+    "Embedded: CheerpX engine hidden inside Dragon86 (default; needs isolation ON for this page). Separate tab: the engine opens as its own browser tab with no terminal UI in it — the Dragon86 Terminal still renders everything — and Dragon86 isolation turns OFF, leaving this page unrestricted for other apps. v86 (compatibility): a tiny Linux that runs right in this page with no isolation at all — the pick for Android WebView and locked-down browsers where the other two can't run; your Files folder is its /shared folder, synced both ways. Switching reloads the page.",
   );
   engineSection.append(modeRow, modeNote);
 
@@ -142,8 +147,9 @@ export function openSettings(win: Win): void {
   systemSection.append(el("h2", undefined, "System"));
   const table = el("table", "about-table");
   const facts: [string, string][] = [
-    ["OS", "Dragon86 0.2.0 (dev build)"],
-    ["Build", "GUST + Sandstone vendored · Monaco editor"],
+    ["OS", "Dragon86 0.3.0 (dev build)"],
+    ["Build", "GUST + Sandstone vendored · Monaco editor · v86 engine"],
+    ["Engines", "CheerpX (embedded / separate tab) · v86 (compatibility, /shared = Files)"],
     ["Vendor", "Dragon Gaming Platforms"],
     ["Terminal", "xterm.js 6 · bridge protocol v1"],
     [

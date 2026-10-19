@@ -66,7 +66,7 @@ GitHub Actions (`.github/workflows/deploy.yml`) builds and publishes to **GitHub
 1. ~~Core OS shell~~ ✔ desktop, WM, files, editor, settings, terminal chrome
 2. ~~CheerpX hoster repo~~ ✔ [CheerpX-Bridge](https://github.com/Dragon-Gaming-Platforms/CheerpX-Bridge) (COI + scoped service worker + Debian disk image)
 3. ~~Bridge handshake → real bash in the terminal~~ ✔ wired (default engine URL, cold-boot-aware handshake, late-ready recovery)
-4. Shared Linux folder in the Files app
+4. ~~Shared Linux folder~~ ✔ wired for the v86 engine: the guest's `/shared` is the OS filesystem (boot-time push + guest-write sync; see `public/v86/VENDORED.md`). CheerpX-side sharing still needs the hoster file channel
 5. ~~Browser app~~ ✔ Scramjet proxy vendored at `/scramjet/` (see `public/scramjet/VENDORED.md`)
 6. Multiple terminals / tmux, cloud-drive mounts (ZenFS backends)
 
@@ -90,6 +90,13 @@ and fast.
   ⚠️ Tab mode needs the hoster to listen on the BroadcastChannel too —
   that's a pending CheerpX-Bridge addition; until it lands, tab mode
   reports "still starting" while embedded mode keeps working.
+- **v86 (compatibility)**: a tiny Linux (vendored v86 emulator + Alpine
+  kernel + busybox, `public/v86/`) boots right inside the Dragon86 page —
+  no isolation, no hoster, no service worker, so it runs in Android
+  WebView and similar places the CheerpX modes can't. Slower and smaller
+  than CheerpX, but its `/shared` folder **is** the OS virtual
+  filesystem: OS files are pushed in at boot, guest writes sync back
+  live. Isolation is OFF in this mode, same as Separate tab.
 
 **Diagnostics:** the Terminal has a **Dev Console** button (Eruda, contained
 in the window). Watch the `[D86:bridge]` logs — especially the *iframe probe*

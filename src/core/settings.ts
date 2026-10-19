@@ -2,7 +2,7 @@
 
 export type ThemeId = "dragon" | "cyberpunk" | "purple" | "matrix" | "amoled" | "sunset";
 
-export type EngineMode = "embedded" | "tab";
+export type EngineMode = "embedded" | "tab" | "v86";
 
 export interface Settings {
   theme: ThemeId;
@@ -15,6 +15,10 @@ export interface Settings {
    * - "tab": hoster opened as its own top-level browser tab (it isolates
    *   itself); Dragon86 does NOT need isolation, so coi-serviceworker is
    *   deregistered and the OS page is unrestricted.
+   * - "v86": the vendored v86 emulator (public/v86/) runs a tiny Linux
+   *   right inside this page. No isolation, no hoster, no service worker
+   *   needed — the compatibility engine for WebView/locked-down browsers.
+   *   Its /shared folder is the OS virtual filesystem (see bridge/v86.ts).
    */
   engineMode: EngineMode;
 }

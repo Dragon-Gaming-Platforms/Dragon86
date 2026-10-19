@@ -83,6 +83,16 @@ export async function writeText(path: string, text: string): Promise<void> {
   await fs.promises.writeFile(path, text, "utf8");
 }
 
+export async function readBytes(path: string): Promise<Uint8Array> {
+  const data = (await fs.promises.readFile(path)) as unknown as Uint8Array;
+  return data instanceof Uint8Array ? data : new Uint8Array(data as ArrayBuffer);
+}
+
+export async function writeBytes(path: string, data: Uint8Array): Promise<void> {
+  await ensureDir(parentOf(path));
+  await fs.promises.writeFile(path, data as never);
+}
+
 export interface Entry {
   name: string;
   path: string;

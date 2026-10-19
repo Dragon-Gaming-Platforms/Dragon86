@@ -18,6 +18,7 @@ import {
   DEFAULT_HOSTER_URL,
   type TerminalBackend,
 } from "../bridge/hoster";
+import { getV86Backend } from "../bridge/v86";
 import { isolationReport, logInfo, logWarn } from "../core/log";
 
 const GREEN = "\x1b[38;2;46;204;113m";
@@ -175,6 +176,33 @@ export function openTerminal(win: Win): void {
   };
 
   const connect = async () => {
+    if (getSettings().engineMode === "v86") {
+      openTabBtn.style.display = "none";
+      logInfo("terminal", "connect mode=v86 (in-page compatibility engine, no isolation needed)");
+      backend?.dispose();
+      backend = null;
+      setChip("connecting", "Connecting…");
+      term.clear();
+      term.writeln(`${DIM}Starting the v86 compatibility engine (tiny Linux, in-page).${RESET}`);
+      term.writeln(`${DIM}No cross-origin isolation needed — this is the WebView-friendly engine.${RESET}`);
+      term.writeln(`${DIM}Your Files folder appears in the guest as /shared, both ways.${RESET}`);
+      const vb = getV86Backend({
+        onData: (data) => term.write(filterOutput(data)),
+        onStatus: (s) => {
+          if (s === "ready") {
+            setChip("online", "v86 online");
+            term.focus();
+          } else {
+            setChip("connecting", "Still starting…");
+            term.writeln(`${RED}The v86 engine is still booting.${RESET}`);
+            term.writeln(`${DIM}Keep this window open — bash appears automatically when ready, or hit Reconnect.${RESET}`);
+          }
+        },
+      });
+      backend = vb;
+      vb.connect();
+      return;
+    }
     const url = getSettings().hosterUrl.trim() || DEFAULT_HOSTER_URL;
     const tabMode = getSettings().engineMode === "tab";
     openTabBtn.style.display = tabMode ? "" : "none";

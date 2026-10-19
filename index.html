@@ -34,7 +34,7 @@
         var tabMode = false;
         try {
           var s = JSON.parse(localStorage.getItem("dragon86.settings") || "{}");
-          tabMode = s.engineMode === "tab";
+          tabMode = s.engineMode === "tab" || s.engineMode === "v86";
         } catch (e) {
           /* no settings yet → embedded default */
         }
