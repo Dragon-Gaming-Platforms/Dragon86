@@ -14,6 +14,7 @@
 - **Text Editor** — open & edit any text file, `Ctrl+S` saves
 - **Terminal** — xterm.js front end, waiting for the **CheerpX** engine (message-bridge protocol v1 is wired)
 - **Browser** — Scramjet web proxy (vendored at `/scramjet/`, iframed by the app; traffic via a configurable Wisp server)
+- **Games** — the Dragon Gaming Platforms catalog player (`cdn.singlefile.html`), iframed live from the org's GitHub Pages site
 - **Settings** — six themes (Dragon Red, Cyberpunk, Purple, Matrix, AMOLED, Sunset), wallpapers, engine host URL, factory reset
 
 ## Architecture (the two-repo plan)

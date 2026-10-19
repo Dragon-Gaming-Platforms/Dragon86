@@ -22,13 +22,7 @@ export function scramjetUrl(): string {
 
 export function openBrowser(win: Win): void {
   const root = el("div", "app-root");
-  const toolbar = el("div", "app-toolbar");
   const status = el("div", "app-statusbar");
-
-  const label = el("span", "tool-btn", "🌐 Scramjet proxy");
-  const reloadBtn = el("button", "tool-btn", "Reload page");
-  const openBtn = el("button", "tool-btn", "Open standalone ↗");
-  toolbar.append(label, reloadBtn, openBtn);
   status.textContent = "Browser: Scramjet (traffic routes via the Wisp server set in the page's ⚙ panel)";
 
   const frame = document.createElement("iframe");
@@ -43,13 +37,6 @@ export function openBrowser(win: Win): void {
     logInfo("os", `browser iframe loaded: ${frame.src}`);
   });
 
-  reloadBtn.addEventListener("click", () => {
-    frame.src = scramjetUrl();
-  });
-  openBtn.addEventListener("click", () => {
-    window.open(scramjetUrl(), "_blank");
-  });
-
-  root.append(toolbar, frame, status);
+  root.append(frame, status);
   win.el.append(root);
 }
