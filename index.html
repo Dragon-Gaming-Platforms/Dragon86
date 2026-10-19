@@ -5,11 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="description" content="Dragon86 — a web OS by Dragon Gaming Platforms" />
     <title>Dragon86</title>
+    <!--
+      Cross-origin isolation for THIS page, via coi-serviceworker (MIT,
+      (c) Guido Zuidhof — see third-party/coi-serviceworker.LICENSE).
+      GitHub Pages cannot set COOP/COEP headers, so this service worker
+      (scoped to /Dragon86/ by its file location) rewrites our own
+      responses with them. This page must be cross-origin isolated because
+      the CheerpX hoster runs in a hidden iframe: an embedded frame can
+      only get SharedArrayBuffer when the top page is isolated. First-ever
+      visit: the worker installs and reloads the page once — expected.
+      Force require-corp (credentialless off) for Safari compatibility,
+      matching CheerpX-Bridge. This must load before any other script.
+    -->
+    <script>
+      window.coi = { coepCredentialless: () => false };
+    </script>
+    <script src="./coi-serviceworker.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- crossorigin=anonymous: under COEP require-corp, cross-origin
+         subresources must pass CORS (Google Fonts serves ACAO:*). -->
     <link
       href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&display=swap"
       rel="stylesheet"
+      crossorigin="anonymous"
     />
   </head>
   <body>
