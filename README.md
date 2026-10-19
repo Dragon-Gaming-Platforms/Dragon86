@@ -19,7 +19,7 @@
 
 | Repo | Role | Isolation |
 |---|---|---|
-| **Dragon86** (this one) | The OS: desktop, WM, ZenFS VFS, xterm.js UI | None (normal page — can embed anything) |
+| **Dragon86** (this one) | The OS: desktop, WM, ZenFS VFS, xterm.js UI | Cross-origin isolated via `coi-serviceworker`, scoped to `/Dragon86/` — an embedded frame can only get SharedArrayBuffer when the **top page** is isolated, so the OS isolates itself and the hoster inherits it |
 | **hoster** (separate) | CheerpX engine page + disk images | Cross-origin isolated via `coi-serviceworker`, scoped to its subdirectory only |
 
 The OS embeds the hoster as a **hidden iframe** and talks to it over a versioned `postMessage` protocol (PTY byte-stream + control channel — see `src/bridge/hoster.ts`). The terminal UI never leaves the OS; the engine never touches the OS DOM.
@@ -59,11 +59,19 @@ The Terminal connects to the **CheerpX-Bridge** hoster by default
 (service-worker install + WASM compile + disk connect); later opens are warm
 and fast.
 
+**Diagnostics:** the Terminal has a **Dev Console** button (Eruda, contained
+in the window). Watch the `[D86:bridge]` logs — especially the *iframe probe*
+line, which reads the embedded hoster's `crossOriginIsolated` directly.
+Isolation debugging rule: the top OS page must report
+`crossOriginIsolated: true` (after the one-time service-worker reload) before
+the engine inside the iframe can start at all.
+
 ## Credits
 
 - Design tokens & themes: [Dragon-Gaming-Platforms](https://github.com/Dragon-Gaming-Platforms/Dragon-Gaming-Platforms) brand stylesheet
 - [ZenFS](https://github.com/zen-fs/core) (LGPL-3.0) — virtual filesystem
 - [xterm.js](https://github.com/xtermjs/xterm.js) (MIT) — terminal emulator
+- [coi-serviceworker](https://github.com/gzuidhof/coi-serviceworker) (MIT, © Guido Zuidhof and contributors) — vendored at `public/coi-serviceworker.js`, license in `third-party/`
 - CheerpX is a trademark of Leaning Technologies; engine licensing applies (Community/Commercial)
 
 ## License
