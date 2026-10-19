@@ -42,8 +42,14 @@ const PROTOCOL_VERSION = 1;
 const HELLO_INTERVAL_MS = 400;
 /** Per-load budget: reset on every iframe `load` (see above). */
 const LOAD_TIMEOUT_MS = 6_000;
-/** Give up on hello entirely after this, but keep listening for `ready`. */
-const HELLO_CAP_MS = 60_000;
+/**
+ * Stop hello only after this long. CRITICAL: the hoster answers `hello`
+ * with `ready` ONLY once its engine is up (`peerSeen` gate) — if we stop
+ * hello-ing before then, `ready` can never arrive and the terminal hangs
+ * forever even when the engine boots fine. The 6 s timeout above only
+ * reports "still starting"; it must never silence the probe.
+ */
+const HELLO_CAP_MS = 180_000;
 
 interface BridgeMessage {
   v: number;
@@ -156,11 +162,15 @@ class HosterBridge implements TerminalBackend {
     }
   };
 
-  /** Timeout: report offline, but stay listening — a late `ready` still wins. */
+  /**
+   * Timeout: report "still starting", but KEEP hello-ing — the hoster only
+   * announces `ready` in reply to a hello, so silencing the probe here
+   * would guarantee a hang even when the engine boots successfully.
+   * A late `ready` still wins (auto-recovery).
+   */
   private reportTimeout(): void {
     if (this.gotReady || this.reportedOffline) return;
     this.reportedOffline = true;
-    this.stopHello();
     this.handlers.onStatus("offline");
   }
 
