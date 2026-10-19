@@ -1,4 +1,4 @@
-# Dragon86
+# <div align="center">Dragon86 </div>
 
 **A web OS by Dragon Gaming Platforms.** No login, no server — the whole desktop lives in your browser's local storage.
 
