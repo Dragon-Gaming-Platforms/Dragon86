@@ -9,13 +9,15 @@
       Cross-origin isolation for THIS page, via coi-serviceworker (MIT,
       (c) Guido Zuidhof — see third-party/coi-serviceworker.LICENSE).
       GitHub Pages cannot set COOP/COEP headers, so this service worker
-      (scoped to /Dragon86/ by its file location) rewrites our own
-      responses with them. This page must be cross-origin isolated because
-      the CheerpX hoster runs in a hidden iframe: an embedded frame can
-      only get SharedArrayBuffer when the top page is isolated. First-ever
-      visit: the worker installs and reloads the page once — expected.
-      Force require-corp (credentialless off) for Safari compatibility,
-      matching CheerpX-Bridge. This must load before any other script.
+      (scoped to /Dragon86/ by its file location) stamps them onto our
+      DOCUMENT responses only — subresources pass through untouched
+      (local modification, see the banner in coi-serviceworker.js). This
+      page must be cross-origin isolated because the CheerpX hoster runs
+      in a hidden iframe: an embedded frame can only get SharedArrayBuffer
+      when the top page is isolated. First-ever visit: the worker installs
+      and reloads the page once — expected. Force require-corp
+      (credentialless off) for Safari compatibility, matching
+      CheerpX-Bridge. This must load before any other script.
     -->
     <script>
       window.coi = { coepCredentialless: () => false };
