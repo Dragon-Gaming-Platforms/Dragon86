@@ -79,10 +79,17 @@ export class WindowManager {
   create(opts: WindowOpts): Win {
     const id = this.nextId++;
     const frame = el("div", "d86-window");
-    const width = Math.min(opts.width ?? 720, window.innerWidth - 40);
-    const height = Math.min(opts.height ?? 480, window.innerHeight - 100);
-    const x = opts.x ?? 60 + ((id * 28) % 180);
-    const y = opts.y ?? 40 + ((id * 24) % 140);
+    /* Phone-width screens: open windows as near-fullscreen panels
+       (maximized right after create — see below). */
+    const compact = this.container.clientWidth < 720;
+    const width = compact
+      ? Math.max(280, this.container.clientWidth - 12)
+      : Math.min(opts.width ?? 720, window.innerWidth - 40);
+    const height = compact
+      ? Math.max(220, this.container.clientHeight - 12)
+      : Math.min(opts.height ?? 480, window.innerHeight - 100);
+    const x = compact ? 6 : opts.x ?? 60 + ((id * 28) % 180);
+    const y = compact ? 6 : opts.y ?? 40 + ((id * 24) % 140);
     frame.style.width = `${width}px`;
     frame.style.height = `${height}px`;
     frame.style.left = `${x}px`;
@@ -167,7 +174,8 @@ export class WindowManager {
       }
     });
 
-    /* drag */
+    /* drag — with an 8px threshold so a tap on the title bar
+       (e.g. a missed close button) never grabs the window */
     bar.addEventListener("pointerdown", (e: PointerEvent) => {
       if ((e.target as HTMLElement).closest(".d86-win-controls")) return;
       if (state.maximized) return;
@@ -175,17 +183,24 @@ export class WindowManager {
       const startY = e.clientY;
       const origX = frame.offsetLeft;
       const origY = frame.offsetTop;
+      let dragging = false;
       bar.setPointerCapture(e.pointerId);
       const move = (ev: PointerEvent) => {
-        frame.style.left = `${origX + ev.clientX - startX}px`;
-        frame.style.top = `${Math.max(0, origY + ev.clientY - startY)}px`;
+        const dx = ev.clientX - startX;
+        const dy = ev.clientY - startY;
+        if (!dragging && Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
+        dragging = true;
+        frame.style.left = `${origX + dx}px`;
+        frame.style.top = `${Math.max(0, origY + dy)}px`;
       };
       const up = () => {
         bar.removeEventListener("pointermove", move);
         bar.removeEventListener("pointerup", up);
+        bar.removeEventListener("pointercancel", up);
       };
       bar.addEventListener("pointermove", move);
       bar.addEventListener("pointerup", up);
+      bar.addEventListener("pointercancel", up);
     });
 
     /* resize */
@@ -220,6 +235,7 @@ export class WindowManager {
 
     this.container.append(frame);
     this.focus(id);
+    if (compact) this.toggleMaximize(id);
     this.emit();
     return win;
   }

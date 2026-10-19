@@ -2,7 +2,7 @@
  * Files — file manager over the ZenFS VFS.
  */
 
-import { el, icon } from "../core/dom";
+import { el, icon, attachLongPress } from "../core/dom";
 import { showContextMenu, showConfirm, showInput } from "../core/dialog";
 import * as vfs from "../core/vfs";
 import type { Win } from "../core/wm";
@@ -70,7 +70,7 @@ export function openFiles(win: Win, startPath: string, handlers: FilesHandlers):
     for (const item of sideItems) {
       const b = el("button", "fm-side-item");
       b.innerHTML = icon(item.ic).innerHTML;
-      b.append(` ${item.name}`);
+      b.append(el("span", "side-label", item.name));
       if (item.disabled) {
         b.classList.add("disabled");
         b.title = "Available when the CheerpX engine is connected";
@@ -121,11 +121,9 @@ export function openFiles(win: Win, startPath: string, handlers: FilesHandlers):
         row.classList.add("selected");
       });
       row.addEventListener("dblclick", () => openEntry(entry));
-      row.addEventListener("contextmenu", (e) => {
-        e.preventDefault();
-        e.stopPropagation();
+      const openRowMenu = (x: number, y: number) => {
         row.classList.add("selected");
-        showContextMenu(e.clientX, e.clientY, [
+        showContextMenu(x, y, [
           { label: "Open", iconHtml: icon("file").innerHTML, onClick: () => openEntry(entry) },
           {
             label: "Rename",
@@ -150,6 +148,12 @@ export function openFiles(win: Win, startPath: string, handlers: FilesHandlers):
             },
           },
         ]);
+      };
+      attachLongPress(row, openRowMenu);
+      row.addEventListener("contextmenu", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        openRowMenu(e.clientX, e.clientY);
       });
       list.append(row);
     }

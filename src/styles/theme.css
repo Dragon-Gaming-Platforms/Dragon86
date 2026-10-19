@@ -99,6 +99,7 @@ html,
 body {
   height: 100%;
   overflow: hidden;
+  overscroll-behavior: none;
 }
 
 body {
@@ -108,6 +109,9 @@ body {
   font-size: 15px;
   line-height: 1.5;
   user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  touch-action: manipulation;
 }
 
 ::selection {

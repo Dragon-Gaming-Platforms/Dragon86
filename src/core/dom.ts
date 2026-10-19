@@ -1,5 +1,40 @@
 /** Tiny DOM helpers. */
 
+/**
+ * Long-press → handler (for touch context menus).
+ * Mouse users keep using right-click; this is pointer:finger only.
+ * Cancels on move (>10px) so scrolling never triggers it.
+ */
+export function attachLongPress(
+  node: HTMLElement,
+  handler: (x: number, y: number) => void,
+): void {
+  let timer: number | null = null;
+  let sx = 0;
+  let sy = 0;
+  const cancel = () => {
+    if (timer !== null) {
+      window.clearTimeout(timer);
+      timer = null;
+    }
+  };
+  node.addEventListener("pointerdown", (e: PointerEvent) => {
+    if (e.pointerType === "mouse") return;
+    sx = e.clientX;
+    sy = e.clientY;
+    cancel();
+    timer = window.setTimeout(() => {
+      timer = null;
+      handler(sx, sy);
+    }, 480);
+  });
+  node.addEventListener("pointerup", cancel);
+  node.addEventListener("pointercancel", cancel);
+  node.addEventListener("pointermove", (e: PointerEvent) => {
+    if (Math.abs(e.clientX - sx) > 10 || Math.abs(e.clientY - sy) > 10) cancel();
+  });
+}
+
 export function el<K extends keyof HTMLElementTagNameMap>(
   tag: K,
   className?: string,
