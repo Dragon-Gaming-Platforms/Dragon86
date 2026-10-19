@@ -11,6 +11,7 @@ import {
   WALLPAPERS,
   type ThemeId,
 } from "../core/settings";
+import { DEFAULT_HOSTER_URL } from "../bridge/hoster";
 import * as vfs from "../core/vfs";
 import type { Win } from "../core/wm";
 
@@ -67,21 +68,40 @@ export function openSettings(win: Win): void {
   const row = el("div", "settings-row");
   row.append(el("label", undefined, "Hoster URL"));
   const hosterInput = el("input", "input");
-  hosterInput.placeholder = "https://…/hoster/ (leave empty if not deployed yet)";
+  hosterInput.placeholder = DEFAULT_HOSTER_URL;
   hosterInput.value = getSettings().hosterUrl;
   const saveHost = el("button", "btn", "Save");
   saveHost.addEventListener("click", () => {
     setSettings({ hosterUrl: hosterInput.value.trim() });
+    hosterInput.value = getSettings().hosterUrl;
+    refreshEffective();
     saveHost.textContent = "Saved ✓";
     setTimeout(() => (saveHost.textContent = "Save"), 1500);
   });
-  row.append(hosterInput, saveHost);
+  const defaultHost = el("button", "btn", "Use Default");
+  defaultHost.addEventListener("click", () => {
+    setSettings({ hosterUrl: "" });
+    hosterInput.value = "";
+    refreshEffective();
+  });
+  row.append(hosterInput, saveHost, defaultHost);
+  const effective = el(
+    "div",
+    "settings-note",
+  );
+  const refreshEffective = () => {
+    const custom = getSettings().hosterUrl.trim();
+    effective.textContent = custom
+      ? `Using custom engine: ${custom}`
+      : `Using default engine: ${DEFAULT_HOSTER_URL}`;
+  };
+  refreshEffective();
   const note = el(
     "div",
     "settings-note",
-    "The CheerpX Linux engine runs in its own hoster page and connects to the Terminal over the message bridge. Set this once the hoster repo is deployed; the Terminal will pick it up on Reconnect.",
+    "The CheerpX Linux engine runs in its own hoster page (CheerpX-Bridge) and connects to the Terminal over the message bridge. Leave this empty to use the default above. Changes take effect on the next Terminal Reconnect.",
   );
-  engineSection.append(row, note);
+  engineSection.append(row, effective, note);
 
   /* ---------- System ---------- */
   const systemSection = el("div", "settings-section");
@@ -91,7 +111,12 @@ export function openSettings(win: Win): void {
     ["OS", "Dragon86 0.1.0 (dev build)"],
     ["Vendor", "Dragon Gaming Platforms"],
     ["Terminal", "xterm.js 6 · bridge protocol v1"],
-    ["Engine", getSettings().hosterUrl ? "Configured (unverified)" : "Not connected"],
+    [
+      "Engine",
+      getSettings().hosterUrl.trim()
+        ? `Custom: ${getSettings().hosterUrl.trim()}`
+        : "Default: CheerpX-Bridge (github.io)",
+    ],
     ["Filesystem", "ZenFS · IndexedDB + /tmp in-memory"],
     ["Storage", "Local to this browser — no account, no server"],
     ["Themes", THEMES.map((t) => t.name).join(", ")],

@@ -12,7 +12,7 @@ import "@xterm/xterm/css/xterm.css";
 import { el } from "../core/dom";
 import { getSettings } from "../core/settings";
 import type { Win } from "../core/wm";
-import { getBackend, type TerminalBackend } from "../bridge/hoster";
+import { getBackend, DEFAULT_HOSTER_URL, type TerminalBackend } from "../bridge/hoster";
 
 const GREEN = "\x1b[38;2;46;204;113m";
 const RED = "\x1b[38;2;231;76;60m";
@@ -71,13 +71,13 @@ export function openTerminal(win: Win): void {
     term.writeln(`  ${GREEN}●${RESET} Terminal emulator : ready`);
     term.writeln(`  ${RED}●${RESET} CheerpX engine     : not connected`);
     term.writeln("");
-    term.writeln(`  The engine lives in its own repository (the "hoster") and`);
-    term.writeln(`  connects over the message bridge. To bring this terminal to`);
-    term.writeln(`  life:`);
+    term.writeln(`  The engine lives in the CheerpX-Bridge hoster repo and connects`);
+    term.writeln(`  over the message bridge. It is usually found automatically at:`);
     term.writeln("");
-    term.writeln(`    1. Deploy the CheerpX hoster repo`);
-    term.writeln(`    2. Open ${BOLD}Settings → Engine${RESET}`);
-    term.writeln(`    3. Paste the hoster URL and hit Reconnect`);
+    term.writeln(`    ${BOLD}${DEFAULT_HOSTER_URL}${RESET}`);
+    term.writeln("");
+    term.writeln(`  If it never comes up, check ${BOLD}Settings → Engine${RESET} (a custom`);
+    term.writeln(`  URL overrides the default) and hit ${BOLD}Reconnect${RESET}.`);
     term.writeln("");
     term.writeln(`  ${DIM}Engine protocol: v1 · PTY byte-stream + control channel${RESET}`);
     term.writeln("");
@@ -85,7 +85,7 @@ export function openTerminal(win: Win): void {
   };
 
   const connect = async () => {
-    const url = getSettings().hosterUrl.trim();
+    const url = getSettings().hosterUrl.trim() || DEFAULT_HOSTER_URL;
     backend?.dispose();
     backend = null;
     if (!url) {
@@ -94,19 +94,27 @@ export function openTerminal(win: Win): void {
     }
     setChip("connecting", "Connecting…");
     term.clear();
-    term.writeln(`${DIM}Connecting to hoster: ${url}${RESET}`);
+    term.writeln(`${DIM}Connecting to engine: ${url}${RESET}`);
+    term.writeln(`${DIM}First boot builds the engine and can take ~20 s — later opens are instant.${RESET}`);
     const b = getBackend(url, {
       onData: (data) => term.write(data),
       onStatus: (s) => {
         if (s === "ready") {
           setChip("online", "CheerpX online");
           term.writeln(`${GREEN}Engine handshake complete.${RESET}`);
-          term.writeln(`${DIM}Full bash shell arrives with the hoster's PTY stream.${RESET}`);
-          term.write("\r\n$ ");
+          term.writeln(`${DIM}Debian bash — have fun.${RESET}`);
+          term.write("\r\n");
+          /* Tell the PTY its real size so wrapping and full-screen apps
+             are correct from the very first prompt. */
+          b.resize(term.cols, term.rows);
+          term.focus();
         } else {
           setChip("offline", "Not connected");
-          term.writeln(`${RED}Hoster did not answer the handshake.${RESET}`);
-          term.writeln(`${DIM}Check the URL in Settings → Engine, then hit Reconnect.${RESET}`);
+          term.writeln(`${RED}No answer from the engine yet.${RESET}`);
+          term.writeln(
+            `${DIM}It may still be cold-booting — this message can clear itself,` +
+              ` or hit Reconnect.\x1b[0m`,
+          );
         }
       },
     });
