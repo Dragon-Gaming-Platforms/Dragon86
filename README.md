@@ -66,12 +66,22 @@ Isolation debugging rule: the top OS page must report
 `crossOriginIsolated: true` (after the one-time service-worker reload) before
 the engine inside the iframe can start at all.
 
+**Isolation scope (for future apps):** only the OS *document* carries
+COOP/COEP — the service worker stamps headers on navigation responses only
+and never touches subresource responses. Isolation is still a page-level
+property, so while the OS page is isolated, anything it embeds cross-origin
+must satisfy the document's COEP (`require-corp`: CORS or a
+`Cross-Origin-Resource-Policy` opt-in — the hoster does this). Apps that
+can't meet that can open as their own top-level page/popup instead. If the
+site ever moves to a host that can send real headers, the worker can be
+deleted and nothing else changes.
+
 ## Credits
 
 - Design tokens & themes: [Dragon-Gaming-Platforms](https://github.com/Dragon-Gaming-Platforms/Dragon-Gaming-Platforms) brand stylesheet
 - [ZenFS](https://github.com/zen-fs/core) (LGPL-3.0) — virtual filesystem
 - [xterm.js](https://github.com/xtermjs/xterm.js) (MIT) — terminal emulator
-- [coi-serviceworker](https://github.com/gzuidhof/coi-serviceworker) (MIT, © Guido Zuidhof and contributors) — vendored at `public/coi-serviceworker.js`, license in `third-party/`
+- [coi-serviceworker](https://github.com/gzuidhof/coi-serviceworker) (MIT, © Guido Zuidhof and contributors) — vendored at `public/coi-serviceworker.js` with a local modification: it stamps COOP/COEP **only on document (navigation) responses**, letting all subresources pass through untouched; license in `third-party/`
 - CheerpX is a trademark of Leaning Technologies; engine licensing applies (Community/Commercial)
 
 ## License
