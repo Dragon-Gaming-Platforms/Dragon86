@@ -2,7 +2,7 @@
  * Desktop — wallpaper, icons (app shortcuts + ~/Desktop contents), context menu.
  */
 
-import { el, icon } from "./dom";
+import { el, icon, attachLongPress } from "./dom";
 import { showContextMenu, showInput, type CtxItem } from "./dialog";
 import { getSettings, onSettingsChange } from "./settings";
 import * as vfs from "./vfs";
@@ -99,9 +99,7 @@ export function buildDesktop(apps: AppShortcut[], handlers: DesktopHandlers): vo
       node.classList.add("selected");
     });
     node.addEventListener("dblclick", () => onOpen());
-    node.addEventListener("contextmenu", (e) => {
-      e.preventDefault();
-      e.stopPropagation();
+    const openMenu = (x: number, y: number) => {
       node.classList.add("selected");
       const items: CtxItem[] = [{ label: "Open", iconHtml: icon("file").innerHTML, onClick: onOpen }];
       if (fromVfs && path) {
@@ -115,7 +113,13 @@ export function buildDesktop(apps: AppShortcut[], handlers: DesktopHandlers): vo
           },
         });
       }
-      showContextMenu(e.clientX, e.clientY, items);
+      showContextMenu(x, y, items);
+    };
+    attachLongPress(node, openMenu);
+    node.addEventListener("contextmenu", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      openMenu(e.clientX, e.clientY);
     });
     return node;
   }
