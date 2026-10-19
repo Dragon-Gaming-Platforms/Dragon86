@@ -57,20 +57,38 @@ export function openTerminal(win: Win): void {
   const ro = new ResizeObserver(() => fit.fit());
   ro.observe(termHost);
 
-  /* toolbar: engine status */
-  const engineChip = el("span", "tool-btn");
-  const setChip = (state: "offline" | "connecting" | "online", label: string) => {
-    engineChip.innerHTML = `<span class="status-dot ${state === "online" ? "ok" : state === "connecting" ? "warn" : ""}"></span>${label}`;
+  /* engine status lives in the status bar (bottom) — no toolbar badge */
+  const setChip = (_state: "offline" | "connecting" | "online", label: string) => {
     status.textContent = `Engine: ${label}`;
   };
 
   const reconnectBtn = el("button", "tool-btn", "Reconnect");
+  const saveStateBtn = el("button", "tool-btn", "Save State");
+  saveStateBtn.title = "Save the v86 machine state on this device; the next v86 start resumes from it";
+  saveStateBtn.style.display = "none";
   const openTabBtn = el("button", "tool-btn", "Open Engine Tab");
   openTabBtn.title = "Open (or focus) the separate engine tab";
   openTabBtn.style.display = "none";
   const devBtn = el("button", "tool-btn", "Dev Console");
   devBtn.title = "Toggle the built-in developer console (Eruda)";
-  toolbar.append(engineChip, reconnectBtn, openTabBtn, devBtn);
+  toolbar.append(reconnectBtn, saveStateBtn, openTabBtn, devBtn);
+  saveStateBtn.addEventListener("click", () => {
+    if (!backend?.saveState) return;
+    saveStateBtn.disabled = true;
+    status.textContent = "Engine: saving state…";
+    backend
+      .saveState()
+      .then(() => {
+        status.textContent = "Engine: state saved — the next v86 start resumes here";
+      })
+      .catch((err) => {
+        logWarn("terminal", "save state failed:", err);
+        status.textContent = "Engine: state save failed (see Dev Console)";
+      })
+      .finally(() => {
+        saveStateBtn.disabled = false;
+      });
+  });
 
   /* --- Eruda developer console, contained in this window ---
      Loaded lazily on first click so it costs nothing until needed. It lives
@@ -178,6 +196,7 @@ export function openTerminal(win: Win): void {
   const connect = async () => {
     if (getSettings().engineMode === "v86") {
       openTabBtn.style.display = "none";
+      saveStateBtn.style.display = "";
       logInfo("terminal", "connect mode=v86 (in-page compatibility engine, no isolation needed)");
       backend?.dispose();
       backend = null;
@@ -204,6 +223,7 @@ export function openTerminal(win: Win): void {
       return;
     }
     const url = getSettings().hosterUrl.trim() || DEFAULT_HOSTER_URL;
+    saveStateBtn.style.display = "none";
     const tabMode = getSettings().engineMode === "tab";
     openTabBtn.style.display = tabMode ? "" : "none";
     logInfo(
