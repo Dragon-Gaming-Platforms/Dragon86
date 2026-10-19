@@ -20,6 +20,8 @@
  *    outbound messages are addressed to that origin, never "*".
  */
 
+import { isolationReport, logError, logInfo, logWarn } from "../core/log";
+
 export type BackendStatus = "ready" | "offline";
 
 export interface TerminalBackend {
@@ -70,6 +72,13 @@ class HosterBridge implements TerminalBackend {
   private reportedOffline = false;
   private listening = false;
   private pendingInput: string[] = [];
+  /* --- diagnostics --- */
+  private startedAt = 0;
+  private helloCount = 0;
+  private loadCount = 0;
+  private rxCount = 0;
+  private ignoredCount = 0;
+  private firstDataLogged = false;
 
   constructor(
     url: string,
@@ -87,6 +96,30 @@ class HosterBridge implements TerminalBackend {
     this.reportedOffline = false;
     this.listening = true;
     this.pendingInput = [];
+    this.startedAt = performance.now();
+    this.helloCount = 0;
+    this.loadCount = 0;
+    this.rxCount = 0;
+    this.ignoredCount = 0;
+    this.firstDataLogged = false;
+
+    logInfo("bridge", `connect() → ${this.url}`);
+    logInfo("bridge", "OS page environment:", isolationReport());
+    logInfo(
+      "bridge",
+      `hoster origin=${this.hostOrigin} sameOriginAsOS=${this.hostOrigin === window.location.origin}`,
+    );
+    if (!window.crossOriginIsolated) {
+      logWarn(
+        "bridge",
+        "OS top page is NOT cross-origin isolated. A hidden iframe can only " +
+          "get SharedArrayBuffer if the top page is isolated (COOP/COEP) — " +
+          "watch the iframe probe below: if the iframe also reports " +
+          "crossOriginIsolated=false, the hoster engine never starts and " +
+          "no `ready` will ever arrive. That is a COI problem, not a " +
+          "handshake-timing problem.",
+      );
+    }
 
     const iframe = document.createElement("iframe");
     iframe.src = this.url;
@@ -124,10 +157,22 @@ class HosterBridge implements TerminalBackend {
   private startHello(): void {
     if (this.helloTimer !== null || this.gotReady) return;
     const send = () => {
-      this.iframe?.contentWindow?.postMessage(
-        { v: PROTOCOL_VERSION, t: "hello" } satisfies BridgeMessage,
-        this.hostOrigin,
-      );
+      this.helloCount++;
+      try {
+        this.iframe?.contentWindow?.postMessage(
+          { v: PROTOCOL_VERSION, t: "hello" } satisfies BridgeMessage,
+          this.hostOrigin,
+        );
+      } catch (err) {
+        logError("bridge", "hello postMessage threw:", err);
+      }
+      if (this.helloCount === 1 || this.helloCount % 25 === 0) {
+        logInfo(
+          "bridge",
+          `hello #${this.helloCount} sent → ${this.hostOrigin} ` +
+            `(+${Math.round(performance.now() - this.startedAt)}ms, loads=${this.loadCount}, rx=${this.rxCount})`,
+        );
+      }
     };
     send();
     this.helloTimer = window.setInterval(send, HELLO_INTERVAL_MS);
@@ -140,18 +185,54 @@ class HosterBridge implements TerminalBackend {
     this.loadTimer = null;
   }
 
+  private noteIgnored(reason: string, ev: MessageEvent): void {
+    this.ignoredCount++;
+    if (this.ignoredCount <= 5) {
+      logWarn(
+        "bridge",
+        `ignored message (${reason}) origin=${ev.origin} data=`,
+        ev.data,
+      );
+    }
+  }
+
   private onMessage = (ev: MessageEvent): void => {
     if (!this.listening) return;
-    if (ev.source !== this.iframe?.contentWindow) return;
-    if (ev.origin !== this.hostOrigin) return;
+    if (ev.source !== this.iframe?.contentWindow) {
+      /* Only whisper about plausible bridge traffic, not every stray post. */
+      const d = ev.data as BridgeMessage | null;
+      if (d && typeof d === "object" && d.v === PROTOCOL_VERSION) {
+        this.noteIgnored("source is not our iframe", ev);
+      }
+      return;
+    }
+    if (ev.origin !== this.hostOrigin) {
+      this.noteIgnored(`origin ≠ ${this.hostOrigin}`, ev);
+      return;
+    }
     const msg = ev.data as BridgeMessage | null;
-    if (!msg || msg.v !== PROTOCOL_VERSION) return;
+    if (!msg || msg.v !== PROTOCOL_VERSION) {
+      this.noteIgnored("bad/absent protocol version", ev);
+      return;
+    }
+    this.rxCount++;
     switch (msg.t) {
       case "ready":
+        logInfo(
+          "bridge",
+          `← ready received at +${Math.round(performance.now() - this.startedAt)}ms ` +
+            `(hellos=${this.helloCount}, loads=${this.loadCount})`,
+        );
         this.succeed();
         break;
       case "data":
-        if (typeof msg.d === "string") this.handlers.onData(msg.d);
+        if (typeof msg.d === "string") {
+          if (!this.firstDataLogged) {
+            this.firstDataLogged = true;
+            logInfo("bridge", `← first data chunk (${msg.d.length} chars)`);
+          }
+          this.handlers.onData(msg.d);
+        }
         break;
       case "exit":
         this.handlers.onData(
@@ -171,6 +252,12 @@ class HosterBridge implements TerminalBackend {
   private reportTimeout(): void {
     if (this.gotReady || this.reportedOffline) return;
     this.reportedOffline = true;
+    logWarn(
+      "bridge",
+      `${LOAD_TIMEOUT_MS}ms elapsed with no ready. hellos=${this.helloCount} ` +
+        `loads=${this.loadCount} rx=${this.rxCount} ignored=${this.ignoredCount}. ` +
+        "Still probing — a late ready will recover automatically.",
+    );
     this.handlers.onStatus("offline");
   }
 
