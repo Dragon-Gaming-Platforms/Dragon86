@@ -11,6 +11,9 @@
        frozen into a cache). Navigations are never cached either.
        NOTE: browsers allow only ONE service worker per scope, so this
        cache layer lives in this worker rather than a second registration.
+    3. Navigations into /scramjet/ are exempt from header-stamping:
+       Scramjet needs no isolation, and COEP on its document would block
+       the proxied subframes it serves.
     Page-half registration/reload logic is unmodified upstream. */
 
 let coepCredentialless = false;
@@ -88,6 +91,16 @@ if (typeof window === 'undefined') {
             }
             return;
         }
+
+        // Scramjet exemption: its document must NOT carry COEP. Scramjet
+        // needs no SharedArrayBuffer, and a COEP document makes the
+        // browser block the proxied subframes it serves (they carry no
+        // CORP/COEP of their own) — which is why the Browser only worked
+        // with isolation fully off (engine tab mode). Same-origin embed
+        // under the isolated OS page is still allowed without it.
+        try {
+            if (new URL(r.url).pathname.includes("/scramjet/")) return;
+        } catch { /* fall through and stamp as usual */ }
 
         event.respondWith(
             fetch(r)

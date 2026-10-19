@@ -9,6 +9,7 @@ import { openEditor } from "./editor";
 import { openTerminal } from "./terminal";
 import { openSettings } from "./settings";
 import { openBrowser } from "./browser";
+import { openGames } from "./games";
 
 const TEXT_EXT = /\.(txt|md|log|json|js|ts|css|html|htm|yml|yaml|sh|py|xml|csv|ini|cfg|conf|env)$/i;
 
@@ -55,6 +56,16 @@ export function createLauncher(wm: WindowManager) {
     openBrowser(win);
   }
 
+  function openGamesAt(): void {
+    const win = wm.create({
+      title: "Games — Dragon Gaming Platforms",
+      icon: "games",
+      width: 920,
+      height: 620,
+    });
+    openGames(win);
+  }
+
   function openSettingsAt(): void {
     const win = wm.create({
       title: "Settings",
@@ -79,6 +90,7 @@ export function createLauncher(wm: WindowManager) {
     terminal: () => openTerminalAt(),
     editor: () => openEditorAt(),
     browser: () => openBrowserAt(),
+    games: () => openGamesAt(),
     settings: () => openSettingsAt(),
   };
 
