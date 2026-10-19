@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en" data-theme="dragon">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Dragon86 — a web OS by Dragon Gaming Platforms" />
+    <title>Dragon86</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div id="boot">
+      <div class="boot-logo">
+        <div class="boot-dragon">🐉</div>
+        <h1>DRAGON<span>86</span></h1>
+        <div class="boot-bar"><div class="boot-bar-fill"></div></div>
+        <p class="boot-status">Initializing…</p>
+      </div>
+    </div>
+    <div id="os" hidden>
+      <div id="desktop"></div>
+      <div id="windows"></div>
+      <div id="taskbar"></div>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

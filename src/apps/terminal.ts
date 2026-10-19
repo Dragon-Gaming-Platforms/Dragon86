@@ -1,0 +1,123 @@
+/**
+ * Terminal — xterm.js front end.
+ *
+ * v1 behavior (per spec): show "engine not connected" until a CheerpX hoster
+ * URL is configured in Settings. The bridge protocol lives in bridge/hoster.ts
+ * and is the only thing that changes when the hoster repo lands.
+ */
+
+import { Terminal } from "@xterm/xterm";
+import { FitAddon } from "@xterm/addon-fit";
+import "@xterm/xterm/css/xterm.css";
+import { el } from "../core/dom";
+import { getSettings } from "../core/settings";
+import type { Win } from "../core/wm";
+import { getBackend, type TerminalBackend } from "../bridge/hoster";
+
+const GREEN = "\x1b[38;2;46;204;113m";
+const RED = "\x1b[38;2;231;76;60m";
+const DIM = "\x1b[38;2;102;102;102m";
+const BOLD = "\x1b[1m";
+const RESET = "\x1b[0m";
+
+export function openTerminal(win: Win): void {
+  const root = el("div", "app-root");
+  const toolbar = el("div", "app-toolbar");
+  const status = el("div", "app-statusbar");
+
+  const termHost = el("div", "term-wrap");
+  root.append(toolbar, termHost, status);
+  win.el.append(root);
+
+  const term = new Terminal({
+    fontFamily: '"Cascadia Code", "Fira Code", Consolas, monospace',
+    fontSize: 14,
+    theme: {
+      background: "#050505",
+      foreground: "#f0f0f0",
+      cursor: "#e60012",
+      selectionBackground: "rgba(230,0,18,0.4)",
+    },
+    cursorBlink: true,
+  });
+  const fit = new FitAddon();
+  term.loadAddon(fit);
+  term.open(termHost);
+  requestAnimationFrame(() => fit.fit());
+
+  const ro = new ResizeObserver(() => fit.fit());
+  ro.observe(termHost);
+
+  /* toolbar: engine status */
+  const engineChip = el("span", "tool-btn");
+  const setChip = (state: "offline" | "connecting" | "online", label: string) => {
+    engineChip.innerHTML = `<span class="status-dot ${state === "online" ? "ok" : state === "connecting" ? "warn" : ""}"></span>${label}`;
+    status.textContent = `Engine: ${label}`;
+  };
+
+  const reconnectBtn = el("button", "tool-btn", "Reconnect");
+  toolbar.append(engineChip, reconnectBtn);
+
+  let backend: TerminalBackend | null = null;
+
+  const banner = () => {
+    term.clear();
+    term.writeln(`${BOLD}${RED}  ╔══════════════════════════════════════════╗${RESET}`);
+    term.writeln(`${BOLD}${RED}  ║        DRAGON86  ·  CHEERPX TERMINAL     ║${RESET}`);
+    term.writeln(`${BOLD}${RED}  ╚══════════════════════════════════════════╝${RESET}`);
+    term.writeln("");
+    term.writeln(`  ${DIM}xterm.js is online. The Linux engine is not.${RESET}`);
+    term.writeln("");
+    term.writeln(`  ${GREEN}●${RESET} Terminal emulator : ready`);
+    term.writeln(`  ${RED}●${RESET} CheerpX engine     : not connected`);
+    term.writeln("");
+    term.writeln(`  The engine lives in its own repository (the "hoster") and`);
+    term.writeln(`  connects over the message bridge. To bring this terminal to`);
+    term.writeln(`  life:`);
+    term.writeln("");
+    term.writeln(`    1. Deploy the CheerpX hoster repo`);
+    term.writeln(`    2. Open ${BOLD}Settings → Engine${RESET}`);
+    term.writeln(`    3. Paste the hoster URL and hit Reconnect`);
+    term.writeln("");
+    term.writeln(`  ${DIM}Engine protocol: v1 · PTY byte-stream + control channel${RESET}`);
+    term.writeln("");
+    setChip("offline", "Not connected");
+  };
+
+  const connect = async () => {
+    const url = getSettings().hosterUrl.trim();
+    backend?.dispose();
+    backend = null;
+    if (!url) {
+      banner();
+      return;
+    }
+    setChip("connecting", "Connecting…");
+    term.clear();
+    term.writeln(`${DIM}Connecting to hoster: ${url}${RESET}`);
+    const b = getBackend(url, {
+      onData: (data) => term.write(data),
+      onStatus: (s) => {
+        if (s === "ready") {
+          setChip("online", "CheerpX online");
+          term.writeln(`${GREEN}Engine handshake complete.${RESET}`);
+          term.writeln(`${DIM}Full bash shell arrives with the hoster's PTY stream.${RESET}`);
+          term.write("\r\n$ ");
+        } else {
+          setChip("offline", "Not connected");
+          term.writeln(`${RED}Hoster did not answer the handshake.${RESET}`);
+          term.writeln(`${DIM}Check the URL in Settings → Engine, then hit Reconnect.${RESET}`);
+        }
+      },
+    });
+    backend = b;
+    b.connect();
+  };
+
+  reconnectBtn.addEventListener("click", () => void connect());
+
+  term.onData((data) => backend?.write(data));
+  term.onResize(({ cols, rows }) => backend?.resize(cols, rows));
+
+  void connect();
+}
