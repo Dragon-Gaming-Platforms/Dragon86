@@ -12,7 +12,12 @@ import "@xterm/xterm/css/xterm.css";
 import { el } from "../core/dom";
 import { getSettings } from "../core/settings";
 import type { Win } from "../core/wm";
-import { getBackend, DEFAULT_HOSTER_URL, type TerminalBackend } from "../bridge/hoster";
+import {
+  getBackend,
+  getTabBackend,
+  DEFAULT_HOSTER_URL,
+  type TerminalBackend,
+} from "../bridge/hoster";
 import { isolationReport, logInfo, logWarn } from "../core/log";
 
 const GREEN = "\x1b[38;2;46;204;113m";
@@ -59,9 +64,12 @@ export function openTerminal(win: Win): void {
   };
 
   const reconnectBtn = el("button", "tool-btn", "Reconnect");
+  const openTabBtn = el("button", "tool-btn", "Open Engine Tab");
+  openTabBtn.title = "Open (or focus) the separate engine tab";
+  openTabBtn.style.display = "none";
   const devBtn = el("button", "tool-btn", "Dev Console");
   devBtn.title = "Toggle the built-in developer console (Eruda)";
-  toolbar.append(engineChip, reconnectBtn, devBtn);
+  toolbar.append(engineChip, reconnectBtn, openTabBtn, devBtn);
 
   /* --- Eruda developer console, contained in this window ---
      Loaded lazily on first click so it costs nothing until needed. It lives
@@ -168,6 +176,12 @@ export function openTerminal(win: Win): void {
 
   const connect = async () => {
     const url = getSettings().hosterUrl.trim() || DEFAULT_HOSTER_URL;
+    const tabMode = getSettings().engineMode === "tab";
+    openTabBtn.style.display = tabMode ? "" : "none";
+    logInfo(
+      "terminal",
+      `connect url=${url || "(none)"} mode=${tabMode ? "tab (separate engine tab)" : "embedded (iframe)"} coi=${window.crossOriginIsolated}`,
+    );
     backend?.dispose();
     backend = null;
     if (!url) {
@@ -179,7 +193,12 @@ export function openTerminal(win: Win): void {
     term.writeln(`${DIM}Connecting to engine: ${url}${RESET}`);
     term.writeln(`${DIM}First boot builds the engine and can take ~20 s — later opens are instant.${RESET}`);
     term.writeln(`${DIM}Diagnostics: open the "Dev Console" button above and watch [D86:bridge] logs.${RESET}`);
-    const b = getBackend(url, {
+    if (tabMode) {
+      term.writeln(
+        `${DIM}Engine mode: separate tab. If no engine tab opened, click "Open Engine Tab" above (popup blockers trust direct clicks).${RESET}`,
+      );
+    }
+    const b = (tabMode ? getTabBackend : getBackend)(url, {
       onData: (data) => term.write(filterOutput(data)),
       onStatus: (s) => {
         if (s === "ready") {
@@ -206,6 +225,7 @@ export function openTerminal(win: Win): void {
   };
 
   reconnectBtn.addEventListener("click", () => void connect());
+  openTabBtn.addEventListener("click", () => backend?.openTab?.());
 
   term.onData((data) => backend?.write(data));
   term.onResize(({ cols, rows }) => backend?.resize(cols, rows));

@@ -59,6 +59,19 @@ The Terminal connects to the **CheerpX-Bridge** hoster by default
 (service-worker install + WASM compile + disk connect); later opens are warm
 and fast.
 
+**Engine location toggle (Settings → Engine → "Engine runs"):**
+- **Embedded** (default): hoster in a hidden iframe; Dragon86 itself is
+  cross-origin isolated via the coi-serviceworker.
+- **Separate tab**: the hoster opens as its own browser tab — engine only,
+  no terminal UI over there; the Dragon86 Terminal still renders everything
+  and talks to the tab over a `BroadcastChannel` (`dragon86-hoster-v1`,
+  same v1 messages). In this mode Dragon86's coi-serviceworker is
+  deregistered, so the OS page runs with **no COEP/COOP restrictions**.
+  Switching modes reloads the page (isolation is a document-load property).
+  ⚠️ Tab mode needs the hoster to listen on the BroadcastChannel too —
+  that's a pending CheerpX-Bridge addition; until it lands, tab mode
+  reports "still starting" while embedded mode keeps working.
+
 **Diagnostics:** the Terminal has a **Dev Console** button (Eruda, contained
 in the window). Watch the `[D86:bridge]` logs — especially the *iframe probe*
 line, which reads the embedded hoster's `crossOriginIsolated` directly.
