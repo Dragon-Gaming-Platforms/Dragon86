@@ -14,12 +14,25 @@
     3. Navigations into /scramjet/ are exempt from header-stamping:
        Scramjet needs no isolation, and COEP on its document would block
        the proxied subframes it serves.
+    4. Navigation fetches revalidate (cache: "no-cache"): GitHub Pages
+       serves HTML with max-age=600, so without this a phone can keep
+       running the previous build's page (old app list, old editor) for
+       minutes after a deploy. The asset cache is versioned
+       (dragon86-assets-v2; older versions are deleted on activate).
     Page-half registration/reload logic is unmodified upstream. */
 
 let coepCredentialless = false;
 if (typeof window === 'undefined') {
     self.addEventListener("install", () => self.skipWaiting());
-    self.addEventListener("activate", (event) => event.waitUntil(self.clients.claim()));
+    self.addEventListener("activate", (event) => event.waitUntil((async () => {
+        // Dragon86: drop asset caches from older worker versions so a
+        // deploy never leaves stale static files behind.
+        const keys = await caches.keys();
+        await Promise.all(keys
+            .filter((k) => k.startsWith("dragon86-assets-") && k !== "dragon86-assets-v2")
+            .map((k) => caches.delete(k)));
+        await self.clients.claim();
+    })()));
 
     self.addEventListener("message", (ev) => {
         if (!ev.data) {
@@ -71,7 +84,7 @@ if (typeof window === 'undefined') {
                 const cacheableDest = ["script", "style", "image", "font", "worker", "manifest", ""].includes(r.destination);
                 if (!excluded && cacheableDest) {
                     event.respondWith((async () => {
-                        const cache = await caches.open("dragon86-assets-v1");
+                        const cache = await caches.open("dragon86-assets-v2");
                         const hit = await cache.match(r, { ignoreSearch: false });
                         const network = fetch(r).then((res) => {
                             if (res && res.status === 200) {
@@ -103,7 +116,9 @@ if (typeof window === 'undefined') {
         } catch { /* fall through and stamp as usual */ }
 
         event.respondWith(
-            fetch(r)
+            // cache:"no-cache" = revalidate the HTML with the server
+            // instead of trusting Pages' max-age=600 copy (modification 4).
+            fetch(r, { cache: "no-cache" })
                 .then((response) => {
                     if (response.status === 0) {
                         return response;
