@@ -142,7 +142,8 @@ export function openSettings(win: Win): void {
   systemSection.append(el("h2", undefined, "System"));
   const table = el("table", "about-table");
   const facts: [string, string][] = [
-    ["OS", "Dragon86 0.1.0 (dev build)"],
+    ["OS", "Dragon86 0.2.0 (dev build)"],
+    ["Build", "GUST + Sandstone vendored · Monaco editor"],
     ["Vendor", "Dragon Gaming Platforms"],
     ["Terminal", "xterm.js 6 · bridge protocol v1"],
     [
