@@ -103,6 +103,40 @@ export function openSettings(win: Win): void {
   );
   engineSection.append(row, effective, note);
 
+  /* ---------- Engine location (embedded vs separate tab) ---------- */
+  const modeRow = el("div", "settings-row");
+  modeRow.append(el("label", undefined, "Engine runs"));
+  const embeddedBtn = el("button", "btn", "Embedded (in this page)");
+  const tabBtn = el("button", "btn", "In a separate tab");
+  const refreshModeBtns = () => {
+    const mode = getSettings().engineMode;
+    embeddedBtn.classList.toggle("active", mode === "embedded");
+    tabBtn.classList.toggle("active", mode === "tab");
+  };
+  const setMode = (mode: "embedded" | "tab") => {
+    if (getSettings().engineMode === mode) return;
+    setSettings({ engineMode: mode });
+    refreshModeBtns();
+    modeNote.textContent =
+      mode === "tab"
+        ? "Saved. Reloading — cross-origin isolation will be turned OFF for Dragon86 (the engine tab isolates itself). The Terminal will talk to the engine tab directly; no terminal UI appears over there."
+        : "Saved. Reloading — cross-origin isolation will be turned ON for Dragon86 so the embedded engine can run…";
+    /* Isolation is decided when the document loads, so applying a mode
+       change IS a reload: on the next load index.html tells the coi
+       worker to register (embedded) or deregister (tab). */
+    setTimeout(() => location.reload(), 900);
+  };
+  embeddedBtn.addEventListener("click", () => setMode("embedded"));
+  tabBtn.addEventListener("click", () => setMode("tab"));
+  refreshModeBtns();
+  modeRow.append(embeddedBtn, tabBtn);
+  const modeNote = el(
+    "div",
+    "settings-note",
+    "Embedded: engine hidden inside Dragon86 (default; needs isolation ON for this page). Separate tab: the engine opens as its own browser tab with no terminal UI in it — the Dragon86 Terminal still renders everything — and Dragon86 isolation turns OFF, leaving this page unrestricted for other apps. Switching reloads the page.",
+  );
+  engineSection.append(modeRow, modeNote);
+
   /* ---------- System ---------- */
   const systemSection = el("div", "settings-section");
   systemSection.append(el("h2", undefined, "System"));

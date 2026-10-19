@@ -153,6 +153,11 @@ body {
   cursor: pointer;
   transition: var(--t-fast);
 }
+.btn.active {
+  border-color: var(--theme-primary, #e60012);
+  color: var(--text-primary);
+  box-shadow: inset 0 0 0 1px var(--theme-primary, #e60012);
+}
 .btn:hover {
   color: var(--theme-bright);
   background: rgba(var(--theme-rgb), 0.18);

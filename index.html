@@ -20,7 +20,29 @@
       CheerpX-Bridge. This must load before any other script.
     -->
     <script>
-      window.coi = { coepCredentialless: () => false };
+      /* Dynamic COI: the coi worker is only wanted when the engine runs
+         embedded (Settings → Engine → "Embedded"). In "Separate tab" mode
+         the engine isolates its own top-level tab, so we deregister the
+         worker and Dragon86 runs as a normal, unrestricted page. The mode
+         is read from the same localStorage the OS settings use. Switching
+         modes reloads the page (isolation is decided at document load —
+         there is no mid-session switch), after which this block sees the
+         controlling worker (tab mode → deregister; embedded mode →
+         register) and settles into the right state. */
+      (function () {
+        var tabMode = false;
+        try {
+          var s = JSON.parse(localStorage.getItem("dragon86.settings") || "{}");
+          tabMode = s.engineMode === "tab";
+        } catch (e) {
+          /* no settings yet → embedded default */
+        }
+        window.coi = {
+          coepCredentialless: () => false,
+          shouldRegister: () => !tabMode,
+          shouldDeregister: () => tabMode,
+        };
+      })();
     </script>
     <script src="./coi-serviceworker.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />

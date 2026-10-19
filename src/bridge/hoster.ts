@@ -29,6 +29,8 @@ export interface TerminalBackend {
   write(data: string): void;
   resize(cols: number, rows: number): void;
   dispose(): void;
+  /** Tab mode only: (re)open the separate engine tab. */
+  openTab?: () => void;
 }
 
 export interface BackendHandlers {
@@ -318,4 +320,200 @@ class HosterBridge implements TerminalBackend {
 
 export function getBackend(url: string, handlers: BackendHandlers): TerminalBackend {
   return new HosterBridge(url, handlers);
+}
+
+/* ------------------------------------------------------------------ */
+/* Separate-tab backend                                                */
+/*                                                                     */
+/* The hoster runs as its own top-level browser tab (where it isolates  */
+/* itself — Dragon86 doesn't need to). Same protocol v1 messages, but   */
+/* carried over a BroadcastChannel instead of parent↔iframe             */
+/* postMessage: BroadcastChannel reaches same-origin tabs regardless    */
+/* of COOP context groups (window.opener is severed by the hoster's     */
+/* COOP, so direct postMessage between the tabs is NOT available).      */
+/* The engine tab keeps zero terminal UI — the hoster's status page is  */
+/* all that renders there; xterm stays here in Dragon86.                */
+/*                                                                     */
+/* REQUIRES the hoster to listen on this channel too (CheerpX-Bridge    */
+/* task; see README). Until it does, hello goes unanswered and this     */
+/* behaves exactly like a hoster that never boots.                      */
+/* ------------------------------------------------------------------ */
+
+export const HOSTER_CHANNEL = "dragon86-hoster-v1";
+
+class TabHosterBridge implements TerminalBackend {
+  private channel: BroadcastChannel | null = null;
+  private tab: Window | null = null;
+  private helloTimer: number | null = null;
+  private loadTimer: number | null = null;
+  private helloStopTimer: number | null = null;
+  private gotReady = false;
+  private reportedOffline = false;
+  private listening = false;
+  private pendingInput: string[] = [];
+  private url: string;
+
+  constructor(
+    url: string,
+    private handlers: BackendHandlers,
+  ) {
+    this.url = url;
+  }
+
+  connect(): void {
+    this.teardownChannel();
+    this.gotReady = false;
+    this.reportedOffline = false;
+    this.listening = true;
+    this.pendingInput = [];
+
+    logInfo("bridge", `tab-mode connect() → engine tab: ${this.url}`);
+    logInfo(
+      "bridge",
+      `BroadcastChannel "${HOSTER_CHANNEL}" (same-origin tabs only; ` +
+        `OS origin=${window.location.origin}, OS isolated=${window.crossOriginIsolated} — isolation NOT required in tab mode)`,
+    );
+
+    this.channel = new BroadcastChannel(HOSTER_CHANNEL);
+    this.channel.addEventListener("message", this.onChannelMessage);
+    this.openTab();
+
+    this.helloStopTimer = window.setTimeout(() => {
+      logError("bridge", "tab-mode: HELLO_CAP reached — no answer on channel.");
+      this.stopHello();
+    }, HELLO_CAP_MS);
+    this.startHello();
+    this.armLoadTimer();
+  }
+
+  openTab(): void {
+    if (this.tab && !this.tab.closed) {
+      this.tab.focus();
+      return;
+    }
+    this.tab = window.open(this.url, "_blank");
+    if (!this.tab) {
+      logWarn(
+        "bridge",
+        "tab-mode: window.open was blocked — use the 'Open Engine Tab' button (a direct click always works).",
+      );
+    } else {
+      logInfo("bridge", "tab-mode: engine tab opened.");
+    }
+  }
+
+  private startHello(): void {
+    if (this.helloTimer !== null || this.gotReady) return;
+    const send = () => {
+      if (this.tab && this.tab.closed) {
+        logWarn("bridge", "tab-mode: engine tab was closed — reopen it to reconnect.");
+        this.tab = null;
+      }
+      this.channel?.postMessage({
+        v: PROTOCOL_VERSION,
+        t: "hello",
+      } satisfies BridgeMessage);
+    };
+    send();
+    this.helloTimer = window.setInterval(send, HELLO_INTERVAL_MS);
+  }
+
+  private stopHello(): void {
+    if (this.helloTimer !== null) window.clearInterval(this.helloTimer);
+    this.helloTimer = null;
+    if (this.loadTimer !== null) window.clearTimeout(this.loadTimer);
+    this.loadTimer = null;
+  }
+
+  private armLoadTimer(): void {
+    if (this.loadTimer !== null) window.clearTimeout(this.loadTimer);
+    this.loadTimer = window.setTimeout(() => {
+      if (this.gotReady || this.reportedOffline) return;
+      this.reportedOffline = true;
+      logWarn(
+        "bridge",
+        "tab-mode: no ready on BroadcastChannel yet. Either the engine tab " +
+          "is still booting, it was closed/blocked, or the hoster doesn't " +
+          "listen on the channel yet (CheerpX-Bridge update pending).",
+      );
+      this.handlers.onStatus("offline");
+    }, LOAD_TIMEOUT_MS);
+  }
+
+  private onChannelMessage = (ev: MessageEvent): void => {
+    if (!this.listening) return;
+    const msg = ev.data as BridgeMessage | null;
+    if (!msg || msg.v !== PROTOCOL_VERSION) return;
+    switch (msg.t) {
+      case "ready":
+        logInfo("bridge", "tab-mode: ← ready received over BroadcastChannel");
+        this.succeed();
+        break;
+      case "data":
+        if (typeof msg.d === "string") this.handlers.onData(msg.d);
+        break;
+      case "exit":
+        logInfo("bridge", `tab-mode: ← exit code=${msg.code ?? 0}`);
+        this.handlers.onData(
+          `\r\n\x1b[38;2;231;76;60m[process exited: ${msg.code ?? 0}]\x1b[0m` +
+            `\r\n\x1b[38;2;102;102;102mHit Reconnect to start a new shell.\x1b[0m\r\n`,
+        );
+        break;
+    }
+  };
+
+  private succeed(): void {
+    if (this.gotReady) return;
+    this.gotReady = true;
+    this.stopHello();
+    if (this.helloStopTimer !== null) window.clearTimeout(this.helloStopTimer);
+    this.helloStopTimer = null;
+    if (this.pendingInput.length > 0) {
+      const d = this.pendingInput.join("");
+      this.pendingInput = [];
+      this.channel?.postMessage({ v: PROTOCOL_VERSION, t: "data", d } satisfies BridgeMessage);
+    }
+    this.handlers.onStatus("ready");
+  }
+
+  write(data: string): void {
+    if (!this.gotReady) {
+      this.pendingInput.push(data);
+      return;
+    }
+    this.channel?.postMessage({ v: PROTOCOL_VERSION, t: "data", d: data } satisfies BridgeMessage);
+  }
+
+  resize(cols: number, rows: number): void {
+    this.channel?.postMessage({
+      v: PROTOCOL_VERSION,
+      t: "resize",
+      cols,
+      rows,
+    } satisfies BridgeMessage);
+  }
+
+  private teardownChannel(): void {
+    this.stopHello();
+    if (this.helloStopTimer !== null) window.clearTimeout(this.helloStopTimer);
+    this.helloStopTimer = null;
+    this.channel?.removeEventListener("message", this.onChannelMessage);
+    this.channel?.close();
+    this.channel = null;
+    this.listening = false;
+    this.pendingInput = [];
+    this.gotReady = false;
+    this.reportedOffline = false;
+  }
+
+  dispose(): void {
+    logInfo("bridge", "tab-mode: dispose() (engine tab left open for reuse)");
+    this.teardownChannel();
+    /* Deliberately NOT closing the engine tab: it's fast to reuse, and
+       closing tabs the user can see is rude. It closes with the browser. */
+  }
+}
+
+export function getTabBackend(url: string, handlers: BackendHandlers): TerminalBackend {
+  return new TabHosterBridge(url, handlers);
 }

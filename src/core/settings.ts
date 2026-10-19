@@ -2,10 +2,21 @@
 
 export type ThemeId = "dragon" | "cyberpunk" | "purple" | "matrix" | "amoled" | "sunset";
 
+export type EngineMode = "embedded" | "tab";
+
 export interface Settings {
   theme: ThemeId;
   wallpaper: string;
   hosterUrl: string;
+  /**
+   * Where the CheerpX engine runs:
+   * - "embedded": hidden iframe inside this page. Requires Dragon86 itself
+   *   to be cross-origin isolated (coi-serviceworker ON).
+   * - "tab": hoster opened as its own top-level browser tab (it isolates
+   *   itself); Dragon86 does NOT need isolation, so coi-serviceworker is
+   *   deregistered and the OS page is unrestricted.
+   */
+  engineMode: EngineMode;
 }
 
 const KEY = "dragon86.settings";
@@ -43,6 +54,7 @@ const DEFAULTS: Settings = {
   theme: "dragon",
   wallpaper: "ember",
   hosterUrl: "",
+  engineMode: "embedded",
 };
 
 let current: Settings = load();
