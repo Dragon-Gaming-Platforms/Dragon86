@@ -852,6 +852,24 @@
   height: 100%;
 }
 
+/* Eruda dev console host — contained inside the terminal window, between
+   the xterm surface and the status bar. Eruda renders its own UI inside. */
+.term-devtools {
+  flex: 0 0 46%;
+  min-height: 180px;
+  position: relative;
+  overflow: hidden;
+  border-top: 1px solid var(--border-color);
+  background: #0d1117;
+}
+.term-devtools > div {
+  height: 100%;
+}
+.tool-btn.active {
+  border-color: var(--theme-primary, #e60012);
+  color: var(--text-primary);
+}
+
 /* ---------- Settings ---------- */
 .settings-body {
   flex: 1;

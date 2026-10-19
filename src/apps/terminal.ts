@@ -13,6 +13,7 @@ import { el } from "../core/dom";
 import { getSettings } from "../core/settings";
 import type { Win } from "../core/wm";
 import { getBackend, DEFAULT_HOSTER_URL, type TerminalBackend } from "../bridge/hoster";
+import { isolationReport, logInfo, logWarn } from "../core/log";
 
 const GREEN = "\x1b[38;2;46;204;113m";
 const RED = "\x1b[38;2;231;76;60m";
@@ -26,7 +27,9 @@ export function openTerminal(win: Win): void {
   const status = el("div", "app-statusbar");
 
   const termHost = el("div", "term-wrap");
-  root.append(toolbar, termHost, status);
+  const devHost = el("div", "term-devtools");
+  devHost.style.display = "none";
+  root.append(toolbar, termHost, devHost, status);
   win.el.append(root);
 
   const term = new Terminal({
@@ -56,7 +59,51 @@ export function openTerminal(win: Win): void {
   };
 
   const reconnectBtn = el("button", "tool-btn", "Reconnect");
-  toolbar.append(engineChip, reconnectBtn);
+  const devBtn = el("button", "tool-btn", "Dev Console");
+  devBtn.title = "Toggle the built-in developer console (Eruda)";
+  toolbar.append(engineChip, reconnectBtn, devBtn);
+
+  /* --- Eruda developer console, contained in this window ---
+     Loaded lazily on first click so it costs nothing until needed. It lives
+     inside `devHost` (inside this terminal window only) and captures this
+     page's console — including all [D86:bridge] diagnostics. Note: logs from
+     *inside* the hoster iframe appear in the real browser DevTools console,
+     not in Eruda (which instruments this frame only). */
+  let erudaMod: typeof import("eruda")["default"] | null = null;
+  let devOpen = false;
+  devBtn.addEventListener("click", () => {
+    void (async () => {
+      try {
+        if (!erudaMod) {
+          logInfo("terminal", "loading Eruda dev console…");
+          erudaMod = (await import("eruda")).default;
+          erudaMod.init({
+            container: devHost,
+            tool: ["console", "elements", "network", "resources", "info"],
+            defaults: { theme: "Dark" },
+          });
+          /* Inline inside our panel instead of a floating overlay. */
+          erudaMod.show();
+          logInfo("terminal", "Eruda ready. Environment:", isolationReport());
+        }
+        devOpen = !devOpen;
+        devHost.style.display = devOpen ? "" : "none";
+        devBtn.classList.toggle("active", devOpen);
+        if (devOpen) {
+          erudaMod.show("console");
+          logInfo(
+            "terminal",
+            "Dev Console open — watch for [D86:bridge] lines. " +
+              "Key facts: OS crossOriginIsolated, iframe probe result, " +
+              "hello counts, and any ignored messages.",
+          );
+        }
+        requestAnimationFrame(() => fit.fit());
+      } catch (err) {
+        logWarn("terminal", "Eruda failed to load:", err);
+      }
+    })();
+  });
 
   let backend: TerminalBackend | null = null;
 
@@ -96,6 +143,7 @@ export function openTerminal(win: Win): void {
     term.clear();
     term.writeln(`${DIM}Connecting to engine: ${url}${RESET}`);
     term.writeln(`${DIM}First boot builds the engine and can take ~20 s — later opens are instant.${RESET}`);
+    term.writeln(`${DIM}Diagnostics: open the "Dev Console" button above and watch [D86:bridge] logs.${RESET}`);
     const b = getBackend(url, {
       onData: (data) => term.write(data),
       onStatus: (s) => {
