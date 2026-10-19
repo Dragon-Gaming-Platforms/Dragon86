@@ -870,6 +870,15 @@
   color: var(--text-primary);
 }
 
+/* ---------- Browser ---------- */
+.browser-frame {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  border: 0;
+  background: #fff;
+}
+
 /* ---------- Settings ---------- */
 .settings-body {
   flex: 1;

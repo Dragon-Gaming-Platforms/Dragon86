@@ -8,6 +8,7 @@ import { openFiles } from "./files";
 import { openEditor } from "./editor";
 import { openTerminal } from "./terminal";
 import { openSettings } from "./settings";
+import { openBrowser } from "./browser";
 
 const TEXT_EXT = /\.(txt|md|log|json|js|ts|css|html|htm|yml|yaml|sh|py|xml|csv|ini|cfg|conf|env)$/i;
 
@@ -44,6 +45,16 @@ export function createLauncher(wm: WindowManager) {
     openTerminal(win);
   }
 
+  function openBrowserAt(): void {
+    const win = wm.create({
+      title: "Browser — Scramjet",
+      icon: "browser",
+      width: 900,
+      height: 600,
+    });
+    openBrowser(win);
+  }
+
   function openSettingsAt(): void {
     const win = wm.create({
       title: "Settings",
@@ -67,6 +78,7 @@ export function createLauncher(wm: WindowManager) {
     files: () => openFilesAt(),
     terminal: () => openTerminalAt(),
     editor: () => openEditorAt(),
+    browser: () => openBrowserAt(),
     settings: () => openSettingsAt(),
   };
 

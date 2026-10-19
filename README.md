@@ -13,6 +13,7 @@
 - **Files** — browse/create/rename/delete on a virtual hard drive (ZenFS → IndexedDB)
 - **Text Editor** — open & edit any text file, `Ctrl+S` saves
 - **Terminal** — xterm.js front end, waiting for the **CheerpX** engine (message-bridge protocol v1 is wired)
+- **Browser** — Scramjet web proxy (vendored at `/scramjet/`, iframed by the app; traffic via a configurable Wisp server)
 - **Settings** — six themes (Dragon Red, Cyberpunk, Purple, Matrix, AMOLED, Sunset), wallpapers, engine host URL, factory reset
 
 ## Architecture (the two-repo plan)
@@ -49,7 +50,8 @@ GitHub Actions (`.github/workflows/deploy.yml`) builds and publishes to **GitHub
 2. ~~CheerpX hoster repo~~ ✔ [CheerpX-Bridge](https://github.com/Dragon-Gaming-Platforms/CheerpX-Bridge) (COI + scoped service worker + Debian disk image)
 3. ~~Bridge handshake → real bash in the terminal~~ ✔ wired (default engine URL, cold-boot-aware handshake, late-ready recovery)
 4. Shared Linux folder in the Files app
-5. Multiple terminals / tmux, cloud-drive mounts (ZenFS backends)
+5. ~~Browser app~~ ✔ Scramjet proxy vendored at `/scramjet/` (see `public/scramjet/VENDORED.md`)
+6. Multiple terminals / tmux, cloud-drive mounts (ZenFS backends)
 
 ## Engine
 
@@ -95,6 +97,7 @@ deleted and nothing else changes.
 - [ZenFS](https://github.com/zen-fs/core) (LGPL-3.0) — virtual filesystem
 - [xterm.js](https://github.com/xtermjs/xterm.js) (MIT) — terminal emulator
 - [coi-serviceworker](https://github.com/gzuidhof/coi-serviceworker) (MIT, © Guido Zuidhof and contributors) — vendored at `public/coi-serviceworker.js` with a local modification: it stamps COOP/COEP **only on document (navigation) responses**, letting all subresources pass through untouched; license in `third-party/`
+- [Scramjet](https://github.com/MercuryWorkshop/scramjet) (AGPL-3.0, Mercury Workshop) — web proxy vendored at `public/scramjet/` from its pinned npm builds; license text included there. NOTE: this makes the combined deployed site AGPL-relevant — keep the source link handy.
 - CheerpX is a trademark of Leaning Technologies; engine licensing applies (Community/Commercial)
 
 ## License

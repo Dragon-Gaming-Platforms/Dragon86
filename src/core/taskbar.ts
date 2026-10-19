@@ -149,6 +149,7 @@ export function coreApps(launch: Record<string, () => void>): AppShortcut[] {
     { id: "files", name: "Files", icon: "folder", sub: "Explorer", launch: launch["files"]! },
     { id: "terminal", name: "Terminal", icon: "terminal", sub: "CheerpX", launch: launch["terminal"]! },
     { id: "editor", name: "Text Editor", icon: "editor", sub: "Notes", launch: launch["editor"]! },
+    { id: "browser", name: "Browser", icon: "browser", sub: "Scramjet", launch: launch["browser"]! },
     { id: "settings", name: "Settings", icon: "settings", sub: "System", launch: launch["settings"]! },
   ];
 }
