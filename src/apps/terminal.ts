@@ -107,6 +107,34 @@ export function openTerminal(win: Win): void {
 
   let backend: TerminalBackend | null = null;
 
+  /* Output display filter.
+     The guest's TTY/readline layer (under CheerpX's emulated console)
+     emits a stray TAB at the start of the line before command output,
+     which makes every response look indented. Neither bridge injects it —
+     it arrives in the engine's byte stream. Drop TABs that occur at the
+     very start of a line (start of stream, or right after \r / \n);
+     tabs anywhere else (columnated output) pass through untouched. */
+  let atLineStart = true;
+  let tabNoticeShown = false;
+  const filterOutput = (data: string): string => {
+    let out = "";
+    for (const ch of data) {
+      if (atLineStart && ch === "\t") {
+        if (!tabNoticeShown) {
+          tabNoticeShown = true;
+          logInfo(
+            "terminal",
+            "stripping stray leading TAB from engine output (guest TTY quirk)",
+          );
+        }
+        continue;
+      }
+      out += ch;
+      atLineStart = ch === "\n" || ch === "\r";
+    }
+    return out;
+  };
+
   const banner = () => {
     term.clear();
     term.writeln(`${BOLD}${RED}  ╔══════════════════════════════════════════╗${RESET}`);
@@ -145,7 +173,7 @@ export function openTerminal(win: Win): void {
     term.writeln(`${DIM}First boot builds the engine and can take ~20 s — later opens are instant.${RESET}`);
     term.writeln(`${DIM}Diagnostics: open the "Dev Console" button above and watch [D86:bridge] logs.${RESET}`);
     const b = getBackend(url, {
-      onData: (data) => term.write(data),
+      onData: (data) => term.write(filterOutput(data)),
       onStatus: (s) => {
         if (s === "ready") {
           setChip("online", "CheerpX online");
