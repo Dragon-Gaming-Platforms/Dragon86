@@ -1,8 +1,11 @@
 # <div align="center">Dragon86 </div>
 
 **A web OS by Dragon Gaming Platforms.** No login, no server — the whole desktop lives in your browser's local storage.
-
+<div align="center">
+  
 ![status](https://img.shields.io/badge/status-dev%20build-e60012) ![stack](https://img.shields.io/badge/stack-Vite%20%C2%B7%20TypeScript%20%C2%B7%20ZenFS-2a2a2a)
+
+</div>
 
 ## What's in the box
 
