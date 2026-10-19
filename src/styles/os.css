@@ -118,8 +118,8 @@
   padding-top: max(18px, env(safe-area-inset-top));
 }
 .desktop-icon {
-  width: 92px;
-  padding: 10px 6px 8px;
+  width: 74px;
+  padding: 8px 4px 6px;
   border: 1px solid transparent;
   border-radius: 6px;
   text-align: center;
@@ -136,9 +136,9 @@
   box-shadow: 0 0 15px rgba(var(--theme-rgb), 0.2);
 }
 .desktop-icon .icon {
-  width: 44px;
-  height: 44px;
-  margin: 0 auto 6px;
+  width: 32px;
+  height: 32px;
+  margin: 0 auto 4px;
   color: var(--theme-accent);
   filter: drop-shadow(0 0 8px rgba(var(--theme-rgb), 0.35));
 }
@@ -147,8 +147,42 @@
   height: 100%;
   object-fit: contain;
 }
+
+/* Vendored image icons ("img:…" — see core/dom.ts icon()) */
+.icon img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.start-app .icon {
+  display: inline-flex;
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+}
+.task-btn .icon,
+.d86-titlebar .title-icon {
+  display: inline-flex;
+}
+.task-btn .icon {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+}
+
+/* Generic iframe app error (cross-origin refusal, iframe-app.ts) */
+.iframe-app-error {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  text-align: center;
+  color: var(--text-secondary);
+}
 .desktop-icon .label {
-  font-size: 0.82rem;
+  font-size: 0.76rem;
   font-weight: 600;
   color: var(--text-primary);
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
@@ -1106,17 +1140,21 @@
     height: 20px;
   }
 
-  /* Desktop icons */
+  /* Desktop icons — smaller than desktop (phones: compact homescreen) */
+  .desktop-icons {
+    gap: 2px;
+    padding: 10px;
+  }
   .desktop-icon {
-    width: 100px;
-    padding: 12px 6px 10px;
+    width: 66px;
+    padding: 7px 3px 5px;
   }
   .desktop-icon .icon {
-    width: 52px;
-    height: 52px;
+    width: 28px;
+    height: 28px;
   }
   .desktop-icon .label {
-    font-size: 0.9rem;
+    font-size: 0.72rem;
     white-space: normal;
     display: -webkit-box;
     -webkit-line-clamp: 2;

@@ -2,9 +2,10 @@
  * Taskbar + Start menu.
  */
 
-import { el, icon, ICONS } from "./dom";
+import { el, icon } from "./dom";
 import { getSettings, onSettingsChange, THEMES, setSettings } from "./settings";
 import type { WindowManager } from "./wm";
+import { IFRAME_APPS } from "../apps/iframe-app";
 
 export interface AppShortcut {
   id: string;
@@ -71,9 +72,7 @@ export function buildTaskbar(wm: WindowManager, apps: AppShortcut[]): void {
     const list = el("div", "start-apps");
     for (const app of apps) {
       const b = el("button", "start-app");
-      const ic = el("span");
-      ic.innerHTML = ICONS[app.icon] ?? ICONS.file;
-      b.append(ic.firstChild ?? ic, el("span", undefined, app.name));
+      b.append(icon(app.icon), el("span", undefined, app.name));
       if (app.sub) b.append(el("span", "app-sub", app.sub));
       b.addEventListener("click", () => {
         closeStart();
@@ -125,9 +124,7 @@ export function buildTaskbar(wm: WindowManager, apps: AppShortcut[]): void {
       const b = el("button", "task-btn");
       if (w.focused && !w.minimized) b.classList.add("active");
       if (w.minimized) b.classList.add("minimized");
-      const ic = el("span");
-      ic.innerHTML = ICONS[w.icon] ?? ICONS.file;
-      b.append(ic.firstChild ?? ic, el("span", "label", w.title));
+      b.append(icon(w.icon), el("span", "label", w.title));
       b.title = w.title;
       b.addEventListener("click", () => {
         const handle = wm.getWindows().find((h) => h.id === w.id);
@@ -143,14 +140,20 @@ export function buildTaskbar(wm: WindowManager, apps: AppShortcut[]): void {
   });
 }
 
-/** The four primary apps shown in the start menu / desktop. */
+/** Primary apps shown in the start menu / desktop: built-ins, then the
+ *  JSON-defined iframe apps (src/apps/iframe-apps.json), then Settings. */
 export function coreApps(launch: Record<string, () => void>): AppShortcut[] {
   return [
     { id: "files", name: "Files", icon: "folder", sub: "Explorer", launch: launch["files"]! },
     { id: "terminal", name: "Terminal", icon: "terminal", sub: "CheerpX", launch: launch["terminal"]! },
     { id: "editor", name: "Text Editor", icon: "editor", sub: "Notes", launch: launch["editor"]! },
-    { id: "browser", name: "Browser", icon: "browser", sub: "Scramjet", launch: launch["browser"]! },
-    { id: "games", name: "Games", icon: "games", sub: "Dragon Gaming Platforms", launch: launch["games"]! },
+    ...IFRAME_APPS.map((def) => ({
+      id: def.id,
+      name: def.name,
+      icon: def.icon,
+      sub: def.sub,
+      launch: launch[def.id]!,
+    })),
     { id: "settings", name: "Settings", icon: "settings", sub: "System", launch: launch["settings"]! },
   ];
 }

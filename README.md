@@ -13,8 +13,18 @@
 - **Files** — browse/create/rename/delete on a virtual hard drive (ZenFS → IndexedDB)
 - **Text Editor** — open & edit any text file, `Ctrl+S` saves
 - **Terminal** — xterm.js front end, waiting for the **CheerpX** engine (message-bridge protocol v1 is wired)
-- **Browser** — Scramjet web proxy (vendored at `/scramjet/`, iframed by the app; traffic via a configurable Wisp server)
-- **Games** — the Dragon Gaming Platforms catalog player (`cdn.singlefile.html`), iframed live from the org's GitHub Pages site
+- **Scramjet** — web proxy (vendored at `/scramjet/`; traffic via a configurable Wisp server), a JSON-defined iframe app
+- **Dragon Gaming Platforms** — the org catalog player (`cdn.singlefile.html`), iframed live from the org's GitHub Pages site, also a JSON-defined iframe app
+
+### Adding an iframe app
+
+Add **one entry** to `src/apps/iframe-apps.json` — no other code. Fields:
+`id`, `name`, `sub`, `url` (relative to the OS base for vendored pages
+under `public/`, or an absolute **same-origin** URL — cross-origin entries
+are refused at runtime), `icon` (a built-in icon name, or
+`"img:icons/<file>.png"` for a vendored image in `public/icons/`), and
+optional `width`/`height`/`status`. The app appears on the desktop and in
+the start menu automatically. See `src/apps/iframe-app.ts` for details.
 - **Settings** — six themes (Dragon Red, Cyberpunk, Purple, Matrix, AMOLED, Sunset), wallpapers, engine host URL, factory reset
 
 ## Architecture (the two-repo plan)

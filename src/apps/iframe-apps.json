@@ -1,0 +1,22 @@
+[
+  {
+    "id": "scramjet",
+    "name": "Scramjet",
+    "sub": "Web proxy",
+    "url": "scramjet/",
+    "icon": "img:icons/scramjet.png",
+    "width": 900,
+    "height": 600,
+    "status": "Scramjet: traffic routes via the Wisp server set in the page's ⚙ panel"
+  },
+  {
+    "id": "dragon-gaming",
+    "name": "Dragon Gaming Platforms",
+    "sub": "Games catalog",
+    "url": "https://dragon-gaming-platforms.github.io/Dragon-Gaming-Platforms/cdn.singlefile.html",
+    "icon": "img:icons/dragon-gaming.png",
+    "width": 920,
+    "height": 620,
+    "status": "Dragon Gaming Platforms: catalog live from the org site"
+  }
+]

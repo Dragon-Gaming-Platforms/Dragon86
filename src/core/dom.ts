@@ -48,6 +48,15 @@ export function el<K extends keyof HTMLElementTagNameMap>(
 
 export function icon(name: string, className?: string): HTMLElement {
   const wrap = el("span", `icon ${className ?? ""}`.trim());
+  if (name.startsWith("img:")) {
+    /* Vendored image icon (e.g. "img:icons/scramjet.png" → public/icons/…). */
+    const img = document.createElement("img");
+    img.src = `${import.meta.env.BASE_URL}${name.slice(4)}`;
+    img.alt = "";
+    img.draggable = false;
+    wrap.append(img);
+    return wrap;
+  }
   wrap.innerHTML = ICONS[name] ?? ICONS.file;
   return wrap;
 }
