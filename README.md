@@ -46,10 +46,18 @@ GitHub Actions (`.github/workflows/deploy.yml`) builds and publishes to **GitHub
 ## Roadmap
 
 1. ~~Core OS shell~~ ✔ desktop, WM, files, editor, settings, terminal chrome
-2. CheerpX hoster repo (COI + scoped service worker + disk image pipeline)
-3. Bridge handshake → real bash in the terminal
+2. ~~CheerpX hoster repo~~ ✔ [CheerpX-Bridge](https://github.com/Dragon-Gaming-Platforms/CheerpX-Bridge) (COI + scoped service worker + Debian disk image)
+3. ~~Bridge handshake → real bash in the terminal~~ ✔ wired (default engine URL, cold-boot-aware handshake, late-ready recovery)
 4. Shared Linux folder in the Files app
 5. Multiple terminals / tmux, cloud-drive mounts (ZenFS backends)
+
+## Engine
+
+The Terminal connects to the **CheerpX-Bridge** hoster by default
+(`https://dragon-gaming-platforms.github.io/CheerpX-Bridge/`). Override it in
+**Settings → Engine** for development. First cold boot can take ~20 seconds
+(service-worker install + WASM compile + disk connect); later opens are warm
+and fast.
 
 ## Credits
 
