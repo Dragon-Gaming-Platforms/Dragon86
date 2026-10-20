@@ -90,8 +90,8 @@ and fast.
   ⚠️ Tab mode needs the hoster to listen on the BroadcastChannel too —
   that's a pending CheerpX-Bridge addition; until it lands, tab mode
   reports "still starting" while embedded mode keeps working.
-- **v86 (compatibility)**: a tiny Linux (vendored v86 emulator + Alpine
-  kernel + busybox utilities + a genuine GNU bash shell, `public/v86/`)
+- **v86 (compatibility)**: a tiny Linux (vendored v86 emulator + Arch
+  Linux 32 kernel + Arch's genuine GNU bash and coreutils, `public/v86/`)
   boots right inside the Dragon86 page — no isolation, no hoster, no
   service worker, so it runs in Android WebView and similar places the
   CheerpX modes can't. Slower and smaller than CheerpX, but its
