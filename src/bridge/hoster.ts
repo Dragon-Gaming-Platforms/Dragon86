@@ -10,6 +10,14 @@
  *   OS  → hoster : { v:1, t: "resize", cols, rows }
  *   hoster → OS  : { v:1, t: "exit",   code }
  *
+ * Protocol v2 adds the shared filesystem (capability "fs1"): the OS
+ * advertises `caps: ["fs1"]` on hello; a hoster that echoes "fs1" in
+ * its ready's caps may then send { v:2, t:"fs-req", … } file requests,
+ * served from the OS filesystem (guest /home/user/shared ↔ OS
+ * /home/user) and answered with { v:2, t:"fs-res", … }. Spec:
+ * docs/cheerpx-fs-protocol.md; server: bridge/fs-bridge.ts. v1 hosters
+ * simply never send fs-req, so this is fully backward compatible.
+ *
  * Hardened per the hoster's integration notes:
  *  - The handshake budget RESETS whenever the iframe reloads (the
  *    coi-serviceworker takes control on first visit and reloads the page —
@@ -21,6 +29,8 @@
  */
 
 import { isolationReport, logError, logInfo, logWarn } from "../core/log";
+import * as vfs from "../core/vfs";
+import { createFsResponder, type FsRequest } from "./fs-bridge";
 
 export type BackendStatus = "ready" | "offline";
 
@@ -38,6 +48,8 @@ export interface TerminalBackend {
 export interface BackendHandlers {
   onData: (data: string) => void;
   onStatus: (s: BackendStatus) => void;
+  /** CheerpX only: the hoster confirmed the fs1 shared folder is live. */
+  onFsLive?: () => void;
 }
 
 /** Production hoster (CheerpX-Bridge project site). */
@@ -64,9 +76,13 @@ interface BridgeMessage {
   cols?: number;
   rows?: number;
   code?: number;
+  /** Protocol-v2 capability list ("fs1" = shared filesystem). */
+  caps?: string[];
 }
 
 class HosterBridge implements TerminalBackend {
+  private fsRespond = createFsResponder(vfs.HOME);
+  private fsLive = false;
   private iframe: HTMLIFrameElement | null = null;
   private helloTimer: number | null = null;
   private loadTimer: number | null = null;
@@ -98,6 +114,7 @@ class HosterBridge implements TerminalBackend {
     this.teardown();
     this.gotReady = false;
     this.reportedOffline = false;
+    this.fsLive = false;
     this.listening = true;
     this.pendingInput = [];
     this.startedAt = performance.now();
@@ -164,7 +181,7 @@ class HosterBridge implements TerminalBackend {
       this.helloCount++;
       try {
         this.iframe?.contentWindow?.postMessage(
-          { v: PROTOCOL_VERSION, t: "hello" } satisfies BridgeMessage,
+          { v: PROTOCOL_VERSION, t: "hello", caps: ["fs1"] } satisfies BridgeMessage,
           this.hostOrigin,
         );
       } catch (err) {
@@ -214,7 +231,16 @@ class HosterBridge implements TerminalBackend {
       this.noteIgnored(`origin ≠ ${this.hostOrigin}`, ev);
       return;
     }
-    const msg = ev.data as BridgeMessage | null;
+    const raw = ev.data as (BridgeMessage | FsRequest) | null;
+    /* Protocol v2 file service: answered from ZenFS, whatever the
+       terminal state — the hoster may sync files before bash is up. */
+    if (raw && raw.v === 2 && raw.t === "fs-req") {
+      void this.fsRespond(raw as FsRequest).then((res) =>
+        this.iframe?.contentWindow?.postMessage(res, this.hostOrigin),
+      );
+      return;
+    }
+    const msg = raw as BridgeMessage | null;
     if (!msg || msg.v !== PROTOCOL_VERSION) {
       this.noteIgnored("bad/absent protocol version", ev);
       return;
@@ -227,6 +253,7 @@ class HosterBridge implements TerminalBackend {
           `← ready received at +${Math.round(performance.now() - this.startedAt)}ms ` +
             `(hellos=${this.helloCount}, loads=${this.loadCount})`,
         );
+        if (msg.caps?.includes("fs1")) this.noteFsLive();
         this.succeed();
         break;
       case "data":
@@ -246,6 +273,13 @@ class HosterBridge implements TerminalBackend {
         break;
     }
   };
+
+  private noteFsLive(): void {
+    if (this.fsLive) return;
+    this.fsLive = true;
+    logInfo("bridge", "hoster confirmed fs1: guest /home/user/shared is the OS filesystem");
+    this.handlers.onFsLive?.();
+  }
 
   /**
    * Timeout: report "still starting", but KEEP hello-ing — the hoster only
@@ -344,6 +378,8 @@ export function getBackend(url: string, handlers: BackendHandlers): TerminalBack
 export const HOSTER_CHANNEL = "dragon86-hoster-v1";
 
 class TabHosterBridge implements TerminalBackend {
+  private fsRespond = createFsResponder(vfs.HOME);
+  private fsLive = false;
   private channel: BroadcastChannel | null = null;
   private tab: Window | null = null;
   private helloTimer: number | null = null;
@@ -366,6 +402,7 @@ class TabHosterBridge implements TerminalBackend {
     this.teardownChannel();
     this.gotReady = false;
     this.reportedOffline = false;
+    this.fsLive = false;
     this.listening = true;
     this.pendingInput = [];
 
@@ -414,6 +451,7 @@ class TabHosterBridge implements TerminalBackend {
       this.channel?.postMessage({
         v: PROTOCOL_VERSION,
         t: "hello",
+        caps: ["fs1"],
       } satisfies BridgeMessage);
     };
     send();
@@ -444,11 +482,22 @@ class TabHosterBridge implements TerminalBackend {
 
   private onChannelMessage = (ev: MessageEvent): void => {
     if (!this.listening) return;
-    const msg = ev.data as BridgeMessage | null;
+    const raw = ev.data as (BridgeMessage | FsRequest) | null;
+    /* Protocol v2 file service (see HosterBridge). */
+    if (raw && raw.v === 2 && raw.t === "fs-req") {
+      void this.fsRespond(raw as FsRequest).then((res) => this.channel?.postMessage(res));
+      return;
+    }
+    const msg = raw as BridgeMessage | null;
     if (!msg || msg.v !== PROTOCOL_VERSION) return;
     switch (msg.t) {
       case "ready":
         logInfo("bridge", "tab-mode: ← ready received over BroadcastChannel");
+        if (msg.caps?.includes("fs1") && !this.fsLive) {
+          this.fsLive = true;
+          logInfo("bridge", "tab-mode: hoster confirmed fs1: guest /home/user/shared is the OS filesystem");
+          this.handlers.onFsLive?.();
+        }
         this.succeed();
         break;
       case "data":
