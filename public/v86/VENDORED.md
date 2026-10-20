@@ -11,17 +11,23 @@ Contents and provenance:
   `LICENSE.v86`.
 - `bios/seabios.bin`, `bios/vgabios.bin` — from copy/v86 `bios/`.
   SeaBIOS is LGPLv3, see `LICENSE.seabios`.
-- `bzImage` — Alpine Linux 6.12.94 `vmlinuz-virt` (GPL-2.0; source via
-  Alpine's kernel package / kernel.org), extracted from the upstream
-  v86 Alpine image set (fs.json + sha256 flat store).
-- `initrd.gz` — built by Dragon86 from Alpine's initramfs: busybox
-  (GPL-2.0; source via Alpine aports) for the core utilities, the
-  virtio-9p kernel modules, and **GNU bash 5.3 as the login shell** —
-  cross-compiled from the GNU bash mirror with
-  `zig cc -target x86-linux-musl -static`. Our `/init` loads the 9p
-  modules, mounts the host share at `/shared`, sizes the serial line
-  from the kernel cmdline (`d86cols`/`d86rows` — serial has no winsize
-  channel), and spawns bash on ttyS0.
+- `bzImage` — Arch Linux 32 kernel `vmlinuz-linux` 6.12.4-arch1-1.0
+  (GPL-2.0; source via the Arch Linux 32 kernel package / kernel.org),
+  taken from the copy/v86 Arch demo image set (fs.json + sha256 flat
+  store). Despite the filename (kept so the loader config doesn't
+  change), this is the Arch `vmlinuz`, not a bzImage we built.
+- `initrd.gz` — built by Dragon86 from the Arch mkinitcpio initramfs:
+  its busybox (GPL-2.0) and the virtio/9p kernel modules, plus a
+  userland subset extracted from the same Arch demo rootfs — **GNU
+  bash 5.2.32 and GNU coreutils 9.5 with their glibc closure**, so the
+  guest shell is Arch's own bash, not a reimplementation. This is a
+  subset, not the full ~843 MB Arch installation (that can't be
+  vendored into GitHub Pages): no pacman, no systemd, no desktop —
+  the kernel, shell, and core file tools. Our `/init` loads the
+  virtio PCI + 9p modules, mounts the host share at `/shared` in the
+  background (the virtio probe finishes after init under emulation),
+  sizes the serial line from the kernel cmdline (`d86cols`/`d86rows`
+  — serial has no winsize channel), and spawns bash on ttyS0.
 
 ## The filesystem: a real 9p server, not a sync
 

@@ -1,8 +1,9 @@
 /**
  * v86 backend — the Terminal's compatibility engine.
  *
- * Runs the vendored v86 emulator (public/v86/: npm `v86`, SeaBIOS, Alpine
- * 6.12 kernel + our busybox/GNU-bash initrd) directly in this page. Unlike
+ * Runs the vendored v86 emulator (public/v86/: npm `v86`, SeaBIOS, Arch
+ * Linux 32 6.12 kernel + initrd with Arch's GNU bash/coreutils) directly
+ * in this page. Unlike
  * CheerpX it needs no cross-origin isolation and no service worker, so it
  * works in Android WebView and other locked-down browsers.
  *

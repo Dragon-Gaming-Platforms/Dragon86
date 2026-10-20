@@ -147,7 +147,7 @@ export function openSettings(win: Win): void {
   systemSection.append(el("h2", undefined, "System"));
   const table = el("table", "about-table");
   const facts: [string, string][] = [
-    ["OS", "Dragon86 0.4.0 (dev build)"],
+    ["OS", "Dragon86 0.5.0 (dev build)"],
     ["Build", "GUST + Sandstone vendored · Monaco editor · v86 (bash guest, live 9p share, save state)"],
     ["Engines", "CheerpX (embedded / separate tab) · v86 (compatibility, /shared = Files)"],
     ["Vendor", "Dragon Gaming Platforms"],
