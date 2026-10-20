@@ -29,6 +29,16 @@ Contents and provenance:
   sizes the serial line from the kernel cmdline (`d86cols`/`d86rows`
   — serial has no winsize channel), and spawns bash on ttyS0.
 
+## Boot configuration
+
+The emulator is started with ACPI enabled so Linux receives v86's
+interrupt/CPU tables instead of falling back to SeaBIOS's incomplete
+MP table (which otherwise causes RSDP, MP-table and IOAPIC warnings).
+The kernel command line also blacklists `mcheck_init_device`: v86's
+CPU has no machine-check hardware for the Arch kernel to initialize.
+These warnings did not prevent booting, but the guest now boots
+without them; the shared-folder boot was retested after the change.
+
 ## The filesystem: a real 9p server, not a sync
 
 The guest's `/shared` **is** the Dragon86 filesystem (`/home/user`),
