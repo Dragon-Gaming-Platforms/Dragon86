@@ -17,10 +17,13 @@
  *
  * State: "Save State" (Terminal toolbar) snapshots the whole machine
  * (v86 save_state) into IndexedDB, gzip-compressed — far beyond
- * localStorage's ~5 MB, so IndexedDB is the on-device store used. On
- * the next v86 start the snapshot is passed as initial_state and the
- * session resumes where it left off; the 9p server treats unknown fids
- * as the share root, so the restored guest's mount heals itself.
+ * localStorage's ~5 MB, so IndexedDB is the on-device store used. A
+ * normal v86 start passes the snapshot as initial_state and resumes
+ * where it left off; the 9p server treats unknown fids as the share
+ * root, so the restored guest's mount heals itself. The Terminal's
+ * Reconnect button deliberately requests a fresh boot from the guest
+ * image instead, leaving any saved snapshot untouched for a later
+ * normal start.
  */
 
 import * as vfs from "../core/vfs";
@@ -118,7 +121,10 @@ class V86Backend implements TerminalBackend {
   private startTimer: ReturnType<typeof setTimeout> | null = null;
   private nudgeTimer: ReturnType<typeof setInterval> | null = null;
 
-  constructor(private handlers: BackendHandlers) {}
+  constructor(
+    private handlers: BackendHandlers,
+    private freshBoot = false,
+  ) {}
 
   connect(): void {
     /* The guest's serial size rides the kernel cmdline, so give the
@@ -138,7 +144,10 @@ class V86Backend implements TerminalBackend {
   private async start(): Promise<void> {
     this.startTimer = null;
     try {
-      const [V86, saved] = await Promise.all([loadLib(), loadSavedState()]);
+      const [V86, saved] = await Promise.all([
+        loadLib(),
+        this.freshBoot ? Promise.resolve(null) : loadSavedState(),
+      ]);
       if (this.disposed) return;
       const opts: Record<string, unknown> = {
         wasm_path: `${BASE}v86.wasm`,
@@ -158,7 +167,7 @@ class V86Backend implements TerminalBackend {
         opts.bzimage = { url: `${BASE}bzImage` };
         opts.initrd = { url: `${BASE}initrd.gz` };
         opts.cmdline = `console=ttyS0 tsc=reliable d86cols=${this.cols} d86rows=${this.rows}`;
-        logInfo("v86", "cold-booting guest");
+        logInfo("v86", this.freshBoot ? "cold-booting guest from image (Reconnect)" : "cold-booting guest");
       }
       const emu = new V86(opts);
       this.emu = emu;
@@ -252,6 +261,9 @@ class V86Backend implements TerminalBackend {
   }
 }
 
-export function getV86Backend(handlers: BackendHandlers): TerminalBackend {
-  return new V86Backend(handlers);
+export function getV86Backend(
+  handlers: BackendHandlers,
+  freshBoot = false,
+): TerminalBackend {
+  return new V86Backend(handlers, freshBoot);
 }
