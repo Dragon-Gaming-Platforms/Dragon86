@@ -33,15 +33,18 @@ import concurrent.futures
 import json
 import os
 import sys
+import time
 import urllib.request
 
 BASE = os.environ.get("V86_IMAGE_BASE", "https://i.copy.sh/")
 ARCH = os.environ.get("V86_ARCH_DIR", "arch")
 
 
-def fetch(url, dest=None, retries=3):
+def fetch(url, dest=None, retries=5):
     last = None
-    for _ in range(retries):
+    for attempt in range(retries):
+        if attempt:
+            time.sleep(2 ** attempt)  # 2s, 4s, 8s, 16s
         try:
             req = urllib.request.Request(url, headers={"User-Agent": "dragon86-mirror/1"})
             with urllib.request.urlopen(req, timeout=120) as res:

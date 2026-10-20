@@ -1,4 +1,14 @@
-# Copy into the image repo as .github/workflows/mirror.yml
+# Save this file in the image repo at exactly:
+#
+#     .github/workflows/mirror.yml
+#
+# (the .github folder is hidden — on github.com use "Add file → Create new
+# file" and type the full path including .github/workflows/, which creates
+# the folders for you).
+#
+# It expects mirror.py next to the repo root, i.e. <repo>/mirror.py, and
+# calls it with a relative path ("python3 mirror.py site"), which resolves
+# against the checkout root.
 #
 # Downloads copy/v86's Arch Linux filesystem image (fs.json + the
 # content-addressed blob store) and publishes it to GitHub Pages, so
@@ -13,7 +23,7 @@ on:
   workflow_dispatch:
     inputs:
       source:
-        description: "Image root (fs.json lives here)"
+        description: "Image root (the directory holding fs.json), with trailing slash"
         default: "https://i.copy.sh/"
         required: true
 
@@ -35,14 +45,25 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Check the layout
+        run: |
+          ls -l mirror.py
+          pwd
+
       - name: Download the image
         env:
           V86_IMAGE_BASE: ${{ inputs.source }}
+          JOBS: "16"
         run: |
           python3 mirror.py site
           du -sh site
           ls -l site/fs.json
-          ls site/arch | wc -l
+          echo "blobs: $(ls site/arch | wc -l)"
+          # Pages refuses single files over 100 MB; surface that here
+          # rather than in the deploy step.
+          find site -type f -size +100M -print
+
+      - uses: actions/configure-pages@v5
 
       - uses: actions/upload-pages-artifact@v3
         with:
@@ -50,3 +71,8 @@ jobs:
 
       - id: deploy
         uses: actions/deploy-pages@v4
+
+      - name: Where it landed
+        run: |
+          echo "fs.json: ${{ steps.deploy.outputs.page_url }}fs.json"
+          echo "blobs:   ${{ steps.deploy.outputs.page_url }}arch/"
