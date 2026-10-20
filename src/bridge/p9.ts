@@ -320,11 +320,34 @@ export function createP9Handler(
         }
         case 26: { // Tlsetattr
           const fid = r.u32(), valid = r.u32();
-          r.u32(); r.u32(); r.u32();
+          const mode = r.u32();
+          r.u32(); r.u32(); // uid, gid — share is single-user, ignore
           const size = r.u64();
-          r.u64(); r.u64(); r.u64(); r.u64(); r.u64(); r.u64();
+          const atimeSec = r.u64(), atimeNsec = r.u64();
+          const mtimeSec = r.u64(), mtimeNsec = r.u64();
           const f = getFid(fid);
+          /* valid bits (9p2000.L): MODE=1 SIZE=8 ATIME=16 MTIME=32
+             ATIME_SET=128 MTIME_SET=256. A previous version read two
+             u64s too many here, ran off the packet, and turned every
+             chmod/touch/truncate into EIO. */
+          if (valid & 0x1) {
+            const st = await fsImpl.stat(f.path);
+            /* Guest mode may or may not carry file-type bits; keep the
+               real ones, take the permission bits from the guest. */
+            await fsImpl.chmod(f.path, (st.mode & 0o170000) | (mode & 0o7777));
+          }
           if (valid & 0x8) await fsImpl.truncate(f.path, size); // SIZE
+          if (valid & 0xf0) {
+            const st = await fsImpl.stat(f.path);
+            const now = new Date();
+            const atime = valid & 0x80
+              ? new Date(atimeSec * 1000 + atimeNsec / 1e6)
+              : valid & 0x10 ? now : st.atime;
+            const mtime = valid & 0x100
+              ? new Date(mtimeSec * 1000 + mtimeNsec / 1e6)
+              : valid & 0x20 ? now : st.mtime;
+            await fsImpl.utimes(f.path, atime, mtime);
+          }
           return new Writer().build(27, tag);
         }
         case 116: { // Tread
