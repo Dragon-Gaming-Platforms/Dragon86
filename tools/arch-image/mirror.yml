@@ -1,0 +1,52 @@
+# Copy into the image repo as .github/workflows/mirror.yml
+#
+# Downloads copy/v86's Arch Linux filesystem image (fs.json + the
+# content-addressed blob store) and publishes it to GitHub Pages, so
+# Dragon86's v86 engine can boot a full Arch guest with root=host9p.
+#
+# Run it by hand from the Actions tab: it is a one-off mirror, not a
+# per-commit build.
+
+name: Mirror Arch image
+
+on:
+  workflow_dispatch:
+    inputs:
+      source:
+        description: "Image root (fs.json lives here)"
+        default: "https://i.copy.sh/"
+        required: true
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download the image
+        env:
+          V86_IMAGE_BASE: ${{ inputs.source }}
+        run: |
+          python3 mirror.py site
+          du -sh site
+          ls -l site/fs.json
+          ls site/arch | wc -l
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+      - id: deploy
+        uses: actions/deploy-pages@v4
