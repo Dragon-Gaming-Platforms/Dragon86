@@ -23,7 +23,9 @@
  * root, so the restored guest's mount heals itself. The Terminal's
  * Reconnect button deliberately requests a fresh boot from the guest
  * image instead, leaving any saved snapshot untouched for a later
- * normal start.
+ * normal start. Snapshots record the emulator ACPI layout they were
+ * created with (pre-ACPI snapshots default to disabled), because v86's
+ * state format embeds that layout and restoring across layouts fails.
  */
 
 import * as vfs from "../core/vfs";
@@ -90,15 +92,26 @@ async function idbPut(key: string, value: unknown): Promise<void> {
   });
 }
 
-interface SavedState { gzip: boolean; data: ArrayBuffer; savedAt: number }
+interface SavedState {
+  gzip: boolean;
+  data: ArrayBuffer;
+  savedAt: number;
+  /** Emulator ACPI layout used when the snapshot was taken. Snapshots
+      predate this field and were all taken with ACPI disabled; restoring
+      one with a different layout crashes v86's state loader. */
+  acpi?: boolean;
+}
 
-async function loadSavedState(): Promise<ArrayBuffer | null> {
+interface LoadedState { buffer: ArrayBuffer; acpi: boolean }
+
+async function loadSavedState(): Promise<LoadedState | null> {
   try {
     const rec = (await idbGet(STATE_KEY)) as SavedState | undefined;
     if (!rec) return null;
-    if (!rec.gzip) return rec.data;
+    const acpi = rec.acpi === true;
+    if (!rec.gzip) return { buffer: rec.data, acpi };
     const stream = new Blob([rec.data]).stream().pipeThrough(new DecompressionStream("gzip"));
-    return await new Response(stream).arrayBuffer();
+    return { buffer: await new Response(stream).arrayBuffer(), acpi };
   } catch (err) {
     logWarn("v86", "saved state unreadable; cold-booting:", err);
     return null;
@@ -120,6 +133,7 @@ class V86Backend implements TerminalBackend {
   private rows = 24;
   private startTimer: ReturnType<typeof setTimeout> | null = null;
   private nudgeTimer: ReturnType<typeof setInterval> | null = null;
+  private acpiEnabled = false;
 
   constructor(
     private handlers: BackendHandlers,
@@ -149,24 +163,33 @@ class V86Backend implements TerminalBackend {
         this.freshBoot ? Promise.resolve(null) : loadSavedState(),
       ]);
       if (this.disposed) return;
+      /* Fresh boots get ACPI (see below). A restored snapshot must keep
+         the layout it was created with — v86's state format embeds it. */
+      this.acpiEnabled = saved ? saved.acpi : true;
       const opts: Record<string, unknown> = {
         wasm_path: `${BASE}v86.wasm`,
         memory_size: 128 * 1024 * 1024,
         bios: { url: `${BASE}bios/seabios.bin` },
         vga_bios: { url: `${BASE}bios/vgabios.bin` },
         filesystem: { handle9p: createP9Handler(vfs.HOME) },
+        /* Give fresh guests v86's ACPI tables. Without them, SeaBIOS
+           leaves the Arch kernel to fall back to a bogus MP table,
+           producing harmless-but-alarming RSDP/APIC/IOAPIC errors. */
+        acpi: this.acpiEnabled,
         autostart: true,
         disable_keyboard: true,
         disable_mouse: true,
         disable_speaker: true,
       };
       if (saved) {
-        opts.initial_state = { buffer: saved };
+        opts.initial_state = { buffer: saved.buffer };
         logInfo("v86", "resuming from saved state");
       } else {
         opts.bzimage = { url: `${BASE}bzImage` };
         opts.initrd = { url: `${BASE}initrd.gz` };
-        opts.cmdline = `console=ttyS0 tsc=reliable d86cols=${this.cols} d86rows=${this.rows}`;
+        /* v86's CPU has no machine-check hardware; skip only that dead
+           initcall so the kernel does not report an MCE device failure. */
+        opts.cmdline = `console=ttyS0 tsc=reliable initcall_blacklist=mcheck_init_device d86cols=${this.cols} d86rows=${this.rows}`;
         logInfo("v86", this.freshBoot ? "cold-booting guest from image (Reconnect)" : "cold-booting guest");
       }
       const emu = new V86(opts);
@@ -240,7 +263,7 @@ class V86Backend implements TerminalBackend {
     } catch {
       /* CompressionStream unavailable — store raw. */
     }
-    const rec: SavedState = { gzip, data, savedAt: Date.now() };
+    const rec: SavedState = { gzip, data, savedAt: Date.now(), acpi: this.acpiEnabled };
     await idbPut(STATE_KEY, rec);
     logInfo(
       "v86",
