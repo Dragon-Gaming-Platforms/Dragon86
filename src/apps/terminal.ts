@@ -193,16 +193,22 @@ export function openTerminal(win: Win): void {
     setChip("offline", "Not connected");
   };
 
-  const connect = async () => {
+  const connect = async (freshBoot = false) => {
     if (getSettings().engineMode === "v86") {
       openTabBtn.style.display = "none";
       saveStateBtn.style.display = "";
-      logInfo("terminal", "connect mode=v86 (in-page compatibility engine, no isolation needed)");
+      logInfo(
+        "terminal",
+        `connect mode=v86 (in-page compatibility engine, no isolation needed) boot=${freshBoot ? "image" : "saved-state-if-present"}`,
+      );
       backend?.dispose();
       backend = null;
       setChip("connecting", "Connecting…");
       term.clear();
       term.writeln(`${DIM}Starting the v86 compatibility engine (tiny Linux, in-page).${RESET}`);
+      if (freshBoot) {
+        term.writeln(`${DIM}Reconnect: fresh boot from the guest image — saved state is not loaded.${RESET}`);
+      }
       term.writeln(`${DIM}No cross-origin isolation needed — this is the WebView-friendly engine.${RESET}`);
       term.writeln(`${DIM}Your Files folder appears in the guest as /shared, both ways.${RESET}`);
       const vb = getV86Backend({
@@ -217,7 +223,7 @@ export function openTerminal(win: Win): void {
             term.writeln(`${DIM}Keep this window open — bash appears automatically when ready, or hit Reconnect.${RESET}`);
           }
         },
-      });
+      }, freshBoot);
       backend = vb;
       vb.connect();
       return;
@@ -272,7 +278,7 @@ export function openTerminal(win: Win): void {
     b.connect();
   };
 
-  reconnectBtn.addEventListener("click", () => void connect());
+  reconnectBtn.addEventListener("click", () => void connect(true));
   openTabBtn.addEventListener("click", () => backend?.openTab?.());
 
   term.onData((data) => backend?.write(data));
