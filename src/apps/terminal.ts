@@ -254,6 +254,9 @@ export function openTerminal(win: Win): void {
     }
     const b = (tabMode ? getTabBackend : getBackend)(url, {
       onData: (data) => term.write(filterOutput(data)),
+      onFsLive: () => {
+        term.writeln(`${GREEN}Shared folder live: guest /home/user/shared is your Dragon86 Files folder.${RESET}`);
+      },
       onStatus: (s) => {
         if (s === "ready") {
           setChip("online", "CheerpX online");

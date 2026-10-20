@@ -66,7 +66,7 @@ GitHub Actions (`.github/workflows/deploy.yml`) builds and publishes to **GitHub
 1. ~~Core OS shell~~ ✔ desktop, WM, files, editor, settings, terminal chrome
 2. ~~CheerpX hoster repo~~ ✔ [CheerpX-Bridge](https://github.com/Dragon-Gaming-Platforms/CheerpX-Bridge) (COI + scoped service worker + Debian disk image)
 3. ~~Bridge handshake → real bash in the terminal~~ ✔ wired (default engine URL, cold-boot-aware handshake, late-ready recovery)
-4. ~~Shared Linux folder~~ ✔ wired for the v86 engine: the guest's `/shared` is the OS filesystem (boot-time push + guest-write sync; see `public/v86/VENDORED.md`). CheerpX-side sharing still needs the hoster file channel
+4. ~~Shared Linux folder~~ ✔ v86 engine: the guest's `/shared` is the OS filesystem live, both ways (9p served from ZenFS — see `public/v86/VENDORED.md`). CheerpX engine: OS side wired (bridge protocol v2 "fs1", `src/bridge/fs-bridge.ts`, spec in `docs/cheerpx-fs-protocol.md`) — waiting on the hoster to plug it into the guest at `/home/user/shared`
 5. ~~Browser app~~ ✔ Scramjet proxy vendored at `/scramjet/` (see `public/scramjet/VENDORED.md`)
 6. Multiple terminals / tmux, cloud-drive mounts (ZenFS backends)
 
@@ -90,6 +90,17 @@ and fast.
   ⚠️ Tab mode needs the hoster to listen on the BroadcastChannel too —
   that's a pending CheerpX-Bridge addition; until it lands, tab mode
   reports "still starting" while embedded mode keeps working.
+
+**Shared folder (CheerpX modes):** the bridge speaks protocol v2 —
+Dragon86 advertises `caps: ["fs1"]` and serves file requests straight
+from its filesystem (guest `/home/user/shared` ↔ OS `/home/user`), the
+same live arrangement as v86's 9p share but over bridge messages
+(CheerpX's filesystem devices are whole-file JS APIs, so the wire is
+file-level too). The hoster must still mount it inside the guest; the
+contract + hoster implementation notes live in
+`docs/cheerpx-fs-protocol.md`. Until a hoster echoes `fs1`, nothing
+changes — v1 behavior, no shared folder in the CheerpX guest.
+
 - **v86 (compatibility)**: a tiny Linux (vendored v86 emulator + Arch
   Linux 32 kernel + Arch's genuine GNU bash and coreutils, `public/v86/`)
   boots right inside the Dragon86 page — no isolation, no hoster, no
