@@ -29,21 +29,48 @@ downloads the full tree — only what it runs.
 
 So "hosting the image" means publishing those two things.
 
+## Where the files go
+
+Two files, **two different folders** — and no, they are not both at the
+root:
+
+| file in this folder | goes in the image repo at | why |
+|---|---|---|
+| `mirror.py`       | `mirror.py` (repo root)              | the workflow calls it as `python3 mirror.py site`, relative to the checkout root |
+| `mirror.yml`      | `.github/workflows/mirror.yml`       | GitHub only runs workflows from that exact path |
+| `README.md` (this) | optional, repo root as `README.md`  | documentation only |
+
+Everything else is **created by the script**, not by you: `site/fs.json`
+and `site/arch/*.bin` are generated during the run, inside the Actions
+runner, and never committed. The repo itself stays two files and a few
+KB.
+
+Typing the hidden `.github/` path on github.com: *Add file → Create new
+file*, then type `.github/workflows/mirror.yml` as the filename — the
+slashes create the folders.
+
 ## Steps
 
 1. Create an empty public repo, e.g.
-   `Dragon-Gaming-Platforms/Dragon86-arch-image`.
+   `Dragon-Gaming-Platforms/Dragon86-arch-image`. Let it initialise with a
+   `main` branch (a README commit is enough) — Actions will not run in a
+   repo with no commits.
 
-2. Copy these two files into it:
+2. Add the two files at the paths in the table above. You can drag-and-drop
+   `mirror.py` into the repo root in the browser, or use git:
 
-   - `mirror.py` (this folder) → `mirror.py`
-   - `mirror.yml` (this folder) → `.github/workflows/mirror.yml`
+       git clone https://github.com/Dragon-Gaming-Platforms/Dragon86-arch-image
+       cd Dragon86-arch-image
+       cp <dragon86>/tools/arch-image/mirror.py .
+       mkdir -p .github/workflows
+       cp <dragon86>/tools/arch-image/mirror.yml .github/workflows/
+       git add -A && git commit -m "Mirror the copy/v86 Arch image" && git push
 
 3. Settings → Pages → **Source: GitHub Actions**.
 
-4. Actions → *Mirror Arch image* → **Run workflow**. It downloads
-   `fs.json` and every blob (a few hundred MB), checks the total against
-   GitHub's 1 GB Pages cap, and deploys.
+4. Actions → *Mirror Arch image* → **Run workflow** (leave the source as
+   `https://i.copy.sh/`). It downloads `fs.json` and every blob, checks the
+   total against GitHub's 1 GB Pages cap, and deploys.
 
 5. The image lands at:
 
@@ -52,6 +79,12 @@ So "hosting the image" means publishing those two things.
 
    Tell Dragon86 that URL and the v86 engine can boot
    `root=host9p` against it.
+
+If step 4 fails on the first download with a 403/404 from
+`i.copy.sh`, run it again with the `source` input set to
+`https://copy.sh/v86/` (alternate mirror of the same store) — that is
+the one thing about this pipeline I could not test from the build
+sandbox, which has no route to copy.sh.
 
 ## Running it locally instead
 
