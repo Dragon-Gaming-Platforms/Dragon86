@@ -16,6 +16,16 @@ Contents and provenance:
   taken from the copy/v86 Arch demo image set (fs.json + sha256 flat
   store). Despite the filename (kept so the loader config doesn't
   change), this is the Arch `vmlinuz`, not a bzImage we built.
+- `git` (inside `initrd.gz`, not a separate file) — GNU Git 2.49.1,
+  built by Dragon86 from the upstream `git/git` v2.49.1 source with
+  `zig cc -target x86-linux-musl`, fully static, linked against zlib
+  1.3.1. Configured without curl/OpenSSL/expat/gettext (no network in
+  the guest, so `git clone https://…` is not available; local
+  repositories, commits, branches, merges, tags, bundles and
+  `file://`-style remotes all work). GPL-2.0, see `LICENSE.git`.
+  Added to the initrd with `tools/initrd-append.py`, which copies the
+  existing archive through byte-for-byte and inserts new entries
+  before the trailer.
 - `initrd.gz` — built by Dragon86 from the Arch mkinitcpio initramfs:
   its busybox (GPL-2.0) and the virtio/9p kernel modules, plus a
   userland subset extracted from the same Arch demo rootfs — **GNU
@@ -23,7 +33,7 @@ Contents and provenance:
   guest shell is Arch's own bash, not a reimplementation. This is a
   subset, not the full ~843 MB Arch installation (that can't be
   vendored into GitHub Pages): no pacman, no systemd, no desktop —
-  the kernel, shell, and core file tools. Our `/init` loads the
+  the kernel, bash, GNU coreutils and git. Our `/init` loads the
   virtio PCI + 9p modules, mounts the host share at `/shared` in the
   background (the virtio probe finishes after init under emulation),
   sizes the serial line from the kernel cmdline (`d86cols`/`d86rows`
