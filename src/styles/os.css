@@ -83,7 +83,7 @@
 }
 #desktop {
   position: absolute;
-  inset: 0 0 calc(var(--taskbar-h) + env(safe-area-inset-bottom, 0px)) 0;
+  inset: 0 0 calc(var(--taskbar-h, 52px) + env(safe-area-inset-bottom, 0px)) 0;
   overflow: hidden;
   background: var(--bg-darkest);
 }
@@ -196,7 +196,7 @@
 /* ---------- Windows ---------- */
 #windows {
   position: absolute;
-  inset: 0 0 calc(var(--taskbar-h) + env(safe-area-inset-bottom, 0px)) 0;
+  inset: 0 0 calc(var(--taskbar-h, 52px) + env(safe-area-inset-bottom, 0px)) 0;
   z-index: 100;
   pointer-events: none;
 }
@@ -333,7 +333,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  height: calc(var(--taskbar-h) + env(safe-area-inset-bottom, 0px));
+  height: calc(var(--taskbar-h, 52px) + env(safe-area-inset-bottom, 0px));
   z-index: 10000;
   display: flex;
   align-items: center;
@@ -464,7 +464,7 @@
 .start-menu {
   position: absolute;
   left: 10px;
-  bottom: calc(var(--taskbar-h) + env(safe-area-inset-bottom, 0px) + 8px);
+  bottom: calc(var(--taskbar-h, 52px) + env(safe-area-inset-bottom, 0px) + 8px);
   width: 320px;
   z-index: 10001;
   background: rgba(10, 10, 10, 0.97);
