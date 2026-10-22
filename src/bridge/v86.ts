@@ -29,7 +29,9 @@
  */
 
 import * as vfs from "../core/vfs";
+import { getSettings } from "../core/settings";
 import { createP9Handler } from "./p9";
+import { normalizeImageBase } from "./v86-image";
 import { logInfo, logWarn } from "../core/log";
 import type { BackendHandlers, TerminalBackend } from "./hoster";
 
@@ -100,14 +102,25 @@ interface SavedState {
       predate this field and were all taken with ACPI disabled; restoring
       one with a different layout crashes v86's state loader. */
   acpi?: boolean;
+  /** Which guest image the snapshot belongs to. Legacy snapshots are all
+      from the mini guest. A snapshot is only restorable into the same
+      guest: the full Arch guest's root filesystem is served over HTTP by
+      v86 and is NOT part of save_state, so restoring one would hand the
+      resumed machine an empty root. */
+  guest?: "dragon" | "arch";
 }
 
 interface LoadedState { buffer: ArrayBuffer; acpi: boolean }
 
-async function loadSavedState(): Promise<LoadedState | null> {
+async function loadSavedState(guest: "dragon" | "arch"): Promise<LoadedState | null> {
   try {
     const rec = (await idbGet(STATE_KEY)) as SavedState | undefined;
     if (!rec) return null;
+    const recGuest = rec.guest ?? "dragon";
+    if (recGuest !== guest) {
+      logInfo("v86", `saved state belongs to the ${recGuest} guest; booting ${guest} fresh`);
+      return null;
+    }
     const acpi = rec.acpi === true;
     if (!rec.gzip) return { buffer: rec.data, acpi };
     const stream = new Blob([rec.data]).stream().pipeThrough(new DecompressionStream("gzip"));
@@ -134,6 +147,7 @@ class V86Backend implements TerminalBackend {
   private startTimer: ReturnType<typeof setTimeout> | null = null;
   private nudgeTimer: ReturnType<typeof setInterval> | null = null;
   private acpiEnabled = false;
+  private guest: "dragon" | "arch" = "dragon";
 
   constructor(
     private handlers: BackendHandlers,
@@ -144,6 +158,27 @@ class V86Backend implements TerminalBackend {
     /* The guest's serial size rides the kernel cmdline, so give the
        terminal a beat to report its real size before we construct. */
     this.startTimer = setTimeout(() => void this.start(), 300);
+  }
+
+  /**
+   * Full Arch boots with `init=/bin/bash` (serial console, no VGA screen),
+   * so the distro's own boot scripts never run. This types the handful of
+   * lines a login would normally have done for us. Sent only when the user
+   * clicks the Terminal's "Prepare Shell" button.
+   */
+  prepareShell(): void {
+    if (!this.emu) return;
+    const lines = [
+      "mount -t devtmpfs devtmpfs /dev 2>/dev/null; " +
+        "mount -t proc proc /proc 2>/dev/null; " +
+        "mount -t sysfs sysfs /sys 2>/dev/null; " +
+        "mount -t devpts devpts /dev/pts 2>/dev/null",
+      "export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+      "export TERM=xterm-256color HOME=/root",
+      "cd /root 2>/dev/null || cd /",
+      "echo '[dragon86] /dev, /proc, /sys mounted — you are in full Arch now: pacman -Q | wc -l'",
+    ];
+    for (const line of lines) this.emu.serial0_send(line + "\n");
   }
 
   resize(cols: number, rows: number): void {
@@ -158,20 +193,34 @@ class V86Backend implements TerminalBackend {
   private async start(): Promise<void> {
     this.startTimer = null;
     try {
+      const guest = getSettings().v86Guest === "arch" ? "arch" : "dragon";
+      this.guest = guest;
+      const imageBase = normalizeImageBase(getSettings().v86ImageBase);
+      /* Save/restore only exists for the mini guest: the full Arch root
+         filesystem lives in v86's HTTP-backed 9p store, which is not part
+         of save_state (see SavedState.guest). */
+      const wantSaved = !this.freshBoot && guest === "dragon";
       const [V86, saved] = await Promise.all([
         loadLib(),
-        this.freshBoot ? Promise.resolve(null) : loadSavedState(),
+        wantSaved ? loadSavedState(guest) : Promise.resolve(null),
       ]);
       if (this.disposed) return;
       /* Fresh boots get ACPI (see below). A restored snapshot must keep
          the layout it was created with — v86's state format embeds it. */
       this.acpiEnabled = saved ? saved.acpi : true;
+
+      /* 128 MB is plenty for the mini guest. The full Arch root filesystem
+         runs a real distro userland (pacman, glibc, sshd-sized binaries), so
+         it gets upstream's 512 MB — trimmed on touch devices, where browsers
+         are stingy about large WebAssembly heaps. */
+      const coarse = typeof matchMedia === "function" && matchMedia("(pointer: coarse)").matches;
+      const memoryMB = guest === "arch" ? (coarse ? 320 : 512) : 128;
+
       const opts: Record<string, unknown> = {
         wasm_path: `${BASE}v86.wasm`,
-        memory_size: 128 * 1024 * 1024,
+        memory_size: memoryMB * 1024 * 1024,
         bios: { url: `${BASE}bios/seabios.bin` },
         vga_bios: { url: `${BASE}bios/vgabios.bin` },
-        filesystem: { handle9p: createP9Handler(vfs.HOME) },
         /* Give fresh guests v86's ACPI tables. Without them, SeaBIOS
            leaves the Arch kernel to fall back to a bogus MP table,
            producing harmless-but-alarming RSDP/APIC/IOAPIC errors. */
@@ -181,10 +230,39 @@ class V86Backend implements TerminalBackend {
         disable_mouse: true,
         disable_speaker: true,
       };
-      if (saved) {
+
+      if (guest === "arch") {
+        /* The full Arch image: v86 serves the root filesystem over 9p from
+           the HTTP store, and boots the kernel/initrd found inside it
+           (`bzimage_initrd_from_filesystem`). This is upstream copy/v86's
+           own boot configuration, with two changes: `console=ttyS0` plus
+           `init=/bin/bash`, because Dragon86's Terminal is a serial line
+           with no VGA screen, and upstream's openrc init greets tty1. */
+        opts.filesystem = {
+          baseurl: `${imageBase}arch/`,
+          basefs: `${imageBase}fs.json`,
+        };
+        opts.bzimage_initrd_from_filesystem = true;
+        opts.vga_memory_size = 8 * 1024 * 1024;
+        if (saved) {
+          opts.initial_state = { buffer: saved.buffer };
+          logInfo("v86", "resuming from saved state");
+        } else {
+          opts.cmdline = [
+            "rw console=ttyS0 tsc=reliable",
+            "root=host9p rootfstype=9p rootflags=trans=virtio,cache=loose",
+            "mitigations=off audit=0 init_on_free=on random.trust_cpu=on nowatchdog",
+            "init=/bin/bash",
+            `d86cols=${this.cols} d86rows=${this.rows}`,
+          ].join(" ");
+          logInfo("v86", `cold-booting full Arch from ${imageBase}`);
+        }
+      } else if (saved) {
+        opts.filesystem = { handle9p: createP9Handler(vfs.HOME) };
         opts.initial_state = { buffer: saved.buffer };
         logInfo("v86", "resuming from saved state");
       } else {
+        opts.filesystem = { handle9p: createP9Handler(vfs.HOME) };
         opts.bzimage = { url: `${BASE}bzImage` };
         opts.initrd = { url: `${BASE}initrd.gz` };
         /* v86's CPU has no machine-check hardware; skip only that dead
@@ -253,6 +331,13 @@ class V86Backend implements TerminalBackend {
   /** Snapshot the machine into IndexedDB (gzip; see header). */
   async saveState(): Promise<void> {
     if (!this.emu) throw new Error("engine not running");
+    if (this.guest === "arch") {
+      throw new Error(
+        "the full Arch guest boots its root filesystem over HTTP, which a " +
+          "snapshot cannot contain — save state is only available for the " +
+          "Dragon86 mini guest",
+      );
+    }
     const raw = await this.emu.save_state();
     let data = raw;
     let gzip = false;
@@ -263,7 +348,13 @@ class V86Backend implements TerminalBackend {
     } catch {
       /* CompressionStream unavailable — store raw. */
     }
-    const rec: SavedState = { gzip, data, savedAt: Date.now(), acpi: this.acpiEnabled };
+    const rec: SavedState = {
+      gzip,
+      data,
+      savedAt: Date.now(),
+      acpi: this.acpiEnabled,
+      guest: this.guest,
+    };
     await idbPut(STATE_KEY, rec);
     logInfo(
       "v86",

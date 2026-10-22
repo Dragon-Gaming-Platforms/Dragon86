@@ -84,3 +84,46 @@ guest is wrong for GitHub Pages + phones. The interactive parts that
 motivated the swap are covered: the shell is genuine GNU bash and the
 file system is the OS's own. If a fetchable archlinux32 image ever
 becomes available, it can drop in as an `hda` image beside this setup.
+
+## Full Arch Linux (the copy/v86 image)
+
+The mini guest above is the default. Settings → v86 guest can switch to
+**Full Arch Linux 32**, which boots copy.sh's complete Arch root
+filesystem instead of our subset.
+
+That image is not a disk file. Upstream serves a whole root filesystem
+over 9p from a flat HTTP store — `fs.json` (the tree) plus
+`arch/<sha256-10>.bin` blobs, fetched lazily as the guest touches files.
+Dragon86 points v86 at that store (`filesystem: { baseurl, basefs }` +
+`bzimage_initrd_from_filesystem`, so the kernel and initrd come from
+inside the image) and changes only the console: upstream's openrc init
+greets tty1, but Dragon86's Terminal is a serial line, so the command
+line asks for `console=ttyS0 init=/bin/bash`. Because no boot scripts
+run, the Terminal's **Prepare Shell** button types the equivalent of a
+login (mount devtmpfs/proc/sys/devpts, set PATH) when the user asks for
+it. Nothing is injected automatically.
+
+Consequences, by design:
+
+- The image is streamed from the origin, not vendored, so Dragon86 stays
+  far under GitHub Pages' 1 GB limit.
+- The origin must allow cross-origin reads. `i.copy.sh` must, since
+  copy.sh itself is a different origin and fetches the same URLs; the
+  Settings **Test** button and the Terminal's **Check Image** button
+  report the exact HTTP/CORS result from the user's browser. If it is
+  blocked, `tools/arch-image/` mirrors the store into a Pages repo of
+  our own (Pages always sends `Access-Control-Allow-Origin: *`) and the
+  same setting points at it.
+- `/shared` is unavailable in this mode: v86 has one 9p device and the
+  root filesystem occupies it.
+- Save State is unavailable in this mode: the root filesystem lives in
+  v86's HTTP-backed 9p store, which `save_state()` does not contain, so
+  a restored machine would come back with an empty root. Snapshots
+  record which guest they belong to and are ignored across guests.
+- Memory rises to 512 MB (320 MB on touch devices), matching upstream's
+  demo, because a real distro userland needs it.
+
+Verified locally before shipping: a store built from a real root tree
+(fs.json + 160 blobs) was booted through v86's `filesystem: { baseurl,
+basefs }` path; the guest mounted the streamed root over 9p and listed
+its contents from the shell.

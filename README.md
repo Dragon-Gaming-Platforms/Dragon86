@@ -7,6 +7,23 @@
 
 </div>
 
+### v86 guests: mini vs full Arch
+
+The v86 engine boots one of two guests (Settings → **v86 guest**):
+
+- **Dragon86 mini** (default) — the vendored Arch kernel with bash,
+  coreutils and git. Boots in seconds and `/shared` *is* your Files
+  folder, live in both directions.
+- **Full Arch Linux 32** — the complete Arch root filesystem that
+  copy.sh/v86 serves, streamed over 9p from an HTTP image store
+  (`fs.json` + content-addressed blobs) rather than downloaded as a disk
+  image. Real pacman and the whole userland; slower to start; no
+  `/shared` (v86 has a single 9p device and the root filesystem fills
+  it). The image base is a setting, and the **Test** button in Settings
+  reports whether that origin allows cross-origin reads from your
+  browser. Memory goes to 512 MB for this guest.
+
+
 ## What's in the box
 
 - **Window manager** — draggable, resizable, focusable windows with taskbar integration
