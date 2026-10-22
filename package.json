@@ -6,7 +6,7 @@
   "description": "Dragon86 — a web OS by Dragon Gaming Platforms",
   "scripts": {
     "dev": "vite",
-    "build": "tsc --noEmit && node tools/check-css-vars.mjs && vite build",
+    "build": "tsc --noEmit && node tools/check-css-vars.mjs && node tools/test-coi-deregister.mjs && vite build",
     "preview": "vite preview"
   },
   "dependencies": {

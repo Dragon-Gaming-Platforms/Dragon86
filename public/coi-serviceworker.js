@@ -19,7 +19,14 @@
        running the previous build's page (old app list, old editor) for
        minutes after a deploy. The asset cache is versioned
        (dragon86-assets-v2; older versions are deleted on activate).
-    Page-half registration/reload logic is unmodified upstream. */
+    5. Deregistration is deterministic and page-side: when the selected
+       engine needs no isolation (v86, separate tab), the page calls
+       navigator.serviceWorker.getRegistrations() and unregisters the
+       worker itself, then reloads once so the next document carries no
+       COOP/COEP. It no longer depends on a postMessage reaching a
+       possibly-dead worker (and the worker's deregister handler now uses
+       waitUntil so its unregister + reload chain cannot be cut short).
+    Page-half registration logic is otherwise unmodified upstream. */
 
 let coepCredentialless = false;
 if (typeof window === 'undefined') {
@@ -38,14 +45,25 @@ if (typeof window === 'undefined') {
         if (!ev.data) {
             return;
         } else if (ev.data.type === "deregister") {
-            self.registration
-                .unregister()
-                .then(() => {
-                    return self.clients.matchAll();
-                })
-                .then(clients => {
-                    clients.forEach((client) => client.navigate(client.url));
-                });
+            // Dragon86: waitUntil() is mandatory here. Without it the worker
+            // may be terminated the moment this handler returns, and the
+            // unregister -> reload chain (the reload is what actually
+            // removes COOP/COEP from the document) silently never finishes.
+            ev.waitUntil((async () => {
+                try {
+                    await self.registration.unregister();
+                } catch (err) {
+                    console.error("coi: unregister failed", err);
+                }
+                try {
+                    const clients = await self.clients.matchAll({ type: "window" });
+                    clients.forEach((client) => {
+                        client.navigate(client.url).catch(() => {});
+                    });
+                } catch (err) {
+                    console.error("coi: client reload failed", err);
+                }
+            })());
         } else if (ev.data.type === "coepCredentialless") {
             coepCredentialless = ev.data.value;
         }
@@ -161,6 +179,73 @@ if (typeof window === 'undefined') {
         };
 
         const n = navigator;
+
+        /* Dragon86 modification 5: turning isolation OFF must be
+           deterministic. v86 and separate-tab mode do not need COOP/COEP,
+           and they used to rely on messaging the controller — a worker that
+           might already be gone, and whose handler was not kept alive. If
+           that message was lost, the registration survived and every reload
+           came back isolated. Now the page unregisters the worker itself,
+           through the registration API, and reloads exactly once so the
+           next document is served without the headers. */
+        if (coi.shouldDeregister && coi.shouldDeregister()) {
+            const KEY = "coiDeregistered";
+            const store = (() => {
+                try { return window.sessionStorage; } catch { return null; }
+            })();
+            const already = store ? store.getItem(KEY) === "1" : false;
+            const controlled = !!n.serviceWorker.controller;
+            const isolated = window.crossOriginIsolated === true;
+
+            const done = (reason) => {
+                if (store) store.removeItem(KEY);
+                /* Reload only when this document was actually served through
+                   the worker (or is isolated because of it). After the reload
+                   there is no controller, so this cannot loop; `already`
+                   covers the case where unregistering itself failed. */
+                if ((controlled || isolated) && !already) {
+                    if (store) store.setItem(KEY, "1");
+                    !coi.quiet && console.log(`Dragon86: engine does not need isolation (${reason}) — service worker removed, reloading once.`);
+                    coi.doReload();
+                } else {
+                    !coi.quiet && console.log(`Dragon86: isolation off, no service worker controlling this page (${reason}).`);
+                }
+            };
+
+            if (!n.serviceWorker) {
+                done("no service worker support");
+            } else if (typeof n.serviceWorker.getRegistrations !== "function") {
+                /* Very old browsers: fall back to the upstream message path. */
+                if (n.serviceWorker.controller) {
+                    n.serviceWorker.controller.postMessage({ type: "deregister" });
+                }
+                done("legacy deregister");
+            } else {
+                if (store) store.setItem(KEY, already ? "1" : "0");
+                Promise.resolve(n.serviceWorker.getRegistrations())
+                    .then((regs) => Promise.all(regs
+                        /* Only our own worker: coi-serviceworker's script URL. */
+                        .filter((r) => !r.active || /coi-serviceworker\.js/.test(r.active.scriptURL || ""))
+                        .map((r) => {
+                            try { return r.unregister(); } catch { return undefined; }
+                        })))
+                    .then(
+                        () => done("unregistered"),
+                        (err) => {
+                            !coi.quiet && console.warn("Dragon86: unregister failed, falling back to message", err);
+                            if (n.serviceWorker.controller) {
+                                n.serviceWorker.controller.postMessage({ type: "deregister" });
+                            }
+                            done("unregister failed");
+                        },
+                    );
+            }
+            return;
+        }
+        if (window.sessionStorage.getItem("coiDeregistered")) {
+            window.sessionStorage.removeItem("coiDeregistered");
+        }
+
         const controlling = n.serviceWorker && n.serviceWorker.controller;
 
         // Record the failure if the page is served by serviceWorker.
