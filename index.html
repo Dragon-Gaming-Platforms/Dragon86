@@ -22,14 +22,19 @@
     -->
     <script>
       /* Dynamic COI: the coi worker is only wanted when the engine runs
-         embedded (Settings → Engine → "Embedded"). In "Separate tab" mode
-         the engine isolates its own top-level tab, so we deregister the
-         worker and Dragon86 runs as a normal, unrestricted page. The mode
-         is read from the same localStorage the OS settings use. Switching
-         modes reloads the page (isolation is decided at document load —
-         there is no mid-session switch), after which this block sees the
-         controlling worker (tab mode → deregister; embedded mode →
-         register) and settles into the right state. */
+         embedded (Settings → Engine → "Embedded"). "Separate tab" and
+         "v86 (compatibility)" need no isolation at all — v86 uses no
+         SharedArrayBuffer — so in those modes the worker must not merely
+         stop registering: it has to be actively removed, and the document
+         has to be reloaded to shed the COOP/COEP headers it already
+         stamped. That removal is done deterministically by the worker
+         script's page half (navigator.serviceWorker.getRegistrations() →
+         unregister → one reload), which reads shouldDeregister() below.
+         Switching modes in Settings also drops the registration before
+         reloading, so there is only ever one reload. */
+
+      /* The flag the worker script's page half acts on. Kept in one place so
+         "which engines want isolation" has a single answer. */
       (function () {
         var tabMode = false;
         try {
@@ -42,6 +47,16 @@
           coepCredentialless: () => false,
           shouldRegister: () => !tabMode,
           shouldDeregister: () => tabMode,
+        };
+        window.dragon86Isolation = {
+          mode: tabMode ? "off" : "on",
+          engine: (function () {
+            try {
+              return JSON.parse(localStorage.getItem("dragon86.settings") || "{}").engineMode || "embedded";
+            } catch (e) {
+              return "embedded";
+            }
+          })(),
         };
       })();
     </script>

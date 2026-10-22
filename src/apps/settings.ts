@@ -127,9 +127,20 @@ export function openSettings(win: Win): void {
           ? "Saved. Reloading — cross-origin isolation will be turned OFF for Dragon86 (v86 doesn't need it). The Terminal will boot a tiny Linux right here in the page; your Files folder shows up in it as /shared."
           : "Saved. Reloading — cross-origin isolation will be turned ON for Dragon86 so the embedded engine can run…";
     /* Isolation is decided when the document loads, so applying a mode
-       change IS a reload: on the next load index.html tells the coi
-       worker to register (embedded) or deregister (tab/v86). */
-    setTimeout(() => location.reload(), 900);
+       change IS a reload. Leaving isolation needs the worker gone BEFORE
+       that reload: otherwise the reloaded document is still controlled and
+       still carries COOP/COEP, and coi-serviceworker has to unregister and
+       reload a second time. Doing it here means one reload and an
+       unrestrained page immediately. */
+    if (mode === "embedded") {
+      setTimeout(() => location.reload(), 900);
+      return;
+    }
+    const sw = navigator.serviceWorker;
+    const drop = sw && typeof sw.getRegistrations === "function"
+      ? sw.getRegistrations().then((regs) => Promise.all(regs.map((r) => r.unregister())))
+      : Promise.resolve();
+    void drop.catch(() => {}).then(() => setTimeout(() => location.reload(), 400));
   };
   embeddedBtn.addEventListener("click", () => setMode("embedded"));
   tabBtn.addEventListener("click", () => setMode("tab"));
@@ -210,11 +221,23 @@ export function openSettings(win: Win): void {
   systemSection.append(el("h2", undefined, "System"));
   const table = el("table", "about-table");
   const facts: [string, string][] = [
-    ["OS", "Dragon86 0.7.0 (dev build)"],
+    ["OS", "Dragon86 0.7.1 (dev build)"],
     ["Build", "GUST + Sandstone vendored · Monaco editor · v86 (bash + coreutils + git, live 9p share, save state) · desktop layout fix"],
     ["Engines", "CheerpX (embedded / separate tab) · v86 (mini guest with /shared, or full Arch Linux streamed from an image store)"],
     ["Vendor", "Dragon Gaming Platforms"],
     ["Terminal", "xterm.js 6 · bridge protocol v1"],
+    [
+      "Isolation",
+      window.crossOriginIsolated
+        ? "ON — COOP/COEP from the coi service worker (CheerpX needs it)"
+        : "off — no COOP/COEP, no service worker required for this engine",
+    ],
+    [
+      "Service worker",
+      navigator.serviceWorker?.controller
+        ? `controlling this page (${navigator.serviceWorker.controller.scriptURL.split("/").pop()})`
+        : "not controlling this page",
+    ],
     [
       "Engine",
       getSettings().hosterUrl.trim()

@@ -7,6 +7,18 @@
 
 </div>
 
+### Service worker: on only when the engine needs isolation
+
+COOP/COEP arrive via `coi-serviceworker.js`, and only the **embedded
+CheerpX** engine needs them. Selecting **Separate tab** or **v86** makes
+the worker remove *itself*: its page half calls
+`navigator.serviceWorker.getRegistrations()`, unregisters the worker and
+reloads once so the next document carries no COOP/COEP — no reliance on
+messaging a controller that may already be gone. Settings → System shows
+the live state ("Isolation: ON/off", "Service worker: controlling / not
+controlling"), and `tools/test-coi-deregister.mjs` (run by `npm run
+build`) asserts the contract.
+
 ### v86 guests: mini vs full Arch
 
 The v86 engine boots one of two guests (Settings → **v86 guest**):
