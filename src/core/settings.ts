@@ -4,6 +4,17 @@ export type ThemeId = "dragon" | "cyberpunk" | "purple" | "matrix" | "amoled" | 
 
 export type EngineMode = "embedded" | "tab" | "v86";
 
+/**
+ * Which guest the v86 engine boots.
+ * - "dragon": the vendored mini guest (Arch kernel + bash/coreutils/git).
+ *   Boots in seconds, /shared is the live OS filesystem.
+ * - "arch": the full Arch Linux 32 root filesystem that copy.sh/v86 serves,
+ *   streamed over 9p from an HTTP image store (fs.json + blobs). Real Arch:
+ *   pacman, the whole userland. Slower, and no /shared (v86 has a single
+ *   9p device, which the root filesystem occupies).
+ */
+export type V86Guest = "dragon" | "arch";
+
 export interface Settings {
   theme: ThemeId;
   wallpaper: string;
@@ -21,6 +32,10 @@ export interface Settings {
    *   Its /shared folder is the OS virtual filesystem (see bridge/v86.ts).
    */
   engineMode: EngineMode;
+  /** Guest image for the v86 engine — see V86Guest. */
+  v86Guest: V86Guest;
+  /** Image store root for v86Guest "arch" (fs.json + arch/ live here). */
+  v86ImageBase: string;
 }
 
 const KEY = "dragon86.settings";
@@ -59,6 +74,8 @@ const DEFAULTS: Settings = {
   wallpaper: "ember",
   hosterUrl: "",
   engineMode: "embedded",
+  v86Guest: "dragon",
+  v86ImageBase: "https://i.copy.sh/",
 };
 
 let current: Settings = load();

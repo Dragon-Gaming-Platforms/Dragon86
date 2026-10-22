@@ -4,6 +4,7 @@
 
 import { el, icon } from "../core/dom";
 import { showConfirm } from "../core/dialog";
+import { DEFAULT_IMAGE_BASE, probeImage } from "../bridge/v86-image";
 import {
   getSettings,
   setSettings,
@@ -142,14 +143,76 @@ export function openSettings(win: Win): void {
   );
   engineSection.append(modeRow, modeNote);
 
+  /* ---------- v86 guest image (mini vs full Arch) ---------- */
+  const guestRow = el("div", "settings-row");
+  guestRow.append(el("label", undefined, "v86 guest"));
+  const miniBtn = el("button", "btn", "Dragon86 mini (fast)");
+  const archBtn = el("button", "btn", "Full Arch Linux 32");
+  const refreshGuestBtns = () => {
+    const g = getSettings().v86Guest;
+    miniBtn.classList.toggle("active", g !== "arch");
+    archBtn.classList.toggle("active", g === "arch");
+  };
+  miniBtn.addEventListener("click", () => {
+    setSettings({ v86Guest: "dragon" });
+    refreshGuestBtns();
+  });
+  archBtn.addEventListener("click", () => {
+    setSettings({ v86Guest: "arch" });
+    refreshGuestBtns();
+  });
+  refreshGuestBtns();
+  guestRow.append(miniBtn, archBtn);
+
+  const imageRow = el("div", "settings-row");
+  imageRow.append(el("label", undefined, "Arch image"));
+  const imageInput = el("input", "input");
+  imageInput.placeholder = DEFAULT_IMAGE_BASE;
+  imageInput.value = getSettings().v86ImageBase;
+  const saveImage = el("button", "btn", "Save");
+  saveImage.addEventListener("click", () => {
+    setSettings({ v86ImageBase: imageInput.value.trim() || DEFAULT_IMAGE_BASE });
+    imageInput.value = getSettings().v86ImageBase;
+    saveImage.textContent = "Saved ✓";
+    setTimeout(() => (saveImage.textContent = "Save"), 1500);
+  });
+  imageRow.append(imageInput, saveImage);
+
+  const testImage = el("button", "btn", "Test");
+  const imageResult = el("div", "settings-note");
+  testImage.addEventListener("click", () => {
+    testImage.disabled = true;
+    imageResult.textContent = "Checking cross-origin reachability…";
+    void probeImage(getSettings().v86ImageBase)
+      .then((r) => {
+        imageResult.textContent = r.message;
+        imageResult.style.color = r.ok ? "var(--text-primary)" : "var(--theme-bright)";
+      })
+      .finally(() => {
+        testImage.disabled = false;
+      });
+  });
+  imageRow.append(testImage);
+
+  const guestNote = el(
+    "div",
+    "settings-note",
+    "Dragon86 mini: the vendored Arch kernel with bash, coreutils and git — boots in seconds, and /shared is your Files folder. " +
+      "Full Arch Linux 32: copy.sh/v86's complete Arch root filesystem, streamed over 9p from an HTTP image store — real pacman and the whole userland, " +
+      "slower to start, and no /shared (v86 has a single 9p device and the root filesystem occupies it). " +
+      "The image is fetched straight from the origin below, so its CORS policy matters: press Test to check from this browser. " +
+      "Changes take effect on the next Terminal Reconnect.",
+  );
+  engineSection.append(guestRow, imageRow, imageResult, guestNote);
+
   /* ---------- System ---------- */
   const systemSection = el("div", "settings-section");
   systemSection.append(el("h2", undefined, "System"));
   const table = el("table", "about-table");
   const facts: [string, string][] = [
-    ["OS", "Dragon86 0.6.1 (dev build)"],
+    ["OS", "Dragon86 0.7.0 (dev build)"],
     ["Build", "GUST + Sandstone vendored · Monaco editor · v86 (bash + coreutils + git, live 9p share, save state) · desktop layout fix"],
-    ["Engines", "CheerpX (embedded / separate tab) · v86 (compatibility, /shared = Files)"],
+    ["Engines", "CheerpX (embedded / separate tab) · v86 (mini guest with /shared, or full Arch Linux streamed from an image store)"],
     ["Vendor", "Dragon Gaming Platforms"],
     ["Terminal", "xterm.js 6 · bridge protocol v1"],
     [

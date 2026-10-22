@@ -43,6 +43,10 @@ export interface TerminalBackend {
   openTab?: () => void;
   /** v86 only: snapshot the machine to on-device storage. */
   saveState?: () => Promise<void>;
+  /** v86 "arch" guest only: type the first-run setup into the guest (mount
+      /dev, /proc, /sys so a bare `init=/bin/bash` behaves like a real
+      system). Explicit user action — nothing is injected behind their back. */
+  prepareShell?: () => void;
 }
 
 export interface BackendHandlers {
