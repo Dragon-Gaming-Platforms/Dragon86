@@ -55,12 +55,12 @@ Target: `i.copy.sh/fs.json`
 Response headers:
 
 ```
-Date: Fri, 23 Oct 2026 19:52:39 GMT
+Date: Fri, 23 Oct 2026 19:54:32 GMT
 Content-Type: application/json
 Content-Length: 5815708
 Connection: close
 Vary: Accept-Encoding
-Server: BunnyCDN-LA1-852
+Server: BunnyCDN-MI1-1354
 CDN-PullZone: 165003
 CDN-RequestCountryCode: US
 Access-Control-Allow-Origin: *
@@ -69,14 +69,14 @@ Access-Control-Expose-Headers: Server, x-goog-meta-frames, Content-Length, Conte
 Cache-Control: public, max-age=43200
 ETag: "6717277a-58bd9c"
 Last-Modified: Tue, 22 Oct 2024 04:18:02 GMT
-CDN-StorageServer: LA-1053
-CDN-FileServer: 828
+CDN-StorageServer: MI-727
+CDN-FileServer: 391
 CDN-ProxyVer: 1.71
 CDN-RequestPullSuccess: True
 CDN-RequestPullCode: 200
-CDN-CachedAt: 10/23/2026 19:07:28
-CDN-EdgeStorageId: 1109
-CDN-RequestId: ae0005d1fbd35b3f690a51f50d87adcd
+CDN-CachedAt: 10/23/2026 19:18:53
+CDN-EdgeStorageId: 1351
+CDN-RequestId: 0202e318295e26ed6eb72543dcfd9296
 CDN-Cache: HIT
 CDN-Status: 200
 CDN-RequestTime: 0
@@ -94,7 +94,12 @@ Accept-Ranges: bytes
 ## The vendored mirror (`arch-image` branch)
 
 - base: `https://raw.githubusercontent.com/Dragon-Gaming-Platforms/Dragon86/arch-image/`
-- manifest.json: **failed** — NameError: `name 'HEADERS' is not defined`
+- manifest.json: **HTTP 200**, 886 bytes
+- CORS header: `*`
+- content-type: `text/plain; charset=utf-8`
+- mirrored: 14999 blobs, 698.1 MB
+- `84b4903a.bin`: **HTTP 200**, 21688320 bytes, CORS `*`, type `application/octet-stream`
+- `d7b414f8.bin`: **HTTP 200**, 9479456 bytes, CORS `*`, type `application/octet-stream`
 
 ## The vendor workflow's own fetch (`mirror.py`)
 
