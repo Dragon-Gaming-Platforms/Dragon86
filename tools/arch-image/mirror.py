@@ -18,9 +18,14 @@ Pages repo of its own, in our case) without needing to understand the
 guest's contents:
 
     python3 mirror.py site            # writes site/fs.json + site/arch/*
+    python3 mirror.py --list-only public/v86/fs.json
+                                      # vendor just the index into the app
 
 Environment:
     V86_IMAGE_BASE   source root, default https://i.copy.sh/
+                     (the store also answers on http://; if https returns 403
+                     for a request with no referer, point this at
+                     http://i.copy.sh/ instead)
     V86_ARCH_DIR     blob directory name under the root, default arch
     JOBS             parallel downloads, default 16
     SKIP_EXISTING    "1" to keep files already downloaded (resumable)
@@ -94,11 +99,48 @@ def human(n):
         n /= 1024
 
 
+def list_only(path):
+    """Write fs.json to `path` — the whole file tree, minus any file contents.
+
+    The app uses this copy to build the Arch filesystem in ZenFS without
+    touching the network: paths, directories, symlinks, modes and sizes all
+    come from it, and only file contents are streamed from the image store.
+    Refuses to write something that is not an image index.
+    """
+    print(f"source: {BASE}")
+    raw = fetch(BASE + "fs.json")
+    try:
+        tree = json.loads(raw)
+    except ValueError as err:
+        raise SystemExit(f"not JSON ({err}); got {len(raw)} bytes - wrong URL or an error page?")
+    root = tree.get("fsroot") if isinstance(tree, dict) else tree
+    if not isinstance(root, list) or not root:
+        raise SystemExit("no fsroot array in that document")
+    names = set()
+    for node in root:
+        blobs(node, names)
+    if not names:
+        raise SystemExit("fsroot has no file entries - refusing to write it")
+    os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
+    with open(path, "wb") as fh:
+        fh.write(raw)
+    print(f"wrote {path} ({human(len(raw))}), {len(names)} file contents referenced")
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("dest", nargs="?", default="site")
     ap.add_argument("--max-size", type=float, default=950, help="MB")
+    ap.add_argument(
+        "--list-only",
+        metavar="PATH",
+        help="download just fs.json and write it to PATH (vendor the index; no blobs)",
+    )
     args = ap.parse_args()
+
+    if args.list_only:
+        list_only(args.list_only)
+        return
 
     os.makedirs(os.path.join(args.dest, ARCH), exist_ok=True)
     print(f"source: {BASE}")

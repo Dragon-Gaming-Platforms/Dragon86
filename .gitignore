@@ -6,3 +6,8 @@ dist/
 .vscode/
 .cursor/
 .DS_Store
+
+# Vendored by the deploy workflow (tools/arch-image/mirror.py --list-only)
+public/v86/fs.json
+
+tools/test-image-list/.out/

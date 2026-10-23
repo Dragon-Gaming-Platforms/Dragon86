@@ -190,7 +190,7 @@ class V86Backend implements TerminalBackend {
       "export TERM=xterm-256color HOME=/root",
       "cd /root 2>/dev/null || cd /",
       "echo '[dragon86] /dev, /proc, /sys mounted'",
-      "[ -x /root/networking.sh ] && /root/networking.sh",
+      "[ -x /networking.sh ] && /networking.sh",
     ];
     for (const line of lines) this.emu.serial0_send(line + "\n");
   }
@@ -235,8 +235,7 @@ class V86Backend implements TerminalBackend {
       const src = await fetch(`${BASE}scripts/networking.sh`);
       if (!src.ok) return;
       const body = await src.text();
-      const dest = `${root}/root/networking.sh`;
-      await fs.promises.mkdir(`${root}/root`, { recursive: true });
+      const dest = `${root}/networking.sh`;
       const existing = await fs.promises.readFile(dest, "utf8").catch(() => null);
       if (existing !== body) {
         await fs.promises.writeFile(dest, body);
@@ -329,7 +328,7 @@ class V86Backend implements TerminalBackend {
         /* The emulated NIC is the emulator's job, not the guest's: v86
            provides the card and the backend behind it (a wsproxy/wisp relay,
            or the in-page stack), including DHCP. The guest only loads its
-           driver and asks for a lease — see /root/networking.sh. Setting the
+           driver and asks for a lease — see /networking.sh. Setting the
            field to "off" gives the guest loopback only. */
         ...(this.netDeviceUrl()
           ? { net_device: { type: "virtio", relay_url: this.netDeviceUrl() } }
@@ -341,7 +340,6 @@ class V86Backend implements TerminalBackend {
       };
 
       const net = this.netDeviceUrl();
-      void this.installNetworkingScript(vfs.ENGINE_ROOT.v86);
       logInfo(
         "v86",
         net
@@ -357,11 +355,13 @@ class V86Backend implements TerminalBackend {
            why we no longer hand v86 `baseurl`/`basefs`: that path is v86's
            own private store, invisible to Dragon86. */
         this.status("reading the Arch image index…");
-        const store = await ImageStore.load(imageBase);
+        const store = await ImageStore.load(imageBase, { root: vfs.ENGINE_ROOT.v86 });
         const root = vfs.ENGINE_ROOT.v86;
         await ensureDir(root);
         await ensureDir(vfs.SHARED_DIR.v86);
 
+        /* The script sits at the top of the image tree, so the guest sees it
+           at /networking.sh and you can edit it in Files. */
         void this.installNetworkingScript(root);
         const imageFs = createUnionFs(root, store);
         /* Guest /shared = your Files folder (ZenFS floor) with changes kept

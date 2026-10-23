@@ -7,7 +7,7 @@
 # v86's network backend — the relay URL set in Dragon86's Settings — so
 # "no internet" here usually means the relay, not this script.
 #
-# Same job as /root/networking.sh in copy.sh's own images: load the driver,
+# Same job as /networking.sh in copy.sh's own images: load the driver,
 # ask for a lease, done. Both NIC types v86 can emulate are handled, because
 # the Arch image ships ne2k while Dragon86's guest ships virtio-net.
 #

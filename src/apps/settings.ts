@@ -5,6 +5,7 @@
 import { el, icon } from "../core/dom";
 import { showConfirm } from "../core/dialog";
 import { DEFAULT_IMAGE_BASE, probeImage, probeRelay, relayBackendName } from "../bridge/v86-image";
+import { ImageStore } from "../bridge/image-store";
 import {
   getSettings,
   setSettings,
@@ -189,6 +190,61 @@ export function openSettings(win: Win): void {
   });
   imageRow.append(imageInput, saveImage);
 
+  /* The image's file list: shipped with the app, or vendored onto this
+     device from the image store in one click (that fetch happens here, in
+     your browser, which is why it can succeed where a build machine can't). */
+  const vendorRow = el("div", "settings-row");
+  vendorRow.append(el("label", undefined, "Image file list"));
+  const vendorState = el("div", "settings-note");
+  const vendorBtn = el("button", "btn", "Vendor to this device");
+  const clearVendorBtn = el("button", "btn", "Clear vendored");
+  const refreshVendor = () => {
+    void (async () => {
+      const root = vfs.ENGINE_ROOT.v86;
+      const shippedUrl = `${import.meta.env.BASE_URL}v86/fs.json`;
+      const shipped = await fetch(shippedUrl)
+        .then(async (r) => r.ok && (await r.text()).trimStart().startsWith("{"))
+        .catch(() => false);
+      const vendored = await ImageStore.vendoredInfo(root);
+      vendorState.textContent =
+        `Shipped with the app: ${shipped ? "yes — the Arch tree builds with no network at all" : "no"}. ` +
+        (vendored
+          ? `Vendored on this device: ${(vendored.bytes / 1048576).toFixed(1)} MB, ${new Date(vendored.savedAt).toLocaleString()}.`
+          : "Vendored on this device: no — the list is fetched from the Arch image on first boot.");
+      vendorState.style.color = "";
+    })();
+  };
+  refreshVendor();
+  vendorBtn.addEventListener("click", () => {
+    vendorBtn.disabled = true;
+    vendorState.style.color = "";
+    vendorState.textContent = `Fetching fs.json from ${getSettings().v86ImageBase}… (several MB, one time)`;
+    void ImageStore.vendorList(getSettings().v86ImageBase, vfs.ENGINE_ROOT.v86)
+      .then((r) => {
+        vendorState.textContent =
+          `Vendored ${(r.bytes / 1048576).toFixed(1)} MB: ${r.paths.toLocaleString()} paths, ${r.blobs.toLocaleString()} file contents. ` +
+          "Next boot builds the Arch tree from this copy; contents still stream on demand.";
+      })
+      .catch((err) => {
+        vendorState.textContent = `Could not vendor the list: ${(err as Error).message}. ` +
+          "The origin must allow this page to read it (CORS); try Test above, or another image base.";
+        vendorState.style.color = "var(--theme-bright)";
+      })
+      .finally(() => {
+        vendorBtn.disabled = false;
+        refreshVendor();
+      });
+  });
+  clearVendorBtn.addEventListener("click", () => {
+    void ImageStore.clearVendored(vfs.ENGINE_ROOT.v86).then((gone) => {
+      vendorState.textContent = gone
+        ? "Vendored list removed. The next boot fetches it from the Arch image again."
+        : "There was no vendored list to remove.";
+      refreshVendor();
+    });
+  });
+  vendorRow.append(vendorBtn, clearVendorBtn);
+
   const testImage = el("button", "btn", "Test");
   const imageResult = el("div", "settings-note");
   testImage.addEventListener("click", () => {
@@ -244,7 +300,7 @@ export function openSettings(win: Win): void {
     "div",
     "settings-note",
     "The network card is emulated by v86, not by the guest: v86 provides the NIC and the backend behind it, including DHCP. " +
-      "Inside the guest, /root/networking.sh only loads the driver and asks for a lease (the same job as that script in copy.sh's images). " +
+      "Inside the guest, /networking.sh only loads the driver and asks for a lease (the same job as that script in copy.sh's images). " +
       "wss:// = wsproxy (copy.sh's own backend, rate-limited when public), wisp:// = your own wisp server, fetch = in-page with no server. " +
       "Press Test to check reachability from this browser; changes take effect on the next Terminal Reconnect.",
   );
@@ -260,15 +316,15 @@ export function openSettings(win: Win): void {
       "The image is fetched straight from the origin below, so its CORS policy matters: press Test to check from this browser. " +
       "Changes take effect on the next Terminal Reconnect.",
   );
-  engineSection.append(guestRow, imageRow, imageResult, guestNote);
+  engineSection.append(guestRow, imageRow, imageResult, vendorRow, vendorState, guestNote);
 
   /* ---------- System ---------- */
   const systemSection = el("div", "settings-section");
   systemSection.append(el("h2", undefined, "System"));
   const table = el("table", "about-table");
   const facts: [string, string][] = [
-    ["OS", "Dragon86 0.9.0 (dev build)"],
-    ["Build", "GUST + Sandstone vendored · Monaco editor · v86 (bash + coreutils + git, live 9p share, save state) · desktop layout fix"],
+    ["OS", "Dragon86 0.10.0 (dev build)"],
+    ["Build", "GUST + Sandstone vendored · Monaco editor · v86 (bash + coreutils + git, live 9p share, save state) · desktop layout fix · vendored Arch file list"],
     ["Engines", "CheerpX (embedded / separate tab) · v86 (mini guest with /shared, or full Arch Linux streamed from an image store)"],
     ["Vendor", "Dragon Gaming Platforms"],
     ["Terminal", "xterm.js 6 · bridge protocol v1"],

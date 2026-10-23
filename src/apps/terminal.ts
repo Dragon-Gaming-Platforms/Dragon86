@@ -261,7 +261,7 @@ export function openTerminal(win: Win): void {
         term.writeln(`${DIM}Reconnect: fresh boot from the guest image — saved state is not loaded.${RESET}`);
       }
       term.writeln(`${DIM}No cross-origin isolation needed — this is the WebView-friendly engine.${RESET}`);
-      term.writeln(`${DIM}Network is emulated by v86; in the guest run ./networking.sh (or /root/networking.sh) to bring the card up.${RESET}`);
+      term.writeln(`${DIM}Network is emulated by v86; in the guest run /networking.sh to bring the card up.${RESET}`);
       if (!archGuest) term.writeln(`${DIM}Your Files folder appears in the guest as /shared, both ways.${RESET}`);
       const vb = getV86Backend({
         onData: (data) => term.write(filterOutput(data)),
