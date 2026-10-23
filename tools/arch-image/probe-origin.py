@@ -89,7 +89,10 @@ def mirror_check():
     """Is the vendored mirror actually serving, and does it allow CORS?"""
     out = ["", "## The vendored mirror (`arch-image` branch)", "", f"- base: `{MIRROR}`"]
     try:
-        req = urllib.request.Request(MIRROR + "manifest.json", headers={"User-Agent": HEADERS["User-Agent"]})
+        req = urllib.request.Request(
+            MIRROR + "manifest.json",
+            headers={"User-Agent": "dragon86-vendor/1", "Accept": "*/*"},
+        )
         with urllib.request.urlopen(req, timeout=60) as res:
             body = res.read()
             out.append(f"- manifest.json: **HTTP {res.status}**, {len(body)} bytes")
@@ -102,6 +105,23 @@ def mirror_check():
                 out.append("- manifest.json is not JSON")
     except Exception as err:  # noqa: BLE001
         out.append(f"- manifest.json: **failed** — {type(err).__name__}: `{err}`")
+
+    # One real blob, because a manifest that loads proves nothing about bytes.
+    for name in ("84b4903a.bin", "d7b414f8.bin"):  # initramfs, kernel
+        try:
+            req = urllib.request.Request(
+                MIRROR + "arch/" + name,
+                headers={"User-Agent": "dragon86-vendor/1", "Accept": "*/*"},
+            )
+            with urllib.request.urlopen(req, timeout=120) as res:
+                data = res.read()
+                out.append(
+                    f"- `{name}`: **HTTP {res.status}**, {len(data)} bytes, "
+                    f"CORS `{res.headers.get('Access-Control-Allow-Origin', 'MISSING')}`, "
+                    f"type `{res.headers.get('Content-Type')}`"
+                )
+        except Exception as err:  # noqa: BLE001
+            out.append(f"- `{name}`: **failed** — {type(err).__name__}: `{err}`")
     return out
 
 
