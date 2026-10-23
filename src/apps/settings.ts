@@ -4,7 +4,7 @@
 
 import { el, icon } from "../core/dom";
 import { showConfirm } from "../core/dialog";
-import { DEFAULT_IMAGE_BASE, probeImage } from "../bridge/v86-image";
+import { DEFAULT_IMAGE_BASE, probeImage, probeRelay, relayBackendName } from "../bridge/v86-image";
 import {
   getSettings,
   setSettings,
@@ -205,6 +205,51 @@ export function openSettings(win: Win): void {
   });
   imageRow.append(testImage);
 
+  /* ---------- v86 network (emulator side) ---------- */
+  const netRow = el("div", "settings-row");
+  netRow.append(el("label", undefined, "v86 network"));
+  const netInput = el("input", "input");
+  netInput.placeholder = "wss://relay.widgetry.org/";
+  netInput.value = getSettings().v86Network;
+  const saveNet = el("button", "btn", "Save");
+  saveNet.addEventListener("click", () => {
+    setSettings({ v86Network: netInput.value.trim() });
+    netInput.value = getSettings().v86Network;
+    saveNet.textContent = "Saved ✓";
+    setTimeout(() => (saveNet.textContent = "Save"), 1500);
+  });
+  const offNet = el("button", "btn", "Off");
+  offNet.addEventListener("click", () => {
+    setSettings({ v86Network: "off" });
+    netInput.value = "off";
+  });
+  const testNet = el("button", "btn", "Test");
+  const netResult = el("div", "settings-note");
+  testNet.addEventListener("click", () => {
+    testNet.disabled = true;
+    netResult.style.color = "";
+    netResult.textContent = `Checking ${relayBackendName(getSettings().v86Network)} relay…`;
+    void probeRelay(getSettings().v86Network)
+      .then((r) => {
+        netResult.textContent = `${r.message} (${r.ms} ms, backend: ${r.backend})`;
+        netResult.style.color = r.ok ? "var(--text-primary)" : "var(--theme-bright)";
+      })
+      .finally(() => {
+        testNet.disabled = false;
+      });
+  });
+  netRow.append(netInput, saveNet, offNet, testNet);
+
+  const netNote = el(
+    "div",
+    "settings-note",
+    "The network card is emulated by v86, not by the guest: v86 provides the NIC and the backend behind it, including DHCP. " +
+      "Inside the guest, /root/networking.sh only loads the driver and asks for a lease (the same job as that script in copy.sh's images). " +
+      "wss:// = wsproxy (copy.sh's own backend, rate-limited when public), wisp:// = your own wisp server, fetch = in-page with no server. " +
+      "Press Test to check reachability from this browser; changes take effect on the next Terminal Reconnect.",
+  );
+  engineSection.append(netRow, netResult, netNote);
+
   const guestNote = el(
     "div",
     "settings-note",
@@ -222,7 +267,7 @@ export function openSettings(win: Win): void {
   systemSection.append(el("h2", undefined, "System"));
   const table = el("table", "about-table");
   const facts: [string, string][] = [
-    ["OS", "Dragon86 0.8.0 (dev build)"],
+    ["OS", "Dragon86 0.9.0 (dev build)"],
     ["Build", "GUST + Sandstone vendored · Monaco editor · v86 (bash + coreutils + git, live 9p share, save state) · desktop layout fix"],
     ["Engines", "CheerpX (embedded / separate tab) · v86 (mini guest with /shared, or full Arch Linux streamed from an image store)"],
     ["Vendor", "Dragon Gaming Platforms"],

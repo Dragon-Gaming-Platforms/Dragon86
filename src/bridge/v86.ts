@@ -189,7 +189,8 @@ class V86Backend implements TerminalBackend {
       "export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
       "export TERM=xterm-256color HOME=/root",
       "cd /root 2>/dev/null || cd /",
-      "echo '[dragon86] /dev, /proc, /sys mounted — you are in full Arch now: pacman -Q | wc -l'",
+      "echo '[dragon86] /dev, /proc, /sys mounted'",
+      "[ -x /root/networking.sh ] && /root/networking.sh",
     ];
     for (const line of lines) this.emu.serial0_send(line + "\n");
   }
@@ -201,6 +202,13 @@ class V86Backend implements TerminalBackend {
       clearTimeout(this.startTimer);
       this.startTimer = setTimeout(() => void this.start(), 200);
     }
+  }
+
+  /** Relay URL for v86's network backend, or "" when networking is off. */
+  private netDeviceUrl(): string {
+    const raw = (getSettings().v86Network || "").trim();
+    if (!raw || raw.toLowerCase() === "off" || raw.toLowerCase() === "none") return "";
+    return raw;
   }
 
   /** Progress line for the Terminal (kind of quiet: it is a chatty boot). */
@@ -216,6 +224,30 @@ class V86Backend implements TerminalBackend {
    * and lands in ZenFS then (see union-fs.ts). Skip the walk when the tree
    * for this image base is already there.
    */
+  /**
+   * Put the guest's networking script where both guests can see it: in the
+   * OS filesystem, so it is editable in Files and shows up in the Arch
+   * guest's own root (the image has no such script of its own once we serve
+   * it — copy.sh's image ships one at /root, and ours does too).
+   */
+  private async installNetworkingScript(root: string): Promise<void> {
+    try {
+      const src = await fetch(`${BASE}scripts/networking.sh`);
+      if (!src.ok) return;
+      const body = await src.text();
+      const dest = `${root}/root/networking.sh`;
+      await fs.promises.mkdir(`${root}/root`, { recursive: true });
+      const existing = await fs.promises.readFile(dest, "utf8").catch(() => null);
+      if (existing !== body) {
+        await fs.promises.writeFile(dest, body);
+        logInfo("v86", `networking.sh installed at ${dest}`);
+      }
+      await fs.promises.chmod(dest, 0o755).catch(() => {});
+    } catch (err) {
+      logWarn("v86", "could not install networking.sh:", err);
+    }
+  }
+
   private async materializeSkeleton(store: ImageStore, root: string): Promise<void> {
     const marker = `${root}/.dragon86-image.json`;
     try {
@@ -294,11 +326,28 @@ class V86Backend implements TerminalBackend {
            leaves the Arch kernel to fall back to a bogus MP table,
            producing harmless-but-alarming RSDP/APIC/IOAPIC errors. */
         acpi: this.acpiEnabled,
+        /* The emulated NIC is the emulator's job, not the guest's: v86
+           provides the card and the backend behind it (a wsproxy/wisp relay,
+           or the in-page stack), including DHCP. The guest only loads its
+           driver and asks for a lease — see /root/networking.sh. Setting the
+           field to "off" gives the guest loopback only. */
+        ...(this.netDeviceUrl()
+          ? { net_device: { type: "virtio", relay_url: this.netDeviceUrl() } }
+          : {}),
         autostart: true,
         disable_keyboard: true,
         disable_mouse: true,
         disable_speaker: true,
       };
+
+      const net = this.netDeviceUrl();
+      void this.installNetworkingScript(vfs.ENGINE_ROOT.v86);
+      logInfo(
+        "v86",
+        net
+          ? `network: virtio-net via ${net} (DHCP served by the backend)`
+          : "network: off — the guest gets loopback only",
+      );
 
       if (guest === "arch") {
         /* The full Arch image, but *through us*: the root filesystem is an
@@ -313,6 +362,7 @@ class V86Backend implements TerminalBackend {
         await ensureDir(root);
         await ensureDir(vfs.SHARED_DIR.v86);
 
+        void this.installNetworkingScript(root);
         const imageFs = createUnionFs(root, store);
         /* Guest /shared = your Files folder (ZenFS floor) with changes kept
            in ~/v86/shared — the same layout as the mini guest. */

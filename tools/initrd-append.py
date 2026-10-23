@@ -9,7 +9,10 @@ TRAILER so every existing inode/hardlink/symlink stays exactly as it was.
     tools/initrd-append.py public/v86/initrd.gz <staging-dir> public/v86/initrd.gz
 
 Paths inside <staging-dir> are preserved (e.g. usr/bin/git -> /usr/bin/git).
-An existing path in the archive is an error: this tool only adds.
+An existing path is an error unless --replace is given, in which case the new
+entry is appended after the existing one (the kernel's initramfs unpacker
+overwrites earlier entries with later ones, so this is how a shipped file is
+updated without rebuilding the whole image).
 """
 import gzip
 import os
@@ -58,9 +61,11 @@ def entry(name, mode, ino, data=b""):
 
 
 def main():
-    if len(sys.argv) != 4:
+    args = [a for a in sys.argv[1:] if not a.startswith("--")]
+    replace = "--replace" in sys.argv
+    if len(args) != 3:
         raise SystemExit(__doc__)
-    src, root, dst = sys.argv[1:]
+    src, root, dst = args
     data = gzip.open(src, "rb").read()
     trailer_off, max_ino = walk(data)
     existing = set()
@@ -89,7 +94,8 @@ def main():
         if rel in existing:
             if kind == "dir":
                 continue
-            raise SystemExit(f"already present in archive: /{rel}")
+            if not replace:
+                raise SystemExit(f"already present in archive: /{rel} (use --replace)")
         if kind == "dir":
             mode, body = stat.S_IFDIR | 0o755, b""
         elif os.path.islink(path):
