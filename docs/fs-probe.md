@@ -39,12 +39,12 @@ Target: `i.copy.sh/fs.json`
 Response headers:
 
 ```
-Date: Fri, 23 Oct 2026 19:19:35 GMT
+Date: Fri, 23 Oct 2026 19:22:02 GMT
 Content-Type: application/json
 Content-Length: 5815708
 Connection: close
 Vary: Accept-Encoding
-Server: BunnyCDN-LA1-985
+Server: BunnyCDN-LA1-954
 CDN-PullZone: 165003
 CDN-RequestCountryCode: US
 Access-Control-Allow-Origin: *
@@ -60,7 +60,7 @@ CDN-RequestPullSuccess: True
 CDN-RequestPullCode: 200
 CDN-CachedAt: 10/23/2026 19:07:28
 CDN-EdgeStorageId: 1109
-CDN-RequestId: e71d6cec2b689c1418da74f31278076c
+CDN-RequestId: b8910b03c42bea22585e1c4f87dddfdf
 CDN-Cache: HIT
 CDN-Status: 200
 CDN-RequestTime: 0
@@ -74,3 +74,10 @@ Accept-Ranges: bytes
 | HEAD | **200** |
 | cache-buster query | **200** |
 | Accept: application/json | **200** |
+
+## The vendor workflow's own fetch (`mirror.py`)
+
+- base: `https://i.copy.sh/`
+- fs.json: **5815708 bytes**
+- fsroot entries: 18
+- smallest blob `e3b0c442.bin`: **0 bytes** (listed size 0)
