@@ -9,6 +9,9 @@ TRAILER so every existing inode/hardlink/symlink stays exactly as it was.
     tools/initrd-append.py public/v86/initrd.gz <staging-dir> public/v86/initrd.gz
 
 Paths inside <staging-dir> are preserved (e.g. usr/bin/git -> /usr/bin/git).
+--drop /path removes entries (and everything under /path/) while rewriting the
+archive; combine with files to add and it becomes an edit.
+
 An existing path is an error unless --replace is given, in which case the new
 entry is appended after the existing one (the kernel's initramfs unpacker
 overwrites earlier entries with later ones, so this is how a shipped file is
@@ -61,8 +64,19 @@ def entry(name, mode, ino, data=b""):
 
 
 def main():
-    args = [a for a in sys.argv[1:] if not a.startswith("--")]
+    drops = []
+    rest = []
+    it = iter(sys.argv[1:])
+    for a in it:
+        if a == "--drop":
+            drops.append(next(it).strip("/"))
+        elif a == "--replace":
+            continue
+        else:
+            rest.append(a)
+    args = rest
     replace = "--replace" in sys.argv
+    keep = lambda name: not any(name == d or name.startswith(d + "/") for d in drops)
     if len(args) != 3:
         raise SystemExit(__doc__)
     src, root, dst = args
@@ -88,6 +102,21 @@ def main():
     added = []
     ino = max_ino + 1
     out = []
+
+    dropped = 0
+    if drops:
+        i = 0
+        while i < trailer_off:
+            hdr = data[i:i + 110]
+            namesize = int(hdr[94:102], 16)
+            size = int(hdr[54:62], 16)
+            name = data[i + 110:i + 110 + namesize - 1].decode()
+            end = align4(i + align4(110 + namesize) + size)
+            if keep(name):
+                out.append(data[i:end])
+            else:
+                dropped += 1
+            i = end
     for kind, rel in todo:
         path = os.path.join(root, rel)
         st = os.lstat(path)
@@ -109,13 +138,17 @@ def main():
         ino += 1
 
     trailer = entry("TRAILER!!!", 0, 0)
-    archive = data[:trailer_off] + b"".join(out) + trailer
+    # With --drop the surviving entries are already in `out`; otherwise the
+    # original archive is copied through untouched and `out` is only the new tail.
+    archive = (b"" if drops else data[:trailer_off]) + b"".join(out) + trailer
     archive += b"\0" * (align4(len(archive)) - len(archive))
     with gzip.GzipFile(dst, "wb", compresslevel=9, mtime=0) as fh:
         fh.write(archive)
 
     for rel, n in added:
         print(f"  + /{rel} ({n} bytes)")
+    if dropped:
+        print(f"  - {dropped} entries dropped")
     print(f"{src} + {len(added)} entries -> {dst} "
           f"({os.path.getsize(src)} -> {os.path.getsize(dst)} bytes)")
 

@@ -44,7 +44,7 @@ export interface Settings {
    *   wisp://host   wisp     — v86 runs the stack itself; DHCP answered locally
    *   fetch         in-page  — no server, but only CORS-visible traffic
    * The emulated NIC is v86's job either way; the guest only has to load its
-   * driver and ask for a lease (that is what /root/networking.sh does).
+   * driver and ask for a lease (that is what /networking.sh does).
    */
   v86Network: string;
 }

@@ -11,6 +11,7 @@
  * *writable* on top of the OS filesystem — is union-fs.ts.
  */
 
+import { fs } from "@zenfs/core";
 import { logInfo, logWarn } from "../core/log";
 
 const BLOB_RE = /^[0-9a-f]{10}\.bin(\.zst)?$/;
@@ -73,6 +74,19 @@ function asNode(raw: unknown): Node | null {
   } as Node;
 }
 
+/** Where the list came from — shown in Settings and the Terminal. */
+export type ListSource = "shipped" | "vendored" | "live";
+
+/** ZenFS path of a vendored list (per image base is overkill: one at a time). */
+export const VENDORED_LIST = (root: string): string => `${root}/.dragon86-image-fs.json`;
+
+interface VendoredRecord {
+  base: string;
+  savedAt: number;
+  bytes: number;
+  json: string;
+}
+
 export class ImageStore implements BaseLayer {
   private blobs = new Map<string, Uint8Array>();
   private links = 0;
@@ -81,14 +95,107 @@ export class ImageStore implements BaseLayer {
   private constructor(
     private base: string,
     private entries: Map<string, Node>,
+    public readonly source: ListSource,
   ) {}
 
-  /** Fetch fs.json, index the tree, return a ready store. */
-  static async load(baseRaw: string, signal?: AbortSignal): Promise<ImageStore> {
+  /**
+   * Resolve the image index and index it.
+   *
+   * Order matters and is deliberate:
+   *   1. `shipped`  — public/v86/fs.json, vendored into the build
+   *                   (tools/arch-image/mirror.py --list-only). Same origin, no CORS, no
+   *                   network dependency.
+   *   2. `vendored` — a list this browser kept in ZenFS from an earlier run
+   *                   (see vendorList()), which is what makes boots offline
+   *                   and instant after the first visit.
+   *   3. `live`     — fs.json from the configured image store, then kept in
+   *                   ZenFS so the next boot is case 2.
+   *
+   * Only file *contents* always come from the image store.
+   */
+  static async load(
+    baseRaw: string,
+    opts: { root?: string; shippedUrl?: string; signal?: AbortSignal } = {},
+  ): Promise<ImageStore> {
     const base = baseRaw.endsWith("/") ? baseRaw : `${baseRaw}/`;
-    const res = await fetch(`${base}fs.json`, { signal, cache: "no-cache" });
-    if (!res.ok) throw new Error(`fs.json: HTTP ${res.status} from ${base}`);
-    const doc = (await res.json()) as { fsroot?: unknown[] };
+
+    const fromShipped = async (): Promise<string | null> => {
+      const url = opts.shippedUrl ?? `${import.meta.env.BASE_URL}v86/fs.json`;
+      try {
+        const res = await fetch(url, { signal: opts.signal, cache: "no-cache" });
+        if (!res.ok) return null;
+        const text = await res.text();
+        /* A dev server or Pages SPA fallback answers 200 with index.html for
+           a missing path. An image list is one JSON object; anything else is
+           not a list, so treat it as absent rather than as a parse error. */
+        if (!text.trimStart().startsWith("{")) return null;
+        logInfo("image", `using the shipped image list (${url})`);
+        return text;
+      } catch {
+        return null;
+      }
+    };
+
+    const fromVendored = async (): Promise<string | null> => {
+      if (!opts.root) return null;
+      try {
+        const raw = await fs.promises.readFile(VENDORED_LIST(opts.root), "utf8");
+        const rec = JSON.parse(raw) as VendoredRecord;
+        logInfo(
+          "image",
+          `using the vendored image list (${(rec.bytes / 1048576).toFixed(1)} MB, saved ${new Date(rec.savedAt).toLocaleString()})`,
+        );
+        return rec.json;
+      } catch {
+        return null;
+      }
+    };
+
+    const fromLive = async (): Promise<string | null> => {
+      try {
+        const res = await fetch(`${base}fs.json`, { signal: opts.signal, cache: "no-cache" });
+        if (!res.ok) throw new Error(`HTTP ${res.status} from ${base}fs.json`);
+        return await res.text();
+      } catch (err) {
+        logWarn("image", "could not fetch fs.json:", err);
+        return null;
+      }
+    };
+
+    let text = await fromShipped();
+    let source: ListSource = "shipped";
+    if (!text) {
+      text = await fromVendored();
+      source = "vendored";
+    }
+    if (!text) {
+      text = await fromLive();
+      source = "live";
+    }
+    if (!text) {
+      throw new Error(
+        `no image list for ${base}: no shipped copy at public/v86/fs.json, nothing vendored on this device, ` +
+          `and the origin did not serve fs.json (check Settings -> v86 image -> Test)`,
+      );
+    }
+
+    const store = ImageStore.parse(text, base, source);
+    /* First successful live fetch: keep it, so this source is only needed once. */
+    if (source === "live" && opts.root) {
+      void store.persistList(text, opts.root).catch(() => {});
+    }
+    return store;
+  }
+
+  /** Parse a document (shipped, vendored or fetched) into an indexed store. */
+  static parse(text: string, baseRaw: string, source: ListSource): ImageStore {
+    const base = baseRaw.endsWith("/") ? baseRaw : `${baseRaw}/`;
+    let doc: { fsroot?: unknown[] };
+    try {
+      doc = JSON.parse(text) as { fsroot?: unknown[] };
+    } catch (err) {
+      throw new Error(`image list is not valid JSON (${(err as Error).message})`);
+    }
     const rootNodes = Array.isArray(doc.fsroot) ? doc.fsroot : (doc as unknown as unknown[]);
     const entries = new Map<string, Node>();
 
@@ -102,13 +209,66 @@ export class ImageStore implements BaseLayer {
       }
     };
     for (const raw of rootNodes) walk(raw, "/");
+    if (entries.size === 0) throw new Error("image list has no entries");
 
-    const store = new ImageStore(base, entries);
+    const store = new ImageStore(base, entries, source);
     store.links = [...entries.values()].filter(
       (n) => typeof n.last === "string" && BLOB_RE.test(n.last),
     ).length;
-    logInfo("image", `indexed ${entries.size} paths, ${store.links} blobs, from ${base}fs.json`);
+    logInfo(
+      "image",
+      `indexed ${entries.size} paths, ${store.links} blobs from the ${source} list (${base})`,
+    );
     return store;
+  }
+
+  /** Save a list in ZenFS so later boots need no network for the index. */
+  async persistList(text: string, root: string): Promise<void> {
+    const rec: VendoredRecord = {
+      base: this.base,
+      savedAt: Date.now(),
+      bytes: text.length,
+      json: text,
+    };
+    await fs.promises.mkdir(root, { recursive: true });
+    await fs.promises.writeFile(VENDORED_LIST(root), JSON.stringify(rec));
+    logInfo("image", `image list vendored at ${VENDORED_LIST(root)} (${(text.length / 1048576).toFixed(1)} MB)`);
+  }
+
+  /** Drop the vendored list (Settings -> v86 image -> Clear vendored list). */
+  static async clearVendored(root: string): Promise<boolean> {
+    try {
+      await fs.promises.unlink(VENDORED_LIST(root));
+      logInfo("image", "vendored image list removed");
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  /** Is a list vendored on this device, and how big is it? */
+  static async vendoredInfo(root: string): Promise<{ savedAt: number; bytes: number } | null> {
+    try {
+      const rec = JSON.parse(await fs.promises.readFile(VENDORED_LIST(root), "utf8")) as VendoredRecord;
+      return { savedAt: rec.savedAt, bytes: rec.bytes };
+    } catch {
+      return null;
+    }
+  }
+
+  /**
+   * Fetch the list from the image store and keep it, now. This is the
+   * explicit "vendor it" action: it runs in the user's browser, where the
+   * origin is reachable, and makes the tree available offline afterwards.
+   */
+  static async vendorList(baseRaw: string, root: string): Promise<{ bytes: number; paths: number; blobs: number }> {
+    const base = baseRaw.endsWith("/") ? baseRaw : `${baseRaw}/`;
+    const res = await fetch(`${base}fs.json`, { cache: "no-cache" });
+    if (!res.ok) throw new Error(`HTTP ${res.status} from ${base}fs.json`);
+    const text = await res.text();
+    const store = ImageStore.parse(text, base, "live");
+    await store.persistList(text, root);
+    return { bytes: text.length, paths: store.entries.size, blobs: store.links };
   }
 
   get baseUrl(): string {

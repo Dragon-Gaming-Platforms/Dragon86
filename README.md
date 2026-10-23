@@ -13,7 +13,7 @@ The NIC is emulated by v86 (`net_device: { type: "virtio", relay_url }`),
 including DHCP for its local link — the guest only loads a driver and
 asks for a lease. Set the relay in Settings → **v86 network** (`wss://`
 wsproxy, `wisp://` wisp, `fetch` in-page, or `off`), press **Test** to
-check it from your browser, and run `/root/networking.sh` in the guest
+check it from your browser, and run `/networking.sh` in the guest
 (same script copy.sh's images ship) for a status report.
 
 ### Service worker: on only when the engine needs isolation
@@ -43,6 +43,19 @@ The v86 engine boots one of two guests (Settings → **v86 guest**):
   it). The image base is a setting, and the **Test** button in Settings
   reports whether that origin allows cross-origin reads from your
   browser. Memory goes to 512 MB for this guest.
+
+### Where the Arch file list comes from
+
+`fs.json` is the 9p file list for that image: every path's name, mode,
+size and symlink target, but no file contents. Dragon86 prefers a
+**vendored** copy — `public/v86/fs.json`, written at deploy time by
+`tools/arch-image/mirror.py --list-only` — so the tree at `~/v86` is
+built from a list that ships with the app instead of a cross-origin
+fetch. If the build has no copy, Settings → **v86 image** →
+**Vendor to this device** fetches it once in your browser and keeps it
+in ZenFS; the image base itself is the last resort. Only file contents
+are ever streamed from the image store. Details in
+`public/v86/VENDORED.md`.
 
 
 ## What's in the box

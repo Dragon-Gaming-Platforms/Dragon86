@@ -187,8 +187,8 @@ outcome, because a dead relay looks exactly like a broken guest: the
 interface comes up, the lease never arrives.
 
 `public/v86/scripts/networking.sh` (shipped in the initramfs at
-`/root/networking.sh` and copied into the OS filesystem at
-`~/v86/root/networking.sh`, so it is editable in Files) does what the
+`/networking.sh` and copied into the OS filesystem at
+`~/v86/networking.sh`, so it is editable in Files) does what the
 same script does in copy.sh's images — loads the driver and asks for a
 lease — plus a static fallback and a `status` mode. The guest init also
 tries to bring the card up in the background at boot, so a working relay
@@ -199,3 +199,39 @@ virtio_net, got `192.168.86.100` by DHCP from the emulated router, wrote
 `/etc/resolv.conf`, and fetched a page over HTTP through the emulated
 NIC. Without a relay the same guest loads the driver, shows `eth0`, and
 times out on DHCP — which is why the probe exists.
+
+## The image file list (`fs.json`) is vendored
+
+The full Arch guest's root filesystem is described by a single document,
+`fs.json`: for every path, a `[name, size, mtime, mode, uid, gid, last]`
+entry where `last` is either a child list or the name of a content blob
+(`<sha256[0:10]>.bin[.zst]`). It is the 9p file list, not file contents.
+
+Dragon86 resolves that list in this order, and says which one it used in
+the Console (`[D86:image] using the shipped image list`):
+
+1. **Shipped** — `public/v86/fs.json`, put there at deploy time by
+   `.github/workflows/deploy.yml` running
+   `tools/arch-image/mirror.py --list-only public/v86/fs.json`
+   (https first, then http; the step is best-effort and never fails the
+   deploy). Same origin, so no CORS question, and the tree at `~/v86`
+   builds with no network at all.
+2. **Vendored on this device** — the same document kept in ZenFS at
+   `~/v86/.dragon86-image-fs.json`. Settings → **v86 image** →
+   *Vendor to this device* fetches it once, in the browser, where the
+   origin is reachable, and writes it there. This is the fallback when
+   the build did not ship a copy (or you point Settings at a different
+   image base): the first boot after vendoring needs no index fetch, so
+   the Arch tree appears instantly and works offline.
+3. **Live** — `fs.json` from the configured image base. If this is the
+   one that worked, the list is saved to ZenFS immediately, so case 3
+   happens at most once per image base.
+
+Nothing else about the tree changes: only **file contents** are ever
+streamed from the image store (`<base>arch/<blob>`), lazily, the first
+time the guest or Files touches a file. `public/v86/fs.json` is
+gitignored — it is a ~7 MB build input, not source.
+
+To check which copy a running OS is using, watch the Console at boot, or
+Settings → v86 image, which reports both the shipped copy (yes/no) and
+the size and date of the vendored one.
