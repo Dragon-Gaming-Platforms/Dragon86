@@ -77,7 +77,12 @@ SKIP_FILE = (
     "libOSMesa",
 )
 
+# No single file over this — except under /boot, where the two files that
+# matter (vmlinuz 9 MB, initramfs 21 MB) are the ones a guest cannot start
+# without. A blanket cap silently dropped the initramfs once: the mirror looked
+# complete and the guest still had no root.
 MAX_FILE_BYTES = 12 * 1024 * 1024
+NO_CAP = ("/boot/",)
 
 # Bytes we are willing to publish. A GitHub Pages site is capped at 1 GB and
 # this repo already publishes ~60 MB of engine and apps; a git branch has no
@@ -125,7 +130,7 @@ def select(root):
         if path.startswith(SKIP) or any(f in path for f in SKIP_FILE):
             skipped_bytes += size
             continue
-        if size > MAX_FILE_BYTES:
+        if size > MAX_FILE_BYTES and not path.startswith(NO_CAP):
             skipped_bytes += size
             continue
         kept.append((path, blob, size))
@@ -151,11 +156,47 @@ def select(root):
     blobs = {}
     for path, blob, _size in kept:
         blobs[blob] = path
+
+    # Non-negotiable: a guest with no kernel or no initramfs does not boot, and
+    # a rule change that drops one is invisible until someone tries. Refuse
+    # rather than publish a mirror that looks complete.
+    paths = {p for p, _, _ in kept}
+    missing = [p for p in ("/boot/vmlinuz-linux", "/boot/initramfs-linux.img") if p not in paths]
+    if missing:
+        raise SystemExit(f"selection dropped boot files ({', '.join(missing)}); refusing to publish")
+
     return kept, blobs, total, skipped_bytes, dropped
 
 
 def human(n):
     return f"{n / 1048576:.1f} MB"
+
+
+def verify(out, blobs):
+    """A blob is named after the sha256 prefix of its contents: check it.
+
+    Cheap insurance against a truncated download being published as fact —
+    the guest would read a half-written binary and fail somewhere confusing.
+    """
+    import hashlib
+
+    bad = 0
+    checked = 0
+    for name in blobs:
+        path = os.path.join(out, name)
+        if not os.path.exists(path):
+            continue
+        h = hashlib.sha256()
+        with open(path, "rb") as fh:
+            for chunk in iter(lambda: fh.read(1 << 20), b""):
+                h.update(chunk)
+        checked += 1
+        if not h.hexdigest().startswith(name.split(".")[0]):
+            bad += 1
+            print(f"::error::corrupt blob {name} ({os.path.getsize(path)} bytes)")
+            os.unlink(path)
+    print(f"verified {checked} blobs, {bad} corrupt (removed; the next run re-fetches them)")
+    return 1 if bad else 0
 
 
 def fetch(url, dest, retries=5):
@@ -184,6 +225,7 @@ def main():
     ap.add_argument("--plan", action="store_true", help="report the selection, download nothing")
     ap.add_argument("--jobs", type=int, default=int(os.environ.get("JOBS", "16")))
     ap.add_argument("--list", metavar="PATH", help="write the selected blob names here (for tests)")
+    ap.add_argument("--verify", action="store_true", help="check that a blown-up file still matches its sha256 name")
     args = ap.parse_args()
 
     root = load_tree(args.fs_json)
@@ -201,6 +243,8 @@ def main():
         return 0
 
     out = os.path.join(args.out, ARCH)
+    if args.verify:
+        return verify(out, blobs)
     # The branch doubles as a complete image store: the list lives beside the
     # blobs, so pointing Settings at it needs no other setup.
     import shutil
