@@ -40,6 +40,11 @@ REFERERS = {
     "none": None,
     "copy.sh": "https://copy.sh/v86/",
     "same-origin": f"https://{BASE}/",
+    # What our own pages actually send. If this is refused while copy.sh's is
+    # allowed, the store has a referer allowlist and no browser-side fix
+    # exists (a page cannot forge Referer) — a mirror is the only answer.
+    "our-pages": "https://dragon-gaming-platforms.github.io/Dragon86/",
+    "random-site": "https://example.com/",
 }
 
 
@@ -75,6 +80,29 @@ def attempt(scheme, ua, referer, extra=None, method="GET"):
         }
     except Exception as err:  # noqa: BLE001
         return {"status": type(err).__name__, "final": url, "type": "-", "len": "-", "cors": "-", "head": "", "headers": {}}
+
+
+MIRROR = "https://raw.githubusercontent.com/Dragon-Gaming-Platforms/Dragon86/arch-image/"
+
+
+def mirror_check():
+    """Is the vendored mirror actually serving, and does it allow CORS?"""
+    out = ["", "## The vendored mirror (`arch-image` branch)", "", f"- base: `{MIRROR}`"]
+    try:
+        req = urllib.request.Request(MIRROR + "manifest.json", headers={"User-Agent": HEADERS["User-Agent"]})
+        with urllib.request.urlopen(req, timeout=60) as res:
+            body = res.read()
+            out.append(f"- manifest.json: **HTTP {res.status}**, {len(body)} bytes")
+            out.append(f"- CORS header: `{res.headers.get('Access-Control-Allow-Origin', 'MISSING')}`")
+            out.append(f"- content-type: `{res.headers.get('Content-Type')}`")
+            try:
+                doc = json.loads(body)
+                out.append(f"- mirrored: {doc.get('blobs')} blobs, {doc.get('bytes', 0) / 1048576:.1f} MB")
+            except ValueError:
+                out.append("- manifest.json is not JSON")
+    except Exception as err:  # noqa: BLE001
+        out.append(f"- manifest.json: **failed** — {type(err).__name__}: `{err}`")
+    return out
 
 
 def vendor_check():
@@ -185,6 +213,7 @@ def main():
             r = attempt(scheme, ua, referer, **kw)
             out.append(f"| {label} | **{r['status']}** |")
 
+    out += mirror_check()
     out += vendor_check()
     print("\n".join(out))
 

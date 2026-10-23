@@ -4,6 +4,7 @@
 
 import { el, icon } from "../core/dom";
 import { showConfirm } from "../core/dialog";
+import { DEFAULT_MIRROR } from "../core/settings";
 import { DEFAULT_IMAGE_BASE, probeImage, probeRelay, relayBackendName } from "../bridge/v86-image";
 import { ImageStore, zstdSupport } from "../bridge/image-store";
 import {
@@ -195,12 +196,12 @@ export function openSettings(win: Win): void {
   const mirrorRow = el("div", "settings-row");
   mirrorRow.append(el("label", undefined, "Image mirror"));
   const mirrorInput = el("input", "input");
-  mirrorInput.placeholder = "https://dragon-gaming-platforms.github.io/Dragon86-arch-image/";
-  mirrorInput.value = getSettings().v86ImageFallback;
+  mirrorInput.placeholder = DEFAULT_MIRROR;
+  mirrorInput.value = getSettings().v86ImageFallback || DEFAULT_MIRROR;
   const saveMirror = el("button", "btn", "Save");
   saveMirror.addEventListener("click", () => {
     setSettings({ v86ImageFallback: mirrorInput.value.trim() });
-    mirrorInput.value = getSettings().v86ImageFallback;
+    mirrorInput.value = getSettings().v86ImageFallback || DEFAULT_MIRROR;
     saveMirror.textContent = "Saved ✓";
     setTimeout(() => (saveMirror.textContent = "Save"), 1500);
   });
@@ -209,7 +210,12 @@ export function openSettings(win: Win): void {
     setSettings({ v86ImageFallback: "" });
     mirrorInput.value = "";
   });
-  mirrorRow.append(mirrorInput, saveMirror, clearMirror);
+  const resetMirror = el("button", "btn", "Default");
+  resetMirror.addEventListener("click", () => {
+    setSettings({ v86ImageFallback: DEFAULT_MIRROR });
+    mirrorInput.value = DEFAULT_MIRROR;
+  });
+  mirrorRow.append(mirrorInput, saveMirror, resetMirror, clearMirror);
 
   /* The image's file list: shipped with the app, or vendored onto this
      device from the image store in one click (that fetch happens here, in
@@ -343,9 +349,10 @@ export function openSettings(win: Win): void {
   const mirrorNote = el(
     "div",
     "settings-note",
-    "A second copy of the same image (same file names, same bytes) used only when the store above refuses a file. " +
-      "The upstream store answers 403 to some browsers — Safari in particular — and a mirror on GitHub Pages answers everyone, " +
-      "so this is what makes Full Arch work there. Leave it empty to use the store alone. " +
+    "A second copy of the same image, used when the store above refuses a file — and then preferred for the rest of the boot, " +
+      "because the upstream store demands a Referer header that Safari and some privacy settings strip. " +
+      "The default is ~700 MB of the image (boot files, the whole userland, the libraries it needs) vendored into this repo's " +
+      "arch-image branch; anything it does not have is still fetched from the store. Leave it empty to use the store alone. " +
       `Blob compression in this browser: ${zstdSupport() === "native" ? "native zstd (fastest)" : "built-in zstd decoder (fzstd) — works, just slower"}.`,
   );
   engineSection.append(guestRow, imageRow, imageResult, mirrorRow, mirrorNote, vendorRow, vendorState, guestNote);
@@ -355,8 +362,8 @@ export function openSettings(win: Win): void {
   systemSection.append(el("h2", undefined, "System"));
   const table = el("table", "about-table");
   const facts: [string, string][] = [
-    ["OS", "Dragon86 0.12.0 (dev build)"],
-    ["Build", "GUST + Sandstone vendored · Monaco editor · v86 (bash + coreutils + git, live 9p share, save state) · desktop layout fix · vendored Arch file list · image mirror + zstd fallback · real Arch file list vendored"],
+    ["OS", "Dragon86 0.13.0 (dev build)"],
+    ["Build", "GUST + Sandstone vendored · Monaco editor · v86 (bash + coreutils + git, live 9p share, save state) · desktop layout fix · vendored Arch file list · image mirror + zstd fallback · real Arch file list vendored · 700 MB blob mirror · engine-aware Terminal title"],
     ["Engines", "CheerpX (embedded / separate tab) · v86 (mini guest with /shared, or full Arch Linux streamed from an image store)"],
     ["Vendor", "Dragon Gaming Platforms"],
     ["Terminal", "xterm.js 6 · bridge protocol v1"],

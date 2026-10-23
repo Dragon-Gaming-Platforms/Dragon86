@@ -275,3 +275,50 @@ browser, and only two of them are ours to fix:
 With a mirror configured, nothing about the guest changes: same image,
 same bytes, just a host that will talk to every browser.
 
+
+## The vendored blob mirror (`arch-image` branch)
+
+The image list is cheap to vendor; the 70,661 blobs behind it are 5.3 GB, and
+that is what Safari could not reach. `i.copy.sh` sends
+`Access-Control-Allow-Origin: *` but **requires a `Referer`**, and a page
+cannot forge one — so a browser that strips the referrer (Safari, privacy
+settings, a strict `Referrer-Policy`) gets a connection error on every single
+blob. No amount of client code fixes that.
+
+So the bytes come from a host that does not care:
+`https://raw.githubusercontent.com/Dragon-Gaming-Platforms/Dragon86/arch-image/`,
+published by `.github/workflows/vendor-arch-blobs.yml` into this repo's
+`arch-image` branch. raw.githubusercontent.com serves any file with
+`Access-Control-Allow-Origin: *` and no referrer check.
+
+**How much is vendored** — `tools/arch-image/vendor.py --plan`:
+
+```
+selected: 17116 files, 15003 distinct blobs, 698.5 MB
+not vendored: 5582.9 MB (29 dropped for budget)
+```
+
+That is the whole userland: `/boot` (kernel + initramfs), all of `/usr/bin`,
+`/usr/lib` minus the toolchain monsters, `/etc`, `/usr/libexec`, `/usr/local`.
+Left out, because they are most of the bytes and none of the boot: Rust
+(386 MB), GPU drivers (410 MB), Firefox (308 MB), the JDK (148 MB), GCC
+(133 MB), LLVM/clang (~220 MB), Docker, OCaml, Guile, `/usr/share`,
+`/usr/include`, the package cache and `/var`. Anything not vendored still
+streams from the upstream store, which works in Chrome; in Safari it is simply
+unavailable.
+
+**Order of requests.** The upstream store is tried first — it is the complete
+image, and usually faster — but the first refusal flips the order for the rest
+of the boot, so a browser that cannot use it does not pay a failed round trip
+per file. A 404 from the mirror (blob not in the subset) falls back to the
+store. All of this is logged: `[D86:image] ... refused a blob ... switching to
+the mirror for the rest of this boot`.
+
+Settings → **v86 image** → **Image mirror** shows and changes the base; it
+defaults to the branch above, and can point at a Pages copy instead (faster,
+1 GB limit) once one exists.
+
+**Refreshing it.** The workflow runs when `public/v86/fs.json`, the selection
+rule, or `tools/arch-image/vendor-request` changes — the last one is the
+by-push trigger. It is resumable: it clones the branch first, so only missing
+blobs are downloaded and an unchanged image commits nothing.

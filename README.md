@@ -61,12 +61,16 @@ that copy first, then a copy vendored onto the device (Settings → **v86
 image** → *Vendor to this device*), then the image store itself. Only file
 contents are ever streamed from the store.
 
-For Safari the contents need help too: blobs are zstd-compressed (decoded
-with a bundled fallback when the browser has no native zstd), and the
-upstream host refuses some browsers outright — so Settings → **Image
-mirror** takes a second copy of the same image to retry against
-(`.github/workflows/mirror-arch-image.yml` builds one on a Pages repo of
-its own). Details in `public/v86/VENDORED.md`.
+For Safari the bytes need help too. The upstream store sends
+`Access-Control-Allow-Origin: *` but **requires a `Referer`**, which a page
+cannot forge — so a browser that strips the referrer gets an error on every
+blob. A curated **~700 MB subset of the image** (boot files, the whole
+userland, the libraries it needs) is therefore vendored into this repo's
+`arch-image` branch by `.github/workflows/vendor-arch-blobs.yml`, served by
+raw.githubusercontent.com, and used automatically once the upstream store
+refuses a file. Blobs are also zstd-decoded with a bundled fallback when the
+browser has no native zstd. Settings → **Image mirror** shows the base.
+Details in `public/v86/VENDORED.md`.
 
 ## What's in the box
 
