@@ -6,20 +6,21 @@
  * HTTP store: `fs.json` (the directory tree) plus `arch/<sha256-prefix>.bin`
  * blobs, fetched lazily as the guest touches them.
  *
- * Those files live on a different origin (`i.copy.sh`), so this only works
- * if that host sends permissive CORS headers — it must, because copy.sh's
- * own page is a different origin from i.copy.sh and fetches the same URLs.
- * A CORS block is the one failure mode we can't fix from here, so
- * `probeImage()` exists to report it precisely on the device instead of
+ * Those files live on a different origin (`i.copy.sh`). It does allow CORS
+ * (`Access-Control-Allow-Origin: *`) but it requires a `Referer` header and
+ * will refuse the connection without one, which is how Safari ends up with a
+ * bare failure. The loader therefore sends `referrerPolicy: "origin"` (see
+ * CROSS_ORIGIN in image-store.ts), serves the file list from our own origin
+ * instead of asking for it, and can retry contents against a mirror.
+ * `probeImage()` reports all of that precisely on the device instead of
  * leaving the user with an emulator that never boots.
- *
- * The 1 GB GitHub Pages limit is avoided entirely: nothing is mirrored,
- * the browser streams blobs straight from the upstream store. (If the
- * origin ever blocks us, tools/arch-image/ mirrors the same store into a
- * Pages repo of our own — Pages sends `Access-Control-Allow-Origin: *`.)
  */
 
 export const DEFAULT_IMAGE_BASE = "https://i.copy.sh/";
+
+/* "Is this a blob name?" has one definition, in image-store.ts. Three copies
+   of that regex drifted apart once already, and a pinned prefix length made
+   the whole image look like symlinks. */
 
 /** Accept `i.copy.sh`, `https://i.copy.sh`, `https://host/x/` alike. */
 export function normalizeImageBase(raw: string): string {
@@ -40,7 +41,7 @@ export interface ImageProbe {
   message: string;
 }
 
-const BLOB_RE = /^[0-9a-f]{10}\.bin(\.zst)?$/;
+import { isBlobName } from "./image-store";
 
 /** Collect every blob filename referenced by an fs.json tree. */
 function collectBlobs(node: unknown, out: Set<string>): void {
@@ -49,7 +50,7 @@ function collectBlobs(node: unknown, out: Set<string>): void {
   if (node.length < 7) return;
   const last = node[6];
   if (typeof last === "string") {
-    if (BLOB_RE.test(last)) out.add(last);
+    if (isBlobName(last)) out.add(last);
   } else if (Array.isArray(last)) {
     for (const child of last) collectBlobs(child, out);
   }
@@ -74,7 +75,10 @@ export async function probeImage(baseRaw: string): Promise<ImageProbe> {
 
   let text: string;
   try {
-    const res = await fetch(`${base}fs.json`, { cache: "no-store" });
+    /* Same referrer demand as the real loader — see CROSS_ORIGIN in
+       image-store.ts. A Test button that succeeds where the engine fails
+       would be worse than no Test button. */
+    const res = await fetch(`${base}fs.json`, { cache: "no-store", referrerPolicy: "origin" });
     result.fsStatus = res.status;
     if (!res.ok) {
       result.message =
@@ -93,8 +97,8 @@ export async function probeImage(baseRaw: string): Promise<ImageProbe> {
       `could not fetch ${base}fs.json (${(err as Error).message}). ` +
       `Either the browser is offline, or that origin refuses cross-origin ` +
       `requests (CORS). Open DevTools → Console: a red CORS line confirms it. ` +
-      `Workaround: mirror the store into your own Pages repo with ` +
-      `tools/arch-image/ (Pages always allows CORS).`;
+      `Workaround: point Settings -> v86 image -> Image mirror at a copy of ` +
+      `this image on GitHub Pages (tools/arch-image/ builds one).`;
     return result;
   }
 
@@ -119,6 +123,7 @@ export async function probeImage(baseRaw: string): Promise<ImageProbe> {
     const res = await fetch(`${base}arch/${sample}`, {
       headers: { Range: "bytes=0-1023" },
       cache: "no-store",
+      referrerPolicy: "origin",
     });
     result.blobStatus = res.status;
     if (res.ok || res.status === 206) {

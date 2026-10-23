@@ -23,7 +23,25 @@ import { logInfo, logWarn } from "../core/log";
  * prefix length — pinning it to 10 made every file in this image look like a
  * symlink, which is a quiet way to hand the guest an unusable root.
  */
+/**
+ * Options for every request that leaves our origin.
+ *
+ * The image store is behind a CDN with a referer check: with a Referer it
+ * answers 200 `application/json` with `Access-Control-Allow-Origin: *`; with
+ * no Referer it refuses the connection outright. Browsers normally send a
+ * referrer cross-origin, but not always — a strict Referrer-Policy, Safari's
+ * tracking protections, or a stripped header all turn every image request
+ * into an opaque failure. Asking for `origin` explicitly makes the header
+ * non-optional, which is the difference between booting and not.
+ */
+const CROSS_ORIGIN: RequestInit = { referrerPolicy: "origin", credentials: "omit" };
+
 const BLOB_RE = /^[0-9a-f]{4,64}\.bin(\.zst)?$/;
+
+/** Is this string a blob name (a file's contents) rather than a symlink target? */
+export function isBlobName(name: string): boolean {
+  return BLOB_RE.test(name);
+}
 
 export interface BaseStat {
   mode: number; // POSIX st_mode (type bits + permissions)
@@ -166,7 +184,7 @@ export class ImageStore implements BaseLayer {
     const fromLive = async (): Promise<string | null> => {
       const get = async (url: string): Promise<string | null> => {
         try {
-          const res = await fetch(url, { signal: opts.signal, cache: "no-cache" });
+          const res = await fetch(url, { signal: opts.signal, cache: "no-cache", ...CROSS_ORIGIN });
           if (!res.ok) throw new Error(`HTTP ${res.status} from ${url}`);
           const text = await res.text();
           return text.trimStart().startsWith("{") ? text : null;
@@ -283,7 +301,7 @@ export class ImageStore implements BaseLayer {
    */
   static async vendorList(baseRaw: string, root: string): Promise<{ bytes: number; paths: number; blobs: number }> {
     const base = baseRaw.endsWith("/") ? baseRaw : `${baseRaw}/`;
-    const res = await fetch(`${base}fs.json`, { cache: "no-cache" });
+    const res = await fetch(`${base}fs.json`, { cache: "no-cache", ...CROSS_ORIGIN });
     if (!res.ok) throw new Error(`HTTP ${res.status} from ${base}fs.json`);
     const text = await res.text();
     const store = ImageStore.parse(text, base, "live");
@@ -367,7 +385,7 @@ export class ImageStore implements BaseLayer {
     const url = `${this.base}arch/${name}`;
     let res: Response | null = null;
     try {
-      res = await fetch(url, { cache: "force-cache" });
+      res = await fetch(url, { cache: "force-cache", ...CROSS_ORIGIN });
     } catch (err) {
       logWarn("image", `blob ${name}: ${(err as Error).message}`);
     }
@@ -378,7 +396,7 @@ export class ImageStore implements BaseLayer {
 
     const alt = `${this.fallback}arch/${name}`;
     logWarn("image", `blob ${name}: ${status} from ${this.base}; retrying the mirror at ${this.fallback}`);
-    const mirror = await fetch(alt, { cache: "force-cache" });
+    const mirror = await fetch(alt, { cache: "force-cache", ...CROSS_ORIGIN });
     if (!mirror.ok) {
       throw new Error(`blob ${name}: HTTP ${status} from ${url}, and HTTP ${mirror.status} from ${alt}`);
     }
