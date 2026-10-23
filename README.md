@@ -50,9 +50,13 @@ The v86 engine boots one of two guests (Settings → **v86 guest**):
 
 `fs.json` is the 9p file list for that image: every path's name, mode,
 size and symlink target, but no file contents. It is **committed to this
-repo** (`public/v86/fs.json`, refreshed on every push by
-`.github/workflows/vendor-fs-json.yml`) and served from our own origin,
-because the upstream store answers 403 to Safari. At runtime the app uses
+repo** (`public/v86/fs.json` — 5.8 MB, 98,006 paths — refreshed on every push
+by `.github/workflows/vendor-fs-json.yml`, which also logs what it did to
+`docs/fs-vendor.log`) and served from our own origin. The upstream store
+requires a `Referer` header and refuses the connection without one, which is
+the "403" Safari was showing; asking for the list from our own origin removes
+that question, and every cross-origin request now sends a referrer on
+purpose. At runtime the app uses
 that copy first, then a copy vendored onto the device (Settings → **v86
 image** → *Vendor to this device*), then the image store itself. Only file
 contents are ever streamed from the store.

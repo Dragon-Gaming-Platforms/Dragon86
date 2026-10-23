@@ -1,3 +1,4 @@
+import { existsSync, readFileSync } from "node:fs";
 import { fs } from "@zenfs/core";
 import { ImageStore, VENDORED_LIST } from "../../src/bridge/image-store";
 
@@ -130,4 +131,24 @@ live = null; shipped = null;
 let msg = "";
 try { await ImageStore.load("https://i.copy.sh/", { root }); } catch (e) { msg = (e as Error).message; }
 check("explains how to fix a missing list", /public\/v86\/fs.json/.test(msg) && /Settings/.test(msg));
+// 8. The real, committed image list, when the repo has one. This is the
+// regression that mattered: the list was fetched correctly and then discarded
+// because blob names were assumed to be ten hex digits.
+const realList = "public/v86/fs.json";
+if (existsSync(realList)) {
+  const real = ImageStore.parse(readFileSync(realList, "utf8"), "https://i.copy.sh/", "shipped");
+  const kernel = real.findKernel();
+  check("committed fs.json parses", real.paths().length > 50_000);
+  check("committed fs.json references blobs", real.blobCount > 10_000);
+  check("committed fs.json has a kernel and an initrd", !!kernel.kernel && !!kernel.initrd);
+  check("committed fs.json: /usr/bin/bash is a file", (await real.stat("/usr/bin/bash"))?.isFile() === true);
+  const bin = await real.stat("/bin");
+  check(
+    "committed fs.json: /bin is a symlink to usr/bin",
+    bin?.isSymbolicLink() === true && (await real.readlink("/bin")) === "usr/bin",
+  );
+} else {
+  console.log("skip: no public/v86/fs.json committed yet");
+}
+
 console.log("fetch calls:", calls.length);

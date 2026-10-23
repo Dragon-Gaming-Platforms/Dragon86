@@ -207,7 +207,9 @@ The full Arch guest's root filesystem is described by one document,
 entry where `last` is either a child list or the name of a content blob
 (`<sha256-prefix>.bin[.zst]`, 8 hex digits in the current image). It is the 9p file list, not file contents.
 
-**It is a file in this repository** — `public/v86/fs.json` — and is served
+**It is a file in this repository** — 5.8 MB, 98,006 paths (9,789
+directories, 5,723 symlinks, 82,489 files, 70,661 distinct contents) for the
+current Arch set — — `public/v86/fs.json` — and is served
 from our own origin. That is not a tidiness choice: the upstream store
 answers **403 to Safari**, so a browser-side fetch of the list can simply
 fail. Same-origin has no such opinion.
@@ -239,6 +241,17 @@ file.
 
 ### Safari: the 403, the mirror, and zstd
 
+What the origin actually does (measured, see `docs/fs-probe.md` and
+`docs/fs-vendor.log`): it is not down and it does not hate any browser. It
+**requires a `Referer` header** and refuses the connection without one — and
+when it does answer, it is generous: 200, `application/json`,
+`Access-Control-Allow-Origin: *`. Browsers normally send a referrer
+cross-origin, so this mostly works; when a policy, a tracking protection or a
+stripped header removes it, every image request dies with an opaque failure,
+which is what Safari was showing. The loader now passes
+`referrerPolicy: "origin"` on every cross-origin request, so the header is
+not optional any more.
+
 Three separate things had to be true before Full Arch could work in every
 browser, and only two of them are ours to fix:
 
@@ -247,12 +260,14 @@ browser, and only two of them are ours to fix:
    123; other engines may not, and a guest cannot boot with half its files
    unreadable. `fzstd` (MIT, bundled, ~10 KB) is now the fallback decoder,
    used automatically when the platform API is missing or refuses. Nothing
-   to do at runtime; Settings reports which one your browser uses.
-3. **The blobs themselves** — still fetched from upstream, which refuses
-   Safari. Ours to *work around*, not to fix: Settings → **v86 image** →
-   **Image mirror** takes a second store with the same file names and
-   bytes, and any blob the primary refuses (403 or network error) is
-   retried there. `.github/workflows/mirror-arch-image.yml` builds such a
+   to do at runtime; Settings reports which one your browser uses. (The
+   current Arch set has no `.zst` blobs at all — all 70,661 are plain
+   `.bin` — so today this is insurance against the next image.)
+3. **The blobs themselves** — still fetched from upstream, which refuses a
+   request with no referrer. Ours to *work around*, not to fix: Settings →
+   **v86 image** → **Image mirror** takes a second store with the same file
+   names and bytes, and any blob the primary refuses (403 or network error)
+   is retried there. `.github/workflows/mirror-arch-image.yml` builds such a
    mirror into a Pages repo of its own on demand — see
    `tools/arch-image/README.md` — because Pages answers everyone and sends
    `Access-Control-Allow-Origin: *`.
