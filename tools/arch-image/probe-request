@@ -1,2 +1,2 @@
 Touch this file (any change) to make the `Probe the image origin` workflow run again.
-3: after the mirror exists.
+4: verify the mirror serves with CORS.
