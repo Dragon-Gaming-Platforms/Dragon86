@@ -71,6 +71,10 @@ jobs:
             || V86_IMAGE_BASE=http://i.copy.sh/ python3 tools/arch-image/vendor.py --out /tmp/pub --jobs 24 \
             || echo "::warning::some blobs could not be downloaded; publishing what we have"
 
+      - name: Verify the bytes match their names
+        continue-on-error: true
+        run: python3 tools/arch-image/vendor.py --verify --out /tmp/pub
+
       - name: Publish
         run: |
           set -euo pipefail

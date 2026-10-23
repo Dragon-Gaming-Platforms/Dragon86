@@ -38,6 +38,8 @@ jobs:
         run: |
           git config user.name "dragon86-vendor[bot]"
           git config user.email "dragon86-vendor@users.noreply.github.com"
+          # main moves under us; rebase rather than lose the findings
+          git pull --rebase --autostash origin main || true
           git add docs/fs-probe.md
           git diff --cached --quiet && echo "unchanged" && exit 0
           git commit -m "Record what the image origin says (fs probe)"
