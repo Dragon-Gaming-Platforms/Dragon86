@@ -307,12 +307,23 @@ Left out, because they are most of the bytes and none of the boot: Rust
 streams from the upstream store, which works in Chrome; in Safari it is simply
 unavailable.
 
-**Order of requests.** The upstream store is tried first — it is the complete
-image, and usually faster — but the first refusal flips the order for the rest
-of the boot, so a browser that cannot use it does not pay a failed round trip
-per file. A 404 from the mirror (blob not in the subset) falls back to the
-store. All of this is logged: `[D86:image] ... refused a blob ... switching to
-the mirror for the rest of this boot`.
+**Order of requests: mirror first.** Measured with `docs/fs-probe.md` — the
+upstream store only answers requests whose `Referer` is copy.sh's own:
+
+| Referer | Status |
+|---|---|
+| `https://copy.sh/v86/` | 200, `application/json`, CORS `*` |
+| `https://i.copy.sh/` | 200 |
+| our Pages origin | **403** |
+| any random site | **403** |
+| none at all | connection dropped |
+
+`Referer` is a forbidden header, so no page can forge one. That is true in
+**every** browser, which is why Full Arch did not boot in Chrome either: the
+mirror is the source, not a fallback. A 404 from the mirror (blob not in the
+subset) falls back to the store, which then works only where the referer is
+copy.sh's. The Terminal says which host is feeding it
+(`blobs: vendored mirror (...)`) and Settings → **Check Image** reports both.
 
 Settings → **v86 image** → **Image mirror** shows and changes the base; it
 defaults to the branch above, and can point at a Pages copy instead (faster,

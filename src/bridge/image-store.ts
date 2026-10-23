@@ -116,8 +116,10 @@ interface VendoredRecord {
 
 export class ImageStore implements BaseLayer {
   private blobs = new Map<string, Uint8Array>();
-  /** Set once the image origin refuses a blob; flips mirror-first ordering. */
-  private originRefused = false;
+  /** Set once the mirror has served a blob, so the log says it only once. */
+  private mirrorNoted = false;
+  /** Where to report "blobs are coming from the mirror" (the Terminal). */
+  private notice: ((text: string) => void) | null = null;
   private links = 0;
   private bytes = 0;
 
@@ -146,7 +148,14 @@ export class ImageStore implements BaseLayer {
    */
   static async load(
     baseRaw: string,
-    opts: { root?: string; shippedUrl?: string; signal?: AbortSignal; fallbackBase?: string } = {},
+    opts: {
+      root?: string;
+      shippedUrl?: string;
+      signal?: AbortSignal;
+      fallbackBase?: string;
+      /** Called once with a human sentence about where blobs will come from. */
+      onNotice?: (text: string) => void;
+    } = {},
   ): Promise<ImageStore> {
     const base = baseRaw.endsWith("/") ? baseRaw : `${baseRaw}/`;
     const fallback = opts.fallbackBase ? normalizeBase(opts.fallbackBase) : null;
@@ -220,6 +229,7 @@ export class ImageStore implements BaseLayer {
     }
 
     const store = ImageStore.parse(text, base, source, fallback);
+    store.notice = opts.onNotice ?? null;
     /* First successful live fetch: keep it, so this source is only needed once. */
     if (source === "live" && opts.root) {
       void store.persistList(text, opts.root).catch(() => {});
@@ -376,21 +386,21 @@ export class ImageStore implements BaseLayer {
   }
 
   /**
-   * Download one content blob, using the mirror as the first choice once the
-   * origin has refused us.
+   * Download one content blob: mirror first, origin second.
    *
-   * i.copy.sh answers `Access-Control-Allow-Origin: *` but demands a
-   * `Referer` header, and a page cannot forge one: a browser that strips the
-   * referrer (Safari, tracking protection, a strict policy) gets a connection
-   * error on *every* blob. The first refusal therefore flips the order for the
-   * rest of the session — otherwise a boot pays a failed round trip per file,
-   * thousands of them. The mirror is a published subset, so a miss there
-   * still falls back to the origin.
+   * Measured, not assumed (docs/fs-probe.md): the upstream store sends
+   * `Access-Control-Allow-Origin: *` but only answers requests whose
+   * `Referer` is copy.sh's own — with our origin as the referrer it returns
+   * 403, and with no referrer at all it drops the connection. `Referer` is a
+   * forbidden header, so no page can forge one. That is true of *every*
+   * browser, not just Safari, which means the mirror is not a fallback: it is
+   * the source, and the origin is the fallback for whatever the mirror does
+   * not carry (a 404 there).
    */
   private async fetchBlob(name: string): Promise<Uint8Array<ArrayBuffer>> {
     const origin = `${this.base}arch/${name}`;
     const mirrored = this.fallback ? `${this.fallback}arch/${name}` : null;
-    const attempts = this.originRefused && mirrored ? [mirrored, origin] : [origin, ...(mirrored ? [mirrored] : [])];
+    const attempts = mirrored ? [mirrored, origin] : [origin];
 
     const failures: string[] = [];
     for (const url of attempts) {
@@ -399,27 +409,24 @@ export class ImageStore implements BaseLayer {
         res = await fetch(url, { cache: "force-cache", ...CROSS_ORIGIN });
       } catch (err) {
         failures.push(`${url}: ${(err as Error).message}`);
-        if (url === origin) this.noteRefused(name);
         continue;
       }
-      if (res.ok) return new Uint8Array(await res.arrayBuffer());
+      if (res.ok) {
+        if (url !== origin) this.noteMirrorUsed(name);
+        return new Uint8Array(await res.arrayBuffer());
+      }
       failures.push(`${url}: HTTP ${res.status}`);
-      /* 404 from the mirror just means "not in the subset"; a refusal from
-         the origin means we should stop asking it first. */
-      if (url === origin && res.status !== 404) this.noteRefused(name);
     }
     throw new Error(`blob ${name}: ${failures.join("; ")}`);
   }
 
-  /** Remember that the origin is refusing us, and say so once. */
-  private noteRefused(name: string): void {
-    if (this.originRefused) return;
-    this.originRefused = true;
-    logWarn(
-      "image",
-      `${this.base} refused a blob (${name}) — switching to the mirror for the rest of this boot` +
-        (this.fallback ? ` (${this.fallback})` : ", but no mirror is configured"),
-    );
+  /** Say once per boot that the mirror is what is feeding the guest. */
+  private noteMirrorUsed(name: string): void {
+    if (this.mirrorNoted) return;
+    this.mirrorNoted = true;
+    const where = this.fallback ?? "";
+    logInfo("image", `blobs are coming from the vendored mirror (${where}); started with ${name}`);
+    this.notice?.(`blobs: vendored mirror (${where.replace(/^https?:\/\//, "").replace(/\/$/, "")})`);
   }
 
   /** Every path in the image, depth-first, for materialising the tree. */
