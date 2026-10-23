@@ -1,7 +1,7 @@
 # fs.json vendor run
 
-- date: 2026-10-23T19:25:43Z
-- ref: main @ 36fd2ba9
+- date: 2026-10-23T19:28:09Z
+- ref: main @ 35ae7355
 
 ## What the origin says to whom
 
@@ -20,9 +20,7 @@ http://i.copy.sh/
 
 ```
 source: https://i.copy.sh/
-fsroot has no file entries - refusing to write it
-source: http://i.copy.sh/
-fsroot has no file entries - refusing to write it
+wrote public/v86/fs.json (5.5 MB), 70661 file contents referenced
 ```
 
-No copy in the tree; the app will use a per-device vendored list or the origin.
+- bytes: 5815708
