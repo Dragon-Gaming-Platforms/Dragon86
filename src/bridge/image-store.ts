@@ -12,6 +12,7 @@
  */
 
 import { fs } from "@zenfs/core";
+import { decompress as fzstd } from "fzstd";
 import { logInfo, logWarn } from "../core/log";
 
 const BLOB_RE = /^[0-9a-f]{10}\.bin(\.zst)?$/;
@@ -96,6 +97,8 @@ export class ImageStore implements BaseLayer {
     private base: string,
     private entries: Map<string, Node>,
     public readonly source: ListSource,
+    /** Optional same-list mirror to retry against when `base` refuses a blob. */
+    private fallback: string | null = null,
   ) {}
 
   /**
@@ -115,9 +118,10 @@ export class ImageStore implements BaseLayer {
    */
   static async load(
     baseRaw: string,
-    opts: { root?: string; shippedUrl?: string; signal?: AbortSignal } = {},
+    opts: { root?: string; shippedUrl?: string; signal?: AbortSignal; fallbackBase?: string } = {},
   ): Promise<ImageStore> {
     const base = baseRaw.endsWith("/") ? baseRaw : `${baseRaw}/`;
+    const fallback = opts.fallbackBase ? normalizeBase(opts.fallbackBase) : null;
 
     const fromShipped = async (): Promise<string | null> => {
       const url = opts.shippedUrl ?? `${import.meta.env.BASE_URL}v86/fs.json`;
@@ -152,14 +156,22 @@ export class ImageStore implements BaseLayer {
     };
 
     const fromLive = async (): Promise<string | null> => {
-      try {
-        const res = await fetch(`${base}fs.json`, { signal: opts.signal, cache: "no-cache" });
-        if (!res.ok) throw new Error(`HTTP ${res.status} from ${base}fs.json`);
-        return await res.text();
-      } catch (err) {
-        logWarn("image", "could not fetch fs.json:", err);
-        return null;
-      }
+      const get = async (url: string): Promise<string | null> => {
+        try {
+          const res = await fetch(url, { signal: opts.signal, cache: "no-cache" });
+          if (!res.ok) throw new Error(`HTTP ${res.status} from ${url}`);
+          const text = await res.text();
+          return text.trimStart().startsWith("{") ? text : null;
+        } catch (err) {
+          logWarn("image", "could not fetch fs.json:", err);
+          return null;
+        }
+      };
+      const direct = await get(`${base}fs.json`);
+      if (direct) return direct;
+      if (!fallback) return null;
+      logWarn("image", `retrying the image list from the mirror at ${fallback}`);
+      return get(`${fallback}fs.json`);
     };
 
     let text = await fromShipped();
@@ -179,7 +191,7 @@ export class ImageStore implements BaseLayer {
       );
     }
 
-    const store = ImageStore.parse(text, base, source);
+    const store = ImageStore.parse(text, base, source, fallback);
     /* First successful live fetch: keep it, so this source is only needed once. */
     if (source === "live" && opts.root) {
       void store.persistList(text, opts.root).catch(() => {});
@@ -188,7 +200,7 @@ export class ImageStore implements BaseLayer {
   }
 
   /** Parse a document (shipped, vendored or fetched) into an indexed store. */
-  static parse(text: string, baseRaw: string, source: ListSource): ImageStore {
+  static parse(text: string, baseRaw: string, source: ListSource, fallback: string | null = null): ImageStore {
     const base = baseRaw.endsWith("/") ? baseRaw : `${baseRaw}/`;
     let doc: { fsroot?: unknown[] };
     try {
@@ -211,7 +223,7 @@ export class ImageStore implements BaseLayer {
     for (const raw of rootNodes) walk(raw, "/");
     if (entries.size === 0) throw new Error("image list has no entries");
 
-    const store = new ImageStore(base, entries, source);
+    const store = new ImageStore(base, entries, source, fallback);
     store.links = [...entries.values()].filter(
       (n) => typeof n.last === "string" && BLOB_RE.test(n.last),
     ).length;
@@ -327,13 +339,42 @@ export class ImageStore implements BaseLayer {
     const hit = this.blobs.get(n.last);
     if (hit) return hit;
 
-    const res = await fetch(`${this.base}arch/${n.last}`, { cache: "force-cache" });
-    if (!res.ok) throw new Error(`blob ${n.last}: HTTP ${res.status}`);
-    let data: Uint8Array<ArrayBuffer> = new Uint8Array(await res.arrayBuffer());
+    const fetched = await this.fetchBlob(n.last);
+    let data: Uint8Array<ArrayBuffer> = fetched;
     if (n.last.endsWith(".zst")) data = await unzstd(data);
     this.blobs.set(n.last, data);
     this.bytes += data.byteLength;
     return data;
+  }
+
+  /**
+   * Download one content blob, with a retry against the mirror base.
+   *
+   * The image origin is a shared host outside our control: it can answer
+   * 403 to a browser it does not recognise (Safari, most notably). A
+   * mirror on GitHub Pages — same file names, same bytes — is the way out,
+   * so a refusal here is retried there instead of surfacing as a dead guest.
+   */
+  private async fetchBlob(name: string): Promise<Uint8Array<ArrayBuffer>> {
+    const url = `${this.base}arch/${name}`;
+    let res: Response | null = null;
+    try {
+      res = await fetch(url, { cache: "force-cache" });
+    } catch (err) {
+      logWarn("image", `blob ${name}: ${(err as Error).message}`);
+    }
+    if (res && res.ok) return new Uint8Array(await res.arrayBuffer());
+
+    const status = res ? res.status : "network error";
+    if (!this.fallback) throw new Error(`blob ${name}: HTTP ${status} from ${url}`);
+
+    const alt = `${this.fallback}arch/${name}`;
+    logWarn("image", `blob ${name}: ${status} from ${this.base}; retrying the mirror at ${this.fallback}`);
+    const mirror = await fetch(alt, { cache: "force-cache" });
+    if (!mirror.ok) {
+      throw new Error(`blob ${name}: HTTP ${status} from ${url}, and HTTP ${mirror.status} from ${alt}`);
+    }
+    return new Uint8Array(await mirror.arrayBuffer());
   }
 
   /** Every path in the image, depth-first, for materialising the tree. */
@@ -360,7 +401,27 @@ export class ImageStore implements BaseLayer {
   }
 }
 
-/** zstd blobs: the platform API where available, a clear error otherwise. */
+/** Can this browser inflate zstd natively, or are we relying on fzstd? */
+export function zstdSupport(): "native" | "built-in" {
+  const DS = (globalThis as { DecompressionStream?: typeof DecompressionStream }).DecompressionStream;
+  let native = false;
+  if (DS) {
+    try {
+      new DS("zstd" as CompressionFormat);
+      native = true;
+    } catch {
+      native = false;
+    }
+  }
+  return native ? "native" : "built-in";
+}
+
+/**
+ * zstd blobs. Chromium has had `DecompressionStream("zstd")` since 123; other
+ * engines may not (Safari, notably), and a guest cannot boot with half its
+ * files unreadable — so the shipped `fzstd` decoder is the fallback. Same
+ * bytes in, same bytes out; only the speed differs.
+ */
 async function unzstd(data: Uint8Array<ArrayBuffer>): Promise<Uint8Array<ArrayBuffer>> {
   const DS = (globalThis as { DecompressionStream?: typeof DecompressionStream }).DecompressionStream;
   if (DS) {
@@ -369,10 +430,22 @@ async function unzstd(data: Uint8Array<ArrayBuffer>): Promise<Uint8Array<ArrayBu
         const stream = new Blob([data as BlobPart]).stream().pipeThrough(new DS(fmt as CompressionFormat));
         return new Uint8Array(await new Response(stream).arrayBuffer());
       } catch {
-        /* try the next spelling */
+        /* try the next spelling, then the fallback decoder */
       }
     }
   }
-  logWarn("image", "this browser cannot decompress zstd blobs (needs DecompressionStream('zstd'))");
-  throw new Error("zstd decompression unsupported in this browser");
+  try {
+    return fzstd(data) as Uint8Array<ArrayBuffer>;
+  } catch (err) {
+    logWarn("image", "zstd decompression failed in this browser:", err);
+    throw new Error(`zstd blob could not be decompressed (${(err as Error).message})`);
+  }
+}
+
+/** Normalise a mirror base the way the setting does (no trailing-slash games). */
+function normalizeBase(raw: string): string {
+  const t = raw.trim();
+  if (!t) return "";
+  const withScheme = /^https?:\/\//i.test(t) ? t : `https://${t}`;
+  return withScheme.endsWith("/") ? withScheme : `${withScheme}/`;
 }

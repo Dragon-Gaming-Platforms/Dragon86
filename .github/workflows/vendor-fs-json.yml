@@ -1,0 +1,80 @@
+name: Vendor the Arch image file list
+
+# `fs.json` is the 9p file list for the full Arch guest — every path, mode,
+# size and symlink target, but no file contents. It lives upstream on
+# i.copy.sh, which answers 403 to some clients and some browsers (Safari),
+# so we keep our own copy in the repo and serve it from our own origin.
+#
+# This runs on every push to main: fetch it, validate it, and commit it if it
+# changed. A bot commit does not re-trigger this or the deploy workflow
+# (pushed with GITHUB_TOKEN), so this is one fetch per real push, not a loop.
+#
+# The app already prefers this copy over the network (see
+# src/bridge/image-store.ts), which is what makes the Arch tree build with no
+# cross-origin request — fs.json included — on any browser.
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "public/v86/fs.json"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: vendor-fs-json
+  cancel-in-progress: true
+
+jobs:
+  vendor:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Show what the origin says to whom
+        # Diagnostic only: 403 is a refusal, not an outage, and which request
+        # shape it refuses tells us whether a header or a mirror is the fix.
+        continue-on-error: true
+        run: python3 tools/arch-image/mirror.py --probe
+
+      - name: Fetch fs.json
+        id: fetch
+        run: |
+          set -o pipefail
+          if python3 tools/arch-image/mirror.py --list-only public/v86/fs.json; then
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "https failed, trying the plain-http origin"
+          if V86_IMAGE_BASE=http://i.copy.sh/ python3 tools/arch-image/mirror.py --list-only public/v86/fs.json; then
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "ok=false" >> "$GITHUB_OUTPUT"
+          echo "::warning::could not fetch fs.json from the image origin; keeping the committed copy"
+
+      - name: Commit it if it changed
+        if: steps.fetch.outputs.ok == 'true'
+        run: |
+          set -euo pipefail
+          size=$(wc -c < public/v86/fs.json)
+          echo "fs.json is $size bytes"
+          if [ "$size" -lt 1000000 ]; then
+            echo "::error::fs.json is only $size bytes - too small to be a full image index"
+            exit 1
+          fi
+          if [ "$size" -gt 25000000 ]; then
+            echo "::error::fs.json is $size bytes - larger than expected, refusing to commit"
+            exit 1
+          fi
+          git config user.name "dragon86-vendor[bot]"
+          git config user.email "dragon86-vendor@users.noreply.github.com"
+          git add public/v86/fs.json
+          if git diff --cached --quiet; then
+            echo "unchanged - nothing to commit"
+            exit 0
+          fi
+          git commit -m "Vendor the Arch image file list ($(du -h public/v86/fs.json | cut -f1))"
+          git push

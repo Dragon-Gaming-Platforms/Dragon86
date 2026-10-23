@@ -106,3 +106,36 @@ sandbox, which has no route to copy.sh.
   cannot simultaneously serve Dragon86's live Files folder. Making both
   work means teaching `src/bridge/p9.ts` to merge the two trees — the
   next step once the image exists.
+
+
+## A mirror for browsers the origin refuses
+
+`i.copy.sh` answers **403 to Safari**, so the full Arch guest cannot read
+even its kernel there — and the kernel is a blob, not something we can
+vendor. A mirror is the way out: same file names, same bytes, hosted on
+GitHub Pages, which answers everyone and sends
+`Access-Control-Allow-Origin: *`.
+
+`.github/workflows/mirror-arch-image.yml` does it on demand, and it is
+resumable (it clones what is already published and only downloads what is
+missing):
+
+1. Create an empty **public** repo, e.g. `Dragon86-arch-image`.
+2. Settings → Pages → Source: **Deploy from a branch**, branch `main`, `/`.
+3. Add a secret to *this* repo: `MIRROR_TOKEN`, a fine-grained PAT with
+   `contents: write` on the mirror repo only.
+4. Actions → **Mirror the Arch image (optional)** → Run workflow.
+5. In Dragon86: Settings → **v86 image** → **Image mirror** =
+   `https://<owner>.github.io/<repo>/`.
+
+Without the secret the workflow does nothing but explain itself. To run
+the same thing by hand:
+
+```sh
+python3 tools/arch-image/mirror.py --probe      # what does the origin say?
+V86_IMAGE_BASE=http://i.copy.sh/ SKIP_EXISTING=1 python3 tools/arch-image/mirror.py site
+```
+
+`--probe` is worth running first: a 403 that changes with the `Referer`
+header is a hotlink filter; one that does not is about the browser itself,
+and only a mirror helps.

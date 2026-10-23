@@ -32,9 +32,11 @@ build`) asserts the contract.
 
 The v86 engine boots one of two guests (Settings → **v86 guest**):
 
-- **Dragon86 mini** (default) — the vendored Arch kernel with bash,
-  coreutils and git. Boots in seconds and `/shared` *is* your Files
-  folder, live in both directions.
+- **Dragon86 mini** (default, **legacy**) — the vendored Arch kernel with
+  bash, coreutils and git. Boots in seconds and `/shared` *is* your Files
+  folder, live in both directions. It is a stopgap for browsers where the
+  full image cannot boot yet, and it goes away once Full Arch works
+  everywhere.
 - **Full Arch Linux 32** — the complete Arch root filesystem that
   copy.sh/v86 serves, streamed over 9p from an HTTP image store
   (`fs.json` + content-addressed blobs) rather than downloaded as a disk
@@ -47,16 +49,20 @@ The v86 engine boots one of two guests (Settings → **v86 guest**):
 ### Where the Arch file list comes from
 
 `fs.json` is the 9p file list for that image: every path's name, mode,
-size and symlink target, but no file contents. Dragon86 prefers a
-**vendored** copy — `public/v86/fs.json`, written at deploy time by
-`tools/arch-image/mirror.py --list-only` — so the tree at `~/v86` is
-built from a list that ships with the app instead of a cross-origin
-fetch. If the build has no copy, Settings → **v86 image** →
-**Vendor to this device** fetches it once in your browser and keeps it
-in ZenFS; the image base itself is the last resort. Only file contents
-are ever streamed from the image store. Details in
-`public/v86/VENDORED.md`.
+size and symlink target, but no file contents. It is **committed to this
+repo** (`public/v86/fs.json`, refreshed on every push by
+`.github/workflows/vendor-fs-json.yml`) and served from our own origin,
+because the upstream store answers 403 to Safari. At runtime the app uses
+that copy first, then a copy vendored onto the device (Settings → **v86
+image** → *Vendor to this device*), then the image store itself. Only file
+contents are ever streamed from the store.
 
+For Safari the contents need help too: blobs are zstd-compressed (decoded
+with a bundled fallback when the browser has no native zstd), and the
+upstream host refuses some browsers outright — so Settings → **Image
+mirror** takes a second copy of the same image to retry against
+(`.github/workflows/mirror-arch-image.yml` builds one on a Pages repo of
+its own). Details in `public/v86/VENDORED.md`.
 
 ## What's in the box
 
