@@ -54,6 +54,8 @@ export interface BackendHandlers {
   onStatus: (s: BackendStatus) => void;
   /** CheerpX only: the hoster confirmed the fs1 shared folder is live. */
   onFsLive?: () => void;
+  /** Progress text worth showing in the Terminal (image index, boot steps). */
+  onNotice?: (text: string) => void;
 }
 
 /** Production hoster (CheerpX-Bridge project site). */

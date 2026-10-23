@@ -28,10 +28,14 @@
  * state format embeds that layout and restoring across layouts fails.
  */
 
+import { fs } from "@zenfs/core";
 import * as vfs from "../core/vfs";
+import { ensureDir } from "../core/vfs";
 import { getSettings } from "../core/settings";
 import { createP9Handler } from "./p9";
 import { normalizeImageBase } from "./v86-image";
+import { ImageStore } from "./image-store";
+import { createUnionFs, unionAsPromises, withSubmount, zenfsBase } from "./union-fs";
 import { logInfo, logWarn } from "../core/log";
 import type { BackendHandlers, TerminalBackend } from "./hoster";
 
@@ -133,6 +137,15 @@ async function loadSavedState(guest: "dragon" | "arch"): Promise<LoadedState | n
 
 /* ---------- backend ---------- */
 
+/**
+ * The mini guest's /shared: your Files folder (ZenFS, read-only floor) with
+ * changes written into ~/v86/shared. Same layout as the full Arch guest, so
+ * switching guests never moves where your files appear.
+ */
+function miniSharedFs() {
+  return createUnionFs(vfs.SHARED_DIR.v86, zenfsBase(vfs.HOME, ["v86", "CheerpX"]));
+}
+
 class V86Backend implements TerminalBackend {
   private emu: V86Emulator | null = null;
   private decoder = new TextDecoder();
@@ -190,6 +203,62 @@ class V86Backend implements TerminalBackend {
     }
   }
 
+  /** Progress line for the Terminal (kind of quiet: it is a chatty boot). */
+  private status(text: string): void {
+    logInfo("v86", text);
+    this.handlers.onNotice?.(text);
+  }
+
+  /**
+   * Create the image's directory tree (and symlinks) under ~/v86 so the whole
+   * Arch layout is visible in the Files app from the first boot. File
+   * contents stay lazy: a blob is fetched the first time something reads it,
+   * and lands in ZenFS then (see union-fs.ts). Skip the walk when the tree
+   * for this image base is already there.
+   */
+  private async materializeSkeleton(store: ImageStore, root: string): Promise<void> {
+    const marker = `${root}/.dragon86-image.json`;
+    try {
+      const prev = JSON.parse(await fs.promises.readFile(marker, "utf8")) as { base?: string };
+      if (prev.base === store.baseUrl) {
+        logInfo("v86", "image tree already materialised; not walking it again");
+        return;
+      }
+    } catch {
+      /* first time */
+    }
+    const started = Date.now();
+    let made = 0;
+    for (const path of store.paths()) {
+      if (this.disposed) return;
+      const target = `${root}${path}`;
+      try {
+        const st = await store.stat(path);
+        if (!st) continue;
+        if (st.isDirectory()) {
+          await fs.promises.mkdir(target, { recursive: true });
+          made++;
+        } else if (st.isSymbolicLink()) {
+          const link = await store.readlink(path);
+          if (!link) continue;
+          try {
+            await fs.promises.symlink(link, target);
+            made++;
+          } catch {
+            /* already there, or ZenFS has no symlinks */
+          }
+        }
+      } catch {
+        /* a single unreadable path must not abort the walk */
+      }
+    }
+    await fs.promises.writeFile(
+      marker,
+      JSON.stringify({ base: store.baseUrl, blobs: store.blobCount, at: Date.now(), dirs: made }),
+    );
+    this.status(`image tree ready: ${made} entries under ${root} (${Date.now() - started} ms)`);
+  }
+
   private async start(): Promise<void> {
     this.startTimer = null;
     try {
@@ -232,37 +301,68 @@ class V86Backend implements TerminalBackend {
       };
 
       if (guest === "arch") {
-        /* The full Arch image: v86 serves the root filesystem over 9p from
-           the HTTP store, and boots the kernel/initrd found inside it
-           (`bzimage_initrd_from_filesystem`). This is upstream copy/v86's
-           own boot configuration, with two changes: `console=ttyS0` plus
-           `init=/bin/bash`, because Dragon86's Terminal is a serial line
-           with no VGA screen, and upstream's openrc init greets tty1. */
-        opts.filesystem = {
-          baseurl: `${imageBase}arch/`,
-          basefs: `${imageBase}fs.json`,
-        };
-        opts.bzimage_initrd_from_filesystem = true;
-        opts.vga_memory_size = 8 * 1024 * 1024;
-        if (saved) {
-          opts.initial_state = { buffer: saved.buffer };
-          logInfo("v86", "resuming from saved state");
-        } else {
-          opts.cmdline = [
-            "rw console=ttyS0 tsc=reliable",
-            "root=host9p rootfstype=9p rootflags=trans=virtio,cache=loose",
-            "mitigations=off audit=0 init_on_free=on random.trust_cpu=on nowatchdog",
-            "init=/bin/bash",
-            `d86cols=${this.cols} d86rows=${this.rows}`,
-          ].join(" ");
-          logInfo("v86", `cold-booting full Arch from ${imageBase}`);
+        /* The full Arch image, but *through us*: the root filesystem is an
+           overlay — copy.sh's read-only image underneath, ZenFS on top — so
+           the guest's whole root is browsable and editable at ~/v86 in the
+           OS, and anything the guest writes persists in IndexedDB. This is
+           why we no longer hand v86 `baseurl`/`basefs`: that path is v86's
+           own private store, invisible to Dragon86. */
+        this.status("reading the Arch image index…");
+        const store = await ImageStore.load(imageBase);
+        const root = vfs.ENGINE_ROOT.v86;
+        await ensureDir(root);
+        await ensureDir(vfs.SHARED_DIR.v86);
+
+        const imageFs = createUnionFs(root, store);
+        /* Guest /shared = your Files folder (ZenFS floor) with changes kept
+           in ~/v86/shared — the same layout as the mini guest. */
+        const sharedFs = createUnionFs(
+          vfs.SHARED_DIR.v86,
+          zenfsBase(vfs.HOME, ["v86", "CheerpX"]),
+        );
+        const rootFs = withSubmount(imageFs, vfs.SHARED_DIR.v86, sharedFs);
+
+        /* Kernel + initrd come out of the image, the way upstream does it. */
+        const { kernel, initrd } = store.findKernel();
+        if (!kernel || !initrd) {
+          throw new Error(`no kernel/initrd found inside ${imageBase} (looked for vmlinuz/bzimage and initrd/initramfs)`);
         }
+        this.status(`fetching kernel + initrd from the image…`);
+        const [kImg, iImg] = await Promise.all([
+          store.readFile(kernel),
+          store.readFile(initrd),
+        ]);
+        if (!kImg || !iImg) {
+          throw new Error(`could not read ${kernel} / ${initrd} from the image store`);
+        }
+        logInfo("v86", `arch image: ${kernel} (${(kImg.byteLength / 1048576).toFixed(1)} MB), ${initrd} (${(iImg.byteLength / 1048576).toFixed(1)} MB)`);
+
+        opts.filesystem = {
+          handle9p: createP9Handler(root, unionAsPromises(rootFs) as never),
+        };
+        opts.vga_memory_size = 8 * 1024 * 1024;
+        opts.bzimage = { buffer: kImg.buffer.slice(0) };
+        opts.initrd = { buffer: iImg.buffer.slice(0) };
+        opts.cmdline = [
+          "rw console=ttyS0 tsc=reliable",
+          "root=host9p rootfstype=9p rootflags=trans=virtio,cache=loose",
+          "mitigations=off audit=0 random.trust_cpu=on nowatchdog",
+          "init=/bin/bash",
+          `d86cols=${this.cols} d86rows=${this.rows}`,
+        ].join(" ");
+        logInfo("v86", `cold-booting full Arch from ${imageBase} with the root at ${root}`);
+
+        /* Show the tree in Files immediately (directories + symlinks only;
+           file contents stay lazy, and copy themselves into ZenFS the first
+           time anything touches them). Runs in the background: boot should
+           not wait on thousands of mkdirs. */
+        void this.materializeSkeleton(store, root);
       } else if (saved) {
-        opts.filesystem = { handle9p: createP9Handler(vfs.HOME) };
+        opts.filesystem = { handle9p: createP9Handler(vfs.SHARED_DIR.v86, unionAsPromises(miniSharedFs()) as never) };
         opts.initial_state = { buffer: saved.buffer };
         logInfo("v86", "resuming from saved state");
       } else {
-        opts.filesystem = { handle9p: createP9Handler(vfs.HOME) };
+        opts.filesystem = { handle9p: createP9Handler(vfs.SHARED_DIR.v86, unionAsPromises(miniSharedFs()) as never) };
         opts.bzimage = { url: `${BASE}bzImage` };
         opts.initrd = { url: `${BASE}initrd.gz` };
         /* v86's CPU has no machine-check hardware; skip only that dead

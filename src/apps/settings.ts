@@ -209,8 +209,9 @@ export function openSettings(win: Win): void {
     "div",
     "settings-note",
     "Dragon86 mini: the vendored Arch kernel with bash, coreutils and git — boots in seconds, and /shared is your Files folder. " +
-      "Full Arch Linux 32: copy.sh/v86's complete Arch root filesystem, streamed over 9p from an HTTP image store — real pacman and the whole userland, " +
-      "slower to start, and no /shared (v86 has a single 9p device and the root filesystem occupies it). " +
+      "Full Arch Linux 32: copy.sh/v86's complete Arch root filesystem — real pacman and the whole userland, slower to start. " +
+      "Its root is your Files folder at v86/: the image is a read-only floor, anything you edit is copied there and persists, so edits in Files appear in the guest. " +
+      "Guest /shared is v86/shared. " +
       "The image is fetched straight from the origin below, so its CORS policy matters: press Test to check from this browser. " +
       "Changes take effect on the next Terminal Reconnect.",
   );
@@ -221,7 +222,7 @@ export function openSettings(win: Win): void {
   systemSection.append(el("h2", undefined, "System"));
   const table = el("table", "about-table");
   const facts: [string, string][] = [
-    ["OS", "Dragon86 0.7.1 (dev build)"],
+    ["OS", "Dragon86 0.8.0 (dev build)"],
     ["Build", "GUST + Sandstone vendored · Monaco editor · v86 (bash + coreutils + git, live 9p share, save state) · desktop layout fix"],
     ["Engines", "CheerpX (embedded / separate tab) · v86 (mini guest with /shared, or full Arch Linux streamed from an image store)"],
     ["Vendor", "Dragon Gaming Platforms"],
