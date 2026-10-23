@@ -88,7 +88,9 @@ jobs:
 
           git config user.name "dragon86-vendor[bot]"
           git config user.email "dragon86-vendor@users.noreply.github.com"
-          git add -A public/v86/fs.json docs/fs-vendor.log 2>/dev/null || true
+          # `git add -A <path>` adds NOTHING if one path does not exist, so
+          # never name an optional file here - just stage the tree.
+          git add -A
           if git diff --cached --quiet; then
             echo "nothing changed"
             exit 0
