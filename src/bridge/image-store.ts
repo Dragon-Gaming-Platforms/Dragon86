@@ -116,6 +116,8 @@ interface VendoredRecord {
 
 export class ImageStore implements BaseLayer {
   private blobs = new Map<string, Uint8Array>();
+  /** Set once the image origin refuses a blob; flips mirror-first ordering. */
+  private originRefused = false;
   private links = 0;
   private bytes = 0;
 
@@ -374,33 +376,50 @@ export class ImageStore implements BaseLayer {
   }
 
   /**
-   * Download one content blob, with a retry against the mirror base.
+   * Download one content blob, using the mirror as the first choice once the
+   * origin has refused us.
    *
-   * The image origin is a shared host outside our control: it can answer
-   * 403 to a browser it does not recognise (Safari, most notably). A
-   * mirror on GitHub Pages — same file names, same bytes — is the way out,
-   * so a refusal here is retried there instead of surfacing as a dead guest.
+   * i.copy.sh answers `Access-Control-Allow-Origin: *` but demands a
+   * `Referer` header, and a page cannot forge one: a browser that strips the
+   * referrer (Safari, tracking protection, a strict policy) gets a connection
+   * error on *every* blob. The first refusal therefore flips the order for the
+   * rest of the session — otherwise a boot pays a failed round trip per file,
+   * thousands of them. The mirror is a published subset, so a miss there
+   * still falls back to the origin.
    */
   private async fetchBlob(name: string): Promise<Uint8Array<ArrayBuffer>> {
-    const url = `${this.base}arch/${name}`;
-    let res: Response | null = null;
-    try {
-      res = await fetch(url, { cache: "force-cache", ...CROSS_ORIGIN });
-    } catch (err) {
-      logWarn("image", `blob ${name}: ${(err as Error).message}`);
-    }
-    if (res && res.ok) return new Uint8Array(await res.arrayBuffer());
+    const origin = `${this.base}arch/${name}`;
+    const mirrored = this.fallback ? `${this.fallback}arch/${name}` : null;
+    const attempts = this.originRefused && mirrored ? [mirrored, origin] : [origin, ...(mirrored ? [mirrored] : [])];
 
-    const status = res ? res.status : "network error";
-    if (!this.fallback) throw new Error(`blob ${name}: HTTP ${status} from ${url}`);
-
-    const alt = `${this.fallback}arch/${name}`;
-    logWarn("image", `blob ${name}: ${status} from ${this.base}; retrying the mirror at ${this.fallback}`);
-    const mirror = await fetch(alt, { cache: "force-cache", ...CROSS_ORIGIN });
-    if (!mirror.ok) {
-      throw new Error(`blob ${name}: HTTP ${status} from ${url}, and HTTP ${mirror.status} from ${alt}`);
+    const failures: string[] = [];
+    for (const url of attempts) {
+      let res: Response | null = null;
+      try {
+        res = await fetch(url, { cache: "force-cache", ...CROSS_ORIGIN });
+      } catch (err) {
+        failures.push(`${url}: ${(err as Error).message}`);
+        if (url === origin) this.noteRefused(name);
+        continue;
+      }
+      if (res.ok) return new Uint8Array(await res.arrayBuffer());
+      failures.push(`${url}: HTTP ${res.status}`);
+      /* 404 from the mirror just means "not in the subset"; a refusal from
+         the origin means we should stop asking it first. */
+      if (url === origin && res.status !== 404) this.noteRefused(name);
     }
-    return new Uint8Array(await mirror.arrayBuffer());
+    throw new Error(`blob ${name}: ${failures.join("; ")}`);
+  }
+
+  /** Remember that the origin is refusing us, and say so once. */
+  private noteRefused(name: string): void {
+    if (this.originRefused) return;
+    this.originRefused = true;
+    logWarn(
+      "image",
+      `${this.base} refused a blob (${name}) — switching to the mirror for the rest of this boot` +
+        (this.fallback ? ` (${this.fallback})` : ", but no mirror is configured"),
+    );
   }
 
   /** Every path in the image, depth-first, for materialising the tree. */

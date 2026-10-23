@@ -10,7 +10,7 @@ import { Terminal } from "@xterm/xterm";
 import { FitAddon } from "@xterm/addon-fit";
 import "@xterm/xterm/css/xterm.css";
 import { el } from "../core/dom";
-import { getSettings } from "../core/settings";
+import { getSettings, onSettingsChange } from "../core/settings";
 import type { Win } from "../core/wm";
 import {
   getBackend,
@@ -231,7 +231,31 @@ export function openTerminal(win: Win): void {
     setChip("offline", "Not connected");
   };
 
+  /* The window title says which engine is behind this terminal. It is the
+     first thing visible and it used to say "CheerpX" no matter what, which is
+     exactly the wrong answer on a device where CheerpX cannot run. */
+  const engineLabel = (): string => {
+    const s = getSettings();
+    if (s.engineMode === "v86") {
+      return s.v86Guest === "arch" ? "Terminal — v86 · Arch Linux" : "Terminal — v86 · mini";
+    }
+    return s.engineMode === "tab" ? "Terminal — CheerpX (separate tab)" : "Terminal — CheerpX";
+  };
+  const refreshTitle = () => win.setTitle(engineLabel());
+  refreshTitle();
+  let offSettings: (() => void) | null = onSettingsChange(() => {
+    /* A closed window leaves the element detached; drop the subscription
+       instead of holding the whole terminal alive. */
+    if (!win.el.isConnected) {
+      offSettings?.();
+      offSettings = null;
+      return;
+    }
+    refreshTitle();
+  });
+
   const connect = async (freshBoot = false) => {
+    refreshTitle();
     if (getSettings().engineMode === "v86") {
       const archGuest = getSettings().v86Guest === "arch";
       openTabBtn.style.display = "none";

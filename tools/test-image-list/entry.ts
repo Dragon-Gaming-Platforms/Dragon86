@@ -8,6 +8,8 @@ let shipped: string | null = null;
 let live: string | null = null;
 let originBlobs = true;
 let mirrorBlobs = true;
+let originStatus = 403;
+let mirrorMissing = new Set<string>();
 globalThis.fetch = (async (url: string, init?: any) => {
   const u = String(url);
   calls.push(`${(init?.method ?? "GET")} ${u}`);
@@ -16,9 +18,12 @@ globalThis.fetch = (async (url: string, init?: any) => {
     /* The real quarrel: the origin refuses (403), the mirror serves. */
     const fromMirror = u.includes("mirror.example");
     const allowed = fromMirror ? mirrorBlobs : originBlobs;
+    if (fromMirror && mirrorMissing.has(u.split("/").pop()!)) {
+      return { ok: false, status: 404, arrayBuffer: async () => new ArrayBuffer(0) } as any;
+    }
     return {
       ok: allowed,
-      status: allowed ? 200 : 403,
+      status: allowed ? 200 : fromMirror ? 404 : originStatus,
       arrayBuffer: async () => new TextEncoder().encode("CONTENT:" + u.split("/").pop()).buffer,
     } as any;
   }
@@ -118,6 +123,33 @@ check("clearVendored removes it", (await ImageStore.clearVendored(root)) === tru
   check("a symlink is still a symlink", link?.isSymbolicLink() === true);
   check("a symlink's target is readable", (await st.readlink("/bin/reboot")) === "/sbin/real-reboot");
   check("a missing path is still null", (await st.stat("/bin/nope")) === null);
+}
+
+// 5c. Once the origin refuses, the mirror is tried FIRST for later blobs,
+// because a refusal costs a round trip per file and a boot reads thousands.
+{
+  const store = ImageStore.parse(doc, "https://i.copy.sh/", "shipped", "https://mirror.example/");
+  originBlobs = false;
+  originStatus = 403;
+  mirrorBlobs = true;
+  calls.length = 0;
+  await store.readFile("/etc/hostname"); // first blob: origin, refused, then mirror
+  check("first refusal falls back to the mirror", calls.some((c) => c.includes("mirror.example/arch/")));
+  calls.length = 0;
+  await store.readFile("/etc/passwd");
+  check(
+    "after a refusal the mirror is asked first",
+    calls[0]?.includes("mirror.example/arch/") === true && calls.length === 1,
+  );
+
+  // A blob the subset does not have still comes from the origin.
+  originBlobs = true;
+  mirrorMissing.add("cccccccccc.bin");
+  calls.length = 0;
+  const k = await store.readFile("/boot/vmlinuz-linux");
+  check("mirror miss falls back to the origin", !!k && calls.some((c) => c.includes("i.copy.sh/arch/")));
+  mirrorMissing.clear();
+  originBlobs = true;
 }
 
 // 6. SPA fallback (200 + index.html) must not be mistaken for a list

@@ -37,7 +37,7 @@ export function createLauncher(wm: WindowManager) {
 
   function openTerminalAt(): void {
     const win = wm.create({
-      title: "Terminal — CheerpX",
+      title: "Terminal",
       icon: "terminal",
       width: 760,
       height: 480,
