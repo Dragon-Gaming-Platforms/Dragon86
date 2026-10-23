@@ -1,0 +1,28 @@
+# fs.json vendor run
+
+- date: 2026-10-23T19:25:43Z
+- ref: main @ 36fd2ba9
+
+## What the origin says to whom
+
+```
+https://i.copy.sh/
+  fs.json   browser-ish headers : 200
+  fs.json   no referer          : 200
+  fs.json   no headers at all   : 200
+http://i.copy.sh/
+  fs.json   browser-ish headers : 200
+  fs.json   no referer          : 200
+  fs.json   no headers at all   : 200
+```
+
+## Fetch
+
+```
+source: https://i.copy.sh/
+fsroot has no file entries - refusing to write it
+source: http://i.copy.sh/
+fsroot has no file entries - refusing to write it
+```
+
+No copy in the tree; the app will use a per-device vendored list or the origin.
