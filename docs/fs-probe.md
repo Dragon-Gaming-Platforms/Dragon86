@@ -55,12 +55,20 @@ Target: `i.copy.sh/fs.json`
 Response headers:
 
 ```
+<<<<<<< Updated upstream
 Date: Fri, 23 Oct 2026 19:48:59 GMT
+=======
+Date: Fri, 23 Oct 2026 19:48:51 GMT
+>>>>>>> Stashed changes
 Content-Type: application/json
 Content-Length: 5815708
 Connection: close
 Vary: Accept-Encoding
+<<<<<<< Updated upstream
 Server: BunnyCDN-IL1-894
+=======
+Server: BunnyCDN-MI1-1353
+>>>>>>> Stashed changes
 CDN-PullZone: 165003
 CDN-RequestCountryCode: US
 Access-Control-Allow-Origin: *
@@ -69,6 +77,7 @@ Access-Control-Expose-Headers: Server, x-goog-meta-frames, Content-Length, Conte
 Cache-Control: public, max-age=43200
 ETag: "6717277a-58bd9c"
 Last-Modified: Tue, 22 Oct 2024 04:18:02 GMT
+<<<<<<< Updated upstream
 CDN-StorageServer: NY-346
 CDN-FileServer: 749
 CDN-ProxyVer: 1.71
@@ -77,6 +86,16 @@ CDN-RequestPullCode: 200
 CDN-CachedAt: 10/23/2026 19:17:20
 CDN-EdgeStorageId: 871
 CDN-RequestId: c34b8f5a1452581d36164c1874caa90c
+=======
+CDN-StorageServer: MI-727
+CDN-FileServer: 391
+CDN-ProxyVer: 1.71
+CDN-RequestPullSuccess: True
+CDN-RequestPullCode: 200
+CDN-CachedAt: 10/23/2026 19:18:53
+CDN-EdgeStorageId: 1351
+CDN-RequestId: d8a72136fada58af893ed71f7127f718
+>>>>>>> Stashed changes
 CDN-Cache: HIT
 CDN-Status: 200
 CDN-RequestTime: 0
