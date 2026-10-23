@@ -61,7 +61,10 @@ that copy first, then a copy vendored onto the device (Settings → **v86
 image** → *Vendor to this device*), then the image store itself. Only file
 contents are ever streamed from the store.
 
-For Safari the bytes need help too. The upstream store sends
+For Safari — and, it turns out, for **every** browser — the bytes need help
+too: the upstream store only answers requests whose `Referer` is copy.sh's
+own and a page cannot forge that header (measured in `docs/fs-probe.md`).
+The upstream store sends
 `Access-Control-Allow-Origin: *` but **requires a `Referer`**, which a page
 cannot forge — so a browser that strips the referrer gets an error on every
 blob. A curated **~700 MB subset of the image** (boot files, the whole

@@ -79,28 +79,6 @@ check("clearVendored removes it", (await ImageStore.clearVendored(root)) === tru
   await ImageStore.clearVendored(root);
 }
 
-// 5. mirror fallback for blob contents (Safari gets 403 from the origin)
-{
-  const store = ImageStore.parse(doc, "https://i.copy.sh/", "shipped", "https://mirror.example/");
-  originBlobs = false;
-  mirrorBlobs = true;
-  const data = await store.readFile("/etc/hostname");
-  check("blob comes from the mirror when the origin 403s", !!data && new TextDecoder().decode(data).includes("aaaaaaaaaa.bin"));
-  check("mirror retry is a second request", calls.some((c) => c.includes("mirror.example/arch/aaaaaaaaaa.bin")));
-
-  originBlobs = false;
-  mirrorBlobs = false;
-  let blobErr = "";
-  try { await store.readFile("/etc/passwd"); } catch (e) { blobErr = (e as Error).message; }
-  check("blob error names both stores", /i\.copy\.sh/.test(blobErr) && /mirror\.example/.test(blobErr));
-
-  originBlobs = true;
-  mirrorBlobs = false;
-  const direct = await store.readFile("/boot/vmlinuz-linux");
-  check("no mirror request when the origin works", !!direct && !calls[calls.length - 1].includes("mirror.example"));
-  originBlobs = true;
-}
-
 // 5b. blob names are a *prefix* of a sha256, and the prefix length is the
 // builder's choice: copy.sh's current Arch image uses 8 hex digits, older
 // ones used 10. Pinning it made every file look like a symlink.
@@ -125,30 +103,33 @@ check("clearVendored removes it", (await ImageStore.clearVendored(root)) === tru
   check("a missing path is still null", (await st.stat("/bin/nope")) === null);
 }
 
-// 5c. Once the origin refuses, the mirror is tried FIRST for later blobs,
-// because a refusal costs a round trip per file and a boot reads thousands.
+// 5c. The mirror is the source, not a fallback: the origin refuses our
+// referer in every browser (it only answers copy.sh's own), and Referer is a
+// forbidden header, so a page cannot work around it.
 {
   const store = ImageStore.parse(doc, "https://i.copy.sh/", "shipped", "https://mirror.example/");
-  originBlobs = false;
-  originStatus = 403;
+  originBlobs = true;
+  originStatus = 403; // reachable, but refuses us
   mirrorBlobs = true;
   calls.length = 0;
-  await store.readFile("/etc/hostname"); // first blob: origin, refused, then mirror
-  check("first refusal falls back to the mirror", calls.some((c) => c.includes("mirror.example/arch/")));
+  const a = await store.readFile("/etc/hostname");
+  check("mirror is asked before the origin", calls[0]?.includes("mirror.example/arch/") === true);
+  check("blob served by the mirror", !!a && new TextDecoder().decode(a).includes("aaaaaaaaaa.bin"));
+
+  // A blob the mirror does not carry still comes from the origin.
+  mirrorMissing.add("bbbbbbbbbb.bin");
   calls.length = 0;
   await store.readFile("/etc/passwd");
-  check(
-    "after a refusal the mirror is asked first",
-    calls[0]?.includes("mirror.example/arch/") === true && calls.length === 1,
-  );
-
-  // A blob the subset does not have still comes from the origin.
-  originBlobs = true;
-  mirrorMissing.add("cccccccccc.bin");
-  calls.length = 0;
-  const k = await store.readFile("/boot/vmlinuz-linux");
-  check("mirror miss falls back to the origin", !!k && calls.some((c) => c.includes("i.copy.sh/arch/")));
+  check("mirror miss falls back to the origin", calls.some((c) => c.includes("i.copy.sh/arch/")));
   mirrorMissing.clear();
+
+  // Nothing anywhere: the error names both hosts.
+  mirrorBlobs = false;
+  originBlobs = false;
+  let err = "";
+  try { await store.readFile("/boot/vmlinuz-linux"); } catch (e) { err = (e as Error).message; }
+  check("both hosts named when nothing serves the blob", /mirror\.example/.test(err) && /i\.copy\.sh/.test(err));
+  mirrorBlobs = true;
   originBlobs = true;
 }
 

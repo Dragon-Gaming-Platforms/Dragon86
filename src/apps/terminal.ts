@@ -76,7 +76,8 @@ export function openTerminal(win: Win): void {
     "the steps a normal login would have done";
   prepareBtn.style.display = "none";
   const checkBtn = el("button", "tool-btn", "Check Image");
-  checkBtn.title = "Fetch the Arch image store's fs.json and one blob, and report what happens";
+  checkBtn.title =
+    "Test the image list and one blob from the mirror and the store, and report which host serves them";
   checkBtn.style.display = "none";
   const devBtn = el("button", "tool-btn", "Dev Console");
   devBtn.title = "Toggle the built-in developer console (Eruda)";
@@ -94,7 +95,7 @@ export function openTerminal(win: Win): void {
     const base = getSettings().v86ImageBase;
     checkBtn.disabled = true;
     term.writeln(`${DIM}Checking ${normalizeImageBase(base)} …${RESET}`);
-    void probeImage(base)
+    void probeImage(base, getSettings().v86ImageFallback)
       .then((r) => {
         const colour = r.ok ? GREEN : RED;
         term.writeln(`${colour}${r.message}${RESET}`);

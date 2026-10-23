@@ -60,7 +60,7 @@ function collectBlobs(node: unknown, out: Set<string>): void {
  * Fetch fs.json (and the first blob) from an image store and report exactly
  * what happened. Safe to run from the OS page: read-only, no emulator.
  */
-export async function probeImage(baseRaw: string): Promise<ImageProbe> {
+export async function probeImage(baseRaw: string, mirrorBase = ""): Promise<ImageProbe> {
   const base = normalizeImageBase(baseRaw);
   const result: ImageProbe = {
     ok: false,
@@ -119,6 +119,9 @@ export async function probeImage(baseRaw: string): Promise<ImageProbe> {
   }
 
   const sample = [...blobs][0]!;
+  /* Report the mirror too: it is where blobs come from in practice, and a
+     probe that only tests the origin would call a working setup broken. */
+  const mirror = (mirrorBase || "").trim();
   try {
     const res = await fetch(`${base}arch/${sample}`, {
       headers: { Range: "bytes=0-1023" },
@@ -131,6 +134,24 @@ export async function probeImage(baseRaw: string): Promise<ImageProbe> {
       result.message =
         `image store OK — fs.json ${(result.fsBytes! / 1024).toFixed(0)} KB, ` +
         `${blobs.size} blobs, sample blob fetched (HTTP ${res.status}).`;
+    } else if (mirror) {
+      /* The origin refusing is expected (it only answers copy.sh's referer);
+         what matters is whether the mirror serves this file. */
+      const alt = `${normalizeImageBase(mirror)}arch/${sample}`;
+      try {
+        const m = await fetch(alt, { headers: { Range: "bytes=0-1023" }, cache: "no-store", ...{} });
+        result.blobStatus = m.status;
+        if (m.ok || m.status === 206) {
+          result.ok = true;
+          result.message =
+            `origin refuses blobs (HTTP ${res.status}, a referer allowlist) but the mirror serves them — ` +
+            `sample blob HTTP ${m.status} from ${normalizeImageBase(mirror)}. Full Arch will boot.`;
+          return result;
+        }
+        result.message = `sample blob HTTP ${res.status} from the origin and HTTP ${m.status} from the mirror.`;
+      } catch (err) {
+        result.message = `sample blob HTTP ${res.status} from the origin; the mirror failed too (${(err as Error).message}).`;
+      }
     } else {
       result.message = `fs.json is fine but arch/${sample} returned HTTP ${res.status}.`;
     }

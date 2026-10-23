@@ -358,6 +358,10 @@ class V86Backend implements TerminalBackend {
         const store = await ImageStore.load(imageBase, {
           root: vfs.ENGINE_ROOT.v86,
           fallbackBase: getSettings().v86ImageFallback,
+          /* The upstream store only answers copy.sh's own referer, so blobs
+             come from the mirror; say so in the Terminal instead of leaving a
+             silent difference between browsers. */
+          onNotice: (text) => this.status(text),
         });
         const root = vfs.ENGINE_ROOT.v86;
         await ensureDir(root);
@@ -380,7 +384,7 @@ class V86Backend implements TerminalBackend {
         if (!kernel || !initrd) {
           throw new Error(`no kernel/initrd found inside ${imageBase} (looked for vmlinuz/bzimage and initrd/initramfs)`);
         }
-        this.status(`fetching kernel + initrd from the image…`);
+        this.status(`fetching kernel + initrd (${(store.blobCount || 0).toLocaleString()} blobs available)…`);
         const [kImg, iImg] = await Promise.all([
           store.readFile(kernel),
           store.readFile(initrd),
