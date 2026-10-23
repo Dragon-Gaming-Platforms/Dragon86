@@ -7,6 +7,15 @@
 
 </div>
 
+### v86 networking
+
+The NIC is emulated by v86 (`net_device: { type: "virtio", relay_url }`),
+including DHCP for its local link — the guest only loads a driver and
+asks for a lease. Set the relay in Settings → **v86 network** (`wss://`
+wsproxy, `wisp://` wisp, `fetch` in-page, or `off`), press **Test** to
+check it from your browser, and run `/root/networking.sh` in the guest
+(same script copy.sh's images ship) for a status report.
+
 ### Service worker: on only when the engine needs isolation
 
 COOP/COEP arrive via `coi-serviceworker.js`, and only the **embedded

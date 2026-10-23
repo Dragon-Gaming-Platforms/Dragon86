@@ -36,6 +36,17 @@ export interface Settings {
   v86Guest: V86Guest;
   /** Image store root for v86Guest "arch" (fs.json + arch/ live here). */
   v86ImageBase: string;
+  /**
+   * v86 network backend. Empty/"off" = no NIC at all (the guest sees only
+   * loopback). Anything else is v86's relay URL, which decides the backend by
+   * scheme:
+   *   wss://host/   wsproxy  — copy.sh's own backend; DHCP comes from the proxy
+   *   wisp://host   wisp     — v86 runs the stack itself; DHCP answered locally
+   *   fetch         in-page  — no server, but only CORS-visible traffic
+   * The emulated NIC is v86's job either way; the guest only has to load its
+   * driver and ask for a lease (that is what /root/networking.sh does).
+   */
+  v86Network: string;
 }
 
 const KEY = "dragon86.settings";
@@ -76,6 +87,10 @@ const DEFAULTS: Settings = {
   engineMode: "embedded",
   v86Guest: "dragon",
   v86ImageBase: "https://i.copy.sh/",
+  /* copy.sh's own public proxy: the same one its Arch demo uses, so the
+     guest behaves the way it does there. Rate-limited and shared — set your
+     own wisp/wsproxy URL in Settings for regular use. */
+  v86Network: "wss://relay.widgetry.org/",
 };
 
 let current: Settings = load();

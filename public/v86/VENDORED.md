@@ -167,3 +167,35 @@ guest write persisted into ZenFS, a guest write to an *image* file
 copying it up intact, and `/shared` showing the OS files. The full
 `root=host9p` boot uses the same server with `/` instead of `/shared`
 as the mount point.
+
+## Networking (emulator side)
+
+v86 emulates the NIC and everything behind it; the guest never invents a
+network for itself. Dragon86 passes `net_device: { type: "virtio",
+relay_url }` (Settings → **v86 network**), so:
+
+- v86's virtio-net card appears as `eth0` in the guest,
+- the backend answers DHCP itself for its local link
+  (`192.168.86.100`, router/DNS `192.168.86.1`),
+- traffic beyond that link goes through the relay.
+
+The backend is chosen by the URL's scheme: `wss://`/`ws://` = wsproxy
+(copy.sh's own public relay is the default), `wisp://`/`wisps://` = a
+wisp server, `fetch` = the in-page stack (no server, CORS-limited).
+Settings → Test opens the socket the emulator will open and reports the
+outcome, because a dead relay looks exactly like a broken guest: the
+interface comes up, the lease never arrives.
+
+`public/v86/scripts/networking.sh` (shipped in the initramfs at
+`/root/networking.sh` and copied into the OS filesystem at
+`~/v86/root/networking.sh`, so it is editable in Files) does what the
+same script does in copy.sh's images — loads the driver and asks for a
+lease — plus a static fallback and a `status` mode. The guest init also
+tries to bring the card up in the background at boot, so a working relay
+means the shell already has a network.
+
+Verified with a real guest and a local wisp proxy: the guest loaded
+virtio_net, got `192.168.86.100` by DHCP from the emulated router, wrote
+`/etc/resolv.conf`, and fetched a page over HTTP through the emulated
+NIC. Without a relay the same guest loads the driver, shows `eth0`, and
+times out on DHCP — which is why the probe exists.
