@@ -7,9 +7,17 @@ name: Probe the image origin
 # can be read from anywhere.
 #
 # Manual only. Writes docs/fs-probe.md and commits it.
+#
+# Triggered by a push rather than workflow_dispatch: the automation token in
+# use here can merge and push but cannot create dispatch events, and a push
+# works for everyone. Touch `tools/arch-image/probe-request` to re-run it.
 
 on:
   workflow_dispatch:
+  push:
+    paths:
+      - "tools/arch-image/probe-request"
+      - "tools/arch-image/probe-origin.py"
 
 permissions:
   contents: write
