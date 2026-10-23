@@ -2,22 +2,23 @@ name: Vendor the Arch image file list
 
 # `fs.json` is the 9p file list for the full Arch guest — every path, mode,
 # size and symlink target, but no file contents. It lives upstream on
-# i.copy.sh, which answers 403 to some clients and some browsers (Safari),
-# so we keep our own copy in the repo and serve it from our own origin.
+# i.copy.sh, which is picky about who it talks to, so we keep our own copy in
+# the repo and serve it from our own origin.
 #
-# This runs on every push to main: fetch it, validate it, and commit it if it
-# changed. A bot commit does not re-trigger this or the deploy workflow
-# (pushed with GITHUB_TOKEN), so this is one fetch per real push, not a loop.
+# Runs on every push to main: fetch it, validate it, commit it if it changed.
+# Bot commits use GITHUB_TOKEN, so they do not re-trigger workflows: one fetch
+# per real push, no loop.
 #
-# The app already prefers this copy over the network (see
-# src/bridge/image-store.ts), which is what makes the Arch tree build with no
-# cross-origin request — fs.json included — on any browser.
+# Everything it did is written to docs/fs-vendor.log *and committed*, because
+# a runner cannot be inspected from outside: if a fetch fails, the reason is
+# in the repo rather than in a log nobody can read.
 
 on:
   push:
     branches: [main]
     paths-ignore:
       - "public/v86/fs.json"
+      - "docs/fs-vendor.log"
   workflow_dispatch:
 
 permissions:
@@ -33,48 +34,70 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Show what the origin says to whom
-        # Diagnostic only: 403 is a refusal, not an outage, and which request
-        # shape it refuses tells us whether a header or a mirror is the fix.
-        continue-on-error: true
-        run: python3 tools/arch-image/mirror.py --probe
-
-      - name: Fetch fs.json
-        id: fetch
+      - name: Fetch, validate, commit
         run: |
-          set -o pipefail
-          if python3 tools/arch-image/mirror.py --list-only public/v86/fs.json; then
-            echo "ok=true" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          echo "https failed, trying the plain-http origin"
-          if V86_IMAGE_BASE=http://i.copy.sh/ python3 tools/arch-image/mirror.py --list-only public/v86/fs.json; then
-            echo "ok=true" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          echo "ok=false" >> "$GITHUB_OUTPUT"
-          echo "::warning::could not fetch fs.json from the image origin; keeping the committed copy"
+          set -uo pipefail
+          mkdir -p docs
+          LOG=docs/fs-vendor.log
+          : > "$LOG"
+          {
+            echo "# fs.json vendor run"
+            echo
+            echo "- date: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            echo "- ref: ${GITHUB_REF_NAME} @ ${GITHUB_SHA:0:8}"
+            echo
+            echo "## What the origin says to whom"
+            echo
+            echo '```'
+            python3 tools/arch-image/mirror.py --probe 2>&1 || true
+            echo '```'
+            echo
+            echo "## Fetch"
+            echo
+            echo '```'
+          } >> "$LOG"
 
-      - name: Commit it if it changed
-        if: steps.fetch.outputs.ok == 'true'
-        run: |
-          set -euo pipefail
-          size=$(wc -c < public/v86/fs.json)
-          echo "fs.json is $size bytes"
-          if [ "$size" -lt 1000000 ]; then
-            echo "::error::fs.json is only $size bytes - too small to be a full image index"
-            exit 1
+          ok=0
+          if python3 tools/arch-image/mirror.py --list-only public/v86/fs.json >> "$LOG" 2>&1; then
+            ok=1
+            echo "RESULT: ok over https"
+          elif V86_IMAGE_BASE=http://i.copy.sh/ python3 tools/arch-image/mirror.py --list-only public/v86/fs.json >> "$LOG" 2>&1; then
+            ok=1
+            echo "RESULT: ok over http"
+          else
+            echo "RESULT: failed - both schemes refused"
           fi
-          if [ "$size" -gt 25000000 ]; then
-            echo "::error::fs.json is $size bytes - larger than expected, refusing to commit"
-            exit 1
+          echo '```' >> "$LOG"
+
+          if [ "$ok" = "1" ]; then
+            size=$(wc -c < public/v86/fs.json)
+            echo "" >> "$LOG"
+            echo "- bytes: $size" >> "$LOG"
+            if [ "$size" -lt 1000000 ] || [ "$size" -gt 25000000 ]; then
+              echo "- **rejected**: $size bytes is not a plausible image index" >> "$LOG"
+              rm -f public/v86/fs.json
+              ok=0
+            fi
           fi
+
+          if [ "$ok" = "0" ] && [ ! -f public/v86/fs.json ]; then
+            echo "" >> "$LOG"
+            echo "No copy in the tree; the app will use a per-device vendored list or the origin." >> "$LOG"
+            echo "::warning::could not vendor fs.json; see docs/fs-vendor.log"
+          fi
+
           git config user.name "dragon86-vendor[bot]"
           git config user.email "dragon86-vendor@users.noreply.github.com"
-          git add public/v86/fs.json
+          git add -A public/v86/fs.json docs/fs-vendor.log 2>/dev/null || true
           if git diff --cached --quiet; then
-            echo "unchanged - nothing to commit"
+            echo "nothing changed"
             exit 0
           fi
-          git commit -m "Vendor the Arch image file list ($(du -h public/v86/fs.json | cut -f1))"
+          if [ "$ok" = "1" ]; then
+            msg="Vendor the Arch image file list ($(du -h public/v86/fs.json | cut -f1))"
+          else
+            msg="Record the fs.json vendor attempt (failed)"
+          fi
+          git commit -q -m "$msg"
           git push
+          echo "committed: $msg"
