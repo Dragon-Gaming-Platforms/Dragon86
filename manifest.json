@@ -1,8 +1,8 @@
 {
   "source": "https://i.copy.sh/",
-  "fs_json_entries": 17116,
-  "blobs": 15003,
-  "bytes": 732427074,
+  "fs_json_entries": 17112,
+  "blobs": 14999,
+  "bytes": 732057820,
   "rules": {
     "skip_prefixes": [
       "/var/",
