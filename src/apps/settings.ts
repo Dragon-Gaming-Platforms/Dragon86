@@ -5,7 +5,7 @@
 import { el, icon } from "../core/dom";
 import { showConfirm } from "../core/dialog";
 import { DEFAULT_IMAGE_BASE, probeImage, probeRelay, relayBackendName } from "../bridge/v86-image";
-import { ImageStore } from "../bridge/image-store";
+import { ImageStore, zstdSupport } from "../bridge/image-store";
 import {
   getSettings,
   setSettings,
@@ -158,7 +158,7 @@ export function openSettings(win: Win): void {
   /* ---------- v86 guest image (mini vs full Arch) ---------- */
   const guestRow = el("div", "settings-row");
   guestRow.append(el("label", undefined, "v86 guest"));
-  const miniBtn = el("button", "btn", "Dragon86 mini (fast)");
+  const miniBtn = el("button", "btn", "Dragon86 mini (legacy)");
   const archBtn = el("button", "btn", "Full Arch Linux 32");
   const refreshGuestBtns = () => {
     const g = getSettings().v86Guest;
@@ -190,6 +190,27 @@ export function openSettings(win: Win): void {
   });
   imageRow.append(imageInput, saveImage);
 
+  /* Mirror: a second store serving the same names, tried when the primary
+     refuses a file (Safari gets 403 from i.copy.sh). Optional. */
+  const mirrorRow = el("div", "settings-row");
+  mirrorRow.append(el("label", undefined, "Image mirror"));
+  const mirrorInput = el("input", "input");
+  mirrorInput.placeholder = "https://dragon-gaming-platforms.github.io/Dragon86-arch-image/";
+  mirrorInput.value = getSettings().v86ImageFallback;
+  const saveMirror = el("button", "btn", "Save");
+  saveMirror.addEventListener("click", () => {
+    setSettings({ v86ImageFallback: mirrorInput.value.trim() });
+    mirrorInput.value = getSettings().v86ImageFallback;
+    saveMirror.textContent = "Saved ✓";
+    setTimeout(() => (saveMirror.textContent = "Save"), 1500);
+  });
+  const clearMirror = el("button", "btn", "None");
+  clearMirror.addEventListener("click", () => {
+    setSettings({ v86ImageFallback: "" });
+    mirrorInput.value = "";
+  });
+  mirrorRow.append(mirrorInput, saveMirror, clearMirror);
+
   /* The image's file list: shipped with the app, or vendored onto this
      device from the image store in one click (that fetch happens here, in
      your browser, which is why it can succeed where a build machine can't). */
@@ -202,8 +223,11 @@ export function openSettings(win: Win): void {
     void (async () => {
       const root = vfs.ENGINE_ROOT.v86;
       const shippedUrl = `${import.meta.env.BASE_URL}v86/fs.json`;
-      const shipped = await fetch(shippedUrl)
-        .then(async (r) => r.ok && (await r.text()).trimStart().startsWith("{"))
+      /* HEAD, not GET: the shipped list is several MB and Settings opens
+         often. GitHub Pages and vite both label it application/json, which
+         a 200-with-index.html fallback does not. */
+      const shipped = await fetch(shippedUrl, { method: "HEAD" })
+        .then((r) => r.ok && /json/i.test(r.headers.get("content-type") || ""))
         .catch(() => false);
       const vendored = await ImageStore.vendoredInfo(root);
       vendorState.textContent =
@@ -316,15 +340,23 @@ export function openSettings(win: Win): void {
       "The image is fetched straight from the origin below, so its CORS policy matters: press Test to check from this browser. " +
       "Changes take effect on the next Terminal Reconnect.",
   );
-  engineSection.append(guestRow, imageRow, imageResult, vendorRow, vendorState, guestNote);
+  const mirrorNote = el(
+    "div",
+    "settings-note",
+    "A second copy of the same image (same file names, same bytes) used only when the store above refuses a file. " +
+      "The upstream store answers 403 to some browsers — Safari in particular — and a mirror on GitHub Pages answers everyone, " +
+      "so this is what makes Full Arch work there. Leave it empty to use the store alone. " +
+      `Blob compression in this browser: ${zstdSupport() === "native" ? "native zstd (fastest)" : "built-in zstd decoder (fzstd) — works, just slower"}.`,
+  );
+  engineSection.append(guestRow, imageRow, imageResult, mirrorRow, mirrorNote, vendorRow, vendorState, guestNote);
 
   /* ---------- System ---------- */
   const systemSection = el("div", "settings-section");
   systemSection.append(el("h2", undefined, "System"));
   const table = el("table", "about-table");
   const facts: [string, string][] = [
-    ["OS", "Dragon86 0.10.0 (dev build)"],
-    ["Build", "GUST + Sandstone vendored · Monaco editor · v86 (bash + coreutils + git, live 9p share, save state) · desktop layout fix · vendored Arch file list"],
+    ["OS", "Dragon86 0.11.0 (dev build)"],
+    ["Build", "GUST + Sandstone vendored · Monaco editor · v86 (bash + coreutils + git, live 9p share, save state) · desktop layout fix · vendored Arch file list · image mirror + zstd fallback"],
     ["Engines", "CheerpX (embedded / separate tab) · v86 (mini guest with /shared, or full Arch Linux streamed from an image store)"],
     ["Vendor", "Dragon Gaming Platforms"],
     ["Terminal", "xterm.js 6 · bridge protocol v1"],

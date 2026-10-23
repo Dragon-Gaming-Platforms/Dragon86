@@ -202,36 +202,61 @@ times out on DHCP — which is why the probe exists.
 
 ## The image file list (`fs.json`) is vendored
 
-The full Arch guest's root filesystem is described by a single document,
+The full Arch guest's root filesystem is described by one document,
 `fs.json`: for every path, a `[name, size, mtime, mode, uid, gid, last]`
 entry where `last` is either a child list or the name of a content blob
 (`<sha256[0:10]>.bin[.zst]`). It is the 9p file list, not file contents.
 
-Dragon86 resolves that list in this order, and says which one it used in
-the Console (`[D86:image] using the shipped image list`):
+**It is a file in this repository** — `public/v86/fs.json` — and is served
+from our own origin. That is not a tidiness choice: the upstream store
+answers **403 to Safari**, so a browser-side fetch of the list can simply
+fail. Same-origin has no such opinion.
 
-1. **Shipped** — `public/v86/fs.json`, put there at deploy time by
-   `.github/workflows/deploy.yml` running
-   `tools/arch-image/mirror.py --list-only public/v86/fs.json`
-   (https first, then http; the step is best-effort and never fails the
-   deploy). Same origin, so no CORS question, and the tree at `~/v86`
-   builds with no network at all.
-2. **Vendored on this device** — the same document kept in ZenFS at
-   `~/v86/.dragon86-image-fs.json`. Settings → **v86 image** →
-   *Vendor to this device* fetches it once, in the browser, where the
-   origin is reachable, and writes it there. This is the fallback when
-   the build did not ship a copy (or you point Settings at a different
-   image base): the first boot after vendoring needs no index fetch, so
-   the Arch tree appears instantly and works offline.
-3. **Live** — `fs.json` from the configured image base. If this is the
-   one that worked, the list is saved to ZenFS immediately, so case 3
-   happens at most once per image base.
+Two workflows keep it current:
 
-Nothing else about the tree changes: only **file contents** are ever
-streamed from the image store (`<base>arch/<blob>`), lazily, the first
-time the guest or Files touches a file. `public/v86/fs.json` is
-gitignored — it is a ~7 MB build input, not source.
+- `.github/workflows/vendor-fs-json.yml` — on every push to main, fetches
+  `fs.json` (https, then http), validates it (JSON, a real `fsroot` with
+  file entries, sane size), and commits it if it changed. Bot pushes use
+  `GITHUB_TOKEN`, so they do not re-trigger workflows: one fetch per real
+  push, no loop.
+- `.github/workflows/deploy.yml` — before building, uses the committed copy
+  if there is one, otherwise fetches it. Best-effort either way.
 
-To check which copy a running OS is using, watch the Console at boot, or
-Settings → v86 image, which reports both the shipped copy (yes/no) and
-the size and date of the vendored one.
+At runtime the app resolves it in this order, and logs which one it used
+(`[D86:image] using the shipped image list`):
+
+1. **shipped** — `public/v86/fs.json`, same origin.
+2. **vendored on this device** — the same document kept in ZenFS at
+   `~/v86/.dragon86-image-fs.json`. Settings → **v86 image** → *Vendor to
+   this device* fetches it once in your browser and keeps it there; useful
+   when a build has no copy, or you point Settings at another image base.
+3. **live** — `fs.json` from the configured image base (or its mirror, see
+   below). If this worked, it is saved, so it happens at most once.
+
+Only **file contents** are streamed from the image store
+(`<base>arch/<blob>`), lazily, the first time the guest or Files touches a
+file.
+
+### Safari: the 403, the mirror, and zstd
+
+Three separate things had to be true before Full Arch could work in every
+browser, and only two of them are ours to fix:
+
+1. **The list** — fixed above, by serving our own copy.
+2. **zstd blobs** — Chromium has had `DecompressionStream("zstd")` since
+   123; other engines may not, and a guest cannot boot with half its files
+   unreadable. `fzstd` (MIT, bundled, ~10 KB) is now the fallback decoder,
+   used automatically when the platform API is missing or refuses. Nothing
+   to do at runtime; Settings reports which one your browser uses.
+3. **The blobs themselves** — still fetched from upstream, which refuses
+   Safari. Ours to *work around*, not to fix: Settings → **v86 image** →
+   **Image mirror** takes a second store with the same file names and
+   bytes, and any blob the primary refuses (403 or network error) is
+   retried there. `.github/workflows/mirror-arch-image.yml` builds such a
+   mirror into a Pages repo of its own on demand — see
+   `tools/arch-image/README.md` — because Pages answers everyone and sends
+   `Access-Control-Allow-Origin: *`.
+
+With a mirror configured, nothing about the guest changes: same image,
+same bytes, just a host that will talk to every browser.
+

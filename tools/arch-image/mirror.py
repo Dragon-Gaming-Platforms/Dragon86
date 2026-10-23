@@ -19,6 +19,7 @@ guest's contents:
 
     python3 mirror.py site            # writes site/fs.json + site/arch/*
     python3 mirror.py --list-only public/v86/fs.json
+    python3 mirror.py --probe        # what does the origin say to whom?
                                       # vendor just the index into the app
 
 Environment:
@@ -39,10 +40,52 @@ import json
 import os
 import sys
 import time
+import urllib.error
 import urllib.request
 
 BASE = os.environ.get("V86_IMAGE_BASE", "https://i.copy.sh/")
 ARCH = os.environ.get("V86_ARCH_DIR", "arch")
+
+
+# A browser-ish request. i.copy.sh answers 403 to clients it does not
+# recognise, and a Referer is the header that most such filters look at, so
+# send the one copy.sh's own page would send. (A browser cannot send this
+# cross-origin, which is exactly why Safari gets 403 where curl does not.)
+HEADERS = {
+    "User-Agent": (
+        "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) "
+        "Chrome/124.0 Safari/537.36"
+    ),
+    "Accept": "*/*",
+    "Referer": "https://copy.sh/v86/",
+}
+
+
+def status(url, headers=None):
+    """HTTP status for one URL, or the exception class — for --probe."""
+    try:
+        req = urllib.request.Request(url, headers=headers if headers is not None else HEADERS)
+        with urllib.request.urlopen(req, timeout=60) as res:
+            return res.status
+    except urllib.error.HTTPError as err:
+        return err.code
+    except Exception as err:  # noqa: BLE001
+        return type(err).__name__
+
+
+def probe():
+    """Explain what the image origin says to whom.
+
+    403 is not a network failure: the host is up and is refusing this
+    client. Which header (or scheme) it objects to decides what can be done
+    about it, so print the matrix instead of guessing.
+    """
+    for scheme in ("https", "http"):
+        base = f"{scheme}://i.copy.sh/"
+        print(f"{base}")
+        print(f"  fs.json   browser-ish headers : {status(base + 'fs.json')}")
+        print(f"  fs.json   no referer          : {status(base + 'fs.json', {'User-Agent': HEADERS['User-Agent'], 'Accept': '*/*'})}")
+        print(f"  fs.json   no headers at all   : {status(base + 'fs.json', {})}")
 
 
 def fetch(url, dest=None, retries=5):
@@ -51,7 +94,7 @@ def fetch(url, dest=None, retries=5):
         if attempt:
             time.sleep(2 ** attempt)  # 2s, 4s, 8s, 16s
         try:
-            req = urllib.request.Request(url, headers={"User-Agent": "dragon86-mirror/1"})
+            req = urllib.request.Request(url, headers=HEADERS)
             with urllib.request.urlopen(req, timeout=120) as res:
                 data = res.read()
             if dest:
@@ -136,7 +179,12 @@ def main():
         metavar="PATH",
         help="download just fs.json and write it to PATH (vendor the index; no blobs)",
     )
+    ap.add_argument("--probe", action="store_true", help="print the origin's status for several request shapes")
     args = ap.parse_args()
+
+    if args.probe:
+        probe()
+        return
 
     if args.list_only:
         list_only(args.list_only)

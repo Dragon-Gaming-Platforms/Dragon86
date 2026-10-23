@@ -37,6 +37,13 @@ export interface Settings {
   /** Image store root for v86Guest "arch" (fs.json + arch/ live here). */
   v86ImageBase: string;
   /**
+   * Optional mirror of the same image (same file names, same bytes), used
+   * when the primary store refuses a file. The default store is generous
+   * with CORS but not with every browser — Safari gets a 403 there — and a
+   * mirror on GitHub Pages has no such opinions. Empty = no fallback.
+   */
+  v86ImageFallback: string;
+  /**
    * v86 network backend. Empty/"off" = no NIC at all (the guest sees only
    * loopback). Anything else is v86's relay URL, which decides the backend by
    * scheme:
@@ -87,6 +94,7 @@ const DEFAULTS: Settings = {
   engineMode: "embedded",
   v86Guest: "dragon",
   v86ImageBase: "https://i.copy.sh/",
+  v86ImageFallback: "",
   /* copy.sh's own public proxy: the same one its Arch demo uses, so the
      guest behaves the way it does there. Rate-limited and shared — set your
      own wisp/wsproxy URL in Settings for regular use. */

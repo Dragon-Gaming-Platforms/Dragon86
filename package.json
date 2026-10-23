@@ -14,7 +14,8 @@
     "@xterm/xterm": "^6.0.0",
     "@zenfs/core": "^2.7.7",
     "@zenfs/dom": "^1.2.14",
-    "eruda": "^3.4.3"
+    "eruda": "^3.4.3",
+    "fzstd": "^0.1.1"
   },
   "devDependencies": {
     "typescript": "^5.9.3",

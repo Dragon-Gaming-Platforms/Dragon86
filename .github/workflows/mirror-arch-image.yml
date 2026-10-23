@@ -1,0 +1,94 @@
+name: Mirror the Arch image (optional)
+
+# Why this exists: the upstream image store (i.copy.sh) answers 403 to some
+# browsers — Safari above all — and a 403 there means the full Arch guest
+# cannot read its kernel, let alone its userland. GitHub Pages has no such
+# opinions and sends `Access-Control-Allow-Origin: *`, so a mirror makes the
+# full guest work on every browser.
+#
+# It is optional and manual: it needs a token with `contents: write` on the
+# mirror repo (Settings -> Secrets -> Actions -> `MIRROR_TOKEN`). Without the
+# secret the job explains itself and does nothing. See
+# tools/arch-image/README.md for the one-time setup.
+#
+# The mirror is resumable: it clones what is already published and only
+# downloads what is missing, so a failed run costs nothing to repeat.
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "Repository to publish to (must already exist, Pages enabled)"
+        required: true
+        default: "Dragon-Gaming-Platforms/Dragon86-arch-image"
+      max_size_mb:
+        description: "Refuse to exceed this many MB (Pages allows 1024)"
+        required: true
+        default: "900"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mirror-arch-image
+  cancel-in-progress: false
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Is a mirror token configured?
+        id: gate
+        env:
+          TOKEN: ${{ secrets.MIRROR_TOKEN }}
+        run: |
+          if [ -z "$TOKEN" ]; then
+            echo "::warning::no MIRROR_TOKEN secret - skipping. See tools/arch-image/README.md."
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Clone the published mirror (or start one)
+        if: steps.gate.outputs.ok == 'true'
+        env:
+          TOKEN: ${{ secrets.MIRROR_TOKEN }}
+          TARGET: ${{ inputs.target }}
+        run: |
+          set -euo pipefail
+          url="https://x-access-token:${TOKEN}@github.com/${TARGET}.git"
+          if ! git clone --depth 1 "$url" site 2>/dev/null; then
+            echo "empty or new repo - starting from nothing"
+            mkdir -p site && cd site
+            git init -q
+            git remote add origin "$url"
+            git checkout -q -b main || true
+          fi
+          cd site && git config user.name "dragon86-mirror[bot]" && git config user.email "dragon86-mirror@users.noreply.github.com"
+
+      - name: Download what is missing
+        if: steps.gate.outputs.ok == 'true'
+        env:
+          SKIP_EXISTING: "1"
+          JOBS: "16"
+        run: |
+          python3 tools/arch-image/mirror.py site --max-size ${{ inputs.max_size_mb }} \
+            || V86_IMAGE_BASE=http://i.copy.sh/ python3 tools/arch-image/mirror.py site --max-size ${{ inputs.max_size_mb }}
+
+      - name: Publish
+        if: steps.gate.outputs.ok == 'true'
+        working-directory: site
+        run: |
+          set -euo pipefail
+          : > .nojekyll   # Pages: serve the files as-is, no Jekyll pass
+          git add -A
+          if git diff --cached --quiet; then
+            echo "mirror already complete - nothing to publish"
+            exit 0
+          fi
+          git commit -q -m "Mirror copy.sh's Arch image ($(date -u +%Y-%m-%d))"
+          git push -u origin HEAD:main || git push -u origin HEAD:master
+          echo "::notice::published; set Settings -> v86 image -> Image mirror to https://<owner>.github.io/<repo>/"

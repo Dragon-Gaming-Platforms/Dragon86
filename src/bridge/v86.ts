@@ -355,7 +355,10 @@ class V86Backend implements TerminalBackend {
            why we no longer hand v86 `baseurl`/`basefs`: that path is v86's
            own private store, invisible to Dragon86. */
         this.status("reading the Arch image index…");
-        const store = await ImageStore.load(imageBase, { root: vfs.ENGINE_ROOT.v86 });
+        const store = await ImageStore.load(imageBase, {
+          root: vfs.ENGINE_ROOT.v86,
+          fallbackBase: getSettings().v86ImageFallback,
+        });
         const root = vfs.ENGINE_ROOT.v86;
         await ensureDir(root);
         await ensureDir(vfs.SHARED_DIR.v86);

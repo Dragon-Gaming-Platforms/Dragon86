@@ -25,19 +25,22 @@ jobs:
           cache: npm
       - run: npm ci
 
-      # Vendor copy.sh's 9p image index into the build. `fs.json` is the file
-      # list for the full Arch guest; shipping it with the app means the tree
-      # at ~/v86 is built from a local copy (no cross-origin fetch, no
-      # dependency on the origin being reachable at boot), and only file
-      # *contents* stream from the image store. Best-effort: if the origin is
-      # down or refuses this runner, the app falls back to fetching the list
-      # itself, or to a copy vendored in the browser (Settings -> v86 image).
-      - name: Vendor the Arch image file list
+      # The Arch guest's file list (fs.json). The app prefers a copy served
+      # from our own origin over fetching it from i.copy.sh, which answers
+      # 403 to some browsers — so make sure the build has one. If the repo
+      # already has it (the Vendor workflow commits it on every push), use
+      # that; otherwise fetch it here. Either way it is best-effort: without
+      # it the app falls back to a per-device vendored copy or the origin.
+      - name: Ensure the Arch image file list is in the build
         continue-on-error: true
         run: |
+          if [ -s public/v86/fs.json ]; then
+            echo "using the committed copy ($(wc -c < public/v86/fs.json) bytes)"
+            exit 0
+          fi
           python3 tools/arch-image/mirror.py --list-only public/v86/fs.json \
             || V86_IMAGE_BASE=http://i.copy.sh/ python3 tools/arch-image/mirror.py --list-only public/v86/fs.json \
-            || echo "::warning::could not vendor fs.json - the app will fetch the image list at boot"
+            || echo "::warning::could not vendor fs.json - the app will use a vendored copy or the origin"
 
       - run: npm run build
       - uses: actions/upload-pages-artifact@v3
