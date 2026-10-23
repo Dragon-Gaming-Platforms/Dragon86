@@ -13,6 +13,28 @@ import { IndexedDB } from "@zenfs/dom";
 
 export const HOME = "/home/user";
 
+/**
+ * Engine roots. The guest's filesystem shows up in the OS tree under the
+ * engine it belongs to, so `/` in the guest maps to one of these:
+ *
+ *   ~/v86/…           the v86 machine — for the full Arch guest this is the
+ *                     whole root filesystem (see bridge/union-fs.ts)
+ *   ~/v86/shared/…    the v86 guest's /shared (ZenFS is the floor, so your
+ *                     existing Files stay visible; changes land here)
+ *   ~/CheerpX/…       the CheerpX engine's equivalent home
+ *
+ * `~` here is HOME: /home/user, the persistent IndexedDB mount.
+ */
+export const ENGINE_ROOT = {
+  v86: `${HOME}/v86`,
+  cheerpx: `${HOME}/CheerpX`,
+} as const;
+
+export const SHARED_DIR = {
+  v86: `${ENGINE_ROOT.v86}/shared`,
+  cheerpx: `${ENGINE_ROOT.cheerpx}/shared`,
+} as const;
+
 export const SPECIAL_DIRS = {
   Documents: `${HOME}/Documents`,
   Downloads: `${HOME}/Downloads`,
@@ -30,6 +52,11 @@ export async function initVfs(): Promise<void> {
     },
   });
   for (const dir of Object.values(SPECIAL_DIRS)) {
+    await ensureDir(dir);
+  }
+  /* The engine folders exist from the first boot so Files shows the layout
+     the guest lives in, even before an engine has ever run. */
+  for (const dir of [ENGINE_ROOT.v86, ENGINE_ROOT.cheerpx, SHARED_DIR.v86, SHARED_DIR.cheerpx]) {
     await ensureDir(dir);
   }
   const welcome = `${HOME}/Documents/Welcome.txt`;

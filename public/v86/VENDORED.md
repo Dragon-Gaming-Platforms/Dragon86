@@ -127,3 +127,43 @@ Verified locally before shipping: a store built from a real root tree
 (fs.json + 160 blobs) was booted through v86's `filesystem: { baseurl,
 basefs }` path; the guest mounted the streamed root over 9p and listed
 its contents from the shell.
+
+## The Arch root in ZenFS
+
+`/` inside the full Arch guest is `~/v86` on the OS side, served by our
+own 9p server (`src/bridge/p9.ts`) out of a union filesystem
+(`src/bridge/union-fs.ts`):
+
+    copy.sh's read-only image  (fs.json + blobs, fetched lazily)
+              ↓ read
+    ~/v86/…                    ZenFS: writable, persistent, in Files
+              ↓
+    guest /                    served over 9p
+
+Reads that ZenFS cannot satisfy come from the image. The first **write**
+to an image file copies it up into ZenFS first, so edits persist in
+IndexedDB and show up in the Files app, while untouched files cost
+nothing. Guest deletions of image files are recorded as whiteouts in
+`~/v86/.dragon86-whiteouts.json` so they do not reappear.
+
+On boot the image's directory tree (directories and symlinks only) is
+created in `~/v86` in the background, so the whole Arch layout is
+browsable in Files immediately; contents materialise on first use. The
+marker `~/v86/.dragon86-image.json` records which image base the tree
+came from, so it is not walked twice.
+
+The guest's `/shared` is a submount of the same union: `~/v86/shared`
+on top of your Files folder (`zenfsBase(HOME)`), so existing files stay
+visible in the guest and anything the guest writes there persists in
+`~/v86/shared`. The mini guest uses exactly the same `/shared` layout.
+
+CheerpX gets the matching folder, `~/CheerpX/shared`; pointing the fs1
+bridge at it is the last step for that engine (the hoster side still has
+to mount it).
+
+Verified with a real guest on a local copy of the store: image files
+read through the union, an OS-side edit read back inside the guest, a
+guest write persisted into ZenFS, a guest write to an *image* file
+copying it up intact, and `/shared` showing the OS files. The full
+`root=host9p` boot uses the same server with `/` instead of `/shared`
+as the mount point.

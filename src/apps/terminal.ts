@@ -252,7 +252,8 @@ export function openTerminal(win: Win): void {
         term.writeln(`${DIM}Root filesystem streams from ${normalizeImageBase(getSettings().v86ImageBase)} over 9p.${RESET}`);
         term.writeln(`${DIM}First boot pulls a few MB of blobs, then only what you run. Give it a minute.${RESET}`);
         term.writeln(`${DIM}When the prompt appears, hit "Prepare Shell" once to mount /dev, /proc, /sys.${RESET}`);
-        term.writeln(`${DIM}No /shared in this mode — v86 has one 9p device and the root filesystem owns it.${RESET}`);
+        term.writeln(`${DIM}The whole Arch root is your Files folder at v86/ — edit there, the guest sees it.${RESET}`);
+        term.writeln(`${DIM}Guest /shared is v86/shared (your Files stay visible underneath it).${RESET}`);
       } else {
         term.writeln(`${DIM}Starting the v86 compatibility engine (tiny Linux, in-page).${RESET}`);
       }
@@ -263,6 +264,7 @@ export function openTerminal(win: Win): void {
       if (!archGuest) term.writeln(`${DIM}Your Files folder appears in the guest as /shared, both ways.${RESET}`);
       const vb = getV86Backend({
         onData: (data) => term.write(filterOutput(data)),
+        onNotice: (text) => term.writeln(`${DIM}[v86] ${text}${RESET}`),
         onStatus: (s) => {
           if (s === "ready") {
             setChip("online", archGuest ? "Arch online" : "v86 online");
