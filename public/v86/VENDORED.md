@@ -93,7 +93,7 @@ filesystem instead of our subset.
 
 That image is not a disk file. Upstream serves a whole root filesystem
 over 9p from a flat HTTP store — `fs.json` (the tree) plus
-`arch/<sha256-10>.bin` blobs, fetched lazily as the guest touches files.
+`arch/<sha256-prefix>.bin` blobs, fetched lazily as the guest touches files.
 Dragon86 points v86 at that store (`filesystem: { baseurl, basefs }` +
 `bzimage_initrd_from_filesystem`, so the kernel and initrd come from
 inside the image) and changes only the console: upstream's openrc init
@@ -205,7 +205,7 @@ times out on DHCP — which is why the probe exists.
 The full Arch guest's root filesystem is described by one document,
 `fs.json`: for every path, a `[name, size, mtime, mode, uid, gid, last]`
 entry where `last` is either a child list or the name of a content blob
-(`<sha256[0:10]>.bin[.zst]`). It is the 9p file list, not file contents.
+(`<sha256-prefix>.bin[.zst]`, 8 hex digits in the current image). It is the 9p file list, not file contents.
 
 **It is a file in this repository** — `public/v86/fs.json` — and is served
 from our own origin. That is not a tidiness choice: the upstream store

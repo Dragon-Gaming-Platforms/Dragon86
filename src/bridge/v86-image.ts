@@ -3,7 +3,7 @@
  *
  * copy/v86's Arch demo has no disk image. It boots `root=host9p` and v86
  * serves the entire root filesystem over 9p from a flat, content-addressed
- * HTTP store: `fs.json` (the directory tree) plus `arch/<sha256-10>.bin`
+ * HTTP store: `fs.json` (the directory tree) plus `arch/<sha256-prefix>.bin`
  * blobs, fetched lazily as the guest touches them.
  *
  * Those files live on a different origin (`i.copy.sh`), so this only works
