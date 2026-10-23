@@ -1,0 +1,10 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include/graphviz
+
+Name: liblab_gamut
+Description: data library for default color labeling
+Version: 5.0.0
+Libs: -L${libdir} -llab_gamut
+Cflags: -I${includedir}

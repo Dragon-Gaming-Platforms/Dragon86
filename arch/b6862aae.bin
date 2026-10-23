@@ -1,0 +1,9 @@
+prefix=/usr
+includedir=${prefix}/include
+libdir=${prefix}/lib
+
+Name: GL
+Description: Legacy OpenGL and GLX library and headers.
+Version: 1.2
+Libs: -L${libdir} -lGL
+Cflags: -I${includedir}

@@ -1,0 +1,10 @@
+prefix=/usr
+exec_prefix=/usr
+libdir=/usr/lib
+includedir=/usr/include
+
+Name: libavif
+Description: Library for encoding and decoding .avif files
+Version: 0.9.3
+Libs: -L${libdir} -lavif
+Cflags: -I${includedir} -DAVIF_DLL

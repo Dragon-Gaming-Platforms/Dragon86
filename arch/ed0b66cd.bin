@@ -1,0 +1,25 @@
+# GdkPixbuf Image Loader Modules file
+# Automatically generated file, do not edit
+# Created by gdk-pixbuf-query-loaders from gdk-pixbuf-2.42.8
+#
+# LoaderDir = /usr/lib/gdk-pixbuf-2.0/2.10.0/loaders
+#
+"/usr/lib/gdk-pixbuf-2.0/2.10.0/loaders/libpixbufloader-avif.so"
+"avif" 5 "gdk-pixbuf" "AV1 Image File Format" "BSD"
+"image/avif" ""
+"avif" ""
+"    ftypavif" "zzz         " 100
+
+"/usr/lib/gdk-pixbuf-2.0/2.10.0/loaders/libpixbufloader-heif.so"
+"heif/avif" 4 "pixbufloader-heif" "HEIF/AVIF Image" "LGPL3"
+"image/heif" "image/heic" "image/avif" ""
+"heif" "heic" "avif" ""
+"    ftyp" "xxxx    " 100
+
+"/usr/lib/gdk-pixbuf-2.0/2.10.0/loaders/libpixbufloader-svg.so"
+"svg" 6 "gdk-pixbuf" "Scalable Vector Graphics" "LGPL"
+"image/svg+xml" "image/svg" "image/svg-xml" "image/vnd.adobe.svg+xml" "text/xml-svg" "image/svg+xml-compressed" ""
+"svg" "svgz" "svg.gz" ""
+" <svg" "*    " 100
+" <!DOCTYPE svg" "*             " 100
+

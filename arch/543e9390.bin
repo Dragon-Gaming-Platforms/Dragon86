@@ -1,0 +1,9 @@
+prefix=/usr
+includedir=${prefix}/include
+libdir=${prefix}/lib
+
+Name: pciaccess
+Description: Library providing generic access to the PCI bus and devices
+Version: 0.17
+Libs: -L${libdir} -lpciaccess
+Cflags: -I${includedir}

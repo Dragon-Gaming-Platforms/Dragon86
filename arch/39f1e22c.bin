@@ -1,0 +1,12 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: libsource-highlight
+Description: GNU Source-highlight library.
+URL: http://www.gnu.org/software/src-highlite/
+Version: 3.1.9
+Libs: -L${libdir} -lsource-highlight -L/usr/lib -lboost_regex
+Cflags: -I${includedir} -I/usr/include
+

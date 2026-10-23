@@ -1,0 +1,11 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: libjbig2dec
+Description:  JBIG2 decoder library.
+Version: 0.19
+Libs: -L${libdir} -ljbig2dec
+Libs.private: -lm
+Cflags: -I${includedir}

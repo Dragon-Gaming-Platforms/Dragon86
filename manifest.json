@@ -1,0 +1,44 @@
+{
+  "source": "https://i.copy.sh/",
+  "fs_json_entries": 17116,
+  "blobs": 15003,
+  "bytes": 732427074,
+  "rules": {
+    "skip_prefixes": [
+      "/var/",
+      "/tmp/",
+      "/usr/share/",
+      "/usr/include/",
+      "/usr/src/",
+      "/opt/",
+      "/root/",
+      "/home/",
+      "/usr/lib/modules",
+      "/usr/lib/firmware",
+      "/usr/lib/debug",
+      "/usr/lib/rustlib",
+      "/usr/lib/dri",
+      "/usr/lib/firefox",
+      "/usr/lib/jvm",
+      "/usr/lib/gcc",
+      "/usr/lib/clang",
+      "/usr/lib/docker",
+      "/usr/lib/cni",
+      "/usr/lib/ocaml",
+      "/usr/lib/guile",
+      "/usr/lib/bellagio",
+      "/usr/lib/d3d"
+    ],
+    "skip_substrings": [
+      "libLLVM-",
+      "libclang",
+      "librustc_driver",
+      "libgo.so",
+      "libnode.so",
+      "libicudata",
+      "libOSMesa"
+    ],
+    "max_file_bytes": 12582912,
+    "budget_bytes": 734003200
+  }
+}

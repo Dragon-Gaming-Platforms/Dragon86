@@ -1,0 +1,14 @@
+#!/usr/bin/openrc-run
+
+depend() {
+    before net
+    provide firewall
+}
+
+start() {
+    /usr/lib/ufw/ufw-init start &> /dev/null &
+}
+
+stop() {
+    /usr/lib/ufw/ufw-init stop
+}

@@ -1,0 +1,11 @@
+prefix=/usr
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+Name: raqm
+Description: A library for complex text layout
+URL: https://github.com/HOST-Oman/libraqm
+Version: 0.9.0
+Requires.private: freetype2 >=  24.0.18, harfbuzz >=  3.0.0, fribidi >=  1.0.6
+Libs: -L${libdir} -lraqm
+Cflags: -I${includedir}

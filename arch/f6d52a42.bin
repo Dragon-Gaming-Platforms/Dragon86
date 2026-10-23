@@ -1,0 +1,7 @@
+imagesize/__init__.py,sha256=615b44aa4689aa0b7e1e720d133832755f5e1a1b2a07f8802161035e36cbcb30,102
+imagesize/imagesize.py,sha256=955631fd5661ce576af667154cf8924c1509329915791ffd7b67a0feeff32e13,13992
+imagesize-1.4.1.dist-info/LICENSE.rst,sha256=d0659c2767a164c2bf2736ee9f7bb619e0f165c89a962839de53fd5f77f62f4e,1120
+imagesize-1.4.1.dist-info/METADATA,sha256=6c573845bda676017eefe3e7c74c74610c90746ea166792d2d2dc6004b98e11f,1434
+imagesize-1.4.1.dist-info/WHEEL,sha256=cfd8f4c406bf26650a3299b3ef62b464600b48cfe7fb04159866e5797c765478,110
+imagesize-1.4.1.dist-info/top_level.txt,sha256=fff8fa9258b3a0a09a664db55b6f9d29c400565769d28a5f1d5122122664e914,10
+imagesize-1.4.1.dist-info/RECORD,,

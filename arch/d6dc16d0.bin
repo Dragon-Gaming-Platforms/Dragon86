@@ -1,0 +1,13 @@
+prefix=/usr
+includedir=${prefix}/include
+libdir=${prefix}/lib
+
+libva_version=2.16.0
+va_api_version=1.16.0
+driverdir=/usr/lib/dri
+
+Name: va
+Description: Userspace Video Acceleration (VA) core interface
+Version: 1.16.0
+Libs: -L${libdir} -lva
+Cflags: -I${includedir}

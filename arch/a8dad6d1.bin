@@ -1,0 +1,14 @@
+prefix=/usr
+includedir=${prefix}/include
+libdir=${prefix}/lib
+
+libva_version=2.16.0
+va_api_version=1.16.0
+display=glx
+
+Name: va-glx
+Description: Userspace Video Acceleration (VA) GLX interface
+Version: 1.16.0
+Requires: libva
+Libs: -L${libdir} -lva-glx
+Cflags: -I${includedir}

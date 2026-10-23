@@ -1,0 +1,14 @@
+prefix=/usr
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+exec_prefix=${prefix}
+
+Name: libsoup
+Description: A glib-based HTTP library
+Version: 3.0.3
+Requires: glib-2.0 >=  2.69.1, gmodule-2.0 >=  2.69.1, gobject-2.0 >=  2.69.1, gio-2.0 >=  2.69.1
+Requires.private: sqlite3, libpsl >=  0.20, libbrotlidec, zlib, libnghttp2
+Libs: -L${libdir} -lsoup-3.0
+Libs.private: -lgssapi_krb5 -lkrb5 -lk5crypto -lcom_err
+Cflags: -I${includedir}/libsoup-3.0

@@ -1,0 +1,8 @@
+prefix=/usr
+includedir=${prefix}/include
+
+Name: cairo-xcb-shm
+Description: XCB/SHM functions for cairo graphics library
+Version: 1.17.6
+Requires: cairo, xcb-shm
+Cflags: -I${includedir}

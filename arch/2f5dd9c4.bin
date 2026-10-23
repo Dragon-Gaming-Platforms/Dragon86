@@ -1,0 +1,10 @@
+prefix=/usr
+includedir=${prefix}/include
+libdir=${prefix}/lib
+
+Name: glu
+Description: Mesa OpenGL Utility Library
+Version: 9.0.2
+Requires: opengl
+Libs: -L${libdir} -lGLU
+Cflags: -I${includedir}

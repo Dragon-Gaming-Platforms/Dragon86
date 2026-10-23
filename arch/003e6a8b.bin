@@ -1,0 +1,9 @@
+sphinxcontrib_jsmath-1.0.1-py3.10-nspkg.pth,sha256=6ef09bbd30e129409336dac26eee8755ef13b180b81b8fa14645de1dd109eade,574
+sphinxcontrib/jsmath/__init__.py,sha256=9922b4b04d900410fb1bc4011feabbacf7e05b47b9dfb45f12ab7efc2847de34,3409
+sphinxcontrib/jsmath/version.py,sha256=627898a1aa62b0843b9f92e9f1cd74b5c09caa94587a7e3862993056ee2a1adf,293
+sphinxcontrib_jsmath-1.0.1.dist-info/LICENSE,sha256=d8c25e2e8478ccd32b18375eb3a57c584d31048fe0c23c55905c64c8af6774a9,1435
+sphinxcontrib_jsmath-1.0.1.dist-info/METADATA,sha256=1a0d514f01b7cf770cb92aadf7e47ebb23a41589a8d7b14b683cb98497d5eef8,1381
+sphinxcontrib_jsmath-1.0.1.dist-info/WHEEL,sha256=cfd8f4c406bf26650a3299b3ef62b464600b48cfe7fb04159866e5797c765478,110
+sphinxcontrib_jsmath-1.0.1.dist-info/namespace_packages.txt,sha256=549ad5dffbda88a415815a51d08d6279cc683b476bcc6bbe3348f8d0f54fd904,14
+sphinxcontrib_jsmath-1.0.1.dist-info/top_level.txt,sha256=549ad5dffbda88a415815a51d08d6279cc683b476bcc6bbe3348f8d0f54fd904,14
+sphinxcontrib_jsmath-1.0.1.dist-info/RECORD,,

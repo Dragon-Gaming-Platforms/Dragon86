@@ -1,0 +1,17 @@
+prefix=/usr
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+sysconfdir=/etc
+localstatedir=/var
+confdir=${sysconfdir}/fonts
+cachedir=${localstatedir}/cache/fontconfig
+
+Name: Fontconfig
+Description: Font configuration and customization library
+Version: 2.13.94
+Requires: freetype2 >=  21.0.15
+Requires.private: expat
+Libs: -L${libdir} -lfontconfig
+Libs.private: -pthread
+Cflags: -I${includedir}

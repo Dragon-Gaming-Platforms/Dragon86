@@ -1,0 +1,10 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: ijs
+Description: IJS (InkJet Server) Raster Image Transport Protocol
+Version: 0.35
+Libs: -L${libdir} -lijs 
+Cflags: -I${includedir} 

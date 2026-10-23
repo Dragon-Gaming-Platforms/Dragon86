@@ -1,0 +1,14 @@
+prefix=/usr
+exec_prefix=${prefix}
+includedir=${prefix}/include
+libdir=${exec_prefix}/lib
+host=i686-pc-linux-gnu
+api_version=1
+
+Name: gpgme
+Description: GnuPG Made Easy to access GnuPG
+Requires.private: gpg-error, libassuan
+Version: 1.17.1
+Cflags: -I${includedir} 
+Libs: -L${libdir} -lgpgme
+URL: https://www.gnupg.org/software/gpgme/index.html

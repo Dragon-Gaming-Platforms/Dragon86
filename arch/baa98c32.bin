@@ -1,0 +1,13 @@
+prefix=/usr
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+exec_prefix=${prefix}
+
+Name: gudev-1.0
+Description: GObject bindings for libudev
+Version: 237
+Requires: glib-2.0 >=  2.38.0, gobject-2.0 >=  2.38.0
+Requires.private: libudev >=  199
+Libs: -L${prefix}/lib -lgudev-1.0
+Cflags: -I${includedir}/gudev-1.0

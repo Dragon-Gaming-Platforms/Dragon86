@@ -1,0 +1,8 @@
+../../../bin/podman-compose,sha256=87112c4bd2de473f786222a7e6b9a60ff77b97c8609133d04ea50859ce05f2ae,212
+podman_compose.py,sha256=21a029aa8c1bebfaf9cc99fd37c602edd941e4cc5d18ce0729e243341260306b,73250
+podman_compose-1.0.3.dist-info/LICENSE,sha256=8177f97513213526df2cf6184d8ff986c675afb514d4e68a404010521b880643,18092
+podman_compose-1.0.3.dist-info/METADATA,sha256=13501b764b25aac67a7d0d49789dd6a1fad870da46ed85ef9f1ac77ae50794a0,4128
+podman_compose-1.0.3.dist-info/WHEEL,sha256=cfd8f4c406bf26650a3299b3ef62b464600b48cfe7fb04159866e5797c765478,110
+podman_compose-1.0.3.dist-info/entry_points.txt,sha256=143b1770a8dad9799f4225504fc172361ec6c6e9aab7f3b5977983ee6bd17036,56
+podman_compose-1.0.3.dist-info/top_level.txt,sha256=4a2e89ab3b7b0809d4f4cc083a1661049f564d29ef8a5df9d20956252128ef96,15
+podman_compose-1.0.3.dist-info/RECORD,,

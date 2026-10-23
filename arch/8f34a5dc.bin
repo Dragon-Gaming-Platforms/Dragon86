@@ -1,0 +1,7 @@
+# Static information about the filesystems.
+# See fstab(5) for details.
+
+# <file system> <dir> <type> <options> <dump> <pass>
+# UUID=352f813b-dda7-4f66-bea5-7626d77fbcd0
+/dev/sda1           	/         	ext4      	rw,relatime	0 1
+

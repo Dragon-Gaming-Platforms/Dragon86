@@ -1,0 +1,8 @@
+prefix=/usr
+includedir=${prefix}/include
+
+Name: cairo-ps
+Description: PostScript surface backend for cairo graphics library
+Version: 1.17.6
+Requires: cairo, zlib
+Cflags: -I${includedir}

@@ -1,0 +1,2 @@
+# additional sshd options; see sshd(8)
+#SSHD_OPTS=""

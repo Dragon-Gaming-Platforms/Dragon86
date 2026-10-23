@@ -1,0 +1,18 @@
+prefix=/usr
+includedir=${prefix}/include
+libdir=${prefix}/lib
+
+exec_prefix=${prefix}
+libexecdir=${prefix}/lib
+datadir=${prefix}/share
+tracker_datadir=${datadir}/tracker3
+ontologies_dir=/usr/share/tracker3/ontologies
+
+Name: tracker-sparql-3.0
+Description: Tracker : A SPARQL triple store library
+Version: 3.4.0
+Requires: glib-2.0 > 2.52.0, gio-2.0 > 2.52.0, gobject-2.0 > 2.52.0
+Requires.private: gio-unix-2.0 > 2.52.0, icu-uc >  4.8.1.1, icu-i18n >  4.8.1.1, gmodule-2.0 > 2.52.0, json-glib-1.0 >=  1.4, libxml-2.0 >  2.6, sqlite3 > 3.20.0
+Libs: -L${libdir} -ltracker-sparql-3.0
+Libs.private: -lm -lstemmer -ldl
+Cflags: -I${includedir}/tracker-3.0 -I${includedir}/tracker-3.0/libtracker-sparql

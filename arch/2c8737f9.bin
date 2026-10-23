@@ -1,0 +1,7 @@
+#!/usr/bin/openrc-run
+
+command="/usr/sbin/cupsd"
+
+depend() {
+    use logger
+}

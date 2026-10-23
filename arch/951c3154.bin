@@ -1,0 +1,10 @@
+prefix=/usr
+includedir=${prefix}/include
+
+python_path=/usr/lib/tracker-3.0
+command=/usr/lib/tracker-3.0/trackertestutils/tracker-sandbox
+
+Name: tracker-testutils-3.0
+Description: tracker test utilities
+Version: 3.4.0
+Cflags: -I${includedir}
