@@ -15,7 +15,15 @@ import { fs } from "@zenfs/core";
 import { decompress as fzstd } from "fzstd";
 import { logInfo, logWarn } from "../core/log";
 
-const BLOB_RE = /^[0-9a-f]{10}\.bin(\.zst)?$/;
+/*
+ * A content blob is named after a *prefix of the sha256* of its contents, so
+ * `<hex>.bin`. The length of that prefix is a property of whichever fs2json
+ * built the image, not of the format: copy.sh's current Arch image uses 8
+ * (`e3b0c442.bin` is the empty file), older ones used 10. Accept any sane
+ * prefix length — pinning it to 10 made every file in this image look like a
+ * symlink, which is a quiet way to hand the guest an unusable root.
+ */
+const BLOB_RE = /^[0-9a-f]{4,64}\.bin(\.zst)?$/;
 
 export interface BaseStat {
   mode: number; // POSIX st_mode (type bits + permissions)

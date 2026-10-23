@@ -22,7 +22,7 @@ store:
 - `fs.json` — the whole directory tree: `[name, size, mtime, mode, uid,
   gid, children-or-blob]`
 - `arch/<hash>.bin[.zst]` — one file per unique blob, named after the
-  first 10 hex digits of its sha256
+  first N hex digits of its sha256 (8 in the current Arch set)
 
 v86 fetches blobs lazily as the guest touches them, so the browser never
 downloads the full tree — only what it runs.

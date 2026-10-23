@@ -95,6 +95,30 @@ check("clearVendored removes it", (await ImageStore.clearVendored(root)) === tru
   originBlobs = true;
 }
 
+// 5b. blob names are a *prefix* of a sha256, and the prefix length is the
+// builder's choice: copy.sh's current Arch image uses 8 hex digits, older
+// ones used 10. Pinning it made every file look like a symlink.
+{
+  const real = JSON.stringify({ fsroot: [
+    ["bin", 0, 0, 16877, 0, 0, [
+      ["bash", 8, 0, 33261, 0, 0, "e3b0c442.bin"],
+      ["sh", 8, 0, 33261, 0, 0, "0123456789.bin"],
+      ["zstd-thing", 8, 0, 33261, 0, 0, "aabbccdd.bin.zst"],
+      ["reboot", 12, 0, 41471, 0, 0, "/sbin/real-reboot"],
+    ]],
+  ] });
+  const st = ImageStore.parse(real, "https://i.copy.sh/", "shipped");
+  const st8 = await st.stat("/bin/bash");
+  check("8-hex blob is a regular file", st8?.isFile() === true);
+  check("8-hex blob has its real size", st8?.size === 8);
+  check("10-hex blob still works", (await st.stat("/bin/sh"))?.isFile() === true);
+  check(".bin.zst is still a blob", (await st.stat("/bin/zstd-thing"))?.isFile() === true);
+  const link = await st.stat("/bin/reboot");
+  check("a symlink is still a symlink", link?.isSymbolicLink() === true);
+  check("a symlink's target is readable", (await st.readlink("/bin/reboot")) === "/sbin/real-reboot");
+  check("a missing path is still null", (await st.stat("/bin/nope")) === null);
+}
+
 // 6. SPA fallback (200 + index.html) must not be mistaken for a list
 shipped = "<!doctype html><html></html>"; live = null;
 let fallbackMsg = "";

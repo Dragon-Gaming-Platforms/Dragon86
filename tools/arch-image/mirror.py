@@ -7,7 +7,7 @@ flat, content-addressed HTTP store:
 
     fs.json        a tree of [name, size, mtime, mode, uid, gid, child-or-file]
     arch/<hash>.bin[.zst]
-                   one file per unique blob, named after the first 10 hex
+                   one file per unique blob, named after the first N hex
                    digits of its sha256 (see tools/fs2json.py upstream)
 
 v86 fetches only the blobs the guest actually touches, so the browser
@@ -107,7 +107,12 @@ def fetch(url, dest=None, retries=5):
     raise SystemExit(f"failed: {url}: {last}")
 
 
-BLOB_RE = __import__("re").compile(r"^[0-9a-f]{10}\.bin(\.zst)?$")
+# Blobs are named after a prefix of the sha256 of their contents. The prefix
+# length depends on the fs2json that built the image: copy.sh's current Arch
+# image uses 8 hex digits (`e3b0c442.bin` is the empty file), older sets used
+# 10. Match any sane length - assuming 10 made every file look like a symlink
+# and the list looked empty.
+BLOB_RE = __import__("re").compile(r"^[0-9a-f]{4,64}\.bin(\.zst)?$")
 
 
 def blobs(node, out):
