@@ -39,12 +39,12 @@ Target: `i.copy.sh/fs.json`
 Response headers:
 
 ```
-Date: Fri, 23 Oct 2026 19:19:22 GMT
+Date: Fri, 23 Oct 2026 19:19:35 GMT
 Content-Type: application/json
 Content-Length: 5815708
 Connection: close
 Vary: Accept-Encoding
-Server: BunnyCDN-IL1-1068
+Server: BunnyCDN-LA1-985
 CDN-PullZone: 165003
 CDN-RequestCountryCode: US
 Access-Control-Allow-Origin: *
@@ -53,14 +53,14 @@ Access-Control-Expose-Headers: Server, x-goog-meta-frames, Content-Length, Conte
 Cache-Control: public, max-age=43200
 ETag: "6717277a-58bd9c"
 Last-Modified: Tue, 22 Oct 2024 04:18:02 GMT
-CDN-StorageServer: NY-346
-CDN-FileServer: 749
+CDN-StorageServer: LA-1053
+CDN-FileServer: 828
 CDN-ProxyVer: 1.71
 CDN-RequestPullSuccess: True
 CDN-RequestPullCode: 200
-CDN-CachedAt: 10/23/2026 19:17:20
-CDN-EdgeStorageId: 871
-CDN-RequestId: 7f0a77498378c823c22fb4c0c0b07f6f
+CDN-CachedAt: 10/23/2026 19:07:28
+CDN-EdgeStorageId: 1109
+CDN-RequestId: e71d6cec2b689c1418da74f31278076c
 CDN-Cache: HIT
 CDN-Status: 200
 CDN-RequestTime: 0
