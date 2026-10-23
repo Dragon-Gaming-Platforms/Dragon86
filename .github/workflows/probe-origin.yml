@@ -1,0 +1,36 @@
+name: Probe the image origin
+
+# "i.copy.sh returns 403" is the whole answer we have so far, and 403 is a
+# refusal, not an outage: the host is up and declining *this* request. Which
+# part of the request it objects to decides the fix (a header we can add, the
+# other scheme, or a mirror), so run the matrix and commit the result where it
+# can be read from anywhere.
+#
+# Manual only. Writes docs/fs-probe.md and commits it.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Ask the origin
+        run: |
+          mkdir -p docs
+          python3 tools/arch-image/probe-origin.py > docs/fs-probe.md || true
+          cat docs/fs-probe.md
+
+      - name: Commit the findings
+        run: |
+          git config user.name "dragon86-vendor[bot]"
+          git config user.email "dragon86-vendor@users.noreply.github.com"
+          git add docs/fs-probe.md
+          git diff --cached --quiet && echo "unchanged" && exit 0
+          git commit -m "Record what the image origin says (fs probe)"
+          git push
