@@ -1,0 +1,155 @@
+#!/usr/bin/ash
+# Dragon86 v86 guest init.
+#
+# The guest's root filesystem is *not* in this initramfs. It is ZenFS
+# (/home/user/v86 on the OS side), served to the kernel as a 9p share by
+# src/bridge/p9.ts. This script brings up the buses and the console, mounts
+# that share at /newroot, and switches into it, so from then on every file the
+# distro reads or runs is an ordinary file in Dragon86 — visible in Files,
+# editable there, writable from inside the guest.
+#
+# The initramfs still has to exist: it is what the kernel is given, and it
+# holds the modules needed to reach the 9p device. If the share does not
+# arrive (host still unpacking on a first boot), we fall back to a shell in
+# this initramfs so the user sees a prompt instead of a dead console.
+export PATH=/usr/bin:/usr/sbin
+mount -t proc -o noexec,nosuid,nodev proc /proc 2>/dev/null
+mount -t sysfs -o noexec,nosuid,nodev sysfs /sys 2>/dev/null
+mount -t devtmpfs devtmpfs /dev 2>/dev/null
+mkdir -p /dev/pts /shared /mnt /newroot /run
+mount -t devpts devpts /dev/pts 2>/dev/null
+
+# serial line size arrives on the kernel cmdline (d86cols/d86rows) —
+# serial has no winsize channel, so the host tells us up front, in-band.
+COLS=80; ROWS=24
+for p in $(cat /proc/cmdline); do
+  case "$p" in
+    d86cols=*) COLS="${p#d86cols=}" ;;
+    d86rows=*) ROWS="${p#d86rows=}" ;;
+  esac
+done
+stty -F /dev/ttyS0 rows "$ROWS" cols "$COLS" 2>/dev/null
+
+modprobe virtio_pci_legacy_dev 2>/dev/null
+modprobe virtio_pci_modern_dev 2>/dev/null
+modprobe virtio_pci
+modprobe 9pnet_virtio
+modprobe 9p 2>/dev/null
+
+# Networking. The card is emulated by v86 (virtio-net by default), and v86
+# answers DHCP itself for its local link, so bringing it up here is all the
+# guest needs to do — same job as networking.sh in copy.sh's images,
+# which ships in this root filesystem for exactly that reason. It runs in the
+# background so a missing relay can never delay the shell.
+cat > /etc/udhcpc.script <<'EOF'
+#!/bin/sh
+case "$1" in
+  deconfig)
+    ip addr flush dev "$interface" 2>/dev/null
+    ip link set "$interface" up 2>/dev/null
+    ;;
+  renew|bound)
+    ip addr flush dev "$interface" 2>/dev/null
+    ip addr add "$ip/$mask" dev "$interface" 2>/dev/null
+    ip link set "$interface" up 2>/dev/null
+    [ -n "${router:-}" ] && ip route replace default via "$router" 2>/dev/null
+    { for ns in ${dns:-}; do echo "nameserver $ns"; done; } > /etc/resolv.conf
+    [ -s /etc/resolv.conf ] || echo "nameserver 192.168.86.1" > /etc/resolv.conf
+    ;;
+esac
+exit 0
+EOF
+chmod +x /etc/udhcpc.script
+
+(
+  for i in $(seq 1 60); do
+    [ -e /sys/class/net/eth0 ] && break
+    modprobe virtio_net 2>/dev/null
+    modprobe ne2k_pci 2>/dev/null
+    sleep 1
+  done
+  [ -e /sys/class/net/eth0 ] || exit 0
+  ip link set eth0 up 2>/dev/null
+  udhcpc -i eth0 -s /etc/udhcpc.script -q -n -t 6 -T 3 2>/dev/null
+) &
+
+# The virtio PCI probe finishes well after init starts under emulation, and
+# mounting before the device exists burns the single 9p channel on a doomed
+# client. Wait for the device, then mount the OS filesystem as the root.
+(
+  for i in $(seq 1 150); do
+    [ -e /sys/bus/virtio/devices/virtio0 ] && break
+    sleep 0.2
+  done
+) 
+MOUNTED=0
+for i in $(seq 1 40); do
+  if mount -t 9p -o trans=virtio,version=9p2000.L,cache=loose,msize=1048576 host9p /newroot 2>/dev/null; then
+    MOUNTED=1
+    break
+  fi
+  sleep 1
+done
+
+if [ "$MOUNTED" = "1" ] && [ -x /newroot/usr/bin/bash ]; then
+  mkdir -p /newroot/proc /newroot/sys /newroot/dev /newroot/tmp /newroot/run /newroot/shared /newroot/root
+  # The kernel's own filesystems follow us in by bind mount (a 9p root cannot
+  # be pivot_root'ed into, and switch_root's MS_MOVE fails on it).
+  mount --bind /proc /newroot/proc 2>/dev/null
+  mount --bind /sys /newroot/sys 2>/dev/null
+  mount --bind /dev /newroot/dev 2>/dev/null
+  # /tmp and /run want to be scratch space, not files on the "disk".
+  mount -t tmpfs tmpfs /newroot/tmp 2>/dev/null
+  mount -t tmpfs tmpfs /newroot/run 2>/dev/null
+  # The launcher lives in the guest root so it is editable/inspectable there;
+  # it is rewritten on every boot, so an edit is not what runs next time.
+  cat > /newroot/.dragon86-shell <<'EOS'
+#!/usr/bin/ash
+export HOME=/root
+export TERM=xterm-256color
+cd /shared 2>/dev/null || cd /root 2>/dev/null || cd /
+while true; do
+  setsid -c /usr/bin/bash -l </dev/ttyS0 >/dev/ttyS0 2>&1
+  sleep 1
+done
+EOS
+  chmod +x /newroot/.dragon86-shell
+  clear 2>/dev/null
+  echo ""
+  echo "  Dragon86 Linux (v86 · Arch userland) — compatibility engine"
+  echo "  ----------------------------------------------------------"
+  echo "  / is your Dragon86 filesystem (v86/ in Files) — edit it there."
+  echo "  /shared is your Files folder; network: run /networking.sh"
+  echo ""
+  # Hand over to the distro. chroot (not switch_root) because a 9p mount
+  # cannot be MS_MOVE'd; the kernel filesystems came along by bind mount.
+  while true; do
+    chroot /newroot /.dragon86-shell
+    echo ""
+    echo "  Session ended. Respawning in 2s (Ctrl-C leaves you here) ..."
+    sleep 2
+  done
+fi
+
+# Fallback: no 9p root (first boot is still unpacking, or the host has none).
+# Run from this initramfs and mount /shared when it arrives, as before.
+(
+  for i in $(seq 1 30); do
+    mount -t 9p -o trans=virtio,version=9p2000.L,cache=loose,msize=1048576 host9p /shared 2>/dev/null && exit 0
+    sleep 2
+  done
+) &
+export HOME=/root
+export TERM=xterm-256color
+clear 2>/dev/null
+echo ""
+echo "  Dragon86 Linux (v86 · Arch userland) — recovery shell"
+echo "  ----------------------------------------------------"
+echo "  The OS filesystem did not mount, so this is the fallback shell."
+echo "  Reconnect from the Terminal to try again."
+echo ""
+cd /shared 2>/dev/null || cd /
+while true; do
+  setsid -c /usr/bin/bash -l </dev/ttyS0 >/dev/ttyS0 2>&1
+  sleep 1
+done

@@ -27,7 +27,7 @@ const IOUNIT = MSIZE - 64;
 
 /* errno values the guest turns into strerror() text */
 const ENOENT = 2, EPERM = 1, EIO = 5, EEXIST = 17, ENOTDIR = 20,
-  EISDIR = 21, EINVAL = 22, ENOSYS = 38, ENOTEMPTY = 39;
+  EISDIR = 21, EINVAL = 22, ENODATA = 61, ENOSYS = 38, ENOTEMPTY = 39, ENOTSUP = 95;
 
 function errnoOf(err: unknown): number {
   const code = (err as { code?: string })?.code ?? "";
@@ -131,7 +131,8 @@ export function createP9Handler(
   };
 
   /** ZenFS path → guest-view check: never escape the share root. */
-  const inside = (p: string): boolean => p === root || p.startsWith(`${root}/`);
+  const prefix = root.endsWith("/") ? root : `${root}/`;
+  const inside = (p: string): boolean => p === root || p.startsWith(prefix);
 
   async function qidFor(path: string): Promise<Qid> {
     const st = await fsImpl.stat(path);
@@ -398,6 +399,21 @@ export function createP9Handler(
           else await fsImpl.unlink(path);
           return new Writer().build(77, tag);
         }
+        case 8: { // Tstatfs — ZenFS has no fixed capacity, so present the share
+          // as a fixed 2 GiB volume; without this `df` prints a zero-size disk.
+          const blocks = (2 * 1024 * 1024 * 1024) / 4096;
+          return new Writer()
+            .u32(0x01021997) // V9FS_MAGIC
+            .u32(4096) // bsize
+            .u64(blocks)
+            .u64(blocks * 3 / 4) // bfree
+            .u64(blocks * 3 / 4) // bavail
+            .u64(200000) // files
+            .u64(100000) // ffree
+            .u64(0) // fsid
+            .u32(255) // namelen
+            .build(9, tag);
+        }
         case 20: { // Trename
           const fid = r.u32(), newdirfid = r.u32(), name = r.str();
           const f = getFid(fid);
@@ -416,6 +432,40 @@ export function createP9Handler(
           if (!inside(from) || !inside(to) || from === root) return error(tag, EPERM);
           await fsImpl.rename(from, to);
           return new Writer().build(75, tag);
+        }
+        case 30: { // Txattrwalk
+          // Wire order is fid, newfid, name — the walk opens a *second* fid
+          // that the client reads the value from. Two calls matter here:
+          //   • name ""  = listxattr ("which xattrs exist?"). The answer is a
+          //     zero-length value; ENODATA here makes `ls -l` print
+          //     "No data available" for every file.
+          //   • a real name = getxattr. We store no xattrs, so ENODATA — and
+          //     it must be ENODATA, not a zero-length value: the kernel's
+          //     capability parser reads an empty security.capability as a
+          //     corrupt one and aborts the exec with EINVAL.
+          const fid = r.u32();
+          const newfid = r.u32();
+          const name = r.str();
+          const f = getFid(fid);
+          if (name !== "") return error(tag, ENODATA);
+          fids.set(newfid, {
+            path: f.path,
+            handle: {
+              async read() { return 0; },
+              async write() { throw Object.assign(new Error("ENOTSUP"), { code: "ENOTSUP" }); },
+              async truncate() { throw Object.assign(new Error("ENOTSUP"), { code: "ENOTSUP" }); },
+              async close() {},
+            } as unknown as Handle,
+          });
+          return writeQid(new Writer().u64(0), await qidFor(f.path)).build(31, tag);
+        }
+        case 32: // Txattrcreate — nothing to write attributes into
+          return error(tag, ENOTSUP);
+        case 78: { // Treadlink — the kernel resolves symlinks itself, so a
+          // root full of them (/bin → usr/bin, /lib → usr/lib) needs this.
+          const fid = r.u32();
+          const target = await fsImpl.readlink(getFid(fid).path);
+          return new Writer().str(target).build(79, tag);
         }
         case 50: // Tfsync
           return new Writer().build(51, tag);

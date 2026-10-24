@@ -62,7 +62,11 @@ export function openFiles(win: Win, startPath: string, handlers: FilesHandlers):
     { name: "Documents", ic: "text", path: vfs.SPECIAL_DIRS.Documents },
     { name: "Downloads", ic: "download", path: vfs.SPECIAL_DIRS.Downloads },
     { name: "Desktop", ic: "desktop", path: vfs.SPECIAL_DIRS.Desktop },
-    { name: "Linux (CheerpX)", ic: "linux", path: "", disabled: true },
+    /* The two engine trees, as their own places: the guest's / is ~/v86, and
+       CheerpX keeps its equivalent under ~/CheerpX. Both are ordinary folders
+       here because the engines serve them straight out of ZenFS. */
+    { name: "v86", ic: "linux", path: vfs.ENGINE_ROOT.v86 },
+    { name: "CheerpX", ic: "browser", path: vfs.ENGINE_ROOT.cheerpx },
   ];
 
   function renderSidebar(): void {
