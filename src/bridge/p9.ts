@@ -233,7 +233,8 @@ export function createP9Handler(
         }
         case 14: { // Tlcreate
           const fid = r.u32(), name = r.str(), flags = r.u32();
-          r.u32(); r.u32();
+          const createMode = r.u32();
+          r.u32(); // gid — single-user share
           const f = getFid(fid);
           const path = joinRel(f.path, name);
           if (!inside(path)) return error(tag, EPERM);
@@ -242,6 +243,11 @@ export function createP9Handler(
           } catch {
             await fsImpl.writeFile(path, new Uint8Array(0));
           }
+          /* Honour the mode the guest asked for: `install -m`, `cp -p` and
+             anything that creates a file already executable rely on it, and
+             a file that lands as 0644 cannot be run even after chmod if the
+             backend drops the mode change. */
+          if (createMode & 0o7777) await fsImpl.chmod(path, createMode & 0o7777).catch(() => {});
           const acc = flags & 3;
           f.path = path;
           f.handle = await fsImpl.open(path, acc === 0 ? "r" : "r+");

@@ -28,7 +28,7 @@ const BASE = `${import.meta.env.BASE_URL}v86/`;
  * Bump when the seeding rules change (not when the initramfs changes — that
  * is detected by size). Forces a re-seed on the next boot.
  */
-const SEED_VERSION = 1;
+const SEED_VERSION = 2;
 
 const MARKER = ".dragon86-root.json";
 
@@ -188,6 +188,7 @@ export async function ensureGuestRoot(
 
   let files = 0;
   let bytes = 0;
+  let noMode = 0;
   for (const e of rest) {
     const target = `${root}/${e.name}`;
     try {
@@ -198,7 +199,7 @@ export async function ensureGuestRoot(
       } else {
         await ensureDir(target.slice(0, target.lastIndexOf("/")));
         await fs.promises.writeFile(target, e.data);
-        await fs.promises.chmod(target, e.mode & 0o7777).catch(() => {});
+        await fs.promises.chmod(target, e.mode & 0o7777).catch(() => { noMode++; });
         bytes += e.data.byteLength;
       }
       files++;
@@ -232,6 +233,16 @@ export async function ensureGuestRoot(
     } catch {
       /* already a symlink, or something is in the way — leave it */
     }
+  }
+
+  /* A backend that refuses chmod would leave every binary 0644 and nothing
+     would run — say so loudly instead of presenting a dead console. */
+  if (noMode > 0) {
+    logWarn(
+      "guest",
+      `${noMode} files could not keep their permission bits; the guest may refuse to run them`,
+    );
+    say(`warning: ${noMode} files lost their permission bits`);
   }
 
   await fs.promises.writeFile(
