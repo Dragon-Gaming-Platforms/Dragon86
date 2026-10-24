@@ -30,6 +30,11 @@ for p in $(cat /proc/cmdline); do
 done
 stty -F /dev/ttyS0 rows "$ROWS" cols "$COLS" 2>/dev/null
 
+# Talk to the serial line directly from here on. init's stdout is /dev/console,
+# which the kernel mirrors onto the boot console as well — the same tty twice —
+# so every line would be printed twice on screen.
+exec >/dev/ttyS0 2>&1
+
 modprobe virtio_pci_legacy_dev 2>/dev/null
 modprobe virtio_pci_modern_dev 2>/dev/null
 modprobe virtio_pci
@@ -82,66 +87,91 @@ chmod +x /etc/udhcpc.script
     sleep 0.2
   done
 ) 
-MOUNTED=0
-for i in $(seq 1 40); do
-  if mount -t 9p -o trans=virtio,version=9p2000.L,cache=loose,msize=1048576 host9p /newroot 2>/dev/null; then
-    MOUNTED=1
-    break
-  fi
-  sleep 1
-done
+mount_root() {
+  for i in $(seq 1 40); do
+    if mount -t 9p -o trans=virtio,version=9p2000.L,cache=loose,msize=1048576 host9p /newroot 2>/dev/null; then
+      return 0
+    fi
+    sleep 1
+  done
+  return 1
+}
 
-if [ "$MOUNTED" = "1" ] && [ -x /newroot/usr/bin/bash ]; then
-  mkdir -p /newroot/proc /newroot/sys /newroot/dev /newroot/tmp /newroot/run /newroot/shared /newroot/root
-  # The kernel's own filesystems follow us in by bind mount (a 9p root cannot
-  # be pivot_root'ed into, and switch_root's MS_MOVE fails on it).
+# The kernel's own filesystems follow the 9p root in by bind mount (a 9p root
+# cannot be pivot_root'ed into, and switch_root's MS_MOVE fails on it), and
+# /tmp and /run want to be scratch space rather than files on the "disk".
+setup_mounts() {
+  mkdir -p /newroot/proc /newroot/sys /newroot/dev /newroot/tmp /newroot/run /newroot/root
   mount --bind /proc /newroot/proc 2>/dev/null
   mount --bind /sys /newroot/sys 2>/dev/null
   mount --bind /dev /newroot/dev 2>/dev/null
-  # /tmp and /run want to be scratch space, not files on the "disk".
   mount -t tmpfs tmpfs /newroot/tmp 2>/dev/null
   mount -t tmpfs tmpfs /newroot/run 2>/dev/null
-  # The launcher lives in the guest root so it is editable/inspectable there;
-  # it is rewritten on every boot, so an edit is not what runs next time.
-  cat > /newroot/.dragon86-shell <<'EOS'
-#!/usr/bin/ash
-export HOME=/root
-export TERM=xterm-256color
-cd /shared 2>/dev/null || cd /root 2>/dev/null || cd /
-while true; do
-  setsid -c /usr/bin/bash -l </dev/ttyS0 >/dev/ttyS0 2>&1
-  sleep 1
-done
-EOS
-  chmod +x /newroot/.dragon86-shell
+}
+
+teardown_mounts() {
+  umount /newroot/proc /newroot/sys /newroot/dev /newroot/tmp /newroot/run 2>/dev/null
+  umount /newroot 2>/dev/null
+}
+
+run_session() {
+  # No launcher script: bash itself is the entry point, so nothing on the
+  # share has to be written, chmod'ed or executed for a shell to appear.
+  # setsid -c makes bash a session leader with ttyS0 as its controlling
+  # terminal (job control, Ctrl-C); without setsid we still get a shell.
+  HOME=/root
+  TERM=xterm-256color
+  export HOME TERM
+  if [ -x /newroot/usr/bin/setsid ]; then
+    chroot /newroot /usr/bin/setsid -c /usr/bin/bash -l </dev/ttyS0 >/dev/ttyS0 2>&1
+  else
+    chroot /newroot /usr/bin/bash -l </dev/ttyS0 >/dev/ttyS0 2>&1
+  fi
+}
+
+if mount_root && [ -x /newroot/usr/bin/bash ]; then
   clear 2>/dev/null
   echo ""
   echo "  Dragon86 Linux (v86 · Arch userland) — compatibility engine"
   echo "  ----------------------------------------------------------"
   echo "  / is your Dragon86 filesystem (v86/ in Files) — edit it there."
-  echo "  /shared is your Files folder; network: run /networking.sh"
+  echo "  /Documents, /Downloads and /Desktop are the ones in Files."
+  echo "  /system/apps holds the OS's filesystem apps. Network: /networking.sh"
   echo ""
-  # Hand over to the distro. chroot (not switch_root) because a 9p mount
-  # cannot be MS_MOVE'd; the kernel filesystems came along by bind mount.
-  #
-  # The launcher is handed to bash *as an argument*, never executed directly:
-  # the kernel refuses to exec a file without the execute bit, and on a 9p
-  # share the mode is whatever the host backend ended up storing (ZenFS's
-  # chmod can be a no-op on some backends). Passing it to bash means the
-  # hand-over cannot fail on permissions alone.
-  while true; do
-    chroot /newroot /usr/bin/bash /.dragon86-shell
+  # A shell that dies on its own (rather than exiting) leaves us here. Give
+  # it a few tries, and if it dies almost immediately assume the share is
+  # stale — a rebuilt root or a re-opened Terminal window can hand the guest
+  # inodes whose fids no longer mean anything, and the fix for that is a
+  # fresh 9p mount, not another chroot into the same one.
+  try=1
+  while [ "$try" -le 4 ]; do
+    setup_mounts
+    started=$(cut -d' ' -f1 /proc/uptime)
+    run_session
+    status=$?
+    ended=$(cut -d' ' -f1 /proc/uptime)
     echo ""
-    echo "  Session ended. Respawning in 2s (Ctrl-C leaves you here) ..."
+    echo "  Session ended (status $status). Respawning in 2s — Ctrl-C to stay in the initramfs."
     sleep 2
+    # `cut` gives fractional seconds; a session that lasted under 5s is a
+    # crash, not an exit, so start over with a new mount.
+    lived=$(awk -v a="$started" -v b="$ended" 'BEGIN{printf "%d", b-a}')
+    try=$((try + 1))
+    if [ "${lived:-0}" -lt 5 ]; then
+      teardown_mounts
+      mount_root || break
+    fi
   done
+  echo "  The guest shell keeps exiting at once; dropping to the initramfs recovery shell."
+  echo ""
 fi
 
 # Fallback: no 9p root (first boot is still unpacking, or the host has none).
-# Run from this initramfs and mount /shared when it arrives, as before.
+# Run from this initramfs and mount /shared if it ever arrives.
 (
-  for i in $(seq 1 30); do
-    mount -t 9p -o trans=virtio,version=9p2000.L,cache=loose,msize=1048576 host9p /shared 2>/dev/null && exit 0
+  for i in $(seq 1 10); do
+    mountpoint -q /newroot 2>/dev/null && exit 0
+    mount -t 9p -o trans=virtio,version=9p2000.L,cache=loose,msize=1048576 host9p /newroot 2>/dev/null && exit 0
     sleep 2
   done
 ) &
@@ -151,10 +181,10 @@ clear 2>/dev/null
 echo ""
 echo "  Dragon86 Linux (v86 · Arch userland) — recovery shell"
 echo "  ----------------------------------------------------"
-echo "  The OS filesystem did not mount, so this is the fallback shell."
+echo "  The distro root is not serving, so this is the fallback shell."
 echo "  Reconnect from the Terminal to try again."
 echo ""
-cd /shared 2>/dev/null || cd /
+cd /
 while true; do
   setsid -c /usr/bin/bash -l </dev/ttyS0 >/dev/ttyS0 2>&1
   sleep 1

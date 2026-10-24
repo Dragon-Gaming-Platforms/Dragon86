@@ -11,3 +11,6 @@ dist/
 # image file list there, and the app serves it from our own origin.
 
 tools/test-image-list/.out/
+
+# Headless boot harness used to test the guest offline (node + v86, no browser).
+.harness/

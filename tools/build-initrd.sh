@@ -26,6 +26,6 @@ cp "$here/guest-init/init" "$stage/init"
 chmod 755 "$stage/init"
 
 tmp="$stage/initrd.gz"
-python3 "$here/initrd-append.py" "$src" "$stage" "$tmp" --replace
+python3 "$here/initrd-append.py" "$src" "$stage" "$tmp" --replace --drop init
 mv "$tmp" "$out"
 echo "wrote $out ($(wc -c < "$out") bytes, /init from tools/guest-init/init)"

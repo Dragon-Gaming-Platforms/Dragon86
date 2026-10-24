@@ -34,8 +34,7 @@ bytes. If no Dragon86 window is open the worker answers 503 and says why.
 
 **The registry** is read from the filesystem at boot, from every `*.json` in:
 
-    ~/v86/shared/system/apps/      (the guest sees this as /shared/system/apps)
-    ~/system/apps/                 (fallback, for apps dropped in via Files)
+    ~/system/apps/                 (the guest sees this as /system/apps)
 
 Each file is `{ "apps": [ … ] }` (or a bare array). One entry:
 
@@ -81,7 +80,9 @@ once from `public/v86/initrd.gz` into `~/v86`, and from then on **the guest's
 That is the point of this engine: everything the distro reads is a file in
 your Dragon86 filesystem, and everything it writes lands there too. Edit
 `~/v86/etc/hostname` in Files, `cat /etc/hostname` in the Terminal — same
-file, no sync step. Inside the guest, `/shared` is your Files folder.
+file, no sync step. Your home folders are grafted onto the guest's root, so
+`/Documents`, `/Downloads` and `/Desktop` in the Terminal are the same folders
+the Files app shows.
 
 How it hangs together (details in `public/v86/VENDORED.md`):
 
@@ -154,7 +155,7 @@ GitHub Actions (`.github/workflows/deploy.yml`) builds and publishes to **GitHub
 1. ~~Core OS shell~~ ✔ desktop, WM, files, editor, settings, terminal chrome
 2. ~~CheerpX hoster repo~~ ✔ [CheerpX-Bridge](https://github.com/Dragon-Gaming-Platforms/CheerpX-Bridge) (COI + scoped service worker + Debian disk image)
 3. ~~Bridge handshake → real bash in the terminal~~ ✔ wired (default engine URL, cold-boot-aware handshake, late-ready recovery)
-4. ~~Shared Linux folder~~ ✔ v86 engine: the guest's `/shared` is the OS filesystem live, both ways (9p served from ZenFS — see `public/v86/VENDORED.md`). CheerpX engine: OS side wired (bridge protocol v2 "fs1", `src/bridge/fs-bridge.ts`, spec in `docs/cheerpx-fs-protocol.md`) — waiting on the hoster to plug it into the guest at `/home/user/shared`
+4. ~~Shared Linux folder~~ ✔ v86 engine: the guest's `/` is the OS filesystem live, both ways (9p served from ZenFS — see `public/v86/VENDORED.md`). CheerpX engine: OS side wired (bridge protocol v2 "fs1", `src/bridge/fs-bridge.ts`, spec in `docs/cheerpx-fs-protocol.md`) — waiting on the hoster to plug it into the guest at `/home/user/shared`
 5. ~~Browser app~~ ✔ Scramjet proxy vendored at `/scramjet/` (see `public/scramjet/VENDORED.md`)
 6. Multiple terminals / tmux, cloud-drive mounts (ZenFS backends)
 
@@ -194,7 +195,7 @@ changes — v1 behavior, no shared folder in the CheerpX guest.
   boots right inside the Dragon86 page — no isolation, no hoster, no
   service worker, so it runs in Android WebView and similar places the
   CheerpX modes can't. Slower and smaller than CheerpX, but its
-  `/shared` folder **is** the OS virtual filesystem, live in both
+  `/` **is** the OS virtual filesystem, live in both
   directions: Dragon86 serves 9p straight from its own filesystem
   (`src/bridge/p9.ts`), so guest creates/deletes/renames are OS
   operations and vice versa — no copying, no sync step. The Terminal's

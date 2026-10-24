@@ -19,8 +19,7 @@ export const HOME = "/home/user";
  *
  *   ~/v86/…           the v86 machine's root filesystem — the guest's `/`
  *                     is this folder, served over 9p
- *   ~/v86/shared/…    the v86 guest's /shared (ZenFS is the floor, so your
- *                     existing Files stay visible; changes land here)
+ *   ~/Downloads/…     also at /Downloads inside the v86 guest (HOME_DIRS)
  *   ~/CheerpX/…       the CheerpX engine's equivalent home
  *
  * `~` here is HOME: /home/user, the persistent IndexedDB mount.
@@ -31,9 +30,17 @@ export const ENGINE_ROOT = {
 } as const;
 
 export const SHARED_DIR = {
-  v86: `${ENGINE_ROOT.v86}/shared`,
+  /* CheerpX only: the hoster mounts its guest's /home/user/shared here. */
   cheerpx: `${ENGINE_ROOT.cheerpx}/shared`,
 } as const;
+
+/**
+ * Your home folders, grafted into the v86 guest at `/`: the guest sees
+ * `/Downloads`, `/Documents` and `/Desktop` and they *are* these. There is
+ * no separate "shared" folder any more — everything in the guest is your
+ * filesystem already.
+ */
+export const HOME_DIRS = ["Desktop", "Documents", "Downloads"] as const;
 
 export const SPECIAL_DIRS = {
   Documents: `${HOME}/Documents`,
@@ -56,7 +63,7 @@ export async function initVfs(): Promise<void> {
   }
   /* The engine folders exist from the first boot so Files shows the layout
      the guest lives in, even before an engine has ever run. */
-  for (const dir of [ENGINE_ROOT.v86, ENGINE_ROOT.cheerpx, SHARED_DIR.v86, SHARED_DIR.cheerpx]) {
+  for (const dir of [ENGINE_ROOT.v86, ENGINE_ROOT.cheerpx, SHARED_DIR.cheerpx]) {
     await ensureDir(dir);
   }
   const welcome = `${HOME}/Documents/Welcome.txt`;
@@ -228,4 +235,57 @@ export async function factoryReset(): Promise<void> {
   }
   localStorage.clear();
   location.reload();
+}
+
+/**
+ * Fold a legacy `~/v86/shared` folder back into the home directory.
+ *
+ * Before the guest's `/` became your filesystem outright, the guest's
+ * `/shared` was a union: the OS home as a read floor and `~/v86/shared` as
+ * the writable layer. That layer is gone (everything is ZenFS now), but a
+ * device that ran the old build still has files sitting in it — this copies
+ * them to the matching place under `~` (never overwriting a file that
+ * already exists) and removes the folder. Runs once, cheap when absent.
+ */
+export async function migrateLegacyShared(): Promise<number> {
+  const legacy = `${ENGINE_ROOT.v86}/shared`;
+  const n = await fs.promises.stat(legacy).catch(() => null);
+  if (!n || !n.isDirectory()) return 0;
+
+  let moved = 0;
+  const walk = async (dir: string, target: string): Promise<void> => {
+    let names: string[] = [];
+    try {
+      names = (await fs.promises.readdir(dir)) as unknown as string[];
+    } catch {
+      return;
+    }
+    for (const name of names) {
+      const from = `${dir}/${name}`;
+      const to = `${target}/${name}`;
+      const st = await fs.promises.stat(from).catch(() => null);
+      if (!st) continue;
+      if (st.isDirectory()) {
+        await fs.promises.mkdir(to, { recursive: true }).catch(() => {});
+        await walk(from, to);
+        await fs.promises.rmdir(from).catch(() => {});
+        continue;
+      }
+      const already = await fs.promises.stat(to).catch(() => null);
+      if (already) continue; // never overwrite something newer
+      try {
+        const data = await fs.promises.readFile(from);
+        await fs.promises.writeFile(to, data);
+        await fs.promises.chmod(to, st.mode & 0o7777).catch(() => {});
+        await fs.promises.unlink(from).catch(() => {});
+        moved++;
+      } catch {
+        /* leave it; a partial move is better than data loss */
+      }
+    }
+  };
+
+  await walk(legacy, HOME);
+  await fs.promises.rmdir(legacy).catch(() => {});
+  return moved;
 }

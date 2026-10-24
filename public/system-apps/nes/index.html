@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>NES — test ROM</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: #0f0d0c; color: #f3ece4; font: 13px/1.4 system-ui, sans-serif;
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+    padding: 10px; overflow: hidden; touch-action: none;
+  }
+  header { display: flex; align-items: baseline; gap: 8px; width: 100%; max-width: 512px; }
+  header b { color: #ff5a3c; letter-spacing: .5px; }
+  header span { color: #9d938a; font-size: 11px; }
+  canvas {
+    width: 100%; max-width: 512px; aspect-ratio: 256 / 240; height: auto;
+    image-rendering: pixelated; background: #000;
+    border: 1px solid #2a2523; border-radius: 6px;
+  }
+  .pads { width: 100%; max-width: 512px; display: flex; justify-content: space-between; gap: 12px; }
+  .dpad { display: grid; grid-template-columns: repeat(3, 48px); grid-template-rows: repeat(3, 48px); gap: 4px; }
+  .dpad button { grid-area: var(--a); }
+  .ab { display: grid; grid-template-columns: repeat(2, 56px); grid-template-rows: repeat(2, 48px); gap: 6px; align-content: end; }
+  button {
+    font: 600 15px system-ui, sans-serif; color: #f3ece4; background: #241f1d;
+    border: 1px solid #3a332f; border-radius: 10px; touch-action: none; user-select: none;
+  }
+  button:active, button.on { background: #ff5a3c; border-color: #ff5a3c; color: #14100e; }
+  .start { width: 100%; max-width: 512px; height: 40px; }
+  .hint { color: #7d746d; font-size: 11px; text-align: center; }
+  #err { color: #ff8a6d; font-size: 12px; text-align: center; min-height: 16px; }
+</style>
+</head>
+<body>
+<header><b>NES</b><span>test ROM — served from your filesystem</span></header>
+<canvas id="screen" width="256" height="240"></canvas>
+<div id="err"></div>
+<div class="pads">
+  <div class="dpad">
+    <button data-btn="UP"    style="--a:1/2">▲</button>
+    <button data-btn="LEFT"  style="--a:2/1">◀</button>
+    <button data-btn="RIGHT" style="--a:2/3">▶</button>
+    <button data-btn="DOWN"  style="--a:3/2">▼</button>
+  </div>
+  <div class="ab">
+    <button data-btn="B" style="--a:1/1">B</button>
+    <button data-btn="A" style="--a:1/2">A</button>
+    <button data-btn="SELECT" style="--a:2/1; font-size:11px">SELECT</button>
+    <button data-btn="START" style="--a:2/2; font-size:11px">START</button>
+  </div>
+</div>
+<div class="hint">Arrow keys / WASD, Z = A, X = B, Enter = Start, Shift = Select</div>
+<script src="./jsnes.min.js"></script>
+<script src="./app.js"></script>
+</body>
+</html>

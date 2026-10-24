@@ -12,8 +12,9 @@
  * `/` over 9p (src/bridge/p9.ts speaks 9p2000.L straight to ZenFS through
  * v86's `handle9p`). So `/bin/bash`, `/etc/profile` and everything else the
  * distro runs are ordinary files in Dragon86 — visible in Files, editable in
- * the Text Editor, and writable from inside the guest. `~/v86/shared` is the
- * guest's `/shared`, which is your Files folder (src/bridge/union-fs.ts).
+ * the Text Editor, and writable from inside the guest. Your home folders are
+ * grafted in at `/Downloads`, `/Documents` and `/Desktop`, so the guest and
+ * the Files app are looking at the same directories.
  *
  * The distro itself is unpacked into `~/v86` on first boot from the vendored
  * initramfs (src/bridge/guest-root.ts) — one artifact to keep correct, and
@@ -30,7 +31,7 @@ import { ensureDir } from "../core/vfs";
 import { getSettings } from "../core/settings";
 import { createP9Handler } from "./p9";
 import { ensureGuestRoot } from "./guest-root";
-import { createDirectFs, createUnionFs, unionAsPromises, withSubmount, zenfsBase } from "./union-fs";
+import { createDirectFs, unionAsPromises, withSubmount } from "./union-fs";
 import { logInfo, logWarn } from "../core/log";
 import type { BackendHandlers, TerminalBackend } from "./hoster";
 
@@ -140,16 +141,16 @@ async function loadSavedState(): Promise<LoadedState | null> {
   }
 }
 
-/* ---------- backend ---------- */
+/* Set once this page has taken a snapshot. A snapshot is only meaningful
+   inside the page that took it: it stores the guest's open files, and those
+   are fids in a 9p server (and handles in ZenFS) that are recreated on every
+   page load. Resuming one after a reload found the guest staring at fids
+   that point at nothing — bash exited at once and the terminal filled with
+   "Session ended … Respawning in 2s". Since every write already lands in
+   ZenFS, a cold boot loses nothing worth the crash. */
+let savedThisSession = false;
 
-/**
- * The guest's /shared: your Files folder (ZenFS, read-only floor) with
- * changes written into ~/v86/shared, so the guest and the Files app are
- * looking at the same files.
- */
-function sharedUnionFs() {
-  return createUnionFs(vfs.SHARED_DIR.v86, zenfsBase(vfs.HOME, ["v86", "CheerpX"]));
-}
+/* ---------- backend ---------- */
 
 class V86Backend implements TerminalBackend {
   private emu: V86Emulator | null = null;
@@ -251,6 +252,11 @@ class V86Backend implements TerminalBackend {
       const [V86, loaded] = await Promise.all([loadLib(), wantSaved ? loadSavedState() : Promise.resolve(null)]);
       let saved = loaded;
       if (this.disposed) return;
+      if (saved && !savedThisSession) {
+        logInfo("v86", "saved state is from an earlier page load; booting fresh instead of resuming");
+        await clearSavedState().catch(() => {});
+        saved = null;
+      }
       /* Fresh boots get ACPI (see below). A restored snapshot must keep the
          layout it was created with — v86's state format embeds it. */
       this.acpiEnabled = saved ? saved.acpi : true;
@@ -288,7 +294,6 @@ class V86Backend implements TerminalBackend {
 
       const root = vfs.ENGINE_ROOT.v86;
       await ensureDir(root);
-      await ensureDir(vfs.SHARED_DIR.v86);
       /* The script sits at the top of the guest root, so the guest sees it at
          /networking.sh and you can edit it in Files. */
       void this.installNetworkingScript(root);
@@ -317,9 +322,15 @@ class V86Backend implements TerminalBackend {
       opts.bzimage = { buffer: guestRoot.kernel.buffer.slice(0) };
       opts.initrd = { buffer: guestRoot.initrd.buffer.slice(0) };
 
-      /* One 9p share, mounted by the guest at /, with your Files folder
-         grafted on at /shared. */
-      const rootFs = withSubmount(createDirectFs(root), "/shared", sharedUnionFs());
+      /* One 9p share, mounted by the guest at /. Your home folders are
+         grafted straight into it, so /Downloads, /Documents and /Desktop
+         inside the guest are the same directories the Files app shows —
+         read and write, no copy, no separate "shared" folder. */
+      let rootFs = createDirectFs(root);
+      for (const name of [...vfs.HOME_DIRS, "system"]) {
+        await ensureDir(`${vfs.HOME}/${name}`);
+        rootFs = withSubmount(rootFs, `/${name}`, createDirectFs(`${vfs.HOME}/${name}`));
+      }
       opts.filesystem = { handle9p: createP9Handler(root, unionAsPromises(rootFs) as never) };
 
       if (saved) {
@@ -412,6 +423,7 @@ class V86Backend implements TerminalBackend {
       guest: "dragon",
     };
     await idbPut(STATE_KEY, rec);
+    savedThisSession = true;
     logInfo(
       "v86",
       `state saved: ${(raw.byteLength / 1048576).toFixed(1)} MB raw → ${(data.byteLength / 1048576).toFixed(1)} MB stored`,
