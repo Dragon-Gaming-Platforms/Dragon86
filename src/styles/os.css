@@ -2016,15 +2016,6 @@
   color: var(--text-dim);
   font-size: 0.75rem;
 }
-.store-stars {
-  display: inline-flex;
-  gap: 1px;
-}
-.store-stars svg {
-  width: 12px;
-  height: 12px;
-  color: var(--theme-accent);
-}
 .store-dot {
   opacity: 0.6;
 }
@@ -2200,22 +2191,12 @@
   margin: 0;
   max-width: 70ch;
 }
-.store-highlights {
-  margin: 0;
-  padding-left: 18px;
-  color: var(--text-secondary);
-  font-size: 0.86rem;
-  line-height: 1.7;
-}
-.store-shots {
-  display: flex;
-  gap: 10px;
-  overflow-x: auto;
-}
-.store-shot {
-  height: 180px;
-  border-radius: 8px;
-  border: 1px solid var(--border-color);
+.store-note {
+  margin-top: 18px;
+  max-width: 62ch;
+  font-size: 0.78rem;
+  line-height: 1.6;
+  color: var(--text-dim);
 }
 .store-files {
   display: flex;

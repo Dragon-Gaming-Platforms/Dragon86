@@ -1,9 +1,6 @@
 {
   "version": 1,
   "name": "Dragon86 App Store",
-  "updated": "2026-10-24",
-  "featured": ["nes"],
-  "categories": ["Games", "Utilities", "Files", "Music"],
   "apps": [
     {
       "id": "nes",
@@ -11,40 +8,28 @@
       "sub": "Play NES games from your files",
       "category": "Games",
       "publisher": "Dragon Gaming Platforms",
-      "version": "1.0.0",
       "icon": "games",
-      "rating": 4.7,
-      "reviews": 218,
-      "downloads": "18k",
-      "size": "480 KB",
       "base": "system-apps/nes/",
       "entry": "index.html",
       "files": ["index.html", "app.js", "jsnes.min.js", "test.nes", "LICENSE.jsnes"],
       "opens": ["nes"],
       "width": 560,
       "height": 620,
-      "description": "A real NES emulator that runs in a window. It ships with a handwritten test ROM so you can see it is alive; drop in a cartridge image from your own files and it plays. Once installed it offers to become the default app for .nes files.",
-      "highlights": ["700+ supported cartridge mappers", "On-screen d-pad for touch screens", "Offers to open .nes files for you"]
+      "description": "A real NES emulator that runs in a window. It ships with a handwritten test ROM so you can see it is alive; drop in a cartridge image from your own files and it plays. Once installed it offers to become the default app for .nes files."
     },
     {
       "id": "snake",
       "name": "Snake",
-      "sub": "The classic, in about 4 KB",
+      "sub": "The classic, with a score and a speed curve",
       "category": "Games",
       "publisher": "Dragon Gaming Platforms",
-      "version": "1.0.2",
       "icon": "games",
-      "rating": 4.4,
-      "reviews": 96,
-      "downloads": "11k",
-      "size": "6 KB",
       "base": "system-apps/snake/",
       "entry": "index.html",
       "files": ["index.html", "app.js", "index.json"],
       "width": 460,
-      "height": 540,
-      "description": "Grid-based snake with a score, a speed curve, and swipe controls for phones. Arrow keys or WASD on a keyboard. No scoreboard, no accounts, no pop-ups.",
-      "highlights": ["Keyboard and swipe input", "Speeds up every five points", "Reset button that actually resets"]
+      "height": 560,
+      "description": "Grid-based snake with a score, a speed curve, and swipe controls for phones. Arrow keys or WASD on a keyboard. The board waits for your first key or tap, and the game pauses itself when the window loses focus. No scoreboard, no accounts, no pop-ups."
     },
     {
       "id": "calculator",
@@ -52,19 +37,13 @@
       "sub": "Arithmetic that keeps working offline",
       "category": "Utilities",
       "publisher": "Dragon Gaming Platforms",
-      "version": "1.1.0",
       "icon": "grid",
-      "rating": 4.2,
-      "reviews": 41,
-      "downloads": "7.4k",
-      "size": "8 KB",
       "base": "system-apps/calculator/",
       "entry": "index.html",
       "files": ["index.html", "app.js", "index.json"],
       "width": 340,
       "height": 470,
-      "description": "A pocket calculator: four functions, percentages, sign flip, and a memory of the last result. Deliberately dull — a calculator that wants to be clever is a calculator that lies.",
-      "highlights": ["Keyboard input", "History of the last 20 results", "Works with no network at all"]
+      "description": "A pocket calculator: add, subtract, multiply and divide, plus percent, sign flip and clear. Tap the buttons or use the number keys, Enter for equals and Escape to clear. It keeps twelve digits on screen, then switches to precision notation. Deliberately dull — a calculator that wants to be clever is a calculator that lies."
     }
   ]
 }

@@ -94,9 +94,15 @@ and removable from the store or by hand.
         "entry": "index.html",
         "files": ["index.html", "app.js", "index.json"],
         "opens": ["nes"],                     // optional, see above
-        "description": "…", "rating": 4.4, "size": "6 KB"
+        "description": "…"
       }]
     }
+
+There are no ratings, review counts, download counts or version strings in the
+catalog, and the store does not print any. Those numbers would all be invented
+— a local catalog has no users to average — so the listing shows only what can
+be checked: publisher, category, the files that get written, and the download
+size measured from those files when you open the listing.
 
 Settings → Apps → *Catalog* points the store at a different `store.json`
 (any URL or path). Nothing is fetched until you press Install, and the store

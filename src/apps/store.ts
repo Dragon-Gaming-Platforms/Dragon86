@@ -33,18 +33,21 @@ import type { Win } from "../core/wm";
 
 const BASE = import.meta.env.BASE_URL;
 
+/**
+ * One catalog entry. Nothing here is a statistic: the store used to show a
+ * star rating, a review count and a download count, and every one of those
+ * numbers was made up. A local catalog has no users to average, so it shows
+ * only what can be checked — the publisher, the category, the files that get
+ * written, and the real byte count of those files, measured when you open the
+ * listing.
+ */
 interface StoreApp {
   id: string;
   name: string;
   sub?: string;
   category?: string;
   publisher?: string;
-  version?: string;
   icon?: string;
-  rating?: number;
-  reviews?: number;
-  downloads?: string;
-  size?: string;
   base?: string;
   entry?: string;
   files?: string[];
@@ -52,16 +55,12 @@ interface StoreApp {
   width?: number;
   height?: number;
   description?: string;
-  highlights?: string[];
-  screenshots?: string[];
   /** True for an app found on disk that the catalog does not list. */
   local?: boolean;
 }
 
 interface Catalog {
   name?: string;
-  updated?: string;
-  featured?: string[];
   apps: StoreApp[];
 }
 
@@ -222,7 +221,9 @@ export function openStore(win: Win): void {
       side.append(b);
     }
     const foot = el("div", "store-side-foot");
-    foot.textContent = catalog?.updated ? `Catalog updated ${catalog.updated}` : "Offline catalog";
+    foot.textContent = catalog
+      ? `${catalog.apps.length} app${catalog.apps.length === 1 ? "" : "s"} in ${catalog.name ?? "this catalog"}`
+      : "Offline catalog";
     side.append(foot);
   }
 
@@ -259,15 +260,24 @@ export function openStore(win: Win): void {
     const list = visibleApps();
 
     if (tab === "home" && !query) {
-      const featuredApp =
-        catalog.apps.find((a) => (catalog?.featured ?? []).includes(a.id)) ?? catalog.apps[0];
-      if (featuredApp) content.append(featured(featuredApp));
+      /* No "featured" list and no "top picks this week": the catalog has no
+         way to know what is popular, so it just shows what it has, in the
+         order it lists it. */
+      const first = catalog.apps[0];
+      if (first) content.append(featured(first));
       const row = el("div", "store-row");
-      row.append(el("h2", "store-h2", "Top picks this week"));
+      row.append(el("h2", "store-h2", `Everything in ${catalog.name ?? "the catalog"}`));
       const grid = el("div", "store-grid");
-      for (const app of list.slice(0, 8)) grid.append(card(app));
+      for (const app of list) grid.append(card(app));
       row.append(grid);
       content.append(row);
+      content.append(
+        el(
+          "p",
+          "store-muted store-note",
+          "This catalog is a file that ships with Dragon86, not a server. There are no star ratings, review counts or download counts here — nobody is generating them, so the store does not print them. What it does show is checkable: the publisher, the files that get written, and the measured size of the download.",
+        ),
+      );
       return;
     }
 
@@ -313,7 +323,7 @@ export function openStore(win: Win): void {
     const box = el("div", "store-feature");
     const left = el("div", "store-feature-text");
     left.append(
-      el("div", "store-eyebrow", "Featured"),
+      el("div", "store-eyebrow", "Start here"),
       el("h2", undefined, app.name),
       el("p", undefined, app.description ?? app.sub ?? ""),
     );
@@ -335,8 +345,17 @@ export function openStore(win: Win): void {
     node.append(head);
 
     const meta = el("div", "store-card-meta");
-    meta.append(stars(app.rating ?? 0), el("span", undefined, ` ${(app.rating ?? 0).toFixed(1)}`));
-    if (app.size) meta.append(el("span", "store-dot", "·"), el("span", undefined, app.size));
+    meta.append(el("span", undefined, app.category ?? "App"));
+    if (app.local) meta.append(el("span", "store-dot", "·"), el("span", undefined, "Installed here"));
+    else {
+      const count = app.files?.length ?? 0;
+      if (count) {
+        meta.append(
+          el("span", "store-dot", "·"),
+          el("span", undefined, `${count} file${count === 1 ? "" : "s"}`),
+        );
+      }
+    }
     node.append(meta);
 
     const foot = el("div", "store-card-foot");
@@ -350,13 +369,32 @@ export function openStore(win: Win): void {
     return node;
   }
 
-  function stars(rating: number): HTMLElement {
-    const wrap = el("span", "store-stars");
-    for (let i = 1; i <= 5; i++) {
-      const full = rating >= i - 0.25;
-      wrap.innerHTML += icon(full ? "starFilled" : "star").innerHTML;
+  /**
+   * The real size of the download, in bytes, measured from the files the
+   * catalog says it will fetch. Shown on the detail page because it costs one
+   * request per file, and a card grid should not fire off a dozen of them.
+   */
+  async function measureBytes(app: StoreApp): Promise<number | null> {
+    const files = app.files ?? [];
+    if (!files.length) return null;
+    const base = new URL(app.base ?? `${app.id}/`, catalogBase());
+    try {
+      let total = 0;
+      for (const file of files) {
+        const res = await fetch(new URL(file, base).href, { cache: "no-cache" });
+        if (!res.ok) return null;
+        total += (await res.arrayBuffer()).byteLength;
+      }
+      return total;
+    } catch {
+      return null;
     }
-    return wrap;
+  }
+
+  function humanBytes(bytes: number): string {
+    if (bytes < 1024) return `${bytes} bytes`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   }
 
   /**
@@ -422,48 +460,46 @@ export function openStore(win: Win): void {
     const info = el("div", "store-detail-info");
     info.append(el("h1", undefined, app.name), el("div", "store-publisher", app.publisher ?? "Unknown publisher"));
     const meta = el("div", "store-card-meta");
-    meta.append(stars(app.rating ?? 0), el("span", undefined, ` ${(app.rating ?? 0).toFixed(1)}`));
-    if (app.reviews) meta.append(el("span", "store-dot", "·"), el("span", undefined, `${app.reviews} reviews`));
-    if (app.downloads) meta.append(el("span", "store-dot", "·"), el("span", undefined, `${app.downloads} downloads`));
-    if (app.size) meta.append(el("span", "store-dot", "·"), el("span", undefined, app.size));
+    meta.append(el("span", undefined, app.category ?? "App"));
+    const fileCount = app.files?.length ?? 0;
+    if (fileCount) {
+      meta.append(
+        el("span", "store-dot", "·"),
+        el("span", undefined, `${fileCount} file${fileCount === 1 ? "" : "s"}`),
+      );
+    }
     info.append(meta);
     head.append(info, appActions(app, true));
     content.append(head);
 
     const facts = el("div", "store-facts");
-    facts.append(fact("Version", app.version ?? "1.0.0"));
-    facts.append(fact("Category", app.category ?? "Utilities"));
+    facts.append(fact("Category", app.category ?? "App"));
+    facts.append(fact("Publisher", app.publisher ?? "Unknown"));
     facts.append(fact("Installs to", `~/system/apps/${app.id}/`));
     if (app.opens?.length) {
       facts.append(fact("Opens", app.opens.map((o) => `.${normExt(o)}`).join(", ")));
     }
+    if (!app.local) {
+      /* Measured, not invented: the sum of the bytes actually downloaded. */
+      const sizeFact = fact("Download", "measuring…");
+      facts.append(sizeFact);
+      void measureBytes(app).then((bytes) => {
+        const value = sizeFact.querySelector("strong");
+        if (!value) return;
+        if (bytes === null) sizeFact.remove();
+        else value.textContent = humanBytes(bytes);
+      });
+    }
     content.append(facts);
 
     if (app.description) content.append(el("p", "store-desc", app.description));
-
-    if (app.highlights?.length) {
-      const ul = el("ul", "store-highlights");
-      for (const h of app.highlights) ul.append(el("li", undefined, h));
-      content.append(ul);
-    }
-
-    if (app.screenshots?.length) {
-      const strip = el("div", "store-shots");
-      for (const shot of app.screenshots) {
-        const img = el("img", "store-shot");
-        img.src = new URL(shot, new URL(app.base ?? "", catalogBase())).href;
-        img.alt = `${app.name} screenshot`;
-        strip.append(img);
-      }
-      content.append(strip);
-    }
 
     const files = el("div", "store-files");
     files.append(el("h3", undefined, "What gets installed"));
     for (const file of app.files ?? []) files.append(el("code", undefined, `system/apps/${app.id}/${file}`));
     content.append(files);
 
-    status.textContent = `${app.name} · ${app.version ?? "1.0.0"} · from ${catalog?.name ?? "store.json"}`;
+    status.textContent = `${app.name} · from ${catalog?.name ?? "store.json"}`;
   }
 
   function fact(label: string, value: string): HTMLElement {

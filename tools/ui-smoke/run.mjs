@@ -227,6 +227,31 @@ await wait(600);
 const cards = document.querySelectorAll(".store-card");
 check("store catalog rendered", cards.length >= 3, `${cards.length} cards`);
 
+/* The catalog has no statistics to show, so the store must not print any. */
+const storeWindowEl = () =>
+  [...document.querySelectorAll(".d86-window")].find((w) => w.querySelector(".store-body"));
+check("store renders no star ratings", !document.querySelector(".store-stars"));
+const storeTextNow = storeWindowEl()?.textContent ?? "";
+check(
+  "store shows no review or download counts",
+  !/reviews|downloads/i.test(storeTextNow),
+  (storeTextNow.match(/.{0,20}(reviews|downloads).{0,20}/i) ?? [])[0] ?? "",
+);
+check(
+  "store explains that it has no ratings",
+  /no star ratings/.test(storeTextNow),
+  storeTextNow.slice(0, 120),
+);
+const catalogJson = JSON.parse(readFileSync(resolve(here, "../../public/store.json"), "utf8"));
+const invented = new Set();
+for (const app of catalogJson.apps) {
+  for (const key of ["rating", "reviews", "downloads", "size", "version", "updated", "highlights", "screenshots"]) {
+    if (key in app) invented.add(`${app.id}.${key}`);
+  }
+}
+for (const key of ["updated", "featured", "categories"]) if (key in catalogJson) invented.add(key);
+check("store.json carries no invented metadata", invented.size === 0, [...invented].join(", "));
+
 const snakeCard = [...cards].find((n) => n.textContent.includes("Snake"));
 check("catalog has Snake", Boolean(snakeCard));
 snakeCard.querySelector("button").dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
@@ -242,6 +267,28 @@ check(
   toasts.some((t) => /can open .nes files/.test(t)),
   toasts.join(" | ").slice(0, 200),
 );
+
+/* The detail page: real facts only, including a measured download size. */
+const calcCard = [...document.querySelectorAll(".store-card")].find((n) =>
+  n.textContent.includes("Calculator"),
+);
+calcCard.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+await wait(600);
+const detailWin = storeWindowEl();
+const detailFacts = [...(detailWin?.querySelectorAll(".store-fact") ?? [])].map((f) => f.textContent);
+const downloadFact = detailFacts.find((t) => t.startsWith("Download"));
+check(
+  "detail page invents no version number",
+  !detailFacts.some((t) => t.startsWith("Version")),
+  detailFacts.join(" | "),
+);
+check(
+  "detail page reports a measured download size",
+  Boolean(downloadFact) && /(bytes|KB|MB)/.test(downloadFact),
+  downloadFact ?? detailFacts.join(" | "),
+);
+detailWin.querySelector(".store-back")?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+await wait(300);
 
 check(
   "the installed app appears on the desktop",
@@ -461,6 +508,76 @@ check(
   "default apps table exists",
   settingsWindow.querySelectorAll(".defaults-row").length > 0,
 );
+
+/* ---- Snake, played for real ---- */
+/*
+ * The shipped game used to auto-start and crawl into the wall in ~1.3s, which
+ * looked exactly like "snake does not work". This loads the real files into a
+ * canvas-less window and plays them: it must sit still until told to go, then
+ * move, eat, pause on blur and die only when actually driven into a wall.
+ */
+{
+  const snakeDir = resolve(here, "../../public/system-apps/snake");
+  const snakeDom = new JSDOM(readFileSync(resolve(snakeDir, "index.html"), "utf8"), {
+    url: "https://example.test/9pf/snake/index.html",
+    runScripts: "outside-only",
+    pretendToBeVisual: true,
+  });
+  const sWin = snakeDom.window;
+  const sDoc = sWin.document;
+  const drawn = { rects: 0 };
+  sWin.HTMLCanvasElement.prototype.getContext = () => ({
+    fillStyle: "",
+    fillRect: () => drawn.rects++,
+    beginPath() {},
+    arc() {},
+    fill() {},
+  });
+  /* Put the food two cells to the right of the start position, so the very
+     first step is a guaranteed meal and the score can be checked. */
+  /* jsdom logs "Not implemented" for focus(); the game only calls it so a
+     real browser gives the frame the keyboard. */
+  sWin.focus = () => {};
+  let rand = 0;
+  sWin.Math.random = () => (rand++ % 2 === 0 ? 0.45 : 0.5);
+  const snakeErrors = [];
+  sWin.addEventListener("error", (e) => snakeErrors.push(e.error ?? e.message));
+  sWin.eval(readFileSync(resolve(snakeDir, "app.js"), "utf8"));
+
+  const score = () => sDoc.getElementById("score").textContent;
+  const overlayHidden = () => sDoc.getElementById("overlay").hidden;
+  const overlayText = () => sDoc.getElementById("overlay").textContent;
+  const key = (k) =>
+    sDoc.dispatchEvent(new sWin.KeyboardEvent("keydown", { key: k, bubbles: true, cancelable: true }));
+
+  await wait(1500);
+  check("snake waits for the player", !overlayHidden() && /Tap to start/.test(overlayText()), overlayText());
+  check("snake has not died on its own", !/Game over/i.test(overlayText()), overlayText());
+  check("snake drew its board", drawn.rects > 20, `${drawn.rects} rects`);
+
+  key("ArrowRight");
+  await wait(120);
+  check("a key starts the game", overlayHidden(), overlayText());
+  await wait(450);
+  check("snake moves and eats", /Score [1-9]/.test(score()), score());
+
+  sWin.dispatchEvent(new sWin.Event("blur"));
+  await wait(60);
+  const pausedScore = score();
+  await wait(600);
+  check("snake pauses when the window loses focus", /Paused/.test(overlayText()), overlayText());
+  check("…and the board does not move while paused", score() === pausedScore, `${pausedScore} → ${score()}`);
+
+  key("ArrowDown");
+  await wait(1600);
+  check("snake only dies when driven into a wall", /Game over/i.test(overlayText()), overlayText());
+  check("snake raised no errors", snakeErrors.length === 0, snakeErrors.join(" | "));
+
+  key("ArrowRight");
+  await wait(120);
+  check("a key restarts an ended game", overlayHidden() && /Score 0/.test(score()), score());
+  sWin.close();
+}
 
 console.log(`\n${failures === 0 ? "all checks passed" : `${failures} check(s) failed`}`);
 process.exit(failures === 0 ? 0 : 1);
