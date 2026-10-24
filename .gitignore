@@ -14,3 +14,4 @@ tools/test-image-list/.out/
 
 # Headless boot harness used to test the guest offline (node + v86, no browser).
 .harness/
+tools/ui-smoke/out/
