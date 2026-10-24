@@ -99,6 +99,26 @@ export function buildDesktop(getApps: () => AppShortcut[], handlers: DesktopHand
     return CELL[getSettings().iconSize] ?? CELL.medium;
   }
 
+  /* The shell is built while `#os` is still hidden, and a hidden element
+     measures 0×0. A 0×0 desktop is one cell wide and one cell tall, which is
+     how every icon ended up stacked in the top-left corner on load — and the
+     arrangement was then saved, so it stayed broken across reloads. Nothing
+     about the grid is decided until the desktop has a real size. */
+  function measurable(): boolean {
+    return iconsArea.clientWidth > 0 && iconsArea.clientHeight > 0;
+  }
+
+  const nextFrame = (): Promise<void> =>
+    new Promise((resolve) => {
+      if (typeof requestAnimationFrame === "function") requestAnimationFrame(() => resolve());
+      else setTimeout(resolve, 16);
+    });
+
+  async function waitForSize(): Promise<boolean> {
+    for (let i = 0; i < 600 && !measurable(); i++) await nextFrame();
+    return measurable();
+  }
+
   function gridSize(): { cols: number; rows: number } {
     const { w, h } = cellSize();
     const width = iconsArea.clientWidth || desktop.clientWidth;
@@ -186,7 +206,44 @@ export function buildDesktop(getApps: () => AppShortcut[], handlers: DesktopHand
     syncSelection();
   }
 
+  /** Set when a refresh is asked for while one is already running. */
+  let refreshQueued = false;
+  let refreshRunning = false;
+
+  /**
+   * Re-read the desktop and lay the icons out. Never runs twice at once: the
+   * shell fires several of these in the same breath at boot (apps loaded,
+   * desktop changed, window focused), and two interleaved passes would append
+   * every icon twice.
+   */
   async function refreshIcons(): Promise<void> {
+    if (refreshRunning) {
+      refreshQueued = true;
+      return;
+    }
+    refreshRunning = true;
+    try {
+      do {
+        refreshQueued = false;
+        await layoutIcons();
+      } while (refreshQueued);
+    } finally {
+      refreshRunning = false;
+    }
+  }
+
+  async function layoutIcons(): Promise<void> {
+    if (!measurable()) {
+      /* Draw nothing rather than draw everything on top of everything else:
+         a 0×0 desktop is a one-cell grid, so every icon lands in the same
+         corner. Wait for the boot screen to make way, then lay out for real. */
+      await waitForSize();
+      if (!measurable()) {
+        await nextFrame();
+        refreshQueued = true;
+        return;
+      }
+    }
     const keep = new Set(selected);
     const present = new Set<string>();
     iconsArea.textContent = "";
@@ -225,7 +282,7 @@ export function buildDesktop(getApps: () => AppShortcut[], handlers: DesktopHand
     selected.clear();
     for (const key of keep) if (present.has(key)) selected.add(key);
     syncSelection();
-    saveLayout();
+    if (measurable()) saveLayout();
   }
 
   const deskPaths = new Map<string, string>();
@@ -533,6 +590,21 @@ export function buildDesktop(getApps: () => AppShortcut[], handlers: DesktopHand
      re-reads the folder. */
   window.addEventListener("d86-desktop-changed", () => void refreshIcons());
   window.addEventListener("focus", () => void refreshIcons());
+
+  /* Belt and braces for the same 0×0 problem: whenever the desktop first gets
+     a real size (boot reveal, a rotated phone, a resized window), re-place the
+     icons against the grid that actually exists. */
+  let hadSize = measurable();
+  const onMaybeSized = (): void => {
+    const now = measurable();
+    if (now && !hadSize) void refreshIcons();
+    hadSize = now;
+  };
+  if (typeof ResizeObserver === "function") {
+    new ResizeObserver(onMaybeSized).observe(iconsArea);
+  } else {
+    window.addEventListener("resize", onMaybeSized);
+  }
 
   void refreshIcons();
 }

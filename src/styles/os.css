@@ -1866,6 +1866,23 @@
   font-size: 0.7rem;
   color: var(--text-dim);
 }
+.store-rescan {
+  display: block;
+  margin-top: 6px;
+  padding: 4px 0;
+  border: 0;
+  background: none;
+  color: var(--text-secondary);
+  font: inherit;
+  font-size: 0.72rem;
+  text-align: left;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.store-rescan:hover {
+  color: var(--theme-accent);
+}
 .store-side-foot {
   margin-top: auto;
   padding: 10px 12px;
