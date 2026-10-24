@@ -37,19 +37,43 @@ export interface IframeAppDef {
   id: string;
   name: string;
   sub?: string;
-  url: string;
+  /** Set for entries that come from iframe-apps.json. */
+  url?: string;
   icon: string;
   width?: number;
   height?: number;
   status?: string;
   allow?: string;
+  /**
+   * Set for apps that come from the filesystem (src/core/fs-apps.ts): the
+   * app is addressed as <base>9pf/<id>/<entry> and served by the service
+   * worker, file by file.
+   */
+  fs?: { entry: string; isolated: boolean; dir: string };
+  /** Put the iframe behind a sandbox (no allow-same-origin). */
+  sandbox?: boolean;
 }
 
 export const IFRAME_APPS: IframeAppDef[] = appsJson as IframeAppDef[];
 
-/** Resolve an entry's URL against the OS base; null if cross-origin. */
+/** Add apps discovered in the filesystem (called once per boot). */
+export function registerFsApps(defs: IframeAppDef[]): void {
+  for (const def of defs) {
+    const at = IFRAME_APPS.findIndex((a) => a.id === def.id);
+    if (at >= 0) IFRAME_APPS[at] = def;
+    else IFRAME_APPS.push(def);
+  }
+}
+
+/** The URL an app is served from; null if it would be cross-origin. */
 export function resolveAppUrl(def: IframeAppDef): string | null {
   const base = new URL(import.meta.env.BASE_URL, window.location.origin);
+  if (def.fs) {
+    /* Real path, real origin: relative <script src>, imports, fetch() and
+       wasm inside the app all resolve normally. */
+    return new URL(`9pf/${def.id}/${def.fs.entry}`, base).href;
+  }
+  if (!def.url) return null;
   const resolved = new URL(def.url, base);
   return resolved.origin === window.location.origin ? resolved.href : null;
 }
@@ -76,6 +100,12 @@ export function openIframeApp(win: Win, def: IframeAppDef): void {
   frame.className = "browser-frame";
   frame.src = url;
   frame.title = def.name;
+  /* Opt-in sandbox. Filesystem apps leave this off by default: an opaque
+     origin is not controlled by a service worker, so the app's own files
+     would stop being served (see the note in core/fs-apps.ts). */
+  if (def.sandbox) {
+    frame.setAttribute("sandbox", "allow-scripts allow-forms allow-popups allow-modals allow-downloads");
+  }
   frame.allow =
     def.allow ?? "clipboard-read; clipboard-write; fullscreen; gamepad";
   frame.addEventListener("load", () => {

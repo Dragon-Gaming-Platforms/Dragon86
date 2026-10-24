@@ -16,6 +16,48 @@ wsproxy, `wisp://` wisp, `fetch` in-page, or `off`), press **Test** to
 check it from your browser, and run `/networking.sh` in the guest
 (same script copy.sh's images ship) for a status report.
 
+### Filesystem apps (apps served from your files)
+
+An app can live in your filesystem instead of the build. Its files sit in a
+folder, its registration is a JSON file next to them, and the OS serves it
+through a real URL space so that ordinary web code — `<script src="app.js">`,
+`import "./mod.js"`, `fetch("data.json")`, wasm, images — just works:
+
+    /Dragon86/9pf/<app-id>/index.html
+    /Dragon86/9pf/<app-id>/app.js
+
+`public/app-sw.js` (a service worker) owns that prefix. It cannot read the
+filesystem itself, so for each request it asks an open Dragon86 window for
+the bytes (`postMessage` + a MessagePort); the page reads ZenFS and answers.
+Nothing is cached: edit a file in Files, reload the app, you see the new
+bytes. If no Dragon86 window is open the worker answers 503 and says why.
+
+**The registry** is read from the filesystem at boot, from every `*.json` in:
+
+    ~/v86/shared/system/apps/      (the guest sees this as /shared/system/apps)
+    ~/system/apps/                 (fallback, for apps dropped in via Files)
+
+Each file is `{ "apps": [ … ] }` (or a bare array). One entry:
+
+    {
+      "id": "hello",                 // the folder name: apps/hello/
+      "name": "Hello",
+      "icon": "browser",
+      "entry": "index.html",
+      "folder-isolated": true,
+      "width": 520, "height": 420
+    }
+
+`folder-isolated: true` means the app cannot climb out of its own folder with
+`../` — the service worker answers 403. `false` lets it walk up as far as the
+OS home (`/home/user`), which is what a file viewer wants and what you should
+not give code you didn't write. Either way the app runs same-origin: an
+opaque-origin (sandboxed) frame is not controlled by a service worker, so
+its own files would not be served at all.
+
+A demo app (`hello`: a clock that fetches `data.json` next to itself) is
+created on first boot so the whole loop is visible immediately.
+
 ### Service worker: on only when the engine needs isolation
 
 COOP/COEP arrive via `coi-serviceworker.js`, and only the **embedded
