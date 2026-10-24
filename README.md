@@ -108,6 +108,13 @@ Settings → Apps → *Catalog* points the store at a different `store.json`
 (any URL or path). Nothing is fetched until you press Install, and the store
 cannot write outside `~/system/apps`.
 
+What counts as installed is answered by the disk, not by the registry: the
+store checks that `~/system/apps/<id>/` still holds the app's entry file, so a
+folder deleted in Files (or an entry left behind by a failed uninstall) shows
+up as **Install** again rather than as a button pair for something that is no
+longer there. It re-reads that state when the window is focused, when anything
+else in the OS changes the filesystem, and on demand via **Rescan disk**.
+
 Installed apps get **Open** and **Uninstall** buttons, in the cards, the
 featured panel and the detail page. Uninstall is a real delete, not a trip to
 the trash: it removes `~/system/apps/<id>/` and takes the entry out of

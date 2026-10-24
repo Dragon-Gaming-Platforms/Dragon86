@@ -88,7 +88,12 @@ Object.defineProperty(window.navigator, "serviceWorker", {
   },
 });
 /* jsdom lays everything out at 0×0; give the desktop a size so the icon grid
-   has somewhere to put things. */
+   has somewhere to put things — but only once the boot screen is gone, which
+   is what a real browser effectively does. The shell is built while `#os` is
+   hidden, and a hidden desktop measures 0×0; the smoke test has to reproduce
+   that, because a one-cell grid is what used to stack every icon in the
+   top-left corner. */
+window.__desktopSized = false;
 for (const [prop, value] of [
   ["clientWidth", 1280],
   ["clientHeight", 800],
@@ -96,7 +101,9 @@ for (const [prop, value] of [
   Object.defineProperty(window.HTMLElement.prototype, prop, {
     configurable: true,
     get() {
-      if (this.id === "desktop" || this.classList?.contains("desktop-icons")) return value;
+      if (this.id === "desktop" || this.classList?.contains("desktop-icons")) {
+        return window.__desktopSized ? value : 0;
+      }
       return 0;
     },
   });
@@ -109,6 +116,12 @@ window.addEventListener("unhandledrejection", (e) => errors.push(e.reason));
 
 /* ---- run it ---- */
 window.eval(bundle);
+
+/* The boot screen disappears at the end of boot; that is also when the desktop
+   starts having a size. */
+new window.MutationObserver(() => {
+  if (!document.getElementById("os").hidden) window.__desktopSized = true;
+}).observe(document.getElementById("os"), { attributes: true, attributeFilter: ["hidden"] });
 
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 const tick = () => wait(60);
@@ -132,6 +145,21 @@ check("no boot errors", errors.length === 0, errors.map(String).join(" | ").slic
 /* icon positions: absolute, snapped to the grid */
 const first = icons[0];
 check("icons are positioned", first.style.left !== "" && first.style.top !== "", `${first.style.left},${first.style.top}`);
+/* The "everything crammed into one tile" bug: with a 0×0 desktop the grid is
+   one cell wide, so every icon is placed at the same spot. */
+const iconSpots = [...icons].map((n) => `${n.style.left},${n.style.top}`);
+check(
+  "no two icons share a cell on load",
+  new Set(iconSpots).size === iconSpots.length,
+  `${new Set(iconSpots).size} distinct of ${iconSpots.length}`,
+);
+check(
+  "icons fill columns of the real grid on load",
+  new Set([...icons].map((n) => n.style.left)).size >= 2 &&
+    new Set([...icons].map((n) => n.style.top)).size > 1,
+  iconSpots.join(" ").slice(0, 160),
+);
+check("the desktop laid out once, not twice", icons.length === new Set([...icons].map((n) => n.dataset.key)).size);
 check("icons have no border until selected", !first.classList.contains("selected"));
 
 /* selecting shows the frame */
@@ -446,6 +474,20 @@ const snakeFolderGone = await (async () => {
 })();
 check("the app folder is deleted (not trashed)", snakeFolderGone);
 
+/* After an uninstall the catalog card must offer Install again — not a stale
+   Open/Uninstall pair, and not a blank button. */
+[...storeWin.querySelectorAll(".store-tab")]
+  .find((b) => b.textContent.includes("Games"))
+  ?.click();
+await wait(400);
+const catalogSnake = [...storeWin.querySelectorAll(".store-card")].find((n) =>
+  n.textContent.includes("Snake"),
+);
+const catalogLabels = [...(catalogSnake?.querySelectorAll(".store-actions .btn") ?? [])].map((b) =>
+  b.textContent.trim(),
+);
+check("the Install button comes back after uninstalling", catalogLabels.includes("Install"), catalogLabels.join(" | ") || "(no card)");
+
 /* ---- an app installed by hand (a folder, no catalog entry) can be removed
         from the store too ---- */
 const filesWin2 = [...document.querySelectorAll(".d86-window")].find((w) => w.querySelector(".fm-root"));
@@ -507,6 +549,52 @@ check(
 check(
   "default apps table exists",
   settingsWindow.querySelectorAll(".defaults-row").length > 0,
+);
+
+/* ---- an app whose folder disappears behind the store's back ----
+   The card used to keep offering Open/Uninstall because the registry still
+   listed the app, even though the folder was gone — so "Install" never came
+   back. What is installed is now answered by the disk, not the registry. */
+[...storeWin.querySelectorAll(".store-tab")]
+  .find((b) => b.textContent.includes("Apps"))
+  ?.click();
+await wait(400);
+const calcCatalogCard = [...storeWin.querySelectorAll(".store-card")].find((n) =>
+  n.textContent.includes("Calculator"),
+);
+calcCatalogCard?.querySelector(".store-actions .btn")?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+await wait(1400);
+
+const filesWin3 = [...document.querySelectorAll(".d86-window")].find((w) => w.querySelector(".fm-root"));
+const pathInput3 = filesWin3.querySelector(".fm-path-input");
+pathInput3.value = "/home/user/system/apps";
+pathInput3.dispatchEvent(new window.KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+await wait(400);
+const calcRow = [...filesWin3.querySelectorAll(".fm-row")].find((r) => r.textContent.includes("calculator"));
+check("the installed app folder is visible in Files", Boolean(calcRow));
+calcRow?.dispatchEvent(
+  new window.MouseEvent("contextmenu", { bubbles: true, cancelable: true, clientX: 80, clientY: 80 }),
+);
+await wait(120);
+[...document.querySelectorAll(".ctx-item")]
+  .find((b) => b.textContent.includes("Move to Trash"))
+  ?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+await wait(700);
+
+[...storeWin.querySelectorAll(".store-tab")]
+  .find((b) => b.textContent.includes("Apps"))
+  ?.click();
+await wait(400);
+const calcAfter = [...storeWin.querySelectorAll(".store-card")].find((n) =>
+  n.textContent.includes("Calculator"),
+);
+const calcLabels = [...(calcAfter?.querySelectorAll(".store-actions .btn") ?? [])].map((b) =>
+  b.textContent.trim(),
+);
+check(
+  "Install returns when the app folder is deleted elsewhere",
+  calcLabels.includes("Install"),
+  calcLabels.join(" | ") || "(no card)",
 );
 
 /* ---- Snake, played for real ---- */

@@ -74,6 +74,8 @@ export interface FsAppSummary {
   sub: string;
   icon: string;
   dir: string;
+  /** Entry file inside `dir` (usually index.html). */
+  entry: string;
   opens: string[];
 }
 
@@ -101,6 +103,7 @@ export function getFsApps(): FsAppSummary[] {
     sub: a.def.sub ?? "",
     icon: a.def.icon,
     dir: a.dir,
+    entry: a.def.fs?.entry ?? "index.html",
     opens: a.def.opens ?? [],
   }));
 }

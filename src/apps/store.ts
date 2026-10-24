@@ -107,6 +107,11 @@ export function openStore(win: Win): void {
   /** id → done/total while an install is running. */
   const progress = new Map<string, { done: number; total: number }>();
   const installedIds = new Set<string>();
+  /** Guards the registry clean-up against re-entering itself. */
+  let healing = false;
+  let scanQueued = false;
+  /** The listing currently on screen, if the user drilled into one. */
+  let detailShown: StoreApp | null = null;
 
   async function catalogUrl(): Promise<string> {
     const custom = getSettings().storeUrl.trim();
@@ -148,7 +153,30 @@ export function openStore(win: Win): void {
     localApps = [];
     const byId = new Map(getFsApps().map((a) => [a.id, a]));
 
-    for (const app of byId.values()) installedIds.add(app.id);
+    /* The registry is a claim; the disk is the fact. An entry whose folder is
+       gone used to keep counting as "installed" — which is how the store kept
+       offering Open/Uninstall for something you had just uninstalled instead
+       of the Install button again. */
+    const orphaned: string[] = [];
+    for (const app of byId.values()) {
+      if (await vfs.exists(`${app.dir}/${app.entry}`)) installedIds.add(app.id);
+      else if (!(await vfs.exists(app.dir))) orphaned.push(app.id);
+    }
+    if (orphaned.length && !healing) {
+      /* Clear the dead entries so they stop haunting the desktop and the start
+         menu too, then re-read the registry once. */
+      healing = true;
+      try {
+        for (const id of orphaned) {
+          await removeAppEntry(id);
+          installedIds.delete(id);
+          logWarn("store", `dropped a registry entry with no folder: ${id}`);
+        }
+        await reloadFsApps();
+      } finally {
+        healing = false;
+      }
+    }
     for (const app of catalog?.apps ?? []) {
       if (await vfs.exists(`${APPS_DIRS[0]}/${app.id}/${app.entry ?? "index.html"}`)) {
         installedIds.add(app.id);
@@ -221,9 +249,22 @@ export function openStore(win: Win): void {
       side.append(b);
     }
     const foot = el("div", "store-side-foot");
-    foot.textContent = catalog
-      ? `${catalog.apps.length} app${catalog.apps.length === 1 ? "" : "s"} in ${catalog.name ?? "this catalog"}`
-      : "Offline catalog";
+    foot.append(
+      el(
+        "span",
+        undefined,
+        catalog
+          ? `${catalog.apps.length} app${catalog.apps.length === 1 ? "" : "s"} in ${catalog.name ?? "this catalog"}`
+          : "Offline catalog",
+      ),
+    );
+    /* What is installed is a question about the disk, and the disk can change
+       in Files, the trash or a terminal. This re-reads it on demand so an
+       "Install" button is never a reload away. */
+    const rescan = el("button", "store-rescan", "Rescan disk");
+    rescan.title = "Re-read ~/system/apps and user-apps.json";
+    rescan.addEventListener("click", () => refreshFromDisk());
+    foot.append(rescan);
     side.append(foot);
   }
 
@@ -242,6 +283,7 @@ export function openStore(win: Win): void {
   }
 
   function render(): void {
+    detailShown = null;
     renderSide();
     content.textContent = "";
     content.scrollTop = 0;
@@ -447,6 +489,7 @@ export function openStore(win: Win): void {
   /* ---------- the detail page ---------- */
 
   function openDetail(app: StoreApp): void {
+    detailShown = app;
     content.textContent = "";
     content.scrollTop = 0;
 
@@ -633,6 +676,29 @@ export function openStore(win: Win): void {
     box.append(el("div", "spinner"), el("p", undefined, text));
     return box;
   }
+
+  /**
+   * Anything else in the OS can install or delete an app folder — Files, the
+   * trash, the terminal, another store window. Re-scan the disk when that
+   * happens (and when this window is focused), so a card flips back to
+   * Install without reopening the store.
+   */
+  function refreshFromDisk(): void {
+    if (scanQueued) return;
+    scanQueued = true;
+    void refreshInstalled()
+      .then(() => {
+        scanQueued = false;
+        /* Do not throw the user out of a listing they were reading. */
+        if (detailShown) openDetail(detailShown);
+        else render();
+      })
+      .catch(() => {
+        scanQueued = false;
+      });
+  }
+  window.addEventListener("d86-desktop-changed", refreshFromDisk);
+  window.addEventListener("focus", refreshFromDisk);
 
   searchInput.addEventListener("input", () => {
     query = searchInput.value;
