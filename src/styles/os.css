@@ -2032,8 +2032,27 @@
   display: flex;
   margin-top: 2px;
 }
-.store-card-foot .btn {
+/* Install / Open + Uninstall. The two-button row must not wrap: an
+   "Uninstall" that slips under "Open" on a narrow card is easy to misread. */
+.store-actions {
+  display: flex;
+  gap: 6px;
+  flex-wrap: nowrap;
+  align-items: center;
+}
+.store-actions.sm {
+  width: 100%;
+}
+.store-actions .btn {
   flex: 1;
+  white-space: nowrap;
+}
+.store-actions.lg .btn {
+  flex: 0 0 auto;
+  min-width: 108px;
+}
+.btn.danger.ghost {
+  background: transparent;
 }
 .btn.sm {
   padding: 6px 10px;

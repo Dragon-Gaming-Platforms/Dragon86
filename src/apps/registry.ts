@@ -180,6 +180,20 @@ export function createLauncher(wm: WindowManager) {
     launch[def.id] = () => openIframeAppAt(def);
   }
 
+  /* The App Store's "Open" button lives in a different module and has no
+     handle on this launcher. One event keeps that seam narrow: anything in
+     the OS can ask it to launch an app by id. */
+  window.addEventListener("d86-launch-app", (event) => {
+    const id = (event as CustomEvent<string>).detail;
+    if (!id) return;
+    const open = launch[id];
+    if (!open) {
+      logWarn("os", `asked to launch "${id}", which is not installed any more`);
+      return;
+    }
+    open();
+  });
+
   /**
    * Re-read the filesystem registry and rebuild the launch table.
    *
