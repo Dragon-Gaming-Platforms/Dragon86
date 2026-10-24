@@ -4,9 +4,8 @@
 
 import { el, icon } from "../core/dom";
 import { showConfirm } from "../core/dialog";
-import { DEFAULT_MIRROR } from "../core/settings";
-import { DEFAULT_IMAGE_BASE, probeImage, probeRelay, relayBackendName } from "../bridge/v86-image";
-import { ImageStore, zstdSupport } from "../bridge/image-store";
+import { probeRelay, relayBackendName } from "../bridge/v86-relay";
+import { guestRootInfo, resetGuestRoot } from "../bridge/guest-root";
 import {
   getSettings,
   setSettings,
@@ -156,140 +155,32 @@ export function openSettings(win: Win): void {
   );
   engineSection.append(modeRow, modeNote);
 
-  /* ---------- v86 guest image (mini vs full Arch) ---------- */
-  const guestRow = el("div", "settings-row");
-  guestRow.append(el("label", undefined, "v86 guest"));
-  const miniBtn = el("button", "btn", "Dragon86 mini (legacy)");
-  const archBtn = el("button", "btn", "Full Arch Linux 32");
-  const refreshGuestBtns = () => {
-    const g = getSettings().v86Guest;
-    miniBtn.classList.toggle("active", g !== "arch");
-    archBtn.classList.toggle("active", g === "arch");
-  };
-  miniBtn.addEventListener("click", () => {
-    setSettings({ v86Guest: "dragon" });
-    refreshGuestBtns();
-  });
-  archBtn.addEventListener("click", () => {
-    setSettings({ v86Guest: "arch" });
-    refreshGuestBtns();
-  });
-  refreshGuestBtns();
-  guestRow.append(miniBtn, archBtn);
-
-  const imageRow = el("div", "settings-row");
-  imageRow.append(el("label", undefined, "Arch image"));
-  const imageInput = el("input", "input");
-  imageInput.placeholder = DEFAULT_IMAGE_BASE;
-  imageInput.value = getSettings().v86ImageBase;
-  const saveImage = el("button", "btn", "Save");
-  saveImage.addEventListener("click", () => {
-    setSettings({ v86ImageBase: imageInput.value.trim() || DEFAULT_IMAGE_BASE });
-    imageInput.value = getSettings().v86ImageBase;
-    saveImage.textContent = "Saved ✓";
-    setTimeout(() => (saveImage.textContent = "Save"), 1500);
-  });
-  imageRow.append(imageInput, saveImage);
-
-  /* Mirror: a second store serving the same names, tried when the primary
-     refuses a file (Safari gets 403 from i.copy.sh). Optional. */
-  const mirrorRow = el("div", "settings-row");
-  mirrorRow.append(el("label", undefined, "Image mirror"));
-  const mirrorInput = el("input", "input");
-  mirrorInput.placeholder = DEFAULT_MIRROR;
-  mirrorInput.value = getSettings().v86ImageFallback || DEFAULT_MIRROR;
-  const saveMirror = el("button", "btn", "Save");
-  saveMirror.addEventListener("click", () => {
-    setSettings({ v86ImageFallback: mirrorInput.value.trim() });
-    mirrorInput.value = getSettings().v86ImageFallback || DEFAULT_MIRROR;
-    saveMirror.textContent = "Saved ✓";
-    setTimeout(() => (saveMirror.textContent = "Save"), 1500);
-  });
-  const clearMirror = el("button", "btn", "None");
-  clearMirror.addEventListener("click", () => {
-    setSettings({ v86ImageFallback: "" });
-    mirrorInput.value = "";
-  });
-  const resetMirror = el("button", "btn", "Default");
-  resetMirror.addEventListener("click", () => {
-    setSettings({ v86ImageFallback: DEFAULT_MIRROR });
-    mirrorInput.value = DEFAULT_MIRROR;
-  });
-  mirrorRow.append(mirrorInput, saveMirror, resetMirror, clearMirror);
-
-  /* The image's file list: shipped with the app, or vendored onto this
-     device from the image store in one click (that fetch happens here, in
-     your browser, which is why it can succeed where a build machine can't). */
-  const vendorRow = el("div", "settings-row");
-  vendorRow.append(el("label", undefined, "Image file list"));
-  const vendorState = el("div", "settings-note");
-  const vendorBtn = el("button", "btn", "Vendor to this device");
-  const clearVendorBtn = el("button", "btn", "Clear vendored");
-  const refreshVendor = () => {
-    void (async () => {
-      const root = vfs.ENGINE_ROOT.v86;
-      const shippedUrl = `${import.meta.env.BASE_URL}v86/fs.json`;
-      /* HEAD, not GET: the shipped list is several MB and Settings opens
-         often. GitHub Pages and vite both label it application/json, which
-         a 200-with-index.html fallback does not. */
-      const shipped = await fetch(shippedUrl, { method: "HEAD" })
-        .then((r) => r.ok && /json/i.test(r.headers.get("content-type") || ""))
-        .catch(() => false);
-      const vendored = await ImageStore.vendoredInfo(root);
-      vendorState.textContent =
-        `Shipped with the app: ${shipped ? "yes — the Arch tree builds with no network at all" : "no"}. ` +
-        (vendored
-          ? `Vendored on this device: ${(vendored.bytes / 1048576).toFixed(1)} MB, ${new Date(vendored.savedAt).toLocaleString()}.`
-          : "Vendored on this device: no — the list is fetched from the Arch image on first boot.");
-      vendorState.style.color = "";
-    })();
-  };
-  refreshVendor();
-  vendorBtn.addEventListener("click", () => {
-    vendorBtn.disabled = true;
-    vendorState.style.color = "";
-    vendorState.textContent = `Fetching fs.json from ${getSettings().v86ImageBase}… (several MB, one time)`;
-    void ImageStore.vendorList(getSettings().v86ImageBase, vfs.ENGINE_ROOT.v86)
-      .then((r) => {
-        vendorState.textContent =
-          `Vendored ${(r.bytes / 1048576).toFixed(1)} MB: ${r.paths.toLocaleString()} paths, ${r.blobs.toLocaleString()} file contents. ` +
-          "Next boot builds the Arch tree from this copy; contents still stream on demand.";
-      })
-      .catch((err) => {
-        vendorState.textContent = `Could not vendor the list: ${(err as Error).message}. ` +
-          "The origin must allow this page to read it (CORS); try Test above, or another image base.";
-        vendorState.style.color = "var(--theme-bright)";
-      })
-      .finally(() => {
-        vendorBtn.disabled = false;
-        refreshVendor();
-      });
-  });
-  clearVendorBtn.addEventListener("click", () => {
-    void ImageStore.clearVendored(vfs.ENGINE_ROOT.v86).then((gone) => {
-      vendorState.textContent = gone
-        ? "Vendored list removed. The next boot fetches it from the Arch image again."
-        : "There was no vendored list to remove.";
-      refreshVendor();
+  /* ---------- the guest's filesystem ----------
+     There is no image to configure: the guest's root is ~/v86 in the OS
+     filesystem, unpacked from the vendored initramfs on first boot. What is
+     worth showing is where it lives and how big it is, plus a way to force a
+     re-unpack if something inside it has been broken. */
+  const rootRow = el("div", "settings-row");
+  rootRow.append(el("label", undefined, "v86 filesystem"));
+  const rootState = el("div", "settings-note");
+  const reseedBtn = el("button", "btn", "Re-unpack distro");
+  reseedBtn.title = "Re-extract the distro into ~/v86 on the next boot — use if the guest's own files get broken";
+  reseedBtn.addEventListener("click", () => {
+    void resetGuestRoot(vfs.ENGINE_ROOT.v86).then(() => {
+      rootState.textContent = "The distro will be unpacked again the next time the Terminal connects.";
+      void refreshRoot();
     });
   });
-  vendorRow.append(vendorBtn, clearVendorBtn);
-
-  const testImage = el("button", "btn", "Test");
-  const imageResult = el("div", "settings-note");
-  testImage.addEventListener("click", () => {
-    testImage.disabled = true;
-    imageResult.textContent = "Checking cross-origin reachability…";
-    void probeImage(getSettings().v86ImageBase)
-      .then((r) => {
-        imageResult.textContent = r.message;
-        imageResult.style.color = r.ok ? "var(--text-primary)" : "var(--theme-bright)";
-      })
-      .finally(() => {
-        testImage.disabled = false;
-      });
-  });
-  imageRow.append(testImage);
+  const refreshRoot = async (): Promise<void> => {
+    const info = await guestRootInfo(vfs.ENGINE_ROOT.v86);
+    rootState.textContent = info
+      ? `~/v86 — ${info.files.toLocaleString()} files, unpacked ${new Date(info.at).toLocaleString()}. ` +
+        "This is the guest's /: edit anything there in Files and the distro sees it."
+      : "~/v86 — the distro is unpacked here the first time the Terminal connects. Its / is this folder.";
+    rootState.style.color = "";
+  };
+  void refreshRoot();
+  rootRow.append(reseedBtn);
 
   /* ---------- v86 network (emulator side) ---------- */
   const netRow = el("div", "settings-row");
@@ -336,35 +227,27 @@ export function openSettings(win: Win): void {
   );
   engineSection.append(netRow, netResult, netNote);
 
-  const guestNote = el(
-    "div",
-    "settings-note",
-    "Dragon86 mini: the vendored Arch kernel with bash, coreutils and git — boots in seconds, and /shared is your Files folder. " +
-      "Full Arch Linux 32: copy.sh/v86's complete Arch root filesystem — real pacman and the whole userland, slower to start. " +
-      "Its root is your Files folder at v86/: the image is a read-only floor, anything you edit is copied there and persists, so edits in Files appear in the guest. " +
-      "Guest /shared is v86/shared. " +
-      "The image is fetched straight from the origin below, so its CORS policy matters: press Test to check from this browser. " +
-      "Changes take effect on the next Terminal Reconnect.",
+  engineSection.append(
+    rootRow,
+    rootState,
+    el(
+      "div",
+      "settings-note",
+      "The v86 guest does not use a disk image: its whole root filesystem is ~/v86 in your Files, " +
+        "unpacked there from the vendored kernel and initramfs, and shared with the emulator over 9p. " +
+        "So /bin/bash, /etc/profile and everything else are ordinary files you can open and edit — " +
+        "and /shared inside the guest is your Files folder.",
+    ),
   );
-  const mirrorNote = el(
-    "div",
-    "settings-note",
-    "A second copy of the same image, used when the store above refuses a file — and then preferred for the rest of the boot, " +
-      "because the upstream store demands a Referer header that Safari and some privacy settings strip. " +
-      "The default is ~700 MB of the image (boot files, the whole userland, the libraries it needs) vendored into this repo's " +
-      "arch-image branch; anything it does not have is still fetched from the store. Leave it empty to use the store alone. " +
-      `Blob compression in this browser: ${zstdSupport() === "native" ? "native zstd (fastest)" : "built-in zstd decoder (fzstd) — works, just slower"}.`,
-  );
-  engineSection.append(guestRow, imageRow, imageResult, mirrorRow, mirrorNote, vendorRow, vendorState, guestNote);
 
   /* ---------- System ---------- */
   const systemSection = el("div", "settings-section");
   systemSection.append(el("h2", undefined, "System"));
   const table = el("table", "about-table");
   const facts: [string, string][] = [
-    ["OS", "Dragon86 0.13.0 (dev build)"],
-    ["Build", "GUST + Sandstone vendored · Monaco editor · v86 (bash + coreutils + git, live 9p share, save state) · desktop layout fix · vendored Arch file list · image mirror + zstd fallback · real Arch file list vendored · 700 MB blob mirror · engine-aware Terminal title"],
-    ["Engines", "CheerpX (embedded / separate tab) · v86 (mini guest with /shared, or full Arch Linux streamed from an image store)"],
+    ["OS", "Dragon86 0.14.0 (dev build)"],
+    ["Build", "GUST + Sandstone vendored · Monaco editor · v86 (Arch kernel + bash + coreutils + git, root filesystem in ZenFS over 9p, save state)"],
+    ["Engines", "CheerpX (embedded / separate tab) · v86 (guest whose / is ~/v86 in your files)"],
     ["Vendor", "Dragon Gaming Platforms"],
     ["Terminal", "xterm.js 6 · bridge protocol v1"],
     [

@@ -1,27 +1,17 @@
 /**
- * Union filesystem — a read-only image with ZenFS on top, presented to the
+ * Union filesystem — a read-only floor with ZenFS on top, presented to the
  * 9p server as if it were one ordinary filesystem.
  *
- * This is what makes the full Arch root "available for edit in ZenFS".
- * Layout on the OS side:
- *
- *   /home/user/v86/…      the guest's whole root, writable and persistent
- *   /home/user/v86/shared the guest's /shared folder
- *
- * Reads that ZenFS cannot satisfy come from the image store (copy.sh's
- * fs.json + blobs). The first *write* to an image file copies it up into
- * ZenFS — the classic overlay trick — so edits land in IndexedDB and are
- * visible in the Files app, while untouched files stay lazy and cost
- * nothing. Deletions of image files are recorded as whiteouts so they do not
- * reappear on the next read.
- *
- * The same class serves the shared folder: ZenFS is the floor (your existing
- * Files), /home/user/v86/shared is where changes go.
+ * One job now: the guest's `/shared` is your Files folder. ZenFS is the floor
+ * (everything already in `~/`), `~/v86/shared` is where the guest's changes
+ * land, and the Files app sees both. The guest's *root* no longer needs an
+ * overlay — it is plain ZenFS at `~/v86` (see bridge/guest-root.ts), so every
+ * file the distro reads and writes is an ordinary file in the OS.
  */
 
 import { fs } from "@zenfs/core";
 import { logInfo } from "../core/log";
-import type { BaseLayer, BaseStat } from "./image-store";
+import type { BaseLayer, BaseStat } from "./layer";
 
 const WHITEOUT_FILE = ".dragon86-whiteouts.json";
 
@@ -401,6 +391,40 @@ export function createUnionFs(upperRoot: string, base: BaseLayer): UnionFs {
     utimes,
     readlink,
     materialize,
+  };
+}
+
+/**
+ * A `UnionFs` over plain ZenFS — no floor, no overlay, no whiteouts.
+ *
+ * This is the guest's root: `~/v86` served as `/`. Every operation lands on
+ * ZenFS, so a file the distro writes is a file in the Files app, and a file
+ * you edit in the Files app is what the distro executes next.
+ */
+export function createDirectFs(root: string): UnionFs {
+  return {
+    root,
+    async stat(p) {
+      const st = await fs.promises.stat(p);
+      return Object.assign(st, { origin: "upper" as const }) as unknown as UnionStat;
+    },
+    readdir: (p) => fs.promises.readdir(p),
+    async open(p, flags) {
+      return (await fs.promises.open(p, flags)) as unknown as UHandle;
+    },
+    readFile: async (p) => new Uint8Array(await fs.promises.readFile(p)),
+    writeFile: (p, data) => fs.promises.writeFile(p, data),
+    mkdir: async (p) => {
+      await fs.promises.mkdir(p, { recursive: true });
+    },
+    unlink: (p) => fs.promises.unlink(p),
+    rmdir: (p) => fs.promises.rmdir(p),
+    rename: (a, b) => fs.promises.rename(a, b),
+    chmod: (p, mode) => fs.promises.chmod(p, mode),
+    truncate: (p, n) => fs.promises.truncate(p, n),
+    utimes: (p, a, m) => fs.promises.utimes(p, a, m),
+    readlink: (p) => fs.promises.readlink(p),
+    materialize: async () => {},
   };
 }
 

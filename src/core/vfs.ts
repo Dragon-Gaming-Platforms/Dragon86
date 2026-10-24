@@ -17,8 +17,8 @@ export const HOME = "/home/user";
  * Engine roots. The guest's filesystem shows up in the OS tree under the
  * engine it belongs to, so `/` in the guest maps to one of these:
  *
- *   ~/v86/…           the v86 machine — for the full Arch guest this is the
- *                     whole root filesystem (see bridge/union-fs.ts)
+ *   ~/v86/…           the v86 machine's root filesystem — the guest's `/`
+ *                     is this folder, served over 9p
  *   ~/v86/shared/…    the v86 guest's /shared (ZenFS is the floor, so your
  *                     existing Files stay visible; changes land here)
  *   ~/CheerpX/…       the CheerpX engine's equivalent home

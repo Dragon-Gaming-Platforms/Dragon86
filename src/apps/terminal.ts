@@ -19,7 +19,6 @@ import {
   type TerminalBackend,
 } from "../bridge/hoster";
 import { getV86Backend } from "../bridge/v86";
-import { normalizeImageBase, probeImage } from "../bridge/v86-image";
 import { isolationReport, logInfo, logWarn } from "../core/log";
 
 const GREEN = "\x1b[38;2;46;204;113m";
@@ -72,45 +71,18 @@ export function openTerminal(win: Win): void {
   openTabBtn.style.display = "none";
   const prepareBtn = el("button", "tool-btn", "Prepare Shell");
   prepareBtn.title =
-    "Full Arch only: mount /dev, /proc and /sys in the guest and set PATH — " +
+    "Mount /dev, /proc and /sys in the guest, set PATH, and bring the network up — " +
     "the steps a normal login would have done";
   prepareBtn.style.display = "none";
-  const checkBtn = el("button", "tool-btn", "Check Image");
-  checkBtn.title =
-    "Test the image list and one blob from the mirror and the store, and report which host serves them";
-  checkBtn.style.display = "none";
   const devBtn = el("button", "tool-btn", "Dev Console");
   devBtn.title = "Toggle the built-in developer console (Eruda)";
-  toolbar.append(reconnectBtn, saveStateBtn, prepareBtn, checkBtn, openTabBtn, devBtn);
+  toolbar.append(reconnectBtn, saveStateBtn, prepareBtn, openTabBtn, devBtn);
 
   prepareBtn.addEventListener("click", () => {
     backend?.prepareShell?.();
     term.focus();
   });
 
-  /* Cross-origin reachability of the image store is the one thing that can
-     stop the full Arch guest, and it can only be answered from this browser.
-     Report the exact HTTP/CORS outcome instead of a silent non-boot. */
-  checkBtn.addEventListener("click", () => {
-    const base = getSettings().v86ImageBase;
-    checkBtn.disabled = true;
-    term.writeln(`${DIM}Checking ${normalizeImageBase(base)} …${RESET}`);
-    void probeImage(base, getSettings().v86ImageFallback)
-      .then((r) => {
-        const colour = r.ok ? GREEN : RED;
-        term.writeln(`${colour}${r.message}${RESET}`);
-        if (r.ok) {
-          term.writeln(
-            `${DIM}fs.json ${r.fsStatus}, ${r.blobs} blobs, sample blob HTTP ${r.blobStatus}.${RESET}`,
-          );
-        }
-        logInfo("terminal", "image probe:", r);
-      })
-      .catch((err) => term.writeln(`${RED}probe failed: ${(err as Error).message}${RESET}`))
-      .finally(() => {
-        checkBtn.disabled = false;
-      });
-  });
   saveStateBtn.addEventListener("click", () => {
     if (!backend?.saveState) return;
     saveStateBtn.disabled = true;
@@ -238,7 +210,7 @@ export function openTerminal(win: Win): void {
   const engineLabel = (): string => {
     const s = getSettings();
     if (s.engineMode === "v86") {
-      return s.v86Guest === "arch" ? "Terminal — v86 · Arch Linux" : "Terminal — v86 · mini";
+      return "Terminal — v86 · Arch Linux";
     }
     return s.engineMode === "tab" ? "Terminal — CheerpX (separate tab)" : "Terminal — CheerpX";
   };
@@ -258,12 +230,9 @@ export function openTerminal(win: Win): void {
   const connect = async (freshBoot = false) => {
     refreshTitle();
     if (getSettings().engineMode === "v86") {
-      const archGuest = getSettings().v86Guest === "arch";
       openTabBtn.style.display = "none";
-      /* Snapshots cannot hold an HTTP-served root filesystem. */
-      saveStateBtn.style.display = archGuest ? "none" : "";
-      prepareBtn.style.display = archGuest ? "" : "none";
-      checkBtn.style.display = archGuest ? "" : "none";
+      saveStateBtn.style.display = "";
+      prepareBtn.style.display = "";
       logInfo(
         "terminal",
         `connect mode=v86 (in-page compatibility engine, no isolation needed) boot=${freshBoot ? "image" : "saved-state-if-present"}`,
@@ -272,28 +241,21 @@ export function openTerminal(win: Win): void {
       backend = null;
       setChip("connecting", "Connecting…");
       term.clear();
-      if (archGuest) {
-        term.writeln(`${DIM}Starting the v86 compatibility engine with the full Arch Linux image.${RESET}`);
-        term.writeln(`${DIM}Root filesystem streams from ${normalizeImageBase(getSettings().v86ImageBase)} over 9p.${RESET}`);
-        term.writeln(`${DIM}First boot pulls a few MB of blobs, then only what you run. Give it a minute.${RESET}`);
-        term.writeln(`${DIM}When the prompt appears, hit "Prepare Shell" once to mount /dev, /proc, /sys.${RESET}`);
-        term.writeln(`${DIM}The whole Arch root is your Files folder at v86/ — edit there, the guest sees it.${RESET}`);
-        term.writeln(`${DIM}Guest /shared is v86/shared (your Files stay visible underneath it).${RESET}`);
-      } else {
-        term.writeln(`${DIM}Starting the v86 compatibility engine (tiny Linux, in-page).${RESET}`);
-      }
+      term.writeln(`${DIM}Starting the v86 compatibility engine (Arch userland, in-page).${RESET}`);
+      term.writeln(`${DIM}Its whole root filesystem is ~/v86 in your Files — edit anything there and the guest sees it.${RESET}`);
+      term.writeln(`${DIM}First boot unpacks the distro into your filesystem once; after that it just boots.${RESET}`);
+      term.writeln(`${DIM}Guest /shared is your Files folder (v86/shared is where guest changes land).${RESET}`);
       if (freshBoot) {
         term.writeln(`${DIM}Reconnect: fresh boot from the guest image — saved state is not loaded.${RESET}`);
       }
       term.writeln(`${DIM}No cross-origin isolation needed — this is the WebView-friendly engine.${RESET}`);
       term.writeln(`${DIM}Network is emulated by v86; in the guest run /networking.sh to bring the card up.${RESET}`);
-      if (!archGuest) term.writeln(`${DIM}Your Files folder appears in the guest as /shared, both ways.${RESET}`);
       const vb = getV86Backend({
         onData: (data) => term.write(filterOutput(data)),
         onNotice: (text) => term.writeln(`${DIM}[v86] ${text}${RESET}`),
         onStatus: (s) => {
           if (s === "ready") {
-            setChip("online", archGuest ? "Arch online" : "v86 online");
+            setChip("online", "Arch online");
             term.focus();
           } else {
             setChip("connecting", "Still starting…");

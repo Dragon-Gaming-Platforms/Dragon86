@@ -1,2 +1,0 @@
-Touch this file (any change) to make the `Probe the image origin` workflow run again.
-5: fix the mirror check (HEADERS was undefined) and fetch real blobs.

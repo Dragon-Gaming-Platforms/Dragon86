@@ -13,9 +13,9 @@ Contents and provenance:
   SeaBIOS is LGPLv3, see `LICENSE.seabios`.
 - `bzImage` — Arch Linux 32 kernel `vmlinuz-linux` 6.12.4-arch1-1.0
   (GPL-2.0; source via the Arch Linux 32 kernel package / kernel.org),
-  taken from the copy/v86 Arch demo image set (fs.json + sha256 flat
-  store). Despite the filename (kept so the loader config doesn't
-  change), this is the Arch `vmlinuz`, not a bzImage we built.
+  taken from the copy/v86 Arch demo image set. Despite the filename
+  (kept so the loader config doesn't change), this is the Arch
+  `vmlinuz`, not a bzImage we built.
 - `git` (inside `initrd.gz`, not a separate file) — GNU Git 2.49.1,
   built by Dragon86 from the upstream `git/git` v2.49.1 source with
   `zig cc -target x86-linux-musl`, fully static, linked against zlib
@@ -33,11 +33,10 @@ Contents and provenance:
   guest shell is Arch's own bash, not a reimplementation. This is a
   subset, not the full ~843 MB Arch installation (that can't be
   vendored into GitHub Pages): no pacman, no systemd, no desktop —
-  the kernel, bash, GNU coreutils and git. Our `/init` loads the
-  virtio PCI + 9p modules, mounts the host share at `/shared` in the
-  background (the virtio probe finishes after init under emulation),
-  sizes the serial line from the kernel cmdline (`d86cols`/`d86rows`
-  — serial has no winsize channel), and spawns bash on ttyS0.
+  the kernel, bash, GNU coreutils and git. This archive is also the
+  source of the guest's `/`: it is unpacked once into `~/v86`, and the
+  guest boots from that copy with `/` served back over 9p. `/init` is
+  built from `tools/guest-init/init` (see below for what it does).
 
 ## Boot configuration
 
@@ -75,98 +74,81 @@ machine snapshot). The next v86 start passes it as `initial_state` and
 resumes; the 9p server treats fids it doesn't know as the share root,
 so the restored guest's mount heals itself on first use.
 
-## Why not a full Arch Linux guest?
+## The guest root lives in your files (`~/v86`)
 
-Arch dropped 32-bit; the surviving archlinux32 build path is a ~2 GB
-disk image produced by booting the installer ISO under QEMU/Packer —
-no prebuilt image is fetchable from this build environment, and a 2 GB
-guest is wrong for GitHub Pages + phones. The interactive parts that
-motivated the swap are covered: the shell is genuine GNU bash and the
-file system is the OS's own. If a fetchable archlinux32 image ever
-becomes available, it can drop in as an `hda` image beside this setup.
+`/` inside the guest **is** `~/v86`. Once per device, Dragon86 unpacks
+this initramfs into `~/v86` (`src/bridge/guest-root.ts`: sorted by path,
+directories before files, symlinks last, modes preserved) and drops a
+marker, `~/v86/.dragon86-root.json` (`{v, at, initrdBytes, files}`).
+`~/v86/boot/bzImage` and `~/v86/boot/initrd.gz` are the copies the
+emulator actually boots from, so the distro's own kernel and userland are
+ordinary files you can inspect in the Files app.
 
-## Full Arch Linux (the copy/v86 image)
+From then on everything the guest reads comes from that folder over 9p,
+and everything the guest writes lands in it — edit `~/v86/etc/motd` in
+Files and `cat /etc/motd` shows the change immediately, no sync step.
+Only `bin`, `sbin` and `lib` are created as symlinks into `usr/` (and only
+when the destination is empty), because the archive's root has no `bin`
+directory of its own.
 
-The mini guest above is the default. Settings → v86 guest can switch to
-**Full Arch Linux 32**, which boots copy.sh's complete Arch root
-filesystem instead of our subset.
+`~/v86/shared` is mounted as the guest's `/shared` and is your Files
+folder (`createUnionFs` over the OS home), so `/shared` is the same place
+you see in Files → Home. CheerpX gets the matching `~/CheerpX/shared`.
 
-That image is not a disk file. Upstream serves a whole root filesystem
-over 9p from a flat HTTP store — `fs.json` (the tree) plus
-`arch/<sha256-prefix>.bin` blobs, fetched lazily as the guest touches files.
-Dragon86 points v86 at that store (`filesystem: { baseurl, basefs }` +
-`bzimage_initrd_from_filesystem`, so the kernel and initrd come from
-inside the image) and changes only the console: upstream's openrc init
-greets tty1, but Dragon86's Terminal is a serial line, so the command
-line asks for `console=ttyS0 init=/bin/bash`. Because no boot scripts
-run, the Terminal's **Prepare Shell** button types the equivalent of a
-login (mount devtmpfs/proc/sys/devpts, set PATH) when the user asks for
-it. Nothing is injected automatically.
+## The guest init (`tools/guest-init/init`)
 
-Consequences, by design:
+`public/v86/initrd.gz` boots into an initramfs whose `/init` is built from
+`tools/guest-init/init`; `tools/build-initrd.sh` bakes it in (it replaces
+`/init` in a copy of the archive with `tools/initrd-append.py`). The
+initramfs still exists because it is what the kernel is given, and it
+holds the modules needed to reach the 9p device; all the *distro* files
+are on the share.
 
-- The image is streamed from the origin, not vendored, so Dragon86 stays
-  far under GitHub Pages' 1 GB limit.
-- The origin must allow cross-origin reads. `i.copy.sh` must, since
-  copy.sh itself is a different origin and fetches the same URLs; the
-  Settings **Test** button and the Terminal's **Check Image** button
-  report the exact HTTP/CORS result from the user's browser. If it is
-  blocked, `tools/arch-image/` mirrors the store into a Pages repo of
-  our own (Pages always sends `Access-Control-Allow-Origin: *`) and the
-  same setting points at it.
-- `/shared` is unavailable in this mode: v86 has one 9p device and the
-  root filesystem occupies it.
-- Save State is unavailable in this mode: the root filesystem lives in
-  v86's HTTP-backed 9p store, which `save_state()` does not contain, so
-  a restored machine would come back with an empty root. Snapshots
-  record which guest they belong to and are ignored across guests.
-- Memory rises to 512 MB (320 MB on touch devices), matching upstream's
-  demo, because a real distro userland needs it.
+`/init` does, in order:
 
-Verified locally before shipping: a store built from a real root tree
-(fs.json + 160 blobs) was booted through v86's `filesystem: { baseurl,
-basefs }` path; the guest mounted the streamed root over 9p and listed
-its contents from the shell.
+1. mount `proc`, `sys`, `devtmpfs`, `devpts`;
+2. size the serial console from the kernel cmdline (`d86cols`/`d86rows` —
+   serial has no winsize channel, so the host passes the size in-band);
+3. write `/etc/udhcpc.script` and ask for a DHCP lease in the background
+   (v86 answers it itself; a missing relay never delays the shell);
+4. `modprobe virtio_pci 9pnet_virtio`, wait for `/sys/bus/virtio/devices/virtio0`,
+   then `mount -t 9p -o trans=virtio,version=9p2000.L,cache=loose host9p /newroot`;
+5. `mkdir` the mount points the distro needs, bind `/proc`, `/sys`, `/dev`
+   in and put tmpfs on `/tmp` and `/run` (a 9p root cannot be
+   `pivot_root`ed into: `switch_root`'s `MS_MOVE` fails with `ENOSYS` on
+   a 9p mount, so a `chroot` is what takes us across);
+6. write the launcher `/.dragon86-shell` and `chroot` into it, respawning
+   bash on ttyS0 if the session ends.
 
-## The Arch root in ZenFS
+If the share never arrives (host is still unpacking, or the device has no
+root), init falls back to a recovery shell **in the initramfs** that mounts
+the share at `/shared` — the battery-included behaviour from before — so
+a bad first boot shows a prompt, not a dead console.
 
-`/` inside the full Arch guest is `~/v86` on the OS side, served by our
-own 9p server (`src/bridge/p9.ts`) out of a union filesystem
-(`src/bridge/union-fs.ts`):
+Notes that cost real debugging time and are worth keeping:
 
-    copy.sh's read-only image  (fs.json + blobs, fetched lazily)
-              ↓ read
-    ~/v86/…                    ZenFS: writable, persistent, in Files
-              ↓
-    guest /                    served over 9p
+- baked files need an explicit `chmod 755`, or `/init` dies with
+  `Failed to execute /init (error -13)`;
+- `Txattrwalk` must answer a *named* attribute with `ENODATA` (not a
+  zero-length value). The kernel reads a 0-byte `security.capability` as
+  corrupt and aborts every exec with `EINVAL`
+  (`Invalid argument reading file caps for …` in `dmesg`). An *empty* name
+  is `listxattr` and wants a zero-length value, or `ls -l` prints
+  "No data available" for every file;
+- the wire order for `Txattrwalk` is `fid, newfid, name` — the walk opens a
+  second fid for the value;
+- the 9p handler's path check has to treat a `/` root as `/`, not `//`.
 
-Reads that ZenFS cannot satisfy come from the image. The first **write**
-to an image file copies it up into ZenFS first, so edits persist in
-IndexedDB and show up in the Files app, while untouched files cost
-nothing. Guest deletions of image files are recorded as whiteouts in
-`~/v86/.dragon86-whiteouts.json` so they do not reappear.
+## Full Arch Linux: removed
 
-On boot the image's directory tree (directories and symlinks only) is
-created in `~/v86` in the background, so the whole Arch layout is
-browsable in Files immediately; contents materialise on first use. The
-marker `~/v86/.dragon86-image.json` records which image base the tree
-came from, so it is not walked twice.
-
-The guest's `/shared` is a submount of the same union: `~/v86/shared`
-on top of your Files folder (`zenfsBase(HOME)`), so existing files stay
-visible in the guest and anything the guest writes there persists in
-`~/v86/shared`. The mini guest uses exactly the same `/shared` layout.
-
-CheerpX gets the matching folder, `~/CheerpX/shared`; pointing the fs1
-bridge at it is the last step for that engine (the hoster side still has
-to mount it).
-
-Verified with a real guest on a local copy of the store: image files
-read through the union, an OS-side edit read back inside the guest, a
-guest write persisted into ZenFS, a guest write to an *image* file
-copying it up intact, and `/shared` showing the OS files. The full
-`root=host9p` boot uses the same server with `/` instead of `/shared`
-as the mount point.
+Earlier builds tried to boot the complete copy/v86 Arch image (an
+`fs.json` file list plus content-addressed blobs, mirrored to an
+`arch-image` branch because the origin refuses non-copy.sh referrers).
+That guest never booted reliably and cost ~700 MB of vendored blobs, four
+GitHub workflows and a per-device cache; it is all gone. This userland is
+the engine instead: smaller, boots in seconds, and — unlike the streamed
+image — its files are ordinary files in your filesystem. `networking.sh`
+stays at `/networking.sh` in the guest root.
 
 ## Networking (emulator side)
 
@@ -199,137 +181,3 @@ virtio_net, got `192.168.86.100` by DHCP from the emulated router, wrote
 `/etc/resolv.conf`, and fetched a page over HTTP through the emulated
 NIC. Without a relay the same guest loads the driver, shows `eth0`, and
 times out on DHCP — which is why the probe exists.
-
-## The image file list (`fs.json`) is vendored
-
-The full Arch guest's root filesystem is described by one document,
-`fs.json`: for every path, a `[name, size, mtime, mode, uid, gid, last]`
-entry where `last` is either a child list or the name of a content blob
-(`<sha256-prefix>.bin[.zst]`, 8 hex digits in the current image). It is the 9p file list, not file contents.
-
-**It is a file in this repository** — 5.8 MB, 98,006 paths (9,789
-directories, 5,723 symlinks, 82,489 files, 70,661 distinct contents) for the
-current Arch set — — `public/v86/fs.json` — and is served
-from our own origin. That is not a tidiness choice: the upstream store
-answers **403 to Safari**, so a browser-side fetch of the list can simply
-fail. Same-origin has no such opinion.
-
-Two workflows keep it current:
-
-- `.github/workflows/vendor-fs-json.yml` — on every push to main, fetches
-  `fs.json` (https, then http), validates it (JSON, a real `fsroot` with
-  file entries, sane size), and commits it if it changed. Bot pushes use
-  `GITHUB_TOKEN`, so they do not re-trigger workflows: one fetch per real
-  push, no loop.
-- `.github/workflows/deploy.yml` — before building, uses the committed copy
-  if there is one, otherwise fetches it. Best-effort either way.
-
-At runtime the app resolves it in this order, and logs which one it used
-(`[D86:image] using the shipped image list`):
-
-1. **shipped** — `public/v86/fs.json`, same origin.
-2. **vendored on this device** — the same document kept in ZenFS at
-   `~/v86/.dragon86-image-fs.json`. Settings → **v86 image** → *Vendor to
-   this device* fetches it once in your browser and keeps it there; useful
-   when a build has no copy, or you point Settings at another image base.
-3. **live** — `fs.json` from the configured image base (or its mirror, see
-   below). If this worked, it is saved, so it happens at most once.
-
-Only **file contents** are streamed from the image store
-(`<base>arch/<blob>`), lazily, the first time the guest or Files touches a
-file.
-
-### Safari: the 403, the mirror, and zstd
-
-What the origin actually does (measured, see `docs/fs-probe.md` and
-`docs/fs-vendor.log`): it is not down and it does not hate any browser. It
-**requires a `Referer` header** and refuses the connection without one — and
-when it does answer, it is generous: 200, `application/json`,
-`Access-Control-Allow-Origin: *`. Browsers normally send a referrer
-cross-origin, so this mostly works; when a policy, a tracking protection or a
-stripped header removes it, every image request dies with an opaque failure,
-which is what Safari was showing. The loader now passes
-`referrerPolicy: "origin"` on every cross-origin request, so the header is
-not optional any more.
-
-Three separate things had to be true before Full Arch could work in every
-browser, and only two of them are ours to fix:
-
-1. **The list** — fixed above, by serving our own copy.
-2. **zstd blobs** — Chromium has had `DecompressionStream("zstd")` since
-   123; other engines may not, and a guest cannot boot with half its files
-   unreadable. `fzstd` (MIT, bundled, ~10 KB) is now the fallback decoder,
-   used automatically when the platform API is missing or refuses. Nothing
-   to do at runtime; Settings reports which one your browser uses. (The
-   current Arch set has no `.zst` blobs at all — all 70,661 are plain
-   `.bin` — so today this is insurance against the next image.)
-3. **The blobs themselves** — still fetched from upstream, which refuses a
-   request with no referrer. Ours to *work around*, not to fix: Settings →
-   **v86 image** → **Image mirror** takes a second store with the same file
-   names and bytes, and any blob the primary refuses (403 or network error)
-   is retried there. `.github/workflows/mirror-arch-image.yml` builds such a
-   mirror into a Pages repo of its own on demand — see
-   `tools/arch-image/README.md` — because Pages answers everyone and sends
-   `Access-Control-Allow-Origin: *`.
-
-With a mirror configured, nothing about the guest changes: same image,
-same bytes, just a host that will talk to every browser.
-
-
-## The vendored blob mirror (`arch-image` branch)
-
-The image list is cheap to vendor; the 70,661 blobs behind it are 5.3 GB, and
-that is what Safari could not reach. `i.copy.sh` sends
-`Access-Control-Allow-Origin: *` but **requires a `Referer`**, and a page
-cannot forge one — so a browser that strips the referrer (Safari, privacy
-settings, a strict `Referrer-Policy`) gets a connection error on every single
-blob. No amount of client code fixes that.
-
-So the bytes come from a host that does not care:
-`https://raw.githubusercontent.com/Dragon-Gaming-Platforms/Dragon86/arch-image/`,
-published by `.github/workflows/vendor-arch-blobs.yml` into this repo's
-`arch-image` branch. raw.githubusercontent.com serves any file with
-`Access-Control-Allow-Origin: *` and no referrer check.
-
-**How much is vendored** — `tools/arch-image/vendor.py --plan`:
-
-```
-selected: 17116 files, 15003 distinct blobs, 698.5 MB
-not vendored: 5582.9 MB (29 dropped for budget)
-```
-
-That is the whole userland: `/boot` (kernel + initramfs), all of `/usr/bin`,
-`/usr/lib` minus the toolchain monsters, `/etc`, `/usr/libexec`, `/usr/local`.
-Left out, because they are most of the bytes and none of the boot: Rust
-(386 MB), GPU drivers (410 MB), Firefox (308 MB), the JDK (148 MB), GCC
-(133 MB), LLVM/clang (~220 MB), Docker, OCaml, Guile, `/usr/share`,
-`/usr/include`, the package cache and `/var`. Anything not vendored still
-streams from the upstream store, which works in Chrome; in Safari it is simply
-unavailable.
-
-**Order of requests: mirror first.** Measured with `docs/fs-probe.md` — the
-upstream store only answers requests whose `Referer` is copy.sh's own:
-
-| Referer | Status |
-|---|---|
-| `https://copy.sh/v86/` | 200, `application/json`, CORS `*` |
-| `https://i.copy.sh/` | 200 |
-| our Pages origin | **403** |
-| any random site | **403** |
-| none at all | connection dropped |
-
-`Referer` is a forbidden header, so no page can forge one. That is true in
-**every** browser, which is why Full Arch did not boot in Chrome either: the
-mirror is the source, not a fallback. A 404 from the mirror (blob not in the
-subset) falls back to the store, which then works only where the referer is
-copy.sh's. The Terminal says which host is feeding it
-(`blobs: vendored mirror (...)`) and Settings → **Check Image** reports both.
-
-Settings → **v86 image** → **Image mirror** shows and changes the base; it
-defaults to the branch above, and can point at a Pages copy instead (faster,
-1 GB limit) once one exists.
-
-**Refreshing it.** The workflow runs when `public/v86/fs.json`, the selection
-rule, or `tools/arch-image/vendor-request` changes — the last one is the
-by-push trigger. It is resumable: it clones the branch first, so only missing
-blobs are downloaded and an unchanged image commits nothing.

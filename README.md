@@ -28,52 +28,30 @@ the live state ("Isolation: ON/off", "Service worker: controlling / not
 controlling"), and `tools/test-coi-deregister.mjs` (run by `npm run
 build`) asserts the contract.
 
-### v86 guests: mini vs full Arch
+### The v86 guest: a lightweight Arch userland rooted in your files
 
-The v86 engine boots one of two guests (Settings → **v86 guest**):
+The v86 engine boots one guest: the vendored Arch Linux 32 kernel plus a
+hand-built userland (bash, coreutils, git, `networking.sh`). There is no big
+disk image and nothing is downloaded at boot — the whole distro is unpacked
+once from `public/v86/initrd.gz` into `~/v86`, and from then on **the guest's
+`/` is that folder**.
 
-- **Dragon86 mini** (default, **legacy**) — the vendored Arch kernel with
-  bash, coreutils and git. Boots in seconds and `/shared` *is* your Files
-  folder, live in both directions. It is a stopgap for browsers where the
-  full image cannot boot yet, and it goes away once Full Arch works
-  everywhere.
-- **Full Arch Linux 32** — the complete Arch root filesystem that
-  copy.sh/v86 serves, streamed over 9p from an HTTP image store
-  (`fs.json` + content-addressed blobs) rather than downloaded as a disk
-  image. Real pacman and the whole userland; slower to start; no
-  `/shared` (v86 has a single 9p device and the root filesystem fills
-  it). The image base is a setting, and the **Test** button in Settings
-  reports whether that origin allows cross-origin reads from your
-  browser. Memory goes to 512 MB for this guest.
+That is the point of this engine: everything the distro reads is a file in
+your Dragon86 filesystem, and everything it writes lands there too. Edit
+`~/v86/etc/hostname` in Files, `cat /etc/hostname` in the Terminal — same
+file, no sync step. Inside the guest, `/shared` is your Files folder.
 
-### Where the Arch file list comes from
+How it hangs together (details in `public/v86/VENDORED.md`):
 
-`fs.json` is the 9p file list for that image: every path's name, mode,
-size and symlink target, but no file contents. It is **committed to this
-repo** (`public/v86/fs.json` — 5.8 MB, 98,006 paths — refreshed on every push
-by `.github/workflows/vendor-fs-json.yml`, which also logs what it did to
-`docs/fs-vendor.log`) and served from our own origin. The upstream store
-requires a `Referer` header and refuses the connection without one, which is
-the "403" Safari was showing; asking for the list from our own origin removes
-that question, and every cross-origin request now sends a referrer on
-purpose. At runtime the app uses
-that copy first, then a copy vendored onto the device (Settings → **v86
-image** → *Vendor to this device*), then the image store itself. Only file
-contents are ever streamed from the store.
+- the kernel boots a small initramfs (`public/v86/initrd.gz`), whose `/init`
+  is built from `tools/guest-init/init`;
+- `/init` brings up virtio + 9p, mounts the share as `/newroot`, bind-mounts
+  `/proc`, `/sys` and `/dev` in, then `chroot`s into it;
+- the share itself is served by `src/bridge/p9.ts`, a 9p2000.L server talking
+  straight to ZenFS — no HTTP, no image store, no per-device vendoring.
 
-For Safari — and, it turns out, for **every** browser — the bytes need help
-too: the upstream store only answers requests whose `Referer` is copy.sh's
-own and a page cannot forge that header (measured in `docs/fs-probe.md`).
-The upstream store sends
-`Access-Control-Allow-Origin: *` but **requires a `Referer`**, which a page
-cannot forge — so a browser that strips the referrer gets an error on every
-blob. A curated **~700 MB subset of the image** (boot files, the whole
-userland, the libraries it needs) is therefore vendored into this repo's
-`arch-image` branch by `.github/workflows/vendor-arch-blobs.yml`, served by
-raw.githubusercontent.com, and used automatically once the upstream store
-refuses a file. Blobs are also zstd-decoded with a bundled fallback when the
-browser has no native zstd. Settings → **Image mirror** shows the base.
-Details in `public/v86/VENDORED.md`.
+`~/v86/.dragon86-root.json` marks an unpacked root (version, timestamp, file
+count); Settings → **v86 filesystem** can re-unpack it if it is ever damaged.
 
 ## What's in the box
 
@@ -180,9 +158,9 @@ changes — v1 behavior, no shared folder in the CheerpX guest.
   operations and vice versa — no copying, no sync step. The Terminal's
   **Save State** button snapshots the machine to IndexedDB and the
   next v86 start resumes from it. Isolation is OFF in this mode, same
-  as Separate tab. (A full Arch Linux guest would need a ~2 GB
-  archlinux32 disk image; see `public/v86/VENDORED.md` for why the
-  bash shell ships instead.)
+  as Separate tab. The distro's own `/` **is** `~/v86` — the same folder
+  you see in Files under **v86** — so anything the guest reads or edits
+  is editable from the Files app and vice versa.
 
 **Diagnostics:** the Terminal has a **Dev Console** button (Eruda, contained
 in the window). Watch the `[D86:bridge]` logs — especially the *iframe probe*

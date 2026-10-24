@@ -1,31 +1,27 @@
 /**
  * v86 backend — the Terminal's compatibility engine.
  *
- * Runs the vendored v86 emulator (public/v86/: npm `v86`, SeaBIOS, Arch
- * Linux 32 6.12 kernel + initrd with Arch's GNU bash/coreutils) directly
- * in this page. Unlike
- * CheerpX it needs no cross-origin isolation and no service worker, so it
- * works in Android WebView and other locked-down browsers.
+ * Runs the vendored v86 emulator (public/v86/: npm `v86`, SeaBIOS, the
+ * vendored Arch 32 kernel and initramfs with Arch's GNU bash/coreutils)
+ * directly in this page. Unlike CheerpX it needs no cross-origin isolation
+ * and no service worker, so it works in Android WebView and other locked-down
+ * browsers.
  *
- * Files: the guest's /shared is not a copy or a sync — it *is* the OS
- * filesystem. src/bridge/p9.ts speaks 9p2000.L straight to ZenFS via
- * v86's `handle9p`, so guest and OS see the same live files (creates,
- * deletes, renames included). Nothing is typed into the guest to set
- * this up; the serial line carries only the user's shell session (its
- * size is passed on the kernel cmdline, since serial has no winsize
- * channel — see the guest /init).
+ * The guest's root filesystem is *the OS filesystem*. There is no disk image
+ * and no copy to keep in sync: `~/v86` in ZenFS is what the guest mounts as
+ * `/` over 9p (src/bridge/p9.ts speaks 9p2000.L straight to ZenFS through
+ * v86's `handle9p`). So `/bin/bash`, `/etc/profile` and everything else the
+ * distro runs are ordinary files in Dragon86 — visible in Files, editable in
+ * the Text Editor, and writable from inside the guest. `~/v86/shared` is the
+ * guest's `/shared`, which is your Files folder (src/bridge/union-fs.ts).
+ *
+ * The distro itself is unpacked into `~/v86` on first boot from the vendored
+ * initramfs (src/bridge/guest-root.ts) — one artifact to keep correct, and
+ * what the guest runs is exactly what you can edit.
  *
  * State: "Save State" (Terminal toolbar) snapshots the whole machine
- * (v86 save_state) into IndexedDB, gzip-compressed — far beyond
- * localStorage's ~5 MB, so IndexedDB is the on-device store used. A
- * normal v86 start passes the snapshot as initial_state and resumes
- * where it left off; the 9p server treats unknown fids as the share
- * root, so the restored guest's mount heals itself. The Terminal's
- * Reconnect button deliberately requests a fresh boot from the guest
- * image instead, leaving any saved snapshot untouched for a later
- * normal start. Snapshots record the emulator ACPI layout they were
- * created with (pre-ACPI snapshots default to disabled), because v86's
- * state format embeds that layout and restoring across layouts fails.
+ * (v86 save_state) into IndexedDB, gzip-compressed. A normal start resumes
+ * from it; Reconnect deliberately boots fresh.
  */
 
 import { fs } from "@zenfs/core";
@@ -33,9 +29,8 @@ import * as vfs from "../core/vfs";
 import { ensureDir } from "../core/vfs";
 import { getSettings } from "../core/settings";
 import { createP9Handler } from "./p9";
-import { normalizeImageBase } from "./v86-image";
-import { ImageStore } from "./image-store";
-import { createUnionFs, unionAsPromises, withSubmount, zenfsBase } from "./union-fs";
+import { ensureGuestRoot } from "./guest-root";
+import { createDirectFs, createUnionFs, unionAsPromises, withSubmount, zenfsBase } from "./union-fs";
 import { logInfo, logWarn } from "../core/log";
 import type { BackendHandlers, TerminalBackend } from "./hoster";
 
@@ -106,23 +101,19 @@ interface SavedState {
       predate this field and were all taken with ACPI disabled; restoring
       one with a different layout crashes v86's state loader. */
   acpi?: boolean;
-  /** Which guest image the snapshot belongs to. Legacy snapshots are all
-      from the mini guest. A snapshot is only restorable into the same
-      guest: the full Arch guest's root filesystem is served over HTTP by
-      v86 and is NOT part of save_state, so restoring one would hand the
-      resumed machine an empty root. */
-  guest?: "dragon" | "arch";
+  /** Kept for snapshots written by older builds, which could also run a
+      second (image-store) guest. Anything not "dragon" is ignored. */
+  guest?: string;
 }
 
 interface LoadedState { buffer: ArrayBuffer; acpi: boolean }
 
-async function loadSavedState(guest: "dragon" | "arch"): Promise<LoadedState | null> {
+async function loadSavedState(): Promise<LoadedState | null> {
   try {
     const rec = (await idbGet(STATE_KEY)) as SavedState | undefined;
     if (!rec) return null;
-    const recGuest = rec.guest ?? "dragon";
-    if (recGuest !== guest) {
-      logInfo("v86", `saved state belongs to the ${recGuest} guest; booting ${guest} fresh`);
+    if (rec.guest && rec.guest !== "dragon") {
+      logInfo("v86", "saved state belongs to a guest this build no longer has; booting fresh");
       return null;
     }
     const acpi = rec.acpi === true;
@@ -138,11 +129,11 @@ async function loadSavedState(guest: "dragon" | "arch"): Promise<LoadedState | n
 /* ---------- backend ---------- */
 
 /**
- * The mini guest's /shared: your Files folder (ZenFS, read-only floor) with
- * changes written into ~/v86/shared. Same layout as the full Arch guest, so
- * switching guests never moves where your files appear.
+ * The guest's /shared: your Files folder (ZenFS, read-only floor) with
+ * changes written into ~/v86/shared, so the guest and the Files app are
+ * looking at the same files.
  */
-function miniSharedFs() {
+function sharedUnionFs() {
   return createUnionFs(vfs.SHARED_DIR.v86, zenfsBase(vfs.HOME, ["v86", "CheerpX"]));
 }
 
@@ -160,7 +151,6 @@ class V86Backend implements TerminalBackend {
   private startTimer: ReturnType<typeof setTimeout> | null = null;
   private nudgeTimer: ReturnType<typeof setInterval> | null = null;
   private acpiEnabled = false;
-  private guest: "dragon" | "arch" = "dragon";
 
   constructor(
     private handlers: BackendHandlers,
@@ -174,10 +164,10 @@ class V86Backend implements TerminalBackend {
   }
 
   /**
-   * Full Arch boots with `init=/bin/bash` (serial console, no VGA screen),
-   * so the distro's own boot scripts never run. This types the handful of
-   * lines a login would normally have done for us. Sent only when the user
-   * clicks the Terminal's "Prepare Shell" button.
+   * The guest boots straight to bash on the serial console, so nothing runs
+   * a login. This types the few harmless lines a login would have done —
+   * mounts that already exist become no-ops — and brings the network up.
+   * Sent only when the user clicks the Terminal's "Prepare Shell" button.
    */
   prepareShell(): void {
     if (!this.emu) return;
@@ -218,13 +208,6 @@ class V86Backend implements TerminalBackend {
   }
 
   /**
-   * Create the image's directory tree (and symlinks) under ~/v86 so the whole
-   * Arch layout is visible in the Files app from the first boot. File
-   * contents stay lazy: a blob is fetched the first time something reads it,
-   * and lands in ZenFS then (see union-fs.ts). Skip the walk when the tree
-   * for this image base is already there.
-   */
-  /**
    * Put the guest's networking script where both guests can see it: in the
    * OS filesystem, so it is editable in Files and shows up in the Arch
    * guest's own root (the image has no such script of its own once we serve
@@ -247,78 +230,19 @@ class V86Backend implements TerminalBackend {
     }
   }
 
-  private async materializeSkeleton(store: ImageStore, root: string): Promise<void> {
-    const marker = `${root}/.dragon86-image.json`;
-    try {
-      const prev = JSON.parse(await fs.promises.readFile(marker, "utf8")) as { base?: string };
-      if (prev.base === store.baseUrl) {
-        logInfo("v86", "image tree already materialised; not walking it again");
-        return;
-      }
-    } catch {
-      /* first time */
-    }
-    const started = Date.now();
-    let made = 0;
-    for (const path of store.paths()) {
-      if (this.disposed) return;
-      const target = `${root}${path}`;
-      try {
-        const st = await store.stat(path);
-        if (!st) continue;
-        if (st.isDirectory()) {
-          await fs.promises.mkdir(target, { recursive: true });
-          made++;
-        } else if (st.isSymbolicLink()) {
-          const link = await store.readlink(path);
-          if (!link) continue;
-          try {
-            await fs.promises.symlink(link, target);
-            made++;
-          } catch {
-            /* already there, or ZenFS has no symlinks */
-          }
-        }
-      } catch {
-        /* a single unreadable path must not abort the walk */
-      }
-    }
-    await fs.promises.writeFile(
-      marker,
-      JSON.stringify({ base: store.baseUrl, blobs: store.blobCount, at: Date.now(), dirs: made }),
-    );
-    this.status(`image tree ready: ${made} entries under ${root} (${Date.now() - started} ms)`);
-  }
-
   private async start(): Promise<void> {
     this.startTimer = null;
     try {
-      const guest = getSettings().v86Guest === "arch" ? "arch" : "dragon";
-      this.guest = guest;
-      const imageBase = normalizeImageBase(getSettings().v86ImageBase);
-      /* Save/restore only exists for the mini guest: the full Arch root
-         filesystem lives in v86's HTTP-backed 9p store, which is not part
-         of save_state (see SavedState.guest). */
-      const wantSaved = !this.freshBoot && guest === "dragon";
-      const [V86, saved] = await Promise.all([
-        loadLib(),
-        wantSaved ? loadSavedState(guest) : Promise.resolve(null),
-      ]);
+      const wantSaved = !this.freshBoot;
+      const [V86, saved] = await Promise.all([loadLib(), wantSaved ? loadSavedState() : Promise.resolve(null)]);
       if (this.disposed) return;
-      /* Fresh boots get ACPI (see below). A restored snapshot must keep
-         the layout it was created with — v86's state format embeds it. */
+      /* Fresh boots get ACPI (see below). A restored snapshot must keep the
+         layout it was created with — v86's state format embeds it. */
       this.acpiEnabled = saved ? saved.acpi : true;
-
-      /* 128 MB is plenty for the mini guest. The full Arch root filesystem
-         runs a real distro userland (pacman, glibc, sshd-sized binaries), so
-         it gets upstream's 512 MB — trimmed on touch devices, where browsers
-         are stingy about large WebAssembly heaps. */
-      const coarse = typeof matchMedia === "function" && matchMedia("(pointer: coarse)").matches;
-      const memoryMB = guest === "arch" ? (coarse ? 320 : 512) : 128;
 
       const opts: Record<string, unknown> = {
         wasm_path: `${BASE}v86.wasm`,
-        memory_size: memoryMB * 1024 * 1024,
+        memory_size: 128 * 1024 * 1024,
         bios: { url: `${BASE}bios/seabios.bin` },
         vga_bios: { url: `${BASE}bios/vgabios.bin` },
         /* Give fresh guests v86's ACPI tables. Without them, SeaBIOS
@@ -347,86 +271,41 @@ class V86Backend implements TerminalBackend {
           : "network: off — the guest gets loopback only",
       );
 
-      if (guest === "arch") {
-        /* The full Arch image, but *through us*: the root filesystem is an
-           overlay — copy.sh's read-only image underneath, ZenFS on top — so
-           the guest's whole root is browsable and editable at ~/v86 in the
-           OS, and anything the guest writes persists in IndexedDB. This is
-           why we no longer hand v86 `baseurl`/`basefs`: that path is v86's
-           own private store, invisible to Dragon86. */
-        this.status("reading the Arch image index…");
-        const store = await ImageStore.load(imageBase, {
-          root: vfs.ENGINE_ROOT.v86,
-          fallbackBase: getSettings().v86ImageFallback,
-          /* The upstream store only answers copy.sh's own referer, so blobs
-             come from the mirror; say so in the Terminal instead of leaving a
-             silent difference between browsers. */
-          onNotice: (text) => this.status(text),
-        });
-        const root = vfs.ENGINE_ROOT.v86;
-        await ensureDir(root);
-        await ensureDir(vfs.SHARED_DIR.v86);
+      const root = vfs.ENGINE_ROOT.v86;
+      await ensureDir(root);
+      await ensureDir(vfs.SHARED_DIR.v86);
+      /* The script sits at the top of the guest root, so the guest sees it at
+         /networking.sh and you can edit it in Files. */
+      void this.installNetworkingScript(root);
 
-        /* The script sits at the top of the image tree, so the guest sees it
-           at /networking.sh and you can edit it in Files. */
-        void this.installNetworkingScript(root);
-        const imageFs = createUnionFs(root, store);
-        /* Guest /shared = your Files folder (ZenFS floor) with changes kept
-           in ~/v86/shared — the same layout as the mini guest. */
-        const sharedFs = createUnionFs(
-          vfs.SHARED_DIR.v86,
-          zenfsBase(vfs.HOME, ["v86", "CheerpX"]),
-        );
-        const rootFs = withSubmount(imageFs, vfs.SHARED_DIR.v86, sharedFs);
+      /* Guest / = ~/v86 (ZenFS). The kernel and initramfs are read from there
+         too, so everything the machine runs is a file in the OS filesystem;
+         they are unpacked/copied in on first boot. */
+      const guestRoot = await ensureGuestRoot(root, { status: (t) => this.status(t) });
+      if (this.disposed) return;
+      this.status(
+        guestRoot.reused
+          ? "booting the distro from your filesystem (~/v86)"
+          : "booting the freshly unpacked distro from your filesystem (~/v86)",
+      );
+      opts.bzimage = { buffer: guestRoot.kernel.buffer.slice(0) };
+      opts.initrd = { buffer: guestRoot.initrd.buffer.slice(0) };
 
-        /* Kernel + initrd come out of the image, the way upstream does it. */
-        const { kernel, initrd } = store.findKernel();
-        if (!kernel || !initrd) {
-          throw new Error(`no kernel/initrd found inside ${imageBase} (looked for vmlinuz/bzimage and initrd/initramfs)`);
-        }
-        this.status(`fetching kernel + initrd (${(store.blobCount || 0).toLocaleString()} blobs available)…`);
-        const [kImg, iImg] = await Promise.all([
-          store.readFile(kernel),
-          store.readFile(initrd),
-        ]);
-        if (!kImg || !iImg) {
-          throw new Error(`could not read ${kernel} / ${initrd} from the image store`);
-        }
-        logInfo("v86", `arch image: ${kernel} (${(kImg.byteLength / 1048576).toFixed(1)} MB), ${initrd} (${(iImg.byteLength / 1048576).toFixed(1)} MB)`);
+      /* One 9p share, mounted by the guest at /, with your Files folder
+         grafted on at /shared. */
+      const rootFs = withSubmount(createDirectFs(root), "/shared", sharedUnionFs());
+      opts.filesystem = { handle9p: createP9Handler(root, unionAsPromises(rootFs) as never) };
 
-        opts.filesystem = {
-          handle9p: createP9Handler(root, unionAsPromises(rootFs) as never),
-        };
-        opts.vga_memory_size = 8 * 1024 * 1024;
-        opts.bzimage = { buffer: kImg.buffer.slice(0) };
-        opts.initrd = { buffer: iImg.buffer.slice(0) };
-        opts.cmdline = [
-          "rw console=ttyS0 tsc=reliable",
-          "root=host9p rootfstype=9p rootflags=trans=virtio,cache=loose",
-          "mitigations=off audit=0 random.trust_cpu=on nowatchdog",
-          "init=/bin/bash",
-          `d86cols=${this.cols} d86rows=${this.rows}`,
-        ].join(" ");
-        logInfo("v86", `cold-booting full Arch from ${imageBase} with the root at ${root}`);
-
-        /* Show the tree in Files immediately (directories + symlinks only;
-           file contents stay lazy, and copy themselves into ZenFS the first
-           time anything touches them). Runs in the background: boot should
-           not wait on thousands of mkdirs. */
-        void this.materializeSkeleton(store, root);
-      } else if (saved) {
-        opts.filesystem = { handle9p: createP9Handler(vfs.SHARED_DIR.v86, unionAsPromises(miniSharedFs()) as never) };
+      if (saved) {
         opts.initial_state = { buffer: saved.buffer };
         logInfo("v86", "resuming from saved state");
       } else {
-        opts.filesystem = { handle9p: createP9Handler(vfs.SHARED_DIR.v86, unionAsPromises(miniSharedFs()) as never) };
-        opts.bzimage = { url: `${BASE}bzImage` };
-        opts.initrd = { url: `${BASE}initrd.gz` };
         /* v86's CPU has no machine-check hardware; skip only that dead
            initcall so the kernel does not report an MCE device failure. */
         opts.cmdline = `console=ttyS0 tsc=reliable initcall_blacklist=mcheck_init_device d86cols=${this.cols} d86rows=${this.rows}`;
-        logInfo("v86", this.freshBoot ? "cold-booting guest from image (Reconnect)" : "cold-booting guest");
+        logInfo("v86", this.freshBoot ? "cold-booting guest from the OS filesystem (Reconnect)" : "cold-booting guest");
       }
+
       const emu = new V86(opts);
       this.emu = emu;
       emu.add_listener("serial0-output-byte", (b) => this.onByte(b));
@@ -447,6 +326,7 @@ class V86Backend implements TerminalBackend {
       }, 90_000);
     } catch (err) {
       logWarn("v86", "failed to start:", err);
+      this.status(`could not start the guest: ${(err as Error).message}`);
       this.handlers.onStatus("offline");
     }
   }
@@ -470,7 +350,7 @@ class V86Backend implements TerminalBackend {
             this.emu?.serial0_send(this.pendingInput);
             this.pendingInput = "";
           }
-          logInfo("v86", "guest shell ready (/shared is the OS filesystem)");
+          logInfo("v86", "guest shell ready (its / is the OS filesystem)");
           this.handlers.onStatus("ready");
         }
       }
@@ -488,13 +368,6 @@ class V86Backend implements TerminalBackend {
   /** Snapshot the machine into IndexedDB (gzip; see header). */
   async saveState(): Promise<void> {
     if (!this.emu) throw new Error("engine not running");
-    if (this.guest === "arch") {
-      throw new Error(
-        "the full Arch guest boots its root filesystem over HTTP, which a " +
-          "snapshot cannot contain — save state is only available for the " +
-          "Dragon86 mini guest",
-      );
-    }
     const raw = await this.emu.save_state();
     let data = raw;
     let gzip = false;
@@ -510,7 +383,7 @@ class V86Backend implements TerminalBackend {
       data,
       savedAt: Date.now(),
       acpi: this.acpiEnabled,
-      guest: this.guest,
+      guest: "dragon",
     };
     await idbPut(STATE_KEY, rec);
     logInfo(
