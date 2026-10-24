@@ -15,7 +15,7 @@ export interface AppShortcut {
   launch: () => void;
 }
 
-export function buildTaskbar(wm: WindowManager, apps: AppShortcut[]): void {
+export function buildTaskbar(wm: WindowManager, getApps: () => AppShortcut[]): void {
   const bar = document.getElementById("taskbar")!;
 
   /* ---- start button ---- */
@@ -70,7 +70,7 @@ export function buildTaskbar(wm: WindowManager, apps: AppShortcut[]): void {
     brand.innerHTML = "DRAGON<span>86</span>";
     header.append(brand, el("div", "sub", "Web Desktop Environment"));
     const list = el("div", "start-apps");
-    for (const app of apps) {
+    for (const app of getApps()) {
       const b = el("button", "start-app");
       b.append(icon(app.icon), el("span", undefined, app.name));
       if (app.sub) b.append(el("span", "app-sub", app.sub));
@@ -84,7 +84,7 @@ export function buildTaskbar(wm: WindowManager, apps: AppShortcut[]): void {
     const settingsBtn = el("button", "btn", "Settings");
     settingsBtn.addEventListener("click", () => {
       closeStart();
-      const s = apps.find((a) => a.id === "settings");
+      const s = getApps().find((a) => a.id === "settings");
       s?.launch();
     });
     const reloadBtn = el("button", "btn", "Reload");
@@ -147,6 +147,7 @@ export function coreApps(launch: Record<string, () => void>): AppShortcut[] {
     { id: "files", name: "Files", icon: "folder", sub: "Explorer", launch: launch["files"]! },
     { id: "terminal", name: "Terminal", icon: "terminal", sub: "CheerpX", launch: launch["terminal"]! },
     { id: "editor", name: "Text Editor", icon: "editor", sub: "Notes", launch: launch["editor"]! },
+    { id: "store", name: "App Store", icon: "store", sub: "Get apps", launch: launch["store"]! },
     ...IFRAME_APPS.map((def) => ({
       id: def.id,
       name: def.name,

@@ -50,40 +50,66 @@ export interface IframeAppDef {
    * worker, file by file.
    */
   fs?: { entry: string; isolated: boolean; dir: string };
+  /** Extensions this app opens, e.g. ["nes"]. Set from user-apps.json. */
+  opens?: string[];
   /** Put the iframe behind a sandbox (no allow-same-origin). */
   sandbox?: boolean;
 }
 
 export const IFRAME_APPS: IframeAppDef[] = appsJson as IframeAppDef[];
 
-/** Add apps discovered in the filesystem (called once per boot). */
+/** Ids that came from the filesystem registry the last time it was read. */
+let fsAppIds = new Set<string>();
+
+/**
+ * Replace the filesystem half of the app list — called at boot and again
+ * after the App Store installs or removes something, so the desktop, the
+ * start menu and the file-type menus all see the new set.
+ */
 export function registerFsApps(defs: IframeAppDef[]): void {
   for (const def of defs) {
     const at = IFRAME_APPS.findIndex((a) => a.id === def.id);
     if (at >= 0) IFRAME_APPS[at] = def;
     else IFRAME_APPS.push(def);
   }
+  const keep = new Set(defs.map((d) => d.id));
+  for (const id of fsAppIds) {
+    if (keep.has(id)) continue;
+    const at = IFRAME_APPS.findIndex((a) => a.id === id);
+    if (at >= 0) IFRAME_APPS.splice(at, 1);
+  }
+  fsAppIds = keep;
+}
+
+/** Register a one-off app (an .html file run through the App Launcher). */
+export function registerTransientApp(def: IframeAppDef): void {
+  const at = IFRAME_APPS.findIndex((a) => a.id === def.id);
+  if (at >= 0) IFRAME_APPS[at] = def;
+  else IFRAME_APPS.push(def);
 }
 
 /** The URL an app is served from; null if it would be cross-origin. */
-export function resolveAppUrl(def: IframeAppDef): string | null {
+export function resolveAppUrl(def: IframeAppDef, filePath?: string): string | null {
   const base = new URL(import.meta.env.BASE_URL, window.location.origin);
   if (def.fs) {
     /* Real path, real origin: relative <script src>, imports, fetch() and
-       wasm inside the app all resolve normally. */
-    return new URL(`9pf/${def.id}/${def.fs.entry}`, base).href;
+       wasm inside the app all resolve normally. `?file=` tells an app which
+       document the user asked it to open (see apps/registry.ts). */
+    const url = new URL(`9pf/${def.id}/${def.fs.entry}`, base);
+    if (filePath) url.searchParams.set("file", filePath);
+    return url.href;
   }
   if (!def.url) return null;
   const resolved = new URL(def.url, base);
   return resolved.origin === window.location.origin ? resolved.href : null;
 }
 
-export function openIframeApp(win: Win, def: IframeAppDef): void {
+export function openIframeApp(win: Win, def: IframeAppDef, filePath?: string): void {
   const root = el("div", "app-root");
   const status = el("div", "app-statusbar");
-  status.textContent = def.status ?? def.name;
+  status.textContent = filePath ? `${fileName(filePath)} — ${def.name}` : (def.status ?? def.name);
 
-  const url = resolveAppUrl(def);
+  const url = resolveAppUrl(def, filePath);
   if (!url) {
     const err = el(
       "div",
@@ -114,4 +140,8 @@ export function openIframeApp(win: Win, def: IframeAppDef): void {
 
   root.append(frame, status);
   win.el.append(root);
+}
+
+function fileName(path: string): string {
+  return path.slice(path.lastIndexOf("/") + 1);
 }

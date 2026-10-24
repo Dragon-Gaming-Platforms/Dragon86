@@ -44,6 +44,7 @@ Each file is `{ "apps": [ … ] }` (or a bare array). One entry:
       "icon": "browser",
       "entry": "index.html",
       "folder-isolated": true,
+      "opens": ["txt"],              // file types it can open (optional)
       "width": 520, "height": 420
     }
 
@@ -55,7 +56,67 @@ opaque-origin (sandboxed) frame is not controlled by a service worker, so
 its own files would not be served at all.
 
 A demo app (`hello`: a clock that fetches `data.json` next to itself) is
-created on first boot so the whole loop is visible immediately.
+created on first boot so the whole loop is visible immediately, and the NES
+emulator ships alongside it.
+
+### Default apps and "Open with"
+
+`opens` in an app's registry entry (or in the App Store listing it came from)
+declares the file types it handles: `["nes"]`, `[".nes", "*.zip"]`. On boot
+every such app may ask — once — to become the default for its types, in a
+corner card with **Set as default** / **Not now**. The answer, and the list of
+which apps have already asked, live next to the registry:
+
+    ~/system/default-apps.json
+    { "defaults": { "nes": "nes" }, "asked": { "nes": "nes" } }
+
+Right-clicking a file in Files or on the desktop offers **Open with ›** with
+the current default marked `(default)`. The built-ins have no app folder, so
+they are named for what they are: **Text Editor**, and **System** — the
+built-in viewer that shows a picture, a page, a PDF or a hex dump. An `.html`
+file that is not itself an installed app also offers **App Launcher**, which
+runs that one page through the same `9pf/` route an app uses, for as long as
+its window is open; nothing is added to `user-apps.json`.
+
+### The App Store
+
+`public/store.json` is the catalog. The App Store (`~/system/apps`'s front
+door, hardcoded into the OS) reads it, shows the apps, and installs one by
+fetching each file it lists and writing it to `~/system/apps/<id>/` — then
+adds the entry to `user-apps.json`. An installed app is therefore an ordinary
+folder: editable in Files, visible to the v86 guest at `/system/apps/<id>`,
+and removable from the store or by hand.
+
+    {
+      "apps": [{
+        "id": "snake", "name": "Snake", "icon": "games",
+        "base": "system-apps/snake/",        // relative to store.json, or absolute
+        "entry": "index.html",
+        "files": ["index.html", "app.js", "index.json"],
+        "opens": ["nes"],                     // optional, see above
+        "description": "…", "rating": 4.4, "size": "6 KB"
+      }]
+    }
+
+Settings → Apps → *Catalog* points the store at a different `store.json`
+(any URL or path). Nothing is fetched until you press Install, and the store
+cannot write outside `~/system/apps`.
+
+### The trash
+
+Deleting means moving to `~/trash`, and the bin is the one place with a lock:
+opening it asks for a passphrase you set the first time (stored as a SHA-256
+hash in localStorage, never in the filesystem, so the guest cannot read it).
+Restore and *Delete permanently* live in the trash's own context menu. The
+bin is emptied every time Dragon86 is opened — the tab is the session.
+
+### The desktop
+
+Icons are laid out on a grid and can be dragged anywhere: the drop snaps to
+the nearest free cell and the arrangement is remembered per device
+(`localStorage: dragon86.desktop.layout`). Icons carry no frame until they are
+highlighted; left-dragging on empty wallpaper draws a selection box, and
+right-clicking it offers *Tidy up icons* to reset the layout.
 
 ### Service worker: on only when the engine needs isolation
 
@@ -99,7 +160,11 @@ count); Settings → **v86 filesystem** can re-unpack it if it is ever damaged.
 ## What's in the box
 
 - **Window manager** — draggable, resizable, focusable windows with taskbar integration
-- **Files** — browse/create/rename/delete on a virtual hard drive (ZenFS → IndexedDB)
+- **Desktop** — drag-and-drop icon grid, marquee selection, right-click menus
+- **Files** — browse/create/rename/trash on a virtual hard drive (ZenFS → IndexedDB), with "Open with" per file type
+- **App Store** — installs apps from `store.json` straight into `system/apps/`
+- **Settings** — pages with a sidebar and a search box (appearance, apps, trash, engines, storage, about)
+- **System viewer** — the built-in opener for anything no app claims: image, page, PDF, audio/video, or a hex dump
 - **Text Editor** — open & edit any text file, `Ctrl+S` saves
 - **Terminal** — xterm.js front end, waiting for the **CheerpX** engine (message-bridge protocol v1 is wired)
 - **Scramjet** — web proxy (vendored at `/scramjet/`; traffic via a configurable Wisp server), a JSON-defined iframe app
@@ -137,6 +202,19 @@ The OS embeds the hoster as a **hidden iframe** and talks to it over a versioned
 - The shared "Linux" folder will be a `dir` mount backed by the same storage CheerpX sees — files written in the terminal show up in the Files app, without shelling out to `ls`.
 
 ## Develop
+
+    npm install
+    npm run dev          # the OS at http://localhost:5173/Dragon86/
+    npm run build        # typecheck + the unit checks + the Pages bundle
+    npm run test:ui      # boots the whole OS headlessly (jsdom) and clicks it
+
+`npm run test:ui` bundles `src/main.ts` as one script, loads it into a
+simulated page with IndexedDB, a stubbed service worker and a static file
+server, then drives the UI: drag an icon, open a context menu, install an app
+from the store, trash a file and unlock the bin. It is not a substitute for
+looking at it, but it catches the failures that are otherwise invisible until
+they throw.
+
 
 ```sh
 npm install

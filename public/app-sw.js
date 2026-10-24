@@ -60,6 +60,10 @@ async function serve(rest, search) {
   const slash = path.indexOf("/");
   const appId = slash === -1 ? path : path.slice(0, slash);
   let sub = slash === -1 ? "" : path.slice(slash + 1);
+  /* `/9pf/@open/<encoded absolute path>` — one file from the OS filesystem,
+     not from an app folder. The App Launcher and the built-in viewer use it
+     to show a page that is not an installed app. */
+  const isFile = appId === "@open";
   if (sub === "" || sub.endsWith("/")) sub += "index.html";
   if (!appId) return text(404, "Filesystem app: no app id in " + rest);
 
@@ -73,7 +77,9 @@ async function serve(rest, search) {
     );
   }
 
-  const answer = await ask(client, { appId, path: sub, search });
+  const answer = isFile
+    ? await ask(client, { file: sub })
+    : await ask(client, { appId, path: sub, search });
   if (!answer) return text(504, "Dragon86 did not answer in time (" + appId + "/" + sub + ")");
   if (!answer.ok) return text(answer.status || 404, answer.error || `${appId}/${sub} not found`);
   return new Response(answer.body, {

@@ -34,7 +34,7 @@
 import { fs } from "@zenfs/core";
 import * as vfs from "./vfs";
 import { logInfo, logWarn } from "./log";
-import { registerFsApps, type IframeAppDef } from "../apps/iframe-app";
+import { registerFsApps, registerTransientApp, type IframeAppDef } from "../apps/iframe-app";
 
 /** Where the OS looks for app registries, in order (first one wins per id). */
 export const APPS_DIRS = [`${vfs.HOME}/system/apps`];
@@ -52,6 +52,8 @@ interface RawApp {
   height?: unknown;
   folder?: unknown;
   "folder-isolated"?: unknown;
+  /** Extensions this app can open: ["nes"], [".nes", "*.zip"], "nes". */
+  opens?: unknown;
 }
 
 interface LoadedApp {
@@ -62,6 +64,79 @@ interface LoadedApp {
 }
 
 const loaded = new Map<string, LoadedApp>();
+/** Apps registered for one open window only (the App Launcher). */
+const transient = new Map<string, LoadedApp>();
+const appListeners = new Set<() => void>();
+
+export interface FsAppSummary {
+  id: string;
+  name: string;
+  sub: string;
+  icon: string;
+  dir: string;
+  opens: string[];
+}
+
+/** "NES", ".nes", "*.nes" → "nes". */
+export function normExt(raw: string): string {
+  return raw.trim().toLowerCase().replace(/^\*?\./, "");
+}
+
+function parseOpens(raw: unknown): string[] {
+  const list = Array.isArray(raw) ? raw : typeof raw === "string" ? raw.split(/[\s,]+/) : [];
+  const out: string[] = [];
+  for (const item of list) {
+    if (typeof item !== "string") continue;
+    const ext = normExt(item);
+    if (ext && /^[a-z0-9_+-]+$/.test(ext) && !out.includes(ext)) out.push(ext);
+  }
+  return out;
+}
+
+/** Every installed filesystem app, in registry order. */
+export function getFsApps(): FsAppSummary[] {
+  return [...loaded.values()].map((a) => ({
+    id: a.def.id,
+    name: a.def.name,
+    sub: a.def.sub ?? "",
+    icon: a.def.icon,
+    dir: a.dir,
+    opens: a.def.opens ?? [],
+  }));
+}
+
+/** Installed apps that open `ext` (all apps that open anything, if omitted). */
+export function fsAppsWithOpens(ext?: string): FsAppSummary[] {
+  const all = getFsApps();
+  if (ext === undefined) return all.filter((a) => a.opens.length > 0);
+  return all.filter((a) => a.opens.includes(ext));
+}
+
+export function getFsApp(id: string): FsAppSummary | null {
+  return getFsApps().find((a) => a.id === id) ?? null;
+}
+
+/** Listen for installs, removals and edits (desktop, start menu, Settings). */
+export function onFsAppsChange(fn: () => void): () => void {
+  appListeners.add(fn);
+  return () => appListeners.delete(fn);
+}
+
+function emitAppsChange(): void {
+  for (const fn of appListeners) {
+    try {
+      fn();
+    } catch (err) {
+      logWarn("os", "an apps-change listener threw", err);
+    }
+  }
+}
+
+/** Read the registry again (after an install, an uninstall, or a manual edit). */
+export async function reloadFsApps(): Promise<void> {
+  await loadFsApps();
+  emitAppsChange();
+}
 
 const ID_RE = /^[a-z0-9][a-z0-9._-]*$/i;
 
@@ -125,7 +200,7 @@ async function readRegistries(dir: string): Promise<{ file: string; apps: RawApp
 /* ---------- the demo app, created once ---------- */
 
 /** The one manifest the OS owns a share of; user edits win after seeding. */
-const BUILTIN_VERSION = 1;
+const BUILTIN_VERSION = 2;
 
 /** Apps that ship in public/system-apps/ and get copied into the FS. */
 const BUILTIN_APPS = ["nes"] as const;
@@ -145,9 +220,10 @@ const BUILTIN_ENTRIES: Record<string, RawApp> = {
     id: "nes",
     name: "NES",
     sub: "Emulator · test ROM",
-    icon: "browser",
+    icon: "games",
     entry: "index.html",
     "folder-isolated": true,
+    opens: ["nes"],
     width: 560,
     height: 620,
   },
@@ -265,8 +341,17 @@ async function seedApps(): Promise<void> {
 
   const apps: RawApp[] = Array.isArray(parsed.apps) ? parsed.apps : [];
   for (const [id, entry] of Object.entries(BUILTIN_ENTRIES)) {
-    if (apps.some((a) => a && (a as RawApp).id === id)) continue;
-    apps.push(entry);
+    const at = apps.findIndex((a) => a && (a as RawApp).id === id);
+    if (at === -1) {
+      apps.push(entry);
+      continue;
+    }
+    /* An entry installed by an older build lacks the fields added since
+       (the file types an app opens). Fill those in without touching anything
+       the user changed. */
+    const existing = apps[at] as RawApp;
+    if (!existing.opens && entry.opens) existing.opens = entry.opens;
+    if (!existing.icon && entry.icon) existing.icon = entry.icon;
   }
   await vfs.writeText(manifest, JSON.stringify({ seeded: BUILTIN_VERSION, apps }, null, 2));
 }
@@ -298,6 +383,7 @@ function toDef(raw: RawApp, dir: string): { def: IframeAppDef; isolated: boolean
     width: num(raw.width),
     height: num(raw.height),
     fs: { entry, isolated, dir: `${dir}/${folder}` },
+    opens: parseOpens(raw.opens),
     /* NOT sandboxed, deliberately. A sandboxed iframe without
        allow-same-origin has an opaque origin, and a service worker does not
        control opaque-origin documents — the app's own <script src="app.js">
@@ -377,6 +463,29 @@ const MIME: Record<string, string> = {
   webm: "video/webm",
 };
 
+/** Read one file anywhere under the OS home — the App Launcher's route. */
+async function readHomeFile(rawPath: string): Promise<ReadResult> {
+  let path = rawPath;
+  try {
+    path = decodeURIComponent(rawPath);
+  } catch {
+    /* keep it */
+  }
+  if (!path.startsWith("/")) path = `/${path}`;
+  if (!within(path, vfs.HOME) && !within(path, "/tmp")) {
+    return { ok: false, status: 403, error: `"${path}" is outside your home folder` };
+  }
+  try {
+    const st = await fs.promises.stat(path);
+    if (st.isDirectory()) return { ok: false, status: 404, error: `${path} is a directory` };
+    const bytes = await vfs.readBytes(path);
+    const copy = bytes.slice();
+    return { ok: true, mime: mimeFor(path), body: copy.buffer as ArrayBuffer };
+  } catch {
+    return { ok: false, status: 404, error: `not found: ${path}` };
+  }
+}
+
 export function mimeFor(path: string): string {
   const ext = path.slice(path.lastIndexOf(".") + 1).toLowerCase();
   return MIME[ext] ?? "application/octet-stream";
@@ -410,7 +519,7 @@ interface ReadResult {
 }
 
 async function readAppFile(appId: string, rel: string): Promise<ReadResult> {
-  const app = loaded.get(appId);
+  const app = loaded.get(appId) ?? transient.get(appId);
   if (!app) return { ok: false, status: 404, error: `no filesystem app called "${appId}"` };
 
   const path = resolvePath(app.dir, rel);
@@ -436,6 +545,76 @@ async function readAppFile(appId: string, rel: string): Promise<ReadResult> {
   }
 }
 
+/**
+ * Run a stray file as an app, for as long as its window is open.
+ *
+ * It is served through the same worker path as a real app
+ * (`9pf/<synthetic-id>/<file>`) because that is the only way a browser hands
+ * a page real URLs for its scripts, styles and images. Nothing is written to
+ * user-apps.json: it is not installed, it is just running.
+ */
+export function registerAdHocApp(path: string): IframeAppDef | null {
+  const dir = vfs.parentOf(path);
+  const entry = vfs.baseName(path);
+  if (!dir.startsWith(vfs.HOME)) return null;
+  const id = `d86-run-${dir.replace(/[^a-zA-Z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "root"}-${entry.replace(/[^a-zA-Z0-9.]+/g, "-")}`;
+  const def: IframeAppDef = {
+    id,
+    name: entry,
+    sub: "Opened as an app",
+    icon: "browser",
+    status: `${entry}: run as an app from ${dir}`,
+    fs: { entry, isolated: true, dir },
+    opens: [],
+    sandbox: false,
+  };
+  transient.set(id, { def, dir, isolated: true });
+  registerTransientApp(def);
+  return def;
+}
+
+/** Route prefix for "any file in your home", as a URL. */
+export const OPEN_PREFIX = "@open/";
+
+/** A real URL for any file in the home directory. */
+export function fileUrl(path: string): string {
+  return `${BASE}9pf/${OPEN_PREFIX}${encodeURIComponent(path)}`;
+}
+
+/* ---------- the manifest, for the App Store ---------- */
+
+const MANIFEST = `${APPS_DIRS[0]}/user-apps.json`;
+
+async function readManifest(): Promise<{ seeded?: number; apps: RawApp[] }> {
+  try {
+    const parsed = JSON.parse(await vfs.readText(MANIFEST)) as { seeded?: number; apps?: RawApp[] };
+    return { seeded: parsed.seeded, apps: Array.isArray(parsed.apps) ? parsed.apps : [] };
+  } catch {
+    return { apps: [] };
+  }
+}
+
+/** Add or replace one entry in user-apps.json (the App Store's install step). */
+export async function upsertAppEntry(entry: RawApp & { id: string }): Promise<void> {
+  const manifest = await readManifest();
+  const at = manifest.apps.findIndex((a) => a && (a as RawApp).id === entry.id);
+  if (at >= 0) manifest.apps[at] = entry;
+  else manifest.apps.push(entry);
+  await vfs.writeText(
+    MANIFEST,
+    JSON.stringify({ seeded: manifest.seeded ?? BUILTIN_VERSION, apps: manifest.apps }, null, 2),
+  );
+}
+
+export async function removeAppEntry(id: string): Promise<void> {
+  const manifest = await readManifest();
+  const apps = manifest.apps.filter((a) => a && (a as RawApp).id !== id);
+  await vfs.writeText(
+    MANIFEST,
+    JSON.stringify({ seeded: manifest.seeded ?? BUILTIN_VERSION, apps }, null, 2),
+  );
+}
+
 /** Answer the service worker's file requests. Call once, at boot. */
 export function startFsAppBridge(): void {
   if (!("serviceWorker" in navigator)) {
@@ -444,13 +623,24 @@ export function startFsAppBridge(): void {
   }
 
   navigator.serviceWorker.addEventListener("message", (event: MessageEvent) => {
-    const data = event.data as { type?: string; appId?: string; path?: string } | null;
+    const data = event.data as {
+      type?: string;
+      appId?: string;
+      path?: string;
+      file?: string;
+    } | null;
     if (!data || data.type !== "d86-fs-read") return;
     const port = event.ports?.[0];
     const reply = (msg: ReadResult) => {
       if (port) port.postMessage(msg);
       else navigator.serviceWorker.controller?.postMessage(msg);
     };
+    if (data.appId === OPEN_PREFIX.slice(0, -1) || data.file) {
+      void readHomeFile(String(data.file ?? data.path ?? "")).then(reply, () =>
+        reply({ ok: false, status: 500, error: "the OS could not read that file" }),
+      );
+      return;
+    }
     void readAppFile(String(data.appId ?? ""), String(data.path ?? "index.html")).then(reply, () =>
       reply({ ok: false, status: 500, error: "the OS could not read that file" }),
     );

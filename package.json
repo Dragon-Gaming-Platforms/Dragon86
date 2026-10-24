@@ -3,11 +3,12 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "description": "Dragon86 — a web OS by Dragon Gaming Platforms",
+  "description": "Dragon86 \u2014 a web OS by Dragon Gaming Platforms",
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && node tools/check-css-vars.mjs && node tools/test-coi-deregister.mjs && node tools/test-app-sw.mjs && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test:ui": "vite build --config tools/ui-smoke/vite.config.ts && node tools/ui-smoke/run.mjs"
   },
   "dependencies": {
     "@xterm/addon-fit": "^0.11.0",
@@ -19,6 +20,8 @@
   },
   "devDependencies": {
     "typescript": "^5.9.3",
-    "vite": "^8.3.4"
+    "vite": "^8.3.4",
+    "jsdom": "^30.1.3",
+    "fake-indexeddb": "^6.2.2"
   }
 }

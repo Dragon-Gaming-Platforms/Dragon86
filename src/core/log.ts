@@ -7,7 +7,7 @@
  * handshake, not a firehose.
  */
 
-export type LogScope = "bridge" | "terminal" | "os" | "v86" | "guest" | "union";
+export type LogScope = "bridge" | "terminal" | "os" | "v86" | "guest" | "union" | "store";
 
 function fmt(scope: LogScope, msg: string): string {
   return `[D86:${scope}] ${msg}`;
