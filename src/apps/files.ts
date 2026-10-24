@@ -40,15 +40,15 @@ export function openFiles(win: Win, startPath: string, handlers: FilesHandlers):
 
   /* toolbar */
   const toolbar = el("div", "app-toolbar");
-  const backBtn = toolButton("back", "");
-  const fwdBtn = toolButton("forward", "");
-  const upBtn = toolButton("up", "");
+  const backBtn = toolButton("back", "", "Back");
+  const fwdBtn = toolButton("forward", "", "Forward");
+  const upBtn = toolButton("up", "", "Up one folder");
   const pathInput = el("input", "input fm-path-input");
   pathInput.spellcheck = false;
   pathInput.title = "Path — press Enter to go there";
-  const newFolderBtn = toolButton("plus", "");
-  const newFileBtn = toolButton("text", "");
-  const refreshBtn = toolButton("refresh", "");
+  const newFolderBtn = toolButton("plus", "", "New Folder");
+  const newFileBtn = toolButton("text", "", "New File");
+  const refreshBtn = toolButton("refresh", "", "Refresh");
   toolbar.append(backBtn, fwdBtn, upBtn, pathInput, newFolderBtn, newFileBtn, refreshBtn);
 
   /* body */
@@ -64,10 +64,13 @@ export function openFiles(win: Win, startPath: string, handlers: FilesHandlers):
   root.append(toolbar, body, status);
   win.el.append(root);
 
-  function toolButton(ic: string, label: string): HTMLButtonElement {
+  function toolButton(ic: string, label: string, title: string): HTMLButtonElement {
     const b = el("button", "tool-btn");
     b.innerHTML = icon(ic).innerHTML;
     if (label) b.append(` ${label}`);
+    /* Icon-only buttons need a tooltip — otherwise they are a guessing game. */
+    b.title = title;
+    b.setAttribute("aria-label", title);
     return b;
   }
 

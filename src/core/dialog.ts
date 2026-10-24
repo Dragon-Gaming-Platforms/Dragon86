@@ -38,7 +38,12 @@ export function showInput(title: string, message: string, initial = ""): Promise
   });
 }
 
-export function showConfirm(title: string, message: string, danger = false): Promise<boolean> {
+export function showConfirm(
+  title: string,
+  message: string,
+  danger = false,
+  okLabel?: string,
+): Promise<boolean> {
   return new Promise((resolve) => {
     const backdrop = el("div", "dlg-backdrop");
     const dlg = el("div", "dlg");
@@ -46,7 +51,11 @@ export function showConfirm(title: string, message: string, danger = false): Pro
     const p = el("p", undefined, message);
     const actions = el("div", "dlg-actions");
     const cancel = el("button", "btn", "Cancel");
-    const ok = el("button", `btn ${danger ? "danger" : ""}`.trim(), danger ? "Delete" : "OK");
+    const ok = el(
+      "button",
+      `btn ${danger ? "danger" : ""}`.trim(),
+      okLabel ?? (danger ? "Delete" : "OK"),
+    );
 
     const done = (v: boolean) => {
       backdrop.remove();

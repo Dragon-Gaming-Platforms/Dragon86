@@ -183,6 +183,29 @@ export async function setDefault(ext: string, openerId: string | null): Promise<
   logInfo("os", `default for .${ext} is now ${openerId ?? "(built-in)"}`);
 }
 
+/**
+ * Drop every default choice that points at `appId` — called when an app is
+ * uninstalled, so the type falls back to something that still exists instead
+ * of to a name nothing answers to. Returns the extensions that were reset.
+ */
+export async function clearDefaultsForApp(appId: string): Promise<string[]> {
+  await loadDefaults();
+  const cleared: string[] = [];
+  for (const [ext, id] of Object.entries(store.defaults ?? {})) {
+    if (id !== appId) continue;
+    delete store.defaults![ext];
+    cleared.push(ext);
+  }
+  for (const [ext, id] of Object.entries(store.asked ?? {})) {
+    if (id === appId) delete store.asked![ext];
+  }
+  if (cleared.length) {
+    await save();
+    logInfo("os", `default app for ${cleared.map((e) => `.${e}`).join(", ")} reset (app removed)`);
+  }
+  return cleared;
+}
+
 /** Forget every "already asked" note, so apps may ask again. */
 export async function resetAsked(): Promise<void> {
   await loadDefaults();

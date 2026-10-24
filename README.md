@@ -102,6 +102,16 @@ Settings → Apps → *Catalog* points the store at a different `store.json`
 (any URL or path). Nothing is fetched until you press Install, and the store
 cannot write outside `~/system/apps`.
 
+Installed apps get **Open** and **Uninstall** buttons, in the cards, the
+featured panel and the detail page. Uninstall is a real delete, not a trip to
+the trash: it removes `~/system/apps/<id>/` and takes the entry out of
+`user-apps.json`, so nothing is left pointing at files that no longer exist.
+Any default-app choice that pointed at the app is reset at the same time,
+which means the file type falls back to something that still opens it. The
+**Installed** tab re-reads the disk every time you open it, so apps added by
+hand (a folder dropped in with Files, or an app copied in from inside the
+guest) are listed — and can be uninstalled — the same way.
+
 ### The trash
 
 Deleting means moving to `~/trash`, and the bin is the one place with a lock:

@@ -333,6 +333,105 @@ const runFrame = [...document.querySelectorAll(".d86-window iframe")].find((f) =
 );
 check("App Launcher runs the page through the app route", Boolean(runFrame), String(runFrame?.getAttribute("src")));
 
+/* ---- App Store: installed apps get an explicit Uninstall button ---- */
+const storeWin = [...document.querySelectorAll(".d86-window")].find((w) => w.querySelector(".store-body"));
+check("store window still open", Boolean(storeWin));
+[...storeWin.querySelectorAll(".store-tab")]
+  .find((b) => b.textContent.includes("Installed"))
+  ?.click();
+await wait(400);
+const instCards = [...storeWin.querySelectorAll(".store-card")];
+const snakeCard2 = instCards.find((n) => n.textContent.includes("Snake"));
+check("installed tab lists the app", Boolean(snakeCard2));
+const actionLabels = [...(snakeCard2?.querySelectorAll(".store-actions .btn") ?? [])].map((b) =>
+  b.textContent.trim(),
+);
+check("installed app has an Uninstall button", actionLabels.includes("Uninstall"), actionLabels.join(" | "));
+check("installed app has an Open button", actionLabels.includes("Open"), actionLabels.join(" | "));
+
+/* Open actually launches it. */
+[...snakeCard2.querySelectorAll(".store-actions .btn")]
+  .find((b) => b.textContent.trim() === "Open")
+  .dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+await wait(300);
+check(
+  "Open launches the app from the store",
+  [...document.querySelectorAll(".d86-window iframe")].some((f) => String(f.getAttribute("src")).includes("9pf/snake")),
+);
+
+/* Uninstall: confirm, then the folder and the entry are both gone. */
+[...snakeCard2.querySelectorAll(".store-actions .btn")]
+  .find((b) => b.textContent.trim() === "Uninstall")
+  .dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+await wait(300);
+const confirmDlg = document.querySelector(".dlg");
+check("uninstall asks first", Boolean(confirmDlg));
+check(
+  "the confirmation says it is permanent",
+  /not moved to the trash/i.test(confirmDlg?.textContent ?? ""),
+  confirmDlg?.textContent?.slice(0, 160),
+);
+[...confirmDlg.querySelectorAll(".dlg-actions .btn")]
+  .find((b) => b.textContent.trim() === "Uninstall")
+  ?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+await wait(600);
+check(
+  "uninstalled app leaves the desktop",
+  ![...document.querySelectorAll(".desktop-icon")].some((n) => n.textContent.includes("Snake")),
+);
+[...storeWin.querySelectorAll(".store-tab")]
+  .find((b) => b.textContent.includes("Installed"))
+  ?.click();
+await wait(400);
+check(
+  "uninstalled app is gone from the Installed tab",
+  ![...storeWin.querySelectorAll(".store-card")].some((n) => n.textContent.includes("Snake")),
+);
+const snakeFolderGone = await (async () => {
+  /* The folder must be gone, not merely unregistered: ask the Files app to
+     list ~/system/apps and look for it. */
+  const filesWindow = [...document.querySelectorAll(".d86-window")].find((w) => w.querySelector(".fm-root"));
+  const pathInput = filesWindow.querySelector(".fm-path-input");
+  pathInput.value = "/home/user/system/apps";
+  pathInput.dispatchEvent(new window.KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+  await wait(400);
+  return ![...filesWindow.querySelectorAll(".fm-row")].some((r) => r.textContent.includes("snake"));
+})();
+check("the app folder is deleted (not trashed)", snakeFolderGone);
+
+/* ---- an app installed by hand (a folder, no catalog entry) can be removed
+        from the store too ---- */
+const filesWin2 = [...document.querySelectorAll(".d86-window")].find((w) => w.querySelector(".fm-root"));
+const newFolder = [...filesWin2.querySelectorAll(".tool-btn")].find((b) => b.title === "New Folder");
+newFolder.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+await wait(200);
+document.querySelector(".dlg input").value = "handmade";
+[...document.querySelectorAll(".dlg-actions .btn")].find((b) => b.textContent === "OK")?.click();
+await wait(400);
+const handmadeRow = [...filesWin2.querySelectorAll(".fm-row")].find((r) => r.textContent.includes("handmade"));
+check("hand-made app folder created", Boolean(handmadeRow));
+handmadeRow.dispatchEvent(new window.MouseEvent("dblclick", { bubbles: true }));
+await wait(300);
+[...filesWin2.querySelectorAll(".tool-btn")]
+  .find((b) => b.title === "New File")
+  .dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+await wait(200);
+document.querySelector(".dlg input").value = "index.html";
+[...document.querySelectorAll(".dlg-actions .btn")].find((b) => b.textContent === "OK")?.click();
+await wait(400);
+[...storeWin.querySelectorAll(".store-tab")]
+  .find((b) => b.textContent.includes("Installed"))
+  ?.click();
+await wait(500);
+const handmadeCard = [...storeWin.querySelectorAll(".store-card")].find((n) => /Handmade/i.test(n.textContent));
+check("Apps installed by hand appear in the store", Boolean(handmadeCard));
+check(
+  "…and can be uninstalled from here",
+  [...(handmadeCard?.querySelectorAll(".store-actions .btn") ?? [])].some(
+    (b) => b.textContent.trim() === "Uninstall",
+  ),
+);
+
 /* ---- Settings → Apps lists what is installed ---- */
 settingsIcon.dispatchEvent(new window.MouseEvent("dblclick", { bubbles: true }));
 await wait(300);
@@ -343,9 +442,16 @@ const settingsWindow = [...document.querySelectorAll(".d86-window")].find((w) =>
   .find((b) => b.textContent.includes("Apps"))
   ?.click();
 await wait(300);
+const listedApps = [...settingsWindow.querySelectorAll(".app-list-row")].map((r) => r.textContent);
 check(
   "Settings lists installed apps",
-  [...settingsWindow.querySelectorAll(".app-list-row")].some((r) => r.textContent.includes("Snake")),
+  listedApps.some((t) => t.includes("NES")),
+  listedApps.join(" | ").slice(0, 160),
+);
+check(
+  "the uninstalled app is gone from Settings too",
+  !listedApps.some((t) => t.includes("Snake")),
+  listedApps.join(" | ").slice(0, 160),
 );
 check(
   "Settings shows claimed file types",

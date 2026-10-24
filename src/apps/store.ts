@@ -19,7 +19,7 @@ import { logInfo, logWarn } from "../core/log";
 import { getSettings } from "../core/settings";
 import { notify } from "../core/toast";
 import { showConfirm } from "../core/dialog";
-import { requestDefaults } from "../core/filetypes";
+import { clearDefaultsForApp, requestDefaults } from "../core/filetypes";
 import { refreshDesktops } from "../core/desktop";
 import {
   APPS_DIRS,
@@ -54,6 +54,8 @@ interface StoreApp {
   description?: string;
   highlights?: string[];
   screenshots?: string[];
+  /** True for an app found on disk that the catalog does not list. */
+  local?: boolean;
 }
 
 interface Catalog {
@@ -101,6 +103,8 @@ export function openStore(win: Win): void {
   let query = "";
   let catalog: Catalog | null = null;
   let loadError = "";
+  /** Apps found on disk that the catalog does not mention (installed by hand). */
+  let localApps: StoreApp[] = [];
   /** id → done/total while an install is running. */
   const progress = new Map<string, { done: number; total: number }>();
   const installedIds = new Set<string>();
@@ -133,15 +137,64 @@ export function openStore(win: Win): void {
     render();
   }
 
+  /**
+   * Work out what is actually installed, from the two places that can know:
+   * the registry (user-apps.json) and the disk itself. An app can be in
+   * either without the other — a folder dropped in with Files has no entry,
+   * and an entry can outlive its folder — and the Installed tab has to be
+   * honest about both, because that list is what you can uninstall from.
+   */
   async function refreshInstalled(): Promise<void> {
     installedIds.clear();
-    for (const app of getFsApps()) installedIds.add(app.id);
-    /* An app can also be installed by hand (a folder dropped in Files): count
-       it as installed if its folder and entry exist, without a registry entry. */
+    localApps = [];
+    const byId = new Map(getFsApps().map((a) => [a.id, a]));
+
+    for (const app of byId.values()) installedIds.add(app.id);
     for (const app of catalog?.apps ?? []) {
-      const dir = `${APPS_DIRS[0]}/${app.id}`;
-      if (await vfs.exists(`${dir}/${app.entry ?? "index.html"}`)) installedIds.add(app.id);
+      if (await vfs.exists(`${APPS_DIRS[0]}/${app.id}/${app.entry ?? "index.html"}`)) {
+        installedIds.add(app.id);
+      }
     }
+
+    /* Folders with no catalog listing and no registry entry. */
+    const known = new Set((catalog?.apps ?? []).map((a) => a.id));
+    let names: vfs.Entry[] = [];
+    try {
+      names = await vfs.listDir(APPS_DIRS[0]);
+    } catch {
+      names = [];
+    }
+    for (const entry of names) {
+      if (!entry.isDirectory || known.has(entry.name)) continue;
+      const registered = byId.get(entry.name);
+      const hasEntry = await vfs.exists(`${entry.path}/index.html`);
+      if (!registered && !hasEntry) continue;
+      installedIds.add(entry.name);
+      if (registered) continue; /* the catalog card covers it */
+      localApps.push({
+        id: entry.name,
+        name: prettyName(entry.name),
+        sub: "Installed on this device",
+        category: "Installed",
+        publisher: "Local",
+        icon: "grid",
+        entry: "index.html",
+        description:
+          "This folder was added to system/apps directly rather than installed from the catalog, so the store knows nothing else about it. Uninstalling removes the folder and any registry entry that points at it.",
+        local: true,
+      });
+    }
+  }
+
+  function prettyName(id: string): string {
+    return id
+      .replace(/[-_]+/g, " ")
+      .replace(/\b\w/g, (c) => c.toUpperCase());
+  }
+
+  /** Catalog apps plus anything found only on disk. */
+  function allApps(): StoreApp[] {
+    return [...(catalog?.apps ?? []), ...localApps];
   }
 
   /* ---------- rendering ---------- */
@@ -160,7 +213,11 @@ export function openStore(win: Win): void {
         tab = t.id;
         query = "";
         searchInput.value = "";
-        render();
+        /* The Installed list is a *disk* question, and the disk can change
+           while this window is open (an install, a folder dropped in with
+           Files). Re-scan before showing it. */
+        if (t.id === "installed") void refreshInstalled().then(render);
+        else render();
       });
       side.append(b);
     }
@@ -170,7 +227,7 @@ export function openStore(win: Win): void {
   }
 
   function visibleApps(): StoreApp[] {
-    const apps = catalog?.apps ?? [];
+    const apps = allApps();
     const q = query.trim().toLowerCase();
     return apps.filter((app) => {
       if (tab === "installed" && !installedIds.has(app.id)) return false;
@@ -261,7 +318,7 @@ export function openStore(win: Win): void {
       el("p", undefined, app.description ?? app.sub ?? ""),
     );
     const actions = el("div", "store-feature-actions");
-    actions.append(installButton(app, true));
+    actions.append(appActions(app, true));
     box.append(left, icon(app.icon ?? "store", "store-feature-icon"));
     box.append(actions);
     box.addEventListener("dblclick", () => openDetail(app));
@@ -283,7 +340,7 @@ export function openStore(win: Win): void {
     node.append(meta);
 
     const foot = el("div", "store-card-foot");
-    foot.append(installButton(app, false));
+    foot.append(appActions(app, false));
     node.append(foot);
 
     node.addEventListener("click", (e) => {
@@ -302,28 +359,51 @@ export function openStore(win: Win): void {
     return wrap;
   }
 
-  function installButton(app: StoreApp, large: boolean): HTMLButtonElement {
+  /**
+   * The install / open / uninstall controls for one app.
+   *
+   * Installed apps always get two buttons — "Open" and "Uninstall" — because
+   * a single button that changes meaning ("Installed" that actually deletes
+   * things) is a trap. Uninstalling is permanent: the folder is deleted, not
+   * trashed, and the entry is taken out of user-apps.json.
+   */
+  function appActions(app: StoreApp, large: boolean): HTMLElement {
+    const wrap = el("div", `store-actions ${large ? "lg" : "sm"}`.trim());
     const state = progress.get(app.id);
     const installed = installedIds.has(app.id);
-    const btn = el("button", `btn ${large ? "" : "sm"} ${installed ? "ghost" : "primary"}`.trim());
+    const size = large ? "" : "sm";
+
     if (state) {
-      btn.textContent = `Installing… ${state.done}/${state.total}`;
-      btn.disabled = true;
-    } else if (installed) {
-      btn.textContent = "Installed";
-      btn.title = "Click to remove it and its files";
-      btn.addEventListener("click", (e) => {
+      const busy = el("button", `btn ${size}`.trim(), `Installing… ${state.done}/${state.total}`);
+      busy.disabled = true;
+      wrap.append(busy);
+      return wrap;
+    }
+
+    if (installed) {
+      const openBtn = el("button", `btn ${size} ghost`.trim(), "Open");
+      openBtn.title = `Open ${app.name}`;
+      openBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        window.dispatchEvent(new CustomEvent("d86-launch-app", { detail: app.id }));
+      });
+      const removeBtn = el("button", `btn ${size} danger`.trim(), "Uninstall");
+      removeBtn.title = `Delete ~/system/apps/${app.id}/ and its registry entry`;
+      removeBtn.addEventListener("click", (e) => {
         e.stopPropagation();
         void uninstall(app);
       });
-    } else {
-      btn.textContent = "Install";
-      btn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        void install(app);
-      });
+      wrap.append(openBtn, removeBtn);
+      return wrap;
     }
-    return btn;
+
+    const btn = el("button", `btn ${size} primary`.trim(), "Install");
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      void install(app);
+    });
+    wrap.append(btn);
+    return wrap;
   }
 
   /* ---------- the detail page ---------- */
@@ -347,7 +427,7 @@ export function openStore(win: Win): void {
     if (app.downloads) meta.append(el("span", "store-dot", "·"), el("span", undefined, `${app.downloads} downloads`));
     if (app.size) meta.append(el("span", "store-dot", "·"), el("span", undefined, app.size));
     info.append(meta);
-    head.append(info, installButton(app, true));
+    head.append(info, appActions(app, true));
     content.append(head);
 
     const facts = el("div", "store-facts");
@@ -460,23 +540,55 @@ export function openStore(win: Win): void {
     }
   }
 
+  /**
+   * Uninstall: a real delete, not a trip to the trash.
+   *
+   * Both halves have to go — the folder under ~/system/apps and the entry in
+   * user-apps.json — or the app comes back as a broken icon. Any "default
+   * app" choice that pointed at it is cleared too, so double-clicking that
+   * file type afterwards falls back to something that exists.
+   */
   async function uninstall(app: StoreApp): Promise<void> {
+    const dir = `${APPS_DIRS[0]}/${app.id}`;
     const ok = await showConfirm(
-      "Remove app",
-      `Remove ${app.name}? Its folder system/apps/${app.id}/ and all its files are deleted.`,
+      "Uninstall app",
+      `Uninstall ${app.name}? This deletes ${dir.replace(vfs.HOME, "~")}/ and removes its entry from user-apps.json. It is not moved to the trash, so it cannot be undone.`,
       true,
+      "Uninstall",
     );
     if (!ok) return;
+
+    const hadFolder = await vfs.exists(dir);
     try {
-      await vfs.removePath(`${APPS_DIRS[0]}/${app.id}`);
-    } catch {
-      /* already gone — the registry entry still has to go */
+      await vfs.removePath(dir);
+    } catch (err) {
+      logWarn("store", `could not delete ${dir}`, err);
+      notify({
+        title: `${app.name} could not be removed`,
+        body: `${dir.replace(vfs.HOME, "~")}/ is still on disk. Close any window running it and try again.`,
+        icon: "info",
+        timeout: 0,
+      });
+      return;
     }
     await removeAppEntry(app.id);
+    const cleared = await clearDefaultsForApp(app.id);
     await reloadFsApps();
     await refreshInstalled();
     refreshDesktops();
-    notify({ title: `${app.name} removed`, icon: "trash", timeout: 5000 });
+
+    logInfo("store", `uninstalled ${app.id}${hadFolder ? "" : " (folder was already gone)"}`);
+    notify({
+      title: `${app.name} uninstalled`,
+      body: [
+        "Its folder and its entry are gone.",
+        cleared.length ? `Default app for ${cleared.map((e) => `.${e}`).join(", ")} reset.` : "",
+      ]
+        .filter(Boolean)
+        .join(" "),
+      icon: "trash",
+      timeout: 6000,
+    });
     render();
   }
 
