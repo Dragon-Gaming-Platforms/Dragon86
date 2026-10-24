@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+<title>Snake</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: #0b0c0e; color: #eef1f4;
+    font: 15px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif;
+    display: flex; flex-direction: column; align-items: center;
+    gap: 10px; padding: 14px; user-select: none;
+    -webkit-user-select: none; touch-action: none;
+  }
+  header { width: 100%; display: flex; align-items: baseline; justify-content: space-between; }
+  h1 { font-size: 15px; letter-spacing: 3px; text-transform: uppercase; margin: 0; color: #ff4d5a; }
+  #score { font-variant-numeric: tabular-nums; color: #9aa4ae; font-size: 13px; }
+  canvas { background: #111318; border: 1px solid #23262d; border-radius: 6px; width: 100%; height: auto; max-width: 400px; image-rendering: pixelated; }
+  footer { display: flex; align-items: center; gap: 10px; width: 100%; max-width: 400px; }
+  button {
+    flex: 1; padding: 11px 12px; border-radius: 6px; cursor: pointer;
+    border: 1px solid #33373f; background: #171a20; color: #eef1f4;
+    font: 600 13px/1 system-ui, sans-serif; letter-spacing: 1px; text-transform: uppercase;
+  }
+  button:hover { border-color: #ff4d5a; }
+  #msg { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; }
+  #msg span { background: rgba(0,0,0,.75); border: 1px solid #33373f; padding: 10px 16px; border-radius: 6px; font-size: 13px; }
+  #msg[hidden] { display: none; }
+</style>
+</head>
+<body>
+  <header>
+    <h1>Snake</h1>
+    <div id="score">Score 0 · Best 0</div>
+  </header>
+  <div style="position: relative; width: 100%; max-width: 400px">
+    <canvas id="board" width="400" height="400" aria-label="Snake board"></canvas>
+    <div id="msg"><span>Arrows, WASD or swipe to start</span></div>
+  </div>
+  <footer>
+    <button id="restart">Restart</button>
+    <button id="speed">Speed: normal</button>
+  </footer>
+  <script src="./app.js"></script>
+</body>
+</html>

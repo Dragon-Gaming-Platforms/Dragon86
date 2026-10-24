@@ -7,11 +7,13 @@ import "./styles/os.css";
 import { applySettings } from "./core/settings";
 import { initVfs } from "./core/vfs";
 import { WindowManager } from "./core/wm";
-import { buildDesktop } from "./core/desktop";
+import { buildDesktop, refreshDesktops } from "./core/desktop";
 import { buildTaskbar, coreApps } from "./core/taskbar";
 import { createLauncher } from "./apps/registry";
 import { isolationReport, logInfo, logWarn } from "./core/log";
-import { loadFsApps, startFsAppBridge } from "./core/fs-apps";
+import { loadFsApps, onFsAppsChange, startFsAppBridge } from "./core/fs-apps";
+import { loadDefaults, requestDefaults } from "./core/filetypes";
+import { initTrash } from "./core/trash";
 
 async function boot(): Promise<void> {
   /* Isolation is what lets the embedded CheerpX hoster get
@@ -44,8 +46,11 @@ async function boot(): Promise<void> {
      service worker has to be live before any app window asks for a file. */
   await step(60, "Loading filesystem apps…", async () => {
     await loadFsApps();
+    await loadDefaults();
     startFsAppBridge();
   });
+  /* Deleting means "put it in the trash", and the trash is emptied at boot. */
+  await step(68, "Emptying the trash…", () => initTrash());
   await step(75, "Starting window manager…");
 
   /* build the shell */
@@ -53,12 +58,20 @@ async function boot(): Promise<void> {
   const wm = new WindowManager(wmHost);
   const launcher = createLauncher(wm);
 
-  const apps = coreApps(launcher.launch);
-  buildTaskbar(wm, apps);
-  buildDesktop(apps, {
+  /* The app list is a function, not a snapshot: installing something in the
+     App Store has to show up on the desktop and in the start menu without a
+     reload. */
+  const appsNow = () => coreApps(launcher.launch);
+  buildTaskbar(wm, appsNow);
+  buildDesktop(appsNow, {
     openApp: (id) => launcher.launch[id]?.(),
     openFile: (p) => launcher.openFile(p),
     openFolder: (p) => launcher.openFolder(p),
+    openWith: (p, id) => launcher.openWith(p, id),
+  });
+
+  onFsAppsChange(() => {
+    void launcher.refreshApps().then(() => refreshDesktops());
   });
 
   await step(100, "Welcome to Dragon86.");
@@ -68,6 +81,10 @@ async function boot(): Promise<void> {
   bootEl.classList.add("fade-out");
   document.getElementById("os")!.hidden = false;
   setTimeout(() => bootEl.remove(), 550);
+
+  /* Installed apps get to ask to become the default opener for their file
+     types — once each, in a corner card, after the desktop is visible. */
+  setTimeout(() => void requestDefaults(), 1200);
 }
 
 void boot();

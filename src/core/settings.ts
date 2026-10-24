@@ -33,6 +33,13 @@ export interface Settings {
    * driver and ask for a lease (that is what /networking.sh does).
    */
   v86Network: string;
+  /** Desktop icon size — the tile grid follows it. */
+  iconSize: "small" | "medium" | "large";
+  /**
+   * Where the App Store reads its catalog from. Empty = the store.json that
+   * ships next to the OS. Anything else can be a full URL or a path.
+   */
+  storeUrl: string;
 }
 
 const KEY = "dragon86.settings";
@@ -75,6 +82,8 @@ const DEFAULTS: Settings = {
      guest behaves the way it does there. Rate-limited and shared — set your
      own wisp/wsproxy URL in Settings for regular use. */
   v86Network: "wss://relay.widgetry.org/",
+  iconSize: "medium",
+  storeUrl: "",
 };
 
 let current: Settings = load();
