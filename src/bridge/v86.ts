@@ -84,6 +84,20 @@ async function idbGet(key: string): Promise<unknown> {
   });
 }
 
+async function idbDelete(key: string): Promise<void> {
+  const db = await stateDb();
+  return new Promise((resolve, reject) => {
+    const req = db.transaction("kv", "readwrite").objectStore("kv").delete(key);
+    req.onsuccess = () => resolve();
+    req.onerror = () => reject(req.error);
+  });
+}
+
+/** Forget the snapshot (used when the guest root it belongs to was re-unpacked). */
+async function clearSavedState(): Promise<void> {
+  await idbDelete(STATE_KEY);
+}
+
 async function idbPut(key: string, value: unknown): Promise<void> {
   const db = await stateDb();
   return new Promise((resolve, reject) => {
@@ -234,7 +248,8 @@ class V86Backend implements TerminalBackend {
     this.startTimer = null;
     try {
       const wantSaved = !this.freshBoot;
-      const [V86, saved] = await Promise.all([loadLib(), wantSaved ? loadSavedState() : Promise.resolve(null)]);
+      const [V86, loaded] = await Promise.all([loadLib(), wantSaved ? loadSavedState() : Promise.resolve(null)]);
+      let saved = loaded;
       if (this.disposed) return;
       /* Fresh boots get ACPI (see below). A restored snapshot must keep the
          layout it was created with — v86's state format embeds it. */
@@ -283,6 +298,17 @@ class V86Backend implements TerminalBackend {
          they are unpacked/copied in on first boot. */
       const guestRoot = await ensureGuestRoot(root, { status: (t) => this.status(t) });
       if (this.disposed) return;
+      /* A snapshot belongs to one particular root: it holds the guest's
+         inodes (modes, qids) for files that were re-unpacked underneath it.
+         Resuming into a freshly seeded root gives "permission denied" on
+         files that look fine, so throw the snapshot away instead. */
+      if (saved && !guestRoot.reused) {
+        logInfo("v86", "the guest root was re-unpacked; discarding the saved state");
+        await clearSavedState().catch(() => {});
+        saved = null;
+        this.acpiEnabled = true;
+        opts.acpi = true;
+      }
       this.status(
         guestRoot.reused
           ? "booting the distro from your filesystem (~/v86)"

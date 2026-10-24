@@ -123,8 +123,14 @@ EOS
   echo ""
   # Hand over to the distro. chroot (not switch_root) because a 9p mount
   # cannot be MS_MOVE'd; the kernel filesystems came along by bind mount.
+  #
+  # The launcher is handed to bash *as an argument*, never executed directly:
+  # the kernel refuses to exec a file without the execute bit, and on a 9p
+  # share the mode is whatever the host backend ended up storing (ZenFS's
+  # chmod can be a no-op on some backends). Passing it to bash means the
+  # hand-over cannot fail on permissions alone.
   while true; do
-    chroot /newroot /.dragon86-shell
+    chroot /newroot /usr/bin/bash /.dragon86-shell
     echo ""
     echo "  Session ended. Respawning in 2s (Ctrl-C leaves you here) ..."
     sleep 2
