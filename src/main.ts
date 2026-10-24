@@ -11,6 +11,7 @@ import { buildDesktop } from "./core/desktop";
 import { buildTaskbar, coreApps } from "./core/taskbar";
 import { createLauncher } from "./apps/registry";
 import { isolationReport, logInfo, logWarn } from "./core/log";
+import { loadFsApps, startFsAppBridge } from "./core/fs-apps";
 
 async function boot(): Promise<void> {
   /* Isolation is what lets the embedded CheerpX hoster get
@@ -38,6 +39,13 @@ async function boot(): Promise<void> {
 
   await step(15, "Loading theme…", () => applySettings());
   await step(45, "Mounting virtual filesystem…", () => initVfs());
+  /* Filesystem apps have to be known before the launcher is built (the
+     start menu and desktop get their entries from the registry), and the
+     service worker has to be live before any app window asks for a file. */
+  await step(60, "Loading filesystem apps…", async () => {
+    await loadFsApps();
+    startFsAppBridge();
+  });
   await step(75, "Starting window manager…");
 
   /* build the shell */

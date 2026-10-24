@@ -28,8 +28,35 @@
        waitUntil so its unregister + reload chain cannot be cut short).
     Page-half registration logic is otherwise unmodified upstream. */
 
+
+/* ------------------------------------------------------------------------
+   Dragon86: MASTER SWITCH for the cross-origin-isolation half of this file.
+   ------------------------------------------------------------------------
+   Isolation is only needed while the CheerpX engine runs embedded: the
+   hoster iframe wants SharedArrayBuffer, which a document only gets when it
+   is cross-origin isolated, and GitHub Pages cannot send COOP/COEP, so this
+   worker stamps them onto our document responses.
+
+   A browser allows ONE service worker per scope, and the filesystem-app
+   server (public/app-sw.js) now needs that scope — so this half is switched
+   OFF here rather than fought over. While it is off this file does nothing:
+   no registration, no header stamping, no deregistration, and no asset cache
+   (the cache lives in this same worker and is deliberately NOT merged into
+   app-sw.js yet). Flip the flag back to true to restore the old behaviour,
+   cache included, at the cost of filesystem apps.
+
+   Read from window/self so a test — or a future Settings toggle — can turn
+   it on without editing this file. */
+const D86_COI = (typeof window !== 'undefined')
+    ? window.D86_COI === true
+    : (typeof self !== 'undefined' && self.D86_COI === true);
+
 let coepCredentialless = false;
 if (typeof window === 'undefined') {
+  if (!D86_COI) {
+    /* Filesystem apps own this scope: the worker must exist but do nothing. */
+    self.addEventListener("install", () => self.skipWaiting());
+  } else {
     self.addEventListener("install", () => self.skipWaiting());
     self.addEventListener("activate", (event) => event.waitUntil((async () => {
         // Dragon86: drop asset caches from older worker versions so a
@@ -160,9 +187,15 @@ if (typeof window === 'undefined') {
                 .catch((e) => console.error(e))
         );
     });
-
+  }
 } else {
-    (() => {
+    if (!D86_COI) {
+        /* COI page half off (D86_COI=false): no registration, no reload, no
+           deregistration — public/app-sw.js owns the service worker scope. */
+        if (window.console) {
+            console.log("Dragon86: COI half disabled (D86_COI=false) — app-sw.js owns the service worker scope.");
+        }
+    } else (() => {
         const reloadedBySelf = window.sessionStorage.getItem("coiReloadedBySelf");
         window.sessionStorage.removeItem("coiReloadedBySelf");
         const coepDegrading = (reloadedBySelf == "coepdegrade");

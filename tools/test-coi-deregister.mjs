@@ -25,7 +25,7 @@ const SRC = readFileSync(
   "utf8",
 );
 
-function run({ shouldDeregister, controller = null, regs = [], unregisterFails = false, crossOriginIsolated = false, session = new Map() }) {
+function run({ shouldDeregister, controller = null, regs = [], unregisterFails = false, crossOriginIsolated = false, session = new Map(), coiEnabled = true }) {
   const calls = { unregister: 0, reload: 0, register: 0, postMessage: [], navigations: 0, logs: [] };
   const registrations = regs.map(() => ({
     active: { scriptURL: "https://x/Dragon86/coi-serviceworker.js" },
@@ -53,6 +53,9 @@ function run({ shouldDeregister, controller = null, regs = [], unregisterFails =
       },
       crossOriginIsolated,
       isSecureContext: true,
+      /* public/coi-serviceworker.js reads this master switch; the tests opt
+         in so they exercise the logic even though the shipped default is off. */
+      D86_COI: coiEnabled,
       document: doc,
       coi: {
         shouldRegister: () => !shouldDeregister,
@@ -121,6 +124,19 @@ const check = (name, cond, detail = "") => results.push({ name, ok: !!cond, deta
   check("embedded mode leaves the worker alone", calls.unregister === 0, `unregister=${calls.unregister}`);
   check("embedded mode still tells the worker the COEP mode",
     calls.postMessage.some((m) => m.type === "coepCredentialless"), JSON.stringify(calls.postMessage));
+}
+
+/* 6. shipped default: the COI half is off, so the worker must stay inert —
+   no registration, no unregistration, no reload — because app-sw.js owns the
+   scope now. */
+{
+  const { calls } = await run({ shouldDeregister: false, coiEnabled: false, regs: [{}], controller: {} });
+  check("COI disabled: never registers", calls.register === 0, `register=${calls.register}`);
+  check("COI disabled: never unregisters", calls.unregister === 0, `unregister=${calls.unregister}`);
+  check("COI disabled: never reloads", calls.reload === 0, `reload=${calls.reload}`);
+  const tab = await run({ shouldDeregister: true, coiEnabled: false, regs: [{}], controller: {}, crossOriginIsolated: true });
+  check("COI disabled: v86 mode leaves other workers alone", tab.calls.unregister === 0, `unregister=${tab.calls.unregister}`);
+  check("COI disabled: v86 mode does not reload", tab.calls.reload === 0, `reload=${tab.calls.reload}`);
 }
 
 for (const r of results) console.log(`[${r.ok ? "PASS" : "FAIL"}] ${r.name}${r.detail ? "  (" + r.detail + ")" : ""}`);
