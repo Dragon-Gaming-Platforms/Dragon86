@@ -13,22 +13,42 @@
     font: 15px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif;
     display: flex; flex-direction: column; align-items: center;
     gap: 10px; padding: 14px; user-select: none;
-    -webkit-user-select: none; touch-action: none;
+    -webkit-user-select: none; touch-action: none; overflow: hidden;
   }
-  header { width: 100%; display: flex; align-items: baseline; justify-content: space-between; }
+  header { width: 100%; max-width: 400px; display: flex; align-items: baseline; justify-content: space-between; }
   h1 { font-size: 15px; letter-spacing: 3px; text-transform: uppercase; margin: 0; color: #ff4d5a; }
   #score { font-variant-numeric: tabular-nums; color: #9aa4ae; font-size: 13px; }
-  canvas { background: #111318; border: 1px solid #23262d; border-radius: 6px; width: 100%; height: auto; max-width: 400px; image-rendering: pixelated; }
-  footer { display: flex; align-items: center; gap: 10px; width: 100%; max-width: 400px; }
+  .board-wrap { position: relative; width: 100%; max-width: 400px; flex: 0 0 auto; }
+  canvas {
+    display: block; width: 100%; height: auto; aspect-ratio: 1 / 1;
+    background: #111318; border: 1px solid #23262d; border-radius: 6px;
+    touch-action: none;
+  }
+  /* The overlay is the only thing that can start the game, and clicking it is
+     what gives this frame keyboard focus — so it is both the instruction and
+     the fix for "the arrow keys do nothing". */
+  #overlay {
+    position: absolute; inset: 0; display: grid; place-items: center;
+    background: rgba(8, 9, 11, 0.72); border-radius: 6px; text-align: center;
+    padding: 16px; cursor: pointer;
+  }
+  #overlay[hidden] { display: none; }
+  #overlay .card { display: flex; flex-direction: column; gap: 6px; align-items: center; }
+  #overlay strong { font-size: 15px; letter-spacing: 1px; color: #fff; }
+  #overlay span { font-size: 12px; color: #9aa4ae; max-width: 24ch; line-height: 1.5; }
+  #overlay .hint {
+    margin-top: 8px; font-size: 11px; letter-spacing: 1.4px; text-transform: uppercase;
+    color: #ff8b93; border: 1px solid #ff4d5a55; border-radius: 20px; padding: 6px 12px;
+  }
+  footer { display: flex; align-items: center; gap: 8px; width: 100%; max-width: 400px; }
   button {
-    flex: 1; padding: 11px 12px; border-radius: 6px; cursor: pointer;
+    flex: 1; padding: 11px 10px; border-radius: 6px; cursor: pointer;
     border: 1px solid #33373f; background: #171a20; color: #eef1f4;
-    font: 600 13px/1 system-ui, sans-serif; letter-spacing: 1px; text-transform: uppercase;
+    font: 600 12px/1 system-ui, sans-serif; letter-spacing: 1px; text-transform: uppercase;
+    white-space: nowrap;
   }
   button:hover { border-color: #ff4d5a; }
-  #msg { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; }
-  #msg span { background: rgba(0,0,0,.75); border: 1px solid #33373f; padding: 10px 16px; border-radius: 6px; font-size: 13px; }
-  #msg[hidden] { display: none; }
+  button:focus-visible { outline: 2px solid #ff4d5a; outline-offset: 2px; }
 </style>
 </head>
 <body>
@@ -36,14 +56,24 @@
     <h1>Snake</h1>
     <div id="score">Score 0 · Best 0</div>
   </header>
-  <div style="position: relative; width: 100%; max-width: 400px">
+
+  <div class="board-wrap">
     <canvas id="board" width="400" height="400" aria-label="Snake board"></canvas>
-    <div id="msg"><span>Arrows, WASD or swipe to start</span></div>
+    <div id="overlay">
+      <div class="card">
+        <strong id="ov-title">Snake</strong>
+        <span id="ov-text">Arrows, WASD or a swipe to steer.</span>
+        <div class="hint" id="ov-action">Tap to start</div>
+      </div>
+    </div>
   </div>
+
   <footer>
     <button id="restart">Restart</button>
+    <button id="pause">Pause</button>
     <button id="speed">Speed: normal</button>
   </footer>
+
   <script src="./app.js"></script>
 </body>
 </html>
