@@ -244,12 +244,18 @@ export function openTerminal(win: Win): void {
       term.writeln(`${DIM}Starting the v86 compatibility engine (Arch userland, in-page).${RESET}`);
       term.writeln(`${DIM}Its whole root filesystem is ~/v86 in your Files — edit anything there and the guest sees it.${RESET}`);
       term.writeln(`${DIM}First boot unpacks the distro into your filesystem once; after that it just boots.${RESET}`);
-      term.writeln(`${DIM}Guest /shared is your Files folder (v86/shared is where guest changes land).${RESET}`);
+      term.writeln(
+        `${DIM}/Documents, /Downloads and /Desktop in the guest are the ones in your Files — same folders, both ways.${RESET}`,
+      );
       if (freshBoot) {
         term.writeln(`${DIM}Reconnect: fresh boot from the guest image — saved state is not loaded.${RESET}`);
       }
       term.writeln(`${DIM}No cross-origin isolation needed — this is the WebView-friendly engine.${RESET}`);
       term.writeln(`${DIM}Network is emulated by v86; in the guest run /networking.sh to bring the card up.${RESET}`);
+      /* A snapshot can only be resumed safely within the session that took
+         it: it remembers the guest's open files, and those are handles in a
+         9p server that no longer exists after a reload. Resuming one was
+         "Session ended" forever, so a new page always cold-boots. */
       const vb = getV86Backend({
         onData: (data) => term.write(filterOutput(data)),
         onNotice: (text) => term.writeln(`${DIM}[v86] ${text}${RESET}`),
@@ -323,6 +329,23 @@ export function openTerminal(win: Win): void {
 
   reconnectBtn.addEventListener("click", () => void connect(true));
   openTabBtn.addEventListener("click", () => backend?.openTab?.());
+
+  /* Closing the window must shut the engine down. Without this the machine
+     kept running invisibly: reopening the Terminal started a *second* emulator
+     beside the first one, both writing to the same ZenFS root, and the guest's
+     shell died on boot ("Session ended … Respawning in 2s"). */
+  win.setOnClose(() => {
+    offSettings?.();
+    offSettings = null;
+    ro.disconnect();
+    backend?.dispose();
+    backend = null;
+    try {
+      term.dispose();
+    } catch {
+      /* already gone */
+    }
+  });
 
   term.onData((data) => backend?.write(data));
   term.onResize(({ cols, rows }) => backend?.resize(cols, rows));

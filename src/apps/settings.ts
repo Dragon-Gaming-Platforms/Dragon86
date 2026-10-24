@@ -125,7 +125,7 @@ export function openSettings(win: Win): void {
       mode === "tab"
         ? "Saved. Reloading — cross-origin isolation will be turned OFF for Dragon86 (the engine tab isolates itself). The Terminal will talk to the engine tab directly; no terminal UI appears over there."
         : mode === "v86"
-          ? "Saved. Reloading — cross-origin isolation will be turned OFF for Dragon86 (v86 doesn't need it). The Terminal will boot a tiny Linux right here in the page; your Files folder shows up in it as /shared."
+          ? "Saved. Reloading — cross-origin isolation will be turned OFF for Dragon86 (v86 doesn't need it). The Terminal will boot a small Linux right here in the page; the guest's whole disk is ~/v86 in your Files, and /Documents, /Downloads and /Desktop are your own folders."
           : "Saved. Reloading — cross-origin isolation will be turned ON for Dragon86 so the embedded engine can run…";
     /* Isolation is decided when the document loads, so applying a mode
        change IS a reload. Leaving isolation needs the worker gone BEFORE
@@ -151,7 +151,7 @@ export function openSettings(win: Win): void {
   const modeNote = el(
     "div",
     "settings-note",
-    "Embedded: CheerpX engine hidden inside Dragon86 (default; needs isolation ON for this page). Separate tab: the engine opens as its own browser tab with no terminal UI in it — the Dragon86 Terminal still renders everything — and Dragon86 isolation turns OFF, leaving this page unrestricted for other apps. v86 (compatibility): a tiny Linux that runs right in this page with no isolation at all — the pick for Android WebView and locked-down browsers where the other two can't run; your Files folder is its /shared folder, synced both ways. Switching reloads the page.",
+    "Embedded: CheerpX engine hidden inside Dragon86 (default; needs isolation ON for this page). Separate tab: the engine opens as its own browser tab with no terminal UI in it — the Dragon86 Terminal still renders everything — and Dragon86 isolation turns OFF, leaving this page unrestricted for other apps. v86 (compatibility): a tiny Linux that runs right in this page with no isolation at all — the pick for Android WebView and locked-down browsers where the other two can't run; the guest's whole disk is ~/v86 in your Files, and its /Documents, /Downloads and /Desktop are your own folders. Switching reloads the page.",
   );
   engineSection.append(modeRow, modeNote);
 
@@ -236,7 +236,7 @@ export function openSettings(win: Win): void {
       "The v86 guest does not use a disk image: its whole root filesystem is ~/v86 in your Files, " +
         "unpacked there from the vendored kernel and initramfs, and shared with the emulator over 9p. " +
         "So /bin/bash, /etc/profile and everything else are ordinary files you can open and edit — " +
-        "and /shared inside the guest is your Files folder.",
+        "and /Documents, /Downloads and /Desktop inside the guest are your own folders.",
     ),
   );
 

@@ -3,14 +3,12 @@
  *
  * The registry is plain JSON inside the filesystem itself:
  *
- *     <engine>/shared/system/apps/*.json     ← what the OS reads
- *     /shared/system/apps/*.json             ← the same files, inside the guest
+ *     ~/system/apps/*.json        ← what the OS reads
+ *     /system/apps/*.json         ← the same files, inside the v86 guest
  *
- * (the v86 guest's `/shared` *is* the OS home, so `~/v86/shared/system/…`
- * is what root sees as `/shared/system/…` — edit the JSON from either side
- * and the launcher follows.) A second location, `~/system/apps`, is read too
- * so an app dropped in through the Files app works without the engine ever
- * having booted.
+ * The guest's `/` is the OS home's engine folder, and `~/system` is grafted
+ * into it at `/system`, so an app you add from the emulated machine shows up
+ * in the launcher, and one you add in Files shows up in the guest.
  *
  * Each file is either `{ "apps": [ … ] }` or a bare `[ … ]`; every entry:
  *
@@ -39,10 +37,7 @@ import { logInfo, logWarn } from "./log";
 import { registerFsApps, type IframeAppDef } from "../apps/iframe-app";
 
 /** Where the OS looks for app registries, in order (first one wins per id). */
-export const APPS_DIRS = [
-  `${vfs.ENGINE_ROOT.v86}/shared/system/apps`,
-  `${vfs.HOME}/system/apps`,
-];
+export const APPS_DIRS = [`${vfs.HOME}/system/apps`];
 
 const BASE = import.meta.env.BASE_URL;
 
@@ -129,21 +124,34 @@ async function readRegistries(dir: string): Promise<{ file: string; apps: RawApp
 
 /* ---------- the demo app, created once ---------- */
 
-const DEMO_MANIFEST = `{
-  "apps": [
-    {
-      "id": "hello",
-      "name": "Hello",
-      "sub": "Filesystem app",
-      "icon": "browser",
-      "entry": "index.html",
-      "folder-isolated": true,
-      "width": 520,
-      "height": 420
-    }
-  ]
-}
-`;
+/** The one manifest the OS owns a share of; user edits win after seeding. */
+const BUILTIN_VERSION = 1;
+
+/** Apps that ship in public/system-apps/ and get copied into the FS. */
+const BUILTIN_APPS = ["nes"] as const;
+
+const BUILTIN_ENTRIES: Record<string, RawApp> = {
+  hello: {
+    id: "hello",
+    name: "Hello",
+    sub: "Filesystem app",
+    icon: "browser",
+    entry: "index.html",
+    "folder-isolated": true,
+    width: 520,
+    height: 420,
+  },
+  nes: {
+    id: "nes",
+    name: "NES",
+    sub: "Emulator · test ROM",
+    icon: "browser",
+    entry: "index.html",
+    "folder-isolated": true,
+    width: 560,
+    height: 620,
+  },
+};
 
 const DEMO_HTML = `<!doctype html>
 <html lang="en">
@@ -167,7 +175,7 @@ const DEMO_HTML = `<!doctype html>
   <h1>Hello from your filesystem</h1>
   <div id="clock">--:--:--</div>
   <p id="fromfs">loading data.json…</p>
-  <p>These files live in <code>v86/shared/system/apps/hello/</code>.
+  <p>These files live in <code>system/apps/hello/</code>.
      Edit them in Files and reload this window.</p>
 </main>
 <script src="./app.js"></script>
@@ -200,22 +208,67 @@ const DEMO_DATA = JSON.stringify(
   2,
 );
 
-async function seedDemo(): Promise<void> {
+/** Write `text` only when the file is missing — never clobber an edit. */
+async function writeIfMissing(path: string, text: string): Promise<void> {
+  if (await exists(path)) return;
+  await vfs.writeText(path, text);
+}
+
+/** Copy one of the OS's bundled apps out of public/system-apps/<id>/. */
+async function seedBundledApp(id: string): Promise<void> {
+  const dir = `${APPS_DIRS[0]}/${id}`;
+  await vfs.ensureDir(dir);
+  let files: string[] = [];
+  try {
+    const res = await fetch(`${BASE}system-apps/${id}/index.json`);
+    if (res.ok) files = ((await res.json()) as { files?: string[] }).files ?? [];
+  } catch {
+    /* offline first run: the demo apps below still seed */
+  }
+  for (const name of files) {
+    const target = `${dir}/${name}`;
+    if (await exists(target)) continue;
+    try {
+      const res = await fetch(`${BASE}system-apps/${id}/${name}`);
+      if (!res.ok) continue;
+      await vfs.writeBytes(target, new Uint8Array(await res.arrayBuffer()));
+    } catch (err) {
+      logWarn("os", `filesystem apps: could not copy ${id}/${name}`, err);
+    }
+  }
+}
+
+/**
+ * Create the apps folder on a device that has never had one, and make sure
+ * `user-apps.json` mentions the bundled apps. The merge runs once per
+ * BUILTIN_VERSION: after that the file is the user's, so deleting an entry
+ * stays deleted.
+ */
+async function seedApps(): Promise<void> {
   const dir = APPS_DIRS[0];
   await vfs.ensureDir(dir);
+
+  await writeIfMissing(`${dir}/hello/index.html`, DEMO_HTML);
+  await writeIfMissing(`${dir}/hello/app.js`, DEMO_JS);
+  await writeIfMissing(`${dir}/hello/data.json`, DEMO_DATA);
+  for (const id of BUILTIN_APPS) await seedBundledApp(id);
+
   const manifest = `${dir}/user-apps.json`;
-  if (!(await exists(manifest))) await vfs.writeText(manifest, DEMO_MANIFEST);
-  const appDir = `${dir}/hello`;
-  await vfs.ensureDir(appDir);
-  const files: [string, string][] = [
-    ["index.html", DEMO_HTML],
-    ["app.js", DEMO_JS],
-    ["data.json", DEMO_DATA],
-  ];
-  for (const [name, body] of files) {
-    const path = `${appDir}/${name}`;
-    if (!(await exists(path))) await vfs.writeText(path, body);
+  let parsed: { seeded?: number; apps?: RawApp[] } = { apps: [] };
+  try {
+    if (await exists(manifest)) parsed = JSON.parse(await vfs.readText(manifest));
+  } catch (err) {
+    logWarn("os", `filesystem apps: ${manifest} is not valid JSON — leaving it alone`, err);
+    return;
   }
+  if ((parsed.seeded ?? 0) >= BUILTIN_VERSION) return;
+
+  const apps: RawApp[] = Array.isArray(parsed.apps) ? parsed.apps : [];
+  for (const [id, entry] of Object.entries(BUILTIN_ENTRIES)) {
+    if (apps.some((a) => a && (a as RawApp).id === id)) continue;
+    apps.push(entry);
+  }
+  await vfs.writeText(manifest, JSON.stringify({ seeded: BUILTIN_VERSION, apps }, null, 2));
 }
 
 /* ---------- loading ---------- */
@@ -259,7 +312,13 @@ function toDef(raw: RawApp, dir: string): { def: IframeAppDef; isolated: boolean
 /** Read every registry and hand the apps to the frame registry. */
 export async function loadFsApps(): Promise<IframeAppDef[]> {
   try {
-    await seedDemo();
+    const moved = await vfs.migrateLegacyShared();
+    if (moved) logInfo("os", `folded ${moved} files from the old v86/shared folder into your home`);
+  } catch (err) {
+    logWarn("os", "could not migrate the old v86/shared folder", err);
+  }
+  try {
+    await seedApps();
   } catch (err) {
     logWarn("os", "filesystem apps: could not create the apps folder", err);
   }

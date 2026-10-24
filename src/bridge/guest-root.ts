@@ -209,9 +209,8 @@ export async function ensureGuestRoot(
     if (files % 100 === 0) say(`unpacking the distro… ${files}/${rest.length}`);
   }
 
-  /* Things a 9p root needs that an initramfs never carried, plus the one
-     place the guest expects your Files: /shared. */
-  for (const dir of ["root", "tmp", "proc", "sys", "dev", "shared", "home", "mnt", "run"]) {
+  /* Things a 9p root needs that an initramfs never carried. */
+  for (const dir of ["root", "tmp", "proc", "sys", "dev", "home", "mnt", "run"]) {
     await ensureDir(`${root}/${dir}`);
   }
 

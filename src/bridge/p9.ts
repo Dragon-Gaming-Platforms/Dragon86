@@ -5,8 +5,8 @@
  * `filesystem.handle9p` hands us raw 9p frames from the guest kernel, and
  * every operation (walk/open/read/write/mkdir/unlink/rename…) is served
  * straight from ZenFS. The guest mounts it with
- * `mount -t 9p -o trans=virtio,version=9p2000.L host9p /shared`, so the
- * guest's /shared *is* /home/user — live, both ways, including creates,
+ * `mount -t 9p -o trans=virtio,version=9p2000.L host9p /newroot`, so the
+ * guest's `/` *is* ~/v86 — live, both ways, including creates,
  * deletes and renames. No boot-time push, no shell commands, no sync
  * events. (AnuraOS achieves the same shape with a forked v86 whose 9p
  * layer calls their host fs; this is the stock-upstream-v86 equivalent.)
@@ -496,7 +496,7 @@ export function createP9Handler(
   return (req, reply) => {
     if (!logged) {
       logged = true;
-      logInfo("v86", `9p share live: guest /shared ↔ ${root}`);
+      logInfo("v86", `9p share live: guest / ↔ ${root}`);
     }
     void handle(req).then(reply, () => reply(error(0xffff, EIO)));
   };

@@ -17,6 +17,8 @@ export interface WindowOpts {
 export interface Win {
   id: number;
   el: HTMLElement;
+  /** Run `fn` when the window is closed (engines use this to shut down). */
+  setOnClose(fn: () => void): void;
   setTitle(t: string): void;
   focus(): void;
   close(): void;
@@ -36,6 +38,7 @@ interface WinState {
   maximized: boolean;
   restore: { x: number; y: number; w: number; h: number } | null;
   zIndex: number;
+  closeHooks: Set<() => void>;
 }
 
 type WmListener = (states: { id: number; title: string; icon: string; minimized: boolean; focused: boolean }[]) => void;
@@ -134,6 +137,7 @@ export class WindowManager {
       restore: null,
       zIndex: ++this.zCounter,
       win: null as unknown as Win,
+      closeHooks: new Set<() => void>(),
     };
     frame.style.zIndex = String(state.zIndex);
 
@@ -146,6 +150,9 @@ export class WindowManager {
         this.emit();
       },
       focus: () => this.focus(id),
+      setOnClose: (fn: () => void) => {
+        state.closeHooks.add(fn);
+      },
       close: () => this.close(id),
       minimize: () => this.minimize(id),
       toggleMaximize: () => this.toggleMaximize(id),
@@ -299,6 +306,17 @@ export class WindowManager {
   close(id: number): void {
     const s = this.stateOf(id);
     if (!s) return;
+    /* Give the app a chance to shut down (a running emulator, a poller…)
+       before the DOM goes away — otherwise the window is gone but the
+       machine it was showing keeps running in the background. */
+    for (const fn of s.closeHooks) {
+      try {
+        fn();
+      } catch {
+        /* a broken hook must not block the close */
+      }
+    }
+    s.closeHooks.clear();
     s.frame.remove();
     this.states.delete(id);
     this.emit();
