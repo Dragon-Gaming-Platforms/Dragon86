@@ -122,12 +122,28 @@ run_session() {
   HOME=/root
   TERM=xterm-256color
   export HOME TERM
+  # Never depend on the executable bit of a file on the share: bash is
+  # invoked *by* the kernel's chroot helper, and it is a real ELF that the
+  # unpack gave 0755. The distro's own scripts are run through it, not
+  # exec'd, so a lost bit on one of those cannot lock anyone out.
   if [ -x /newroot/usr/bin/setsid ]; then
     chroot /newroot /usr/bin/setsid -c /usr/bin/bash -l </dev/ttyS0 >/dev/ttyS0 2>&1
   else
     chroot /newroot /usr/bin/bash -l </dev/ttyS0 >/dev/ttyS0 2>&1
   fi
 }
+
+if mount_root; then
+  # A distro unpacked by an older build can have lost its permission bits
+  # (a 9p write lands 0644, and a chmod during unpack that the backend
+  # dropped leaves it that way). Then bash exists but cannot be executed —
+  # exactly the "Permission denied" loop. Fix it here, through the mount we
+  # just made, and say plainly if it will not take.
+  if [ ! -x /newroot/usr/bin/bash ] && [ -f /newroot/usr/bin/bash ]; then
+    chmod 755 /newroot/usr/bin/bash 2>/dev/null
+    echo "  note: /usr/bin/bash was not executable; tried to fix its mode."
+  fi
+fi
 
 if mount_root && [ -x /newroot/usr/bin/bash ]; then
   clear 2>/dev/null

@@ -144,7 +144,11 @@ async function ensureArtifact(root: string, name: string, url: string): Promise<
     const data = new Uint8Array(await fs.promises.readFile(path));
     if (data.byteLength > 1024) return data;
   }
-  const res = await fetch(url);
+  /* `no-cache` = revalidate, not "don't cache": GitHub Pages answers 304
+     when nothing changed (cheap) and fresh bytes when the image was
+     rebuilt. Without this, a browser happily kept serving the previous
+     initrd aloud — which is how a fixed guest can look unfixed. */
+  const res = await fetch(url, { cache: "no-cache" });
   if (!res.ok) throw new Error(`${url}: HTTP ${res.status}`);
   const data = new Uint8Array(await res.arrayBuffer());
   await ensureDir(`${root}/boot`);
@@ -172,6 +176,7 @@ export async function ensureGuestRoot(
   const seeded = marker?.v === SEED_VERSION && marker.initrdBytes === initrd.byteLength;
   if (seeded && !opts.force && (await exists(`${root}/bin/bash`))) {
     logInfo("guest", `running the distro already in the OS filesystem (${marker?.files ?? "?"} files)`);
+    await repairModes(root);
     return { root, kernel, initrd, reused: true };
   }
 
@@ -244,6 +249,8 @@ export async function ensureGuestRoot(
     say(`warning: ${noMode} files lost their permission bits`);
   }
 
+  await repairModes(root);
+
   await fs.promises.writeFile(
     `${root}/${MARKER}`,
     JSON.stringify({ v: SEED_VERSION, at: Date.now(), initrdBytes: initrd.byteLength, files } satisfies Marker),
@@ -254,6 +261,30 @@ export async function ensureGuestRoot(
   );
   logInfo("guest", `guest root ready at ${root}: ${files} files, ${(bytes / 1048576).toFixed(1)} MB`);
   return { root, kernel, initrd, reused: false };
+}
+
+/**
+ * Make sure the few files the guest cannot boot without are executable.
+ *
+ * A file written through 9p starts life 0644, and an initramfs entry whose
+ * mode did not survive (a backend without chmod, an interrupted first
+ * unpack) leaves a distro that looks complete but answers every command with
+ * "Permission denied". Two stats per boot is a cheap price for not shipping
+ * a broken console; anything else that lost its bits is the guest's problem.
+ */
+async function repairModes(root: string): Promise<void> {
+  const must = [`${root}/usr/bin/bash`, `${root}/usr/bin/setsid`, `${root}/usr/bin/ls`];
+  for (const path of must) {
+    try {
+      const st = await fs.promises.stat(path);
+      if ((st.mode & 0o111) === 0) {
+        await fs.promises.chmod(path, (st.mode & 0o170000) | 0o755);
+        logInfo("guest", `${path} was not executable — fixed its mode`);
+      }
+    } catch {
+      /* not there; the unpack check handles that */
+    }
+  }
 }
 
 /** What the seeding left behind, for Settings. */
