@@ -19,16 +19,30 @@ Contents and provenance:
 - `git` (inside `initrd.gz`, not a separate file) — GNU Git 2.49.1,
   built by Dragon86 from the upstream `git/git` v2.49.1 source with
   `zig cc -target x86-linux-musl`, fully static, linked against zlib
-  1.3.1. Configured **without curl/OpenSSL/expat/gettext**, so it has no
-  HTTP or HTTPS transport at all: `git clone https://…` cannot work in
-  the guest, whatever the URL. (The guest does have a network — see
-  "Networking" below — it is the build of git that cannot use it.) Local
-  repositories, commits, branches, merges, tags, bundles and
-  `file://`/path remotes all work, because none of that touches the
-  network. GPL-2.0, see `LICENSE.git`.
+  1.3.1. Configured **without curl/OpenSSL/expat/gettext**; like every
+  git, it has no TLS inside the binary itself — its HTTP transports are
+  separate programs, and this one ships them (next bullet). Local
+  repositories, commits, branches, merges, tags, bundles, `file://`
+  remotes all work in the binary itself. GPL-2.0, see `LICENSE.git`.
   Added to the initrd with `tools/initrd-append.py`, which copies the
   existing archive through byte-for-byte and inserts new entries
   before the trailer.
+- `git-remote-http.gz` — git's HTTPS transport, built by Dragon86 for
+  this guest: `git-remote-http` (the `git-remote-https` name is a
+  symlink to it, which is how upstream ships it) from `git/git`
+  v2.49.1, linked against libcurl 8.11.1 with mbedTLS 3.6.2 and zlib
+  1.3.1, all static, `zig cc -target x86-linux-musl`. 4.3 MB stripped,
+  1.9 MB gzipped, written into the guest's `/usr/lib/git-core` at boot
+  (see `installGitTransport()` in `src/bridge/v86.ts`) because that is
+  the exec path this git was built with. Licences: git GPL-2.0
+  (`LICENSE.git`), curl MIT-like (`LICENSE.curl`), mbedTLS Apache-2.0
+  (`LICENSE.mbedtls`). `tools/build-git-remote-http.sh` is the whole
+  build, from source tarballs, no prebuilt binaries.
+- `ca-certificates.crt` — the Mozilla root store as shipped by Python's
+  `certifi` (MPL-2.0 for the bundle; the certificates belong to their
+  CAs). Installed at the guest's `/etc/ssl/certs/ca-certificates.crt`,
+  the path `git-remote-http` was compiled to trust, so a clone verifies
+  the server against the same roots a browser would.
 - `initrd.gz` — built by Dragon86 from the Arch mkinitcpio initramfs:
   its busybox (GPL-2.0) and the virtio/9p kernel modules, plus a
   userland subset extracted from the same Arch demo rootfs — **GNU
@@ -51,7 +65,24 @@ CPU has no machine-check hardware for the Arch kernel to initialize.
 These warnings did not prevent booting, but the guest now boots
 without them; the shared-folder boot was retested after the change.
 
-## Networking, and why `git clone https://…` is not what it looks like
+## The 9p root: mount once
+
+`/init` (`tools/guest-init/init`) mounts the share with `mount -t 9p … host9p
+/newroot` and then chroots into it. It reaches that step twice — once to repair
+a lost permission bit, once before starting the session — and a second
+`mount` of the same tag is refused with `EBUSY`. Each refusal also makes
+9pnet_virtio log `no channels available for device host9p`, so the retry loop
+used to produce forty of those, give up, and drop into the initramfs recovery
+shell. `mount_root` now treats an already-mounted `/newroot` as success
+(`mountpoint -q`), keeps mount's own error message instead of discarding it,
+and reloads `9pnet_virtio` before retrying a genuine failure. `npm run test:vm`
+boots the real kernel, initramfs and 9p server in Node and fails if either the
+storm or the recovery shell comes back.
+
+Loopback is brought up as well: nothing else in this guest did, so 127.0.0.1
+was unreachable.
+
+## Networking, and what `git clone https://…` needs
 
 The guest gets a NIC from the emulator (virtio-net), DHCP from v86 itself, and
 DNS + TCP through the relay URL set in Settings → v86 network (default
@@ -65,12 +96,14 @@ Two things mislead people here, so both are now handled in the guest itself:
    chain that actually matters — interface, route, resolv.conf, a real DNS
    lookup, a real TLS connection — and stops at the first broken link.
 
-2. **The bundled git has no HTTPS transport** (no curl, no OpenSSL — see the
-   `git` bullet above). `git clone https://github.com/owner/repo` therefore
-   fails before any packet is sent: with a URL git cannot parse as a transport
-   it dies with `repository '…' does not exist`, and otherwise with
-   `Unable to find remote helper for 'https'`. Neither message is about GitHub,
-   the repository, or the connection.
+2. **git's HTTPS transport is a separate program, and it now ships here.** The
+   `git` binary has no TLS of its own (no curl, no OpenSSL — see the `git`
+   bullet above), so it looks for `git-remote-https` in its exec path. That is
+   `/usr/lib/git-core/git-remote-http` plus the alias, installed at boot, with
+   the CA bundle it verifies against. `git clone https://github.com/owner/repo`
+   is therefore a real clone: real history, real branches, no proxy. Before
+   this existed, the same command died with `Unable to find remote helper for
+   'https'` (or `repository '…' does not exist`) before a packet was sent.
 
 `public/v86/scripts/` holds three files that the bridge (`src/bridge/v86.ts`,
 `installGuestTools`) copies into the guest root at every boot, so they are
@@ -86,8 +119,9 @@ ordinary, editable files in Files:
 
 `d86-clone` is a **snapshot import, not a clone**: it downloads GitHub's own
 tarball for one branch (the endpoint behind "Download ZIP"), so you get the
-current files and one commit, and `git log` shows no upstream history. That
-would need the git protocol over TLS, which this build of git cannot speak.
+current files and one commit, and `git log` shows no upstream history. It is
+kept for repositories where only the files matter; for history, `git clone`
+does the real thing now.
 The script says so every time it runs rather than pretending the clone was
 complete, and `--force` is required before it will pull a repository large
 enough to threaten browser storage.

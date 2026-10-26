@@ -22,15 +22,14 @@ Two traps worth knowing before you conclude "the network is broken":
   ping reply arrives even with the relay switched off. Use `d86-net check` in
   the guest instead: it tests the interface, the route, `resolv.conf`, a real
   DNS lookup and a real TLS connection, and stops at the first broken link.
-- **The guest's git has no HTTPS transport.** It is a static build without
-  curl or OpenSSL, so `git clone https://github.com/owner/repo` fails before a
-  packet is sent — usually as `repository '…' does not exist`, which is git's
-  message for a URL it cannot parse as a transport, not a verdict on GitHub.
-  Use `d86-clone https://github.com/owner/repo` in the guest: it fetches the
-  branch with busybox's TLS (which does work), unpacks it, and makes a real
-  one-commit repository with the guest's git. Snapshot, not history — the
-  script says so every run. `git clone <url>` is routed there automatically;
-  local paths, `file://` URLs and bundles still go to the real git.
+- **`git clone https://…` is a real clone.** git keeps its HTTP transports in
+  separate programs, so the guest gets git's own `git-remote-http` (and the
+  `git-remote-https` alias) in `/usr/lib/git-core`: a static build of git
+  2.49.1's transport with libcurl and mbedTLS, plus a CA bundle at
+  `/etc/ssl/certs/ca-certificates.crt`. Nothing is proxied, nothing is
+  faked — the guest's git fetches over TLS itself, with history, branches and
+  `git pull`. `d86-clone` stays as the fallback for repositories where the
+  tarball is the sane choice; it is no longer what an https clone does.
 
 ### Preview — one place for everything you look at but do not edit
 
@@ -307,6 +306,7 @@ The OS embeds the hoster as a **hidden iframe** and talks to it over a versioned
     npm run dev          # the OS at http://localhost:5173/Dragon86/
     npm run build        # typecheck + the unit checks + the Pages bundle
     npm run test:ui      # boots the whole OS headlessly (jsdom) and clicks it
+    npm run test:vm      # boots the v86 guest for real, in Node (see below)
 
 `npm run test:ui` bundles `src/main.ts` as one script, loads it into a
 simulated page with IndexedDB, a stubbed service worker and a static file
@@ -314,6 +314,14 @@ server, then drives the UI: drag an icon, open a context menu, install an app
 from the store, trash a file and unlock the bin. It is not a substitute for
 looking at it, but it catches the failures that are otherwise invisible until
 they throw.
+
+`npm run test:vm` is the same idea one layer down: it loads the vendored
+`libv86.js`, the real kernel and initramfs, and the real 9p server
+(`src/bridge/p9.ts`, bundled for Node), boots the guest headlessly against a
+directory on the host, and fails if the boot ends in the initramfs recovery
+shell, if 9p reports `no channels available` even once, or if the shell cannot
+run `git`. It is the only way to see a kernel-level v86 fault without a
+browser, and it takes about thirty seconds.
 
 
 ```sh

@@ -253,12 +253,51 @@ class V86Backend implements TerminalBackend {
   }
 
   /**
+   * Copy a binary asset from public/v86/ into the guest root, inflating it if
+   * the asset is gzipped (the same format the initramfs uses, so the repo
+   * keeps the compressed copy and the guest gets the real bytes).
+   *
+   * Unlike the scripts this is a multi-megabyte write, so it is skipped when
+   * the destination is already the right size: only a first boot (or a new
+   * build of the binary) pays for it.
+   */
+  private async installHostBinary(asset: string, dest: string, mode = 0o755): Promise<boolean> {
+    try {
+      const res = await fetch(`${BASE}${asset}`);
+      if (!res.ok) {
+        logWarn("v86", `${asset}: HTTP ${res.status} from ${BASE}`);
+        return false;
+      }
+      let bytes = new Uint8Array(await res.arrayBuffer());
+      if (asset.endsWith(".gz")) {
+        const DS = (globalThis as { DecompressionStream?: typeof DecompressionStream })
+          .DecompressionStream;
+        if (!DS) throw new Error("this browser has no DecompressionStream");
+        const stream = new Blob([bytes as BlobPart]).stream().pipeThrough(new DS("gzip"));
+        bytes = new Uint8Array(await new Response(stream).arrayBuffer());
+      }
+      const existing = await fs.promises.stat(dest).catch(() => null);
+      if (!existing || existing.size !== bytes.byteLength) {
+        await ensureDir(dest.slice(0, dest.lastIndexOf("/")));
+        await fs.promises.writeFile(dest, bytes);
+        await fs.promises.chmod(dest, mode).catch(() => {});
+        logInfo("v86", `${asset} installed at ${dest} (${bytes.byteLength} bytes)`);
+      }
+      return true;
+    } catch (err) {
+      logWarn("v86", `could not install ${asset}:`, err);
+      return false;
+    }
+  }
+
+  /**
    * Guest-side scripts and the profile hook that makes them usable.
    *
-   * - /networking.sh       — bring the emulated card up (copy.sh's job too)
-   * - /usr/bin/d86-clone   — fetch a GitHub snapshot (guest git has no HTTPS)
-   * - /usr/bin/d86-net     — check DNS/TLS for real, since ping is emulated
-   * - /usr/share/d86/      — helpers.sh (sourced from /etc/profile) + a note
+   * - /networking.sh          — bring the emulated card up (copy.sh's job too)
+   * - /usr/bin/d86-clone      — fetch a GitHub snapshot without git (fallback)
+   * - /usr/bin/d86-net        — check DNS/TLS for real, since ping is emulated
+   * - /usr/lib/git-core/…     — git's HTTPS transport (see installGitTransport)
+   * - /usr/share/d86/         — helpers.sh (sourced from /etc/profile) + a note
    *
    * /etc/profile is where login shells look, so the helper functions are
    * sourced from there rather than relying on executable bits landing on a
@@ -275,6 +314,7 @@ class V86Backend implements TerminalBackend {
       await this.installHostFile("d86-clone.sh", `${root}/usr/bin/d86-clone`, 0o755);
       await this.installHostFile("d86-net.sh", `${root}/usr/bin/d86-net`, 0o755);
       await this.installHostFile("guest-readme.txt", `${root}/usr/share/d86/README.guest`);
+      await this.installGitTransport(root);
       const helpers = await this.installHostFile(
         "guest-helpers.sh",
         `${root}/usr/share/d86/helpers.sh`,
@@ -286,8 +326,8 @@ class V86Backend implements TerminalBackend {
       if (current === null) return; /* root not unpacked yet; next boot */
       const block = [
         PROFILE_BEGIN,
-        "# Written by Dragon86 at boot. Sources the guest helpers and says how to",
-        "# get a repository in here (the bundled git has no HTTPS transport).",
+        "# Written by Dragon86 at boot: sources the guest helpers (d86-clone,",
+        "# d86-net) and points git's HTTPS helper at the CA bundle.",
         "[ -r /usr/share/d86/helpers.sh ] && . /usr/share/d86/helpers.sh",
         PROFILE_END,
         "",
@@ -303,6 +343,39 @@ class V86Backend implements TerminalBackend {
     } catch (err) {
       logWarn("v86", "could not install the guest tools:", err);
     }
+  }
+
+  /**
+   * git's HTTPS transport, and the CA bundle it needs.
+   *
+   * The guest's git is a static build configured without curl, so it has no
+   * HTTP transport of its own — `git clone https://…` fails with "unable to
+   * find remote helper" before a packet is sent. git expects those transports
+   * to be separate programs (`git-remote-http`, with `git-remote-https` as an
+   * alias) found through its exec path, so that is exactly what ships here:
+   * a self-contained static binary built from git 2.49.1 + libcurl + mbedTLS
+   * (see public/v86/VENDORED.md and tools/build-git-remote-http.sh), written
+   * into the guest's /usr/lib/git-core — the path this git was built with.
+   *
+   * The certificates go where the binary was compiled to look for them, so
+   * a clone verifies github.com against the same roots a browser would.
+   */
+  private async installGitTransport(root: string): Promise<void> {
+    const dir = `${root}/usr/lib/git-core`;
+    const ok = await this.installHostBinary("git-remote-http.gz", `${dir}/git-remote-http`, 0o755);
+    if (!ok) return;
+    const target = `${dir}/git-remote-https`;
+    const existing = await fs.promises.readlink(target).catch(() => null);
+    if (existing !== "git-remote-http") {
+      /* git runs whichever of the two names matches the URL scheme; a symlink
+         is what upstream ships, and it costs nothing. A backend that will not
+         take a symlink gets a second copy of the same bytes instead. */
+      await fs.promises.rmdir(target).catch(() => {});
+      await fs.promises
+        .symlink("git-remote-http", target)
+        .catch(() => this.installHostBinary("git-remote-http.gz", target, 0o755));
+    }
+    await this.installHostBinary("ca-certificates.crt", `${root}/etc/ssl/certs/ca-certificates.crt`, 0o644);
   }
 
   private async start(): Promise<void> {

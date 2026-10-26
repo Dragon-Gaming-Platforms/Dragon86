@@ -97,6 +97,10 @@ case "$MODE" in
         exit 0 ;;
 esac
 
+# Loopback first: it is not the NIC and the emulator does not provide it, but
+# anything that talks to itself over 127.0.0.1 needs it up.
+ip link set lo up 2>/dev/null
+
 load_nic || exit 1
 IF="$(iface)"
 [ -n "$IF" ] || { say "no interface"; exit 1; }

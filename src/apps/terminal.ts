@@ -252,7 +252,7 @@ export function openTerminal(win: Win): void {
       }
       term.writeln(`${DIM}No cross-origin isolation needed — this is the WebView-friendly engine.${RESET}`);
       term.writeln(`${DIM}Network is emulated by v86; in the guest run /networking.sh to bring the card up.${RESET}`);
-      term.writeln(`${DIM}Guest git has no HTTPS:  d86-clone <github-url>  imports a repo,  d86-net check  tests the link.${RESET}`);
+      term.writeln(`${DIM}In the guest:  git clone https://…  works,  d86-net check  tests the link.${RESET}`);
       /* A snapshot can only be resumed safely within the session that took
          it: it remembers the guest's open files, and those are handles in a
          9p server that no longer exists after a reload. Resuming one was

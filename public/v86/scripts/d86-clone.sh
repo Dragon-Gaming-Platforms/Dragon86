@@ -1,22 +1,16 @@
 #!/bin/sh
 # d86-clone — bring a GitHub repository into this filesystem.
 #
-# Why this is not `git clone`:
+# This is the fallback, not the way in. `git clone https://…` works in this
+# guest: git's HTTPS helper ships with it (/usr/lib/git-core/git-remote-http,
+# a static build with libcurl + mbedTLS, plus a CA bundle), so a real clone
+# brings real history.
 #
-#   The git in this guest is a static build with no curl and no OpenSSL
-#   (see /usr/share/d86/README.guest). It has *no HTTPS transport at all*, so
-#   `git clone https://…` cannot work here — the URL is not the problem, the
-#   build of git is. A clone of a local path, a file:// URL or a bundle still
-#   works: that is plain git, no network.
-#
-#   busybox wget, on the other hand, does have TLS. So this script downloads
-#   GitHub's own tarball for a branch, unpacks it, and hands the result to the
-#   guest's git, which makes a real repository out of it (one commit, so
-#   `git log`, `git status`, `git diff`, branches and commits all work).
-#
-#   What you do not get is upstream history: that needs the git protocol over
-#   TLS, which this git cannot speak. One commit is one commit — this script
-#   says so instead of pretending otherwise.
+# This script exists for the case a clone is the wrong tool: a repository so
+# large, or a branch you only want the files from. It downloads GitHub's own
+# tarball for a branch with busybox wget, unpacks it, and hands the result to
+# the guest's git, which makes a repository out of it — one commit, current
+# files, no upstream log. The import commit says exactly that.
 #
 # Usage:
 #   d86-clone <github-url> [directory] [-b branch] [--force]
@@ -58,7 +52,8 @@ d86-clone <github-url> [directory] [-b branch] [--force]
 
 Fetches a snapshot of one branch (GitHub's own tarball), unpacks it and makes a
 local git repository with one commit. Upstream history is not included: this
-guest's git cannot speak HTTPS, which is why `git clone https://…` fails here.
+guest's git can speak HTTPS (git clone works); this is for when the files are
+all you want.
 EOF
 }
 
@@ -269,7 +264,7 @@ else
 Source: $tar_url
 Fetched: $(date -u '+%Y-%m-%d %H:%M UTC')
 This is a snapshot of one branch, not a clone: the upstream history is not
-included, because this guest's git has no HTTPS transport." || exit 1
+included (the tarball has none). Use `git clone` for real history." || exit 1
     ) || die "the files are in $dest, but git could not make a repository of them"
 fi
 

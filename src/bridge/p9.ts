@@ -347,13 +347,19 @@ export function createP9Handler(
           if (valid & 0xf0) {
             const st = await fsImpl.stat(f.path);
             const now = new Date();
+            /* ZenFS stats carry Date objects; a plain stat carries only the
+               millisecond numbers. Take whichever is there, so a chmod or a
+               touch never turns into EIO on a backend that reports the
+               numeric form. */
+            const asDate = (d: unknown, ms: number): Date | undefined =>
+              d instanceof Date ? d : Number.isFinite(ms) ? new Date(ms) : undefined;
             const atime = valid & 0x80
               ? new Date(atimeSec * 1000 + atimeNsec / 1e6)
-              : valid & 0x10 ? now : st.atime;
+              : valid & 0x10 ? now : asDate(st.atime, st.atimeMs);
             const mtime = valid & 0x100
               ? new Date(mtimeSec * 1000 + mtimeNsec / 1e6)
-              : valid & 0x20 ? now : st.mtime;
-            await fsImpl.utimes(f.path, atime, mtime);
+              : valid & 0x20 ? now : asDate(st.mtime, st.mtimeMs);
+            if (atime && mtime) await fsImpl.utimes(f.path, atime, mtime);
           }
           return new Writer().build(27, tag);
         }
@@ -467,11 +473,27 @@ export function createP9Handler(
         }
         case 32: // Txattrcreate — nothing to write attributes into
           return error(tag, ENOTSUP);
-        case 78: { // Treadlink — the kernel resolves symlinks itself, so a
-          // root full of them (/bin → usr/bin, /lib → usr/lib) needs this.
+        case 22: { // Treadlink — resolving a symlink is the kernel's job, but
+          // reading its target is ours, and the guest root is full of them
+          // (/bin → usr/bin, /lib → usr/lib, and every busybox applet). The
+          // opcode is 22 in 9p2000.L; this used to answer 78, which is not a
+          // 9p2000.L request at all, so the real Treadlink fell through to
+          // ENOSYS and no dynamic binary could be exec'd from the share —
+          // which is what left the guest in its recovery shell.
           const fid = r.u32();
           const target = await fsImpl.readlink(getFid(fid).path);
-          return new Writer().str(target).build(79, tag);
+          return new Writer().str(target).build(23, tag);
+        }
+        case 16: { // Tsymlink
+          const fid = r.u32(), name = r.str(), target = r.str();
+          r.u32(); // gid — single-user share
+          const path = joinRel(getFid(fid).path, name);
+          if (!inside(path)) return error(tag, EPERM);
+          await fsImpl.symlink(target, path);
+          return writeQid(new Writer(), await qidFor(path)).build(17, tag);
+        }
+        case 18: { // Tmknod — a regular guest has no business creating devices
+          return error(tag, ENOTSUP);
         }
         case 50: // Tfsync
           return new Writer().build(51, tag);
@@ -484,6 +506,9 @@ export function createP9Handler(
           return w.build(55, tag);
         }
         default:
+          /* Say which request went unanswered instead of failing silently:
+             the guest only sees "Function not implemented". */
+          logWarn("v86", `9p: unsupported request ${type} — replying ENOSYS`);
           return error(tag, ENOSYS);
       }
     } catch (err) {

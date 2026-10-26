@@ -35,6 +35,11 @@ stty -F /dev/ttyS0 rows "$ROWS" cols "$COLS" 2>/dev/null
 # so every line would be printed twice on screen.
 exec >/dev/ttyS0 2>&1
 
+# Loopback is not the emulator's business and nothing else brings it up: without
+# this, 127.0.0.1 is "network unreachable" and anything that talks to itself
+# (a local server, a test, `git clone http://127.0.0.1:…`) fails.
+ip link set lo up 2>/dev/null
+
 modprobe virtio_pci_legacy_dev 2>/dev/null
 modprobe virtio_pci_modern_dev 2>/dev/null
 modprobe virtio_pci
@@ -87,11 +92,28 @@ chmod +x /etc/udhcpc.script
     sleep 0.2
   done
 ) 
+# Mount the share once. The caller reaches this twice (once to repair a lost
+# mode bit, once before the session), so an already-mounted /newroot counts as
+# success instead of being mounted again: a second mount of the same tag is
+# refused with EBUSY, and every refusal also makes 9pnet_virtio log "no
+# channels available" — which is how one successful mount used to turn into a
+# storm of those messages and a recovery shell.
+MOUNT_ROOT_ERR=
 mount_root() {
+  mountpoint -q /newroot && return 0
   for i in $(seq 1 40); do
-    if mount -t 9p -o trans=virtio,version=9p2000.L,cache=loose,msize=1048576 host9p /newroot 2>/dev/null; then
+    # Keep mount's own message: when this fails it is the only description of
+    # why (no device, wrong tag, backend refused the client), and it used to be
+    # thrown away here.
+    MOUNT_ROOT_ERR=$(mount -t 9p -o trans=virtio,version=9p2000.L,cache=loose,msize=1048576 host9p /newroot 2>&1)
+    if [ $? -eq 0 ]; then
       return 0
     fi
+    # A refused mount can leave the transport holding a channel that will never
+    # be used again; reloading it gives the next attempt a clean one.
+    rmmod 9pnet_virtio 2>/dev/null
+    modprobe 9pnet_virtio 2>/dev/null
+    mountpoint -q /newroot && return 0
     sleep 1
   done
   return 1
@@ -198,6 +220,7 @@ echo ""
 echo "  Dragon86 Linux (v86 · Arch userland) — recovery shell"
 echo "  ----------------------------------------------------"
 echo "  The distro root is not serving, so this is the fallback shell."
+[ -n "$MOUNT_ROOT_ERR" ] && echo "  mount said: $MOUNT_ROOT_ERR"
 echo "  Reconnect from the Terminal to try again."
 echo ""
 cd /
