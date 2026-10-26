@@ -147,7 +147,7 @@ export function buildTaskbar(wm: WindowManager, getApps: () => AppShortcut[]): v
 export function coreApps(launch: Record<string, () => void>): AppShortcut[] {
   return [
     { id: "files", name: "Files", icon: "folder", sub: "Explorer", launch: launch["files"]! },
-    { id: "terminal", name: "Terminal", icon: "terminal", sub: "CheerpX", launch: launch["terminal"]! },
+    { id: "terminal", name: "Terminal", icon: "terminal", sub: "Arch Linux · v86", launch: launch["terminal"]! },
     { id: "editor", name: "Text Editor", icon: "editor", sub: "Notes", launch: launch["editor"]! },
     { id: "store", name: "App Store", icon: "store", sub: "Get apps", launch: launch["store"]! },
     ...IFRAME_APPS.map((def) => ({

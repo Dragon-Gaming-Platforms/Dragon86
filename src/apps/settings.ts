@@ -521,10 +521,15 @@ export function openSettings(win: Win, startPage?: string): void {
     );
   }
 
-  /* ---------- Engine (CheerpX) ---------- */
+  /* ---------- Engine ---------- */
 
   function renderEngine(host: HTMLElement): void {
-    host.append(section("CheerpX hoster", "The page that runs the Linux engine, and the URL the Terminal talks to."));
+    host.append(
+      section(
+        "CheerpX hoster",
+        "Only used by the CheerpX engine. v86 needs no hoster at all — it boots inside this page.",
+      ),
+    );
     const row = el("div", "settings-row");
     row.dataset.setting = "CheerpX hoster URL";
     row.append(el("label", undefined, "Hoster URL"));
@@ -561,7 +566,11 @@ export function openSettings(win: Win, startPage?: string): void {
     const modes: { id: "embedded" | "tab" | "v86"; label: string; blurb: string }[] = [
       { id: "embedded", label: "Embedded", blurb: "CheerpX inside this page. Needs cross-origin isolation." },
       { id: "tab", label: "Separate tab", blurb: "CheerpX in its own tab; this page stays unrestricted." },
-      { id: "v86", label: "v86", blurb: "A small Linux that runs right here, no isolation at all." },
+      {
+        id: "v86",
+        label: "v86",
+        blurb: "Default. An Arch userland that boots inside this page — no isolation, no hoster, works on every browser.",
+      },
     ];
     const seg = el("div", "segmented");
     const noteEl = el("div", "settings-note");

@@ -42,6 +42,8 @@ interface V86Emulator {
   save_state(): Promise<ArrayBuffer>;
   /** One string per VGA text row; see the `ansi` option in start(). */
   get_text_screen?: () => string[];
+  /** The screen adapter, which is where libv86 actually keeps that method. */
+  screen?: { get_text_screen?: () => string[] };
 }
 
 type V86Ctor = new (opts: Record<string, unknown>) => V86Emulator;
@@ -195,10 +197,16 @@ class V86Backend implements TerminalBackend {
    * count; there is no size getter.
    */
   getScreen(): EngineScreen | null {
-    if (!this.emu?.get_text_screen) return null;
+    /* libv86 exposes the text rows on the screen adapter (the emulator keeps
+       it as `screen`); some builds also forward it on the emulator itself. */
+    const read =
+      this.emu?.get_text_screen?.bind(this.emu) ??
+      this.emu?.screen?.get_text_screen?.bind(this.emu.screen) ??
+      null;
+    if (!read) return null;
     let lines: string[];
     try {
-      lines = this.emu.get_text_screen();
+      lines = read();
     } catch (err) {
       logWarn("v86", "could not read the text screen", err);
       return null;
