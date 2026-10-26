@@ -20,6 +20,9 @@ import { appForFile } from "../core/fs-apps";
 import { onDesktop, setOnDesktop } from "../core/desktop-apps";
 import { notify } from "../core/toast";
 import { refreshDesktops } from "../core/desktop";
+import { archiveBaseName, isArchiveName } from "../core/archive";
+import { extractArchive, extractDirFor } from "../core/archive-fs";
+import { isRunnableScript, runSystemScript } from "../core/system-scripts";
 
 export interface FilesHandlers {
   openFile: (path: string) => void;
@@ -221,6 +224,37 @@ export function openFiles(win: Win, startPath: string, handlers: FilesHandlers):
       { label: "Open", iconHtml: icon("open").innerHTML, onClick: () => openEntry(entry) },
     ];
 
+    /* Archives: unpacking is what people do with them, so it is one click,
+       not a trip through the viewer. */
+    if (!entry.isDirectory && isArchiveName(entry.name)) {
+      items.push(
+        {
+          label: "Extract here",
+          iconHtml: icon("archive").innerHTML,
+          onClick: () => void extractInto(entry, cwd),
+        },
+        {
+          label: `Extract to ${archiveBaseName(entry.name) || "folder"}/`,
+          iconHtml: icon("archive").innerHTML,
+          onClick: () => void extractInto(entry, extractDirFor(entry.path)),
+        },
+        { label: "", separator: true },
+      );
+    }
+
+    /* A .js file can be *run* — in the OS page, with no sandbox. It asks
+       first (core/system-scripts.ts); the item is here because the file is
+       here, and it is styled as dangerous because it is. */
+    if (!entry.isDirectory && isRunnableScript(entry.name)) {
+      items.push({
+        label: "Run as system script",
+        hint: "no sandbox",
+        iconHtml: icon("terminal").innerHTML,
+        danger: true,
+        onClick: () => void runSystemScript(entry.path),
+      });
+    }
+
     if (!entry.isDirectory && handlers.openWith) {
       const openers = openersFor(entry.path);
       if (openers.length >= 1 || canLaunchAsApp(entry.path)) {
@@ -295,11 +329,33 @@ export function openFiles(win: Win, startPath: string, handlers: FilesHandlers):
     return items;
   }
 
+  async function extractInto(entry: vfs.Entry, dir: string): Promise<void> {
+    status.textContent = `Extracting ${entry.name} → ${dir} …`;
+    try {
+      const result = await extractArchive(entry.path, dir, { overwrite: true });
+      const skipped = result.skipped.length ? ` (${result.skipped.length} skipped)` : "";
+      status.textContent = `Extracted ${result.files} file(s) into ${dir}${skipped}`;
+      notify({
+        title: `${entry.name} extracted`,
+        body: `${result.files} file${result.files === 1 ? "" : "s"} in ${dir}${skipped}`,
+        icon: "archive",
+        timeout: 5000,
+      });
+      refreshDesktops();
+      void render();
+    } catch (err) {
+      status.textContent = `Could not extract ${entry.name}: ${(err as Error).message}`;
+      notify({ title: `${entry.name} did not extract`, body: (err as Error).message, icon: "info", timeout: 0 });
+    }
+  }
+
   function entryIcon(entry: vfs.Entry): string {
     if (entry.isDirectory) return "folder";
     const ext = extOf(entry.name);
     if (ext === "nes" || ext === "rom") return "games";
     if (ext === "d86") return "grid";
+    if (isArchiveName(entry.name)) return "archive";
+    if (ext === "jar") return "linux";
     if (/^(png|jpe?g|gif|webp|avif|svg|bmp|ico)$/.test(ext)) return "image";
     if (/^(mp3|wav|ogg|flac|m4a)$/.test(ext)) return "audio";
     if (/^(mp4|webm|mkv|mov)$/.test(ext)) return "video";
@@ -409,9 +465,24 @@ export function openFiles(win: Win, startPath: string, handlers: FilesHandlers):
     showContextMenu(e.clientX, e.clientY, items);
   });
 
-  /* A file made elsewhere (an install, the guest writing into the tree) shows
-     up without reopening the window. */
-  window.addEventListener("d86-desktop-changed", () => void render());
+  /* A file made elsewhere (an install, the guest writing into the tree, an
+     archive unpacked from the viewer) shows up without reopening the window. */
+  const onDesktopChanged = (): void => {
+    void render();
+  };
+  /* Extraction happens in the viewer window; the desktop (and this list) has
+     to hear about it. Desktop refresh dispatches its own event, so this one
+     must not call it back — that is an infinite loop, not a refresh. */
+  const onFsChanged = (): void => {
+    refreshDesktops();
+    void render();
+  };
+  window.addEventListener("d86-desktop-changed", onDesktopChanged);
+  window.addEventListener("d86-fs-changed", onFsChanged);
+  win.setOnClose(() => {
+    window.removeEventListener("d86-desktop-changed", onDesktopChanged);
+    window.removeEventListener("d86-fs-changed", onFsChanged);
+  });
 
   if (!isUnlocked() && inTrash(cwd)) {
     void unlockTrash().then((ok) => {

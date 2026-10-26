@@ -11,7 +11,8 @@
 import type { WindowManager } from "../core/wm";
 import * as vfs from "../core/vfs";
 import { openFiles } from "./files";
-import { openEditor } from "./editor";
+
+import { openPlainEditor } from "./plain-editor";
 import { openTerminal } from "./terminal";
 import { openSettings } from "./settings";
 import { openStore } from "./store";
@@ -55,7 +56,7 @@ export function createLauncher(wm: WindowManager) {
       width: 720,
       height: 500,
     });
-    openEditor(win, path ?? null);
+    openPlainEditor(win, path ?? null);
   }
 
   function openTerminalAt(): void {
@@ -66,6 +67,24 @@ export function createLauncher(wm: WindowManager) {
       height: 480,
     });
     openTerminal(win);
+  }
+
+  /** Open a shell script in the Terminal, printed — never executed. */
+  async function openScriptInTerminal(path: string): Promise<void> {
+    let text = "";
+    try {
+      text = await vfs.readText(path);
+    } catch (err) {
+      logWarn("os", `could not read ${path}`, err);
+      return;
+    }
+    const win = wm.create({
+      title: `Terminal — ${vfs.baseName(path)}`,
+      icon: "terminal",
+      width: 760,
+      height: 480,
+    });
+    openTerminal(win, { print: { path, text } });
   }
 
   function openIframeAppAt(def: IframeAppDef, filePath?: string): void {
@@ -182,6 +201,9 @@ export function createLauncher(wm: WindowManager) {
       case "shortcut":
         openShortcut(path);
         return;
+      case "terminal":
+        void openScriptInTerminal(path);
+        return;
       case "app": {
         const def = IFRAME_APPS.find((a) => a.id === opener.id);
         if (!def) {
@@ -215,6 +237,7 @@ export function createLauncher(wm: WindowManager) {
     files: () => openFilesAt(),
     terminal: () => openTerminalAt(),
     editor: () => openEditorAt(),
+
     settings: () => openSettingsAt(),
     store: () => openStoreAt(),
     "engine-viewer": () => openEngineViewerAt(),

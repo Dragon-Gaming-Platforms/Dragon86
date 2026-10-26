@@ -2390,3 +2390,71 @@
   border-top: 1px solid var(--border-color);
   text-align: center;
 }
+
+/* ---------- the archive viewer ----------
+   A zip, tar or .gz opens on its own table of contents: what is inside, how
+   big it unpacks to, and the two ways to unpack it. */
+.viewer-archive {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  background: var(--bg-dark);
+}
+.viewer-archive-head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-card);
+}
+.viewer-archive-head strong {
+  font-size: 14px;
+}
+.viewer-archive-head span {
+  color: var(--text-dim);
+  font-size: 12px;
+}
+.viewer-archive-actions {
+  margin-left: auto;
+  display: flex;
+  gap: 8px;
+}
+.viewer-archive-list {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 6px 0;
+}
+.viewer-archive-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 14px;
+  font-size: 13px;
+}
+.viewer-archive-row:hover {
+  background: var(--bg-card-hover);
+}
+.viewer-archive-row svg {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  color: var(--text-dim);
+}
+.viewer-archive-path {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-mono, monospace);
+}
+.viewer-archive-size {
+  color: var(--text-dim);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}

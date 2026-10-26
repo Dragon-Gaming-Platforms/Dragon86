@@ -15,7 +15,8 @@ export type LogScope =
   | "guest"
   | "union"
   | "store"
-  | "engine-viewer";
+  | "engine-viewer"
+  | "script";
 
 function fmt(scope: LogScope, msg: string): string {
   return `[D86:${scope}] ${msg}`;

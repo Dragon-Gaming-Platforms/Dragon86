@@ -13,7 +13,10 @@
 
 import { el, icon } from "../core/dom";
 import * as vfs from "../core/vfs";
-import { logWarn } from "../core/log";
+import { logInfo, logWarn } from "../core/log";
+import { notify } from "../core/toast";
+import { isArchiveName } from "../core/archive";
+import { extractArchive, readArchive, extractDirFor } from "../core/archive-fs";
 import type { Win } from "../core/wm";
 
 const IMAGE = /\.(png|jpe?g|gif|webp|avif|bmp|ico|svg)$/i;
@@ -59,6 +62,13 @@ export function openViewer(win: Win, path: string): void {
   root.append(body, status);
   win.el.append(root);
   win.setTitle(`System — ${name}`);
+
+  /* An archive is answered before the bytes are read: listing one means
+     parsing it, and the hex dump of a zip tells nobody anything useful. */
+  if (isArchiveName(name)) {
+    void openArchiveView(win, path, body, status);
+    return;
+  }
 
   void (async () => {
     let bytes: Uint8Array;
@@ -187,4 +197,92 @@ function peekType(bytes: Uint8Array): string {
   if (bytes.length >= 8 && bytes[0] === 0x89 && at(1, "PNG")) return "PNG image";
   if (bytes.length >= 3 && bytes[0] === 0xff && bytes[1] === 0xd8) return "JPEG image";
   return "unknown bytes";
+}
+
+/**
+ * What an archive shows: what is inside it, and the one action that matters —
+ * unpacking it next to itself. Extraction is native (core/archive.ts): the
+ * browser's own zip/gzip codec plus a tar parser, no library.
+ */
+async function openArchiveView(
+  win: Win,
+  path: string,
+  body: HTMLElement,
+  status: HTMLElement,
+): Promise<void> {
+  const name = vfs.baseName(path);
+  let listing;
+  try {
+    listing = await readArchive(path);
+  } catch (err) {
+    logWarn("os", `viewer could not read the archive ${path}`, err);
+    status.textContent = `${path} · cannot be read`;
+    body.append(message("archive", `${name}: ${(err as Error).message}`));
+    return;
+  }
+
+  const target = extractDirFor(path);
+  const wrap = el("div", "viewer-archive");
+  const head = el("div", "viewer-archive-head");
+  const files = listing.entries.filter((e) => !e.isDirectory);
+  const total = files.reduce((sum, e) => sum + e.size, 0);
+  head.append(
+    el("strong", undefined, name),
+    el(
+      "span",
+      undefined,
+      ` · ${files.length} file${files.length === 1 ? "" : "s"}, ${listing.entries.length - files.length} folder${listing.entries.length - files.length === 1 ? "" : "s"} · ${vfs.formatSize(total, false)} unpacked`,
+    ),
+  );
+
+  const actions = el("div", "viewer-archive-actions");
+  const here = el("button", "btn", "Extract into this folder");
+  const into = el("button", "btn primary", `Extract to ${vfs.baseName(target)}/`);
+  actions.append(here, into);
+  head.append(actions);
+
+  const list = el("div", "viewer-archive-list");
+  for (const entry of listing.entries) {
+    const row = el("div", "viewer-archive-row");
+    row.append(
+      icon(entry.isDirectory ? "folder" : "file"),
+      el("span", "viewer-archive-path", entry.path || "(single file)"),
+      el("span", "viewer-archive-size", entry.isDirectory ? "" : vfs.formatSize(entry.size, false)),
+    );
+    list.append(row);
+  }
+
+  const run = async (dir: string) => {
+    here.disabled = true;
+    into.disabled = true;
+    status.textContent = `Extracting ${name} → ${dir} …`;
+    try {
+      const result = await extractArchive(path, dir, { overwrite: true });
+      const skipped = result.skipped.length
+        ? ` ${result.skipped.length} entr${result.skipped.length === 1 ? "y was" : "ies were"} skipped.`
+        : "";
+      status.textContent = `Extracted ${result.files} file(s) into ${dir}${skipped}`;
+      notify({
+        title: `${name} extracted`,
+        body: `${result.files} file${result.files === 1 ? "" : "s"} in ${dir}.${skipped}`,
+        icon: "archive",
+        timeout: 6000,
+      });
+      logInfo("os", `archive: ${name} → ${dir}`);
+      window.dispatchEvent(new CustomEvent("d86-fs-changed"));
+    } catch (err) {
+      status.textContent = `Could not extract ${name}: ${(err as Error).message}`;
+      notify({ title: `${name} did not extract`, body: (err as Error).message, icon: "info", timeout: 0 });
+    } finally {
+      here.disabled = false;
+      into.disabled = false;
+    }
+  };
+  here.addEventListener("click", () => void run(vfs.parentOf(path)));
+  into.addEventListener("click", () => void run(target));
+
+  status.textContent = `${path} · ${listing.kind}${listing.tarInside ? " (tar inside)" : ""} · ${files.length} file(s)`;
+  wrap.append(head, list);
+  body.append(wrap);
+  win.setTitle(`Archive — ${name}`);
 }
