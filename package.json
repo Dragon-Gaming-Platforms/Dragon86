@@ -6,11 +6,12 @@
   "description": "Dragon86 \u2014 a web OS by Dragon Gaming Platforms",
   "scripts": {
     "dev": "vite",
-    "build": "tsc --noEmit && node tools/check-css-vars.mjs && node tools/test-coi-deregister.mjs && node tools/test-app-sw.mjs && node --experimental-strip-types tools/test-engine-viewer.mjs && vite build",
+    "build": "tsc --noEmit && node tools/check-css-vars.mjs && node tools/test-coi-deregister.mjs && node tools/test-app-sw.mjs && node --experimental-strip-types tools/test-engine-viewer.mjs && node --experimental-strip-types tools/test-archive.mjs && vite build",
     "preview": "vite preview",
     "test:ui": "vite build --config tools/ui-smoke/vite.config.ts && node tools/ui-smoke/run.mjs",
     "test:guest": "node tools/test-guest-scripts.mjs",
     "test:preview": "node tools/test-preview.mjs",
+    "test:archive": "node --experimental-strip-types tools/test-archive.mjs",
     "test:vm": "vite build --config tools/vm/vite.config.ts && node tools/vm/boot.mjs"
   },
   "dependencies": {

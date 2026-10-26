@@ -461,6 +461,7 @@ export function buildDesktop(getApps: () => AppShortcut[], handlers: DesktopHand
     /* A .d86 file *is* an app shortcut (core/app-shortcuts), so it should not
        look like a stray document. */
     if (ext === "d86") return "grid";
+    if (/^(zip|tar|tgz|gz|gzip)$/.test(ext)) return "archive";
     if (/^(png|jpe?g|gif|webp|avif|svg|bmp|ico)$/.test(ext)) return "image";
     if (/^(html?|url)$/.test(ext)) return "browser";
     if (/^(mp3|wav|ogg|flac|m4a)$/.test(ext)) return "audio";
