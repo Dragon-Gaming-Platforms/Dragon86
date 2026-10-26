@@ -73,25 +73,5 @@
     "width": 920,
     "height": 620,
     "status": "Dragon Gaming Platforms: catalog live from the org site"
-  },
-  {
-    "id": "gust",
-    "name": "GUST",
-    "sub": "Web proxy",
-    "url": "gust/",
-    "icon": "img:icons/gust.svg",
-    "width": 920,
-    "height": 620,
-    "status": "GUST: single-file proxy (libcurl/Wisp), vendored locally with its fonts/icons"
-  },
-  {
-    "id": "sandstone",
-    "name": "Sandstone",
-    "sub": "Web proxy",
-    "url": "sandstone/",
-    "icon": "img:icons/sandstone.png",
-    "width": 920,
-    "height": 620,
-    "status": "Sandstone: sandboxed-iframe proxy (built from source), no service worker"
   }
 ]

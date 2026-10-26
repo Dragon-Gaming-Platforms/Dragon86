@@ -16,6 +16,8 @@ import { openTerminal } from "./terminal";
 import { openSettings } from "./settings";
 import { openStore } from "./store";
 import { openViewer } from "./viewer";
+import { engineForViewer, openEngineViewer } from "./engine-viewer";
+import { appIdFromShortcut } from "../core/app-shortcuts";
 import { IFRAME_APPS, openIframeApp, type IframeAppDef } from "./iframe-app";
 import { getFsApps, loadFsApps, registerAdHocApp } from "../core/fs-apps";
 import {
@@ -102,6 +104,37 @@ export function createLauncher(wm: WindowManager) {
     openStore(win);
   }
 
+  function openEngineViewerAt(): void {
+    const win = wm.create({
+      title: "Engine Viewer",
+      icon: "linux",
+      width: 760,
+      height: 560,
+    });
+    openEngineViewer(win, engineForViewer());
+  }
+
+  /**
+   * A `.d86` file in ~/system/apps is a shortcut to an app that is part of
+   * the OS. Opening it launches that app; if the app is gone (an old build's
+   * shortcut), the file still opens in the editor, because the file is HTML
+   * and that is what it says.
+   */
+  function openShortcut(path: string): void {
+    const id = appIdFromShortcut(path);
+    if (id === "engine-viewer") {
+      openEngineViewerAt();
+      return;
+    }
+    const def = IFRAME_APPS.find((a) => a.id === id && !a.fs);
+    if (def) {
+      openIframeAppAt(def);
+      return;
+    }
+    logWarn("os", `${path} points at "${id}", which is not an app any more`);
+    openEditorAt(path);
+  }
+
   function openViewerAt(path: string): void {
     const win = wm.create({
       title: `System — ${vfs.baseName(path)}`,
@@ -146,6 +179,9 @@ export function createLauncher(wm: WindowManager) {
       case "launcher":
         launchAsApp(path);
         return;
+      case "shortcut":
+        openShortcut(path);
+        return;
       case "app": {
         const def = IFRAME_APPS.find((a) => a.id === opener.id);
         if (!def) {
@@ -181,6 +217,7 @@ export function createLauncher(wm: WindowManager) {
     editor: () => openEditorAt(),
     settings: () => openSettingsAt(),
     store: () => openStoreAt(),
+    "engine-viewer": () => openEngineViewerAt(),
   };
   for (const def of IFRAME_APPS) {
     launch[def.id] = () => openIframeAppAt(def);

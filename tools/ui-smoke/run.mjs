@@ -153,11 +153,16 @@ check(
   new Set(iconSpots).size === iconSpots.length,
   `${new Set(iconSpots).size} distinct of ${iconSpots.length}`,
 );
+/* Icons must sit on the grid's pitch, not at arbitrary offsets. With this
+   build's app list they fit in a single column, so a "more than one column"
+   assertion would only be testing how many apps happen to ship — the pitch
+   is the thing that proves a grid was used. */
+const tops = [...new Set([...icons].map((n) => parseFloat(n.style.top) || 0))].sort((a, b) => a - b);
+const pitches = tops.slice(1).map((t, i) => t - tops[i]);
 check(
-  "icons fill columns of the real grid on load",
-  new Set([...icons].map((n) => n.style.left)).size >= 2 &&
-    new Set([...icons].map((n) => n.style.top)).size > 1,
-  iconSpots.join(" ").slice(0, 160),
+  "icons sit on the real grid pitch",
+  tops.length > 1 && pitches.every((g) => Math.abs(g - pitches[0]) < 0.5 && g > 40),
+  `${iconSpots.join(" ").slice(0, 120)} · pitches ${pitches.join(",")}`,
 );
 check("the desktop laid out once, not twice", icons.length === new Set([...icons].map((n) => n.dataset.key)).size);
 check("icons have no border until selected", !first.classList.contains("selected"));
@@ -320,6 +325,62 @@ check(
   [...document.querySelectorAll(".desktop-icon")].some((n) => n.textContent.trim().startsWith("NES")),
   [...document.querySelectorAll(".desktop-icon")].map((n) => n.textContent.trim()).join(" | ").slice(0, 200),
 );
+
+/* ---- the proxies are normal App Store apps now ----
+   GUST and Sandstone used to be hardcoded iframe deployments in public/.
+   They are catalog apps, installed into ~/system/apps like everything else,
+   and they bring their own assets (nested folders included). */
+{
+  const names = [...cards].map((n) => n.textContent);
+  check(
+    "the catalog offers GUST and Sandstone",
+    names.some((t) => t.includes("GUST")) && names.some((t) => t.includes("Sandstone")),
+    names.map((t) => t.slice(0, 20)).join(" | "),
+  );
+  check(
+    "…and they are not installed until asked",
+    ![...document.querySelectorAll(".desktop-icon")].some((n) => /^(GUST|Sandstone)/.test(n.textContent.trim())),
+  );
+  const sandCard = [...cards].find((n) => n.textContent.includes("Sandstone"));
+  sandCard.querySelector("button").dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  await wait(2000);
+  check(
+    "installing Sandstone confirms itself",
+    [...document.querySelectorAll(".toast")].some((n) => /Sandstone installed/.test(n.textContent)),
+  );
+  check(
+    "…and puts it on the desktop",
+    [...document.querySelectorAll(".desktop-icon")].some((n) => n.textContent.trim().startsWith("Sandstone")),
+  );
+  /* Nested asset folders have to survive the install: sandboxed-iframe
+     proxying is useless without resources/main.css. The catalog lists it… */
+  const sandListing = (catalogJson.apps.find((a) => a.id === "sandstone")?.files ?? []);
+  check(
+    "the store listing includes the nested assets",
+    sandListing.includes("resources/main.css") && sandListing.includes("index.html"),
+    sandListing.join(" "),
+  );
+  /* …and the installed app opens from its folder. */
+  [...storeWindowEl().querySelectorAll(".store-tab")].find((b) => b.textContent.includes("Installed"))?.click();
+  await wait(500);
+  const sandInstalled = [...storeWindowEl().querySelectorAll(".store-card")].find((n) =>
+    n.textContent.includes("Sandstone"),
+  );
+  [...(sandInstalled?.querySelectorAll(".store-actions .btn") ?? [])]
+    .find((b) => b.textContent.trim() === "Open")
+    ?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  await wait(700);
+  check(
+    "the installed proxy opens from its own folder",
+    [...document.querySelectorAll(".d86-window iframe")].some((f) =>
+      String(f.getAttribute("src")).includes("9pf/sandstone/index.html"),
+    ),
+    [...document.querySelectorAll(".d86-window iframe")].map((f) => f.getAttribute("src")).join(" | ").slice(0, 200),
+  );
+  /* Back to the tab the rest of the suite expects: the whole catalog. */
+  [...storeWindowEl().querySelectorAll(".store-tab")].find((b) => /\bHome\b/.test(b.textContent))?.click();
+  await wait(500);
+}
 
 const snakeCard = [...cards].find((n) => n.textContent.includes("Snake"));
 check("catalog has Snake", Boolean(snakeCard));
@@ -826,6 +887,96 @@ check(
   [...document.querySelectorAll(".desktop-icon")].map((n) => n.textContent.trim()).join(" | ").slice(0, 200),
 );
 
+/* ---- .d86 shortcuts: the fixed apps are visible where apps live ----
+   Preview, Scramjet and the Engine Viewer are pages, not folders, so each one
+   gets a shortcut file in ~/system/apps. The file holds the iframe markup and
+   opening it launches the app. */
+{
+  const filesW = [...document.querySelectorAll(".d86-window")].find((w) => w.querySelector(".fm-root"));
+  const pathInput = filesW.querySelector(".fm-path-input");
+  pathInput.value = "/home/user/system/apps";
+  pathInput.dispatchEvent(new window.KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+  await wait(500);
+  const names = [...filesW.querySelectorAll(".fm-row")].map((r) => r.textContent);
+  for (const id of ["preview", "scramjet", "engine-viewer"]) {
+    check(
+      `${id}.d86 is in system/apps`,
+      names.some((t) => t.includes(`${id}.d86`)),
+      names.join(" | ").slice(0, 200),
+    );
+  }
+  const previewRow = [...filesW.querySelectorAll(".fm-row")].find((r) =>
+    r.textContent.includes("preview.d86"),
+  );
+  previewRow.dispatchEvent(new window.MouseEvent("dblclick", { bubbles: true }));
+  await wait(700);
+  const fromShortcut = [...document.querySelectorAll(".d86-window")].find((w) =>
+    /\/preview\/(index\.html)?(\?|$)/.test(String(w.querySelector("iframe")?.getAttribute("src") ?? "")),
+  );
+  check("opening preview.d86 launches Preview", Boolean(fromShortcut));
+
+  /* The file itself is the iframe code, which is what anything that reads it
+     should get — not an empty placeholder. Read it the way a user would:
+     right-click → Open with › Text Editor. */
+  const scramRow = [...filesW.querySelectorAll(".fm-row")].find((r) =>
+    r.textContent.includes("scramjet.d86"),
+  );
+  scramRow.dispatchEvent(
+    new window.MouseEvent("contextmenu", { bubbles: true, cancelable: true, clientX: 60, clientY: 60 }),
+  );
+  await tick();
+  const withSub = [...document.querySelectorAll(".ctx-item.has-sub")].find((b) =>
+    b.textContent.includes("Open with"),
+  );
+  withSub?.dispatchEvent(new window.MouseEvent("mouseenter", { bubbles: true }));
+  await tick();
+  [...document.querySelectorAll(".ctx-sub .ctx-item")]
+    .find((b) => b.textContent.includes("Text Editor"))
+    ?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  await wait(700);
+  /* The newest editor window: earlier tests leave editors open too. */
+  const editorWin = [...document.querySelectorAll(".d86-window")]
+    .filter((w) => w.querySelector(".editor-area"))
+    .at(-1);
+  const shortcutText = editorWin?.querySelector(".editor-area")?.value ?? "";
+  check(
+    "the shortcut holds the iframe markup",
+    /<iframe[^>]+src="[^"]*scramjet\/"/.test(shortcutText),
+    shortcutText.slice(0, 160) || "no editor",
+  );
+}
+
+/* ---- Engine Viewer: the machine's own screen ---- */
+{
+  const startBtn = document.querySelector(".start-btn");
+  startBtn.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  await wait(250);
+  const entry = [...document.querySelectorAll(".start-app")].find((n) =>
+    n.textContent.includes("Engine Viewer"),
+  );
+  check("the start menu offers the Engine Viewer", Boolean(entry));
+  startBtn.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  await wait(150);
+  entry?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  await wait(700);
+  const viewerWin = [...document.querySelectorAll(".d86-window")].find((w) =>
+    w.textContent.includes("Engine Viewer"),
+  );
+  check("the Engine Viewer opens", Boolean(viewerWin));
+  check("…with a canvas", Boolean(viewerWin?.querySelector("canvas.engine-canvas")));
+  check(
+    "…and says honestly that no machine is running",
+    /no v86 machine/i.test(viewerWin?.textContent ?? ""),
+    viewerWin?.textContent?.slice(0, 120),
+  );
+  check(
+    "the Engine Viewer has no desktop icon",
+    ![...document.querySelectorAll(".desktop-icon")].some((n) =>
+      n.textContent.trim().startsWith("Engine Viewer"),
+    ),
+  );
+}
+
 /* ---- uninstalling an app that shipped installed ----
    Hello is seeded into ~/system/apps by the OS itself. Uninstalling it used to
    do nothing at all: the next load re-created the folder (writeIfMissing) and
@@ -883,7 +1034,9 @@ check(
   );
   manifestRow?.dispatchEvent(new window.MouseEvent("dblclick", { bubbles: true }));
   await wait(1500);
-  const editorWin = [...document.querySelectorAll(".d86-window")].find((w) => w.querySelector(".editor-area"));
+  const editorWin = [...document.querySelectorAll(".d86-window")]
+    .filter((w) => w.querySelector(".editor-area"))
+    .at(-1);
   const manifestText = editorWin?.querySelector(".editor-area")?.value ?? "";
   check(
     "…and its entry in user-apps.json",

@@ -158,6 +158,16 @@ export function coreApps(launch: Record<string, () => void>): AppShortcut[] {
       onDesktop: def.onDesktop ?? true,
       launch: launch[def.id]!,
     })),
+    /* Part of the OS, but it is a place you go *from a terminal*: no icon on
+       the desktop, and it stays in the start menu for the last machine. */
+    {
+      id: "engine-viewer",
+      name: "Engine Viewer",
+      icon: "linux",
+      sub: "v86 screen",
+      onDesktop: false,
+      launch: launch["engine-viewer"]!,
+    },
     { id: "settings", name: "Settings", icon: "settings", sub: "System", launch: launch["settings"]! },
   ];
 }

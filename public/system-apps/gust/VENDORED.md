@@ -17,6 +17,6 @@ Everything else was already inline. Remaining network needs are runtime
 services, not static resources: the Wisp websocket endpoints GUST is
 configured with (configurable inside GUST) and whatever sites it proxies.
 
-Under Dragon86 it runs as the JSON iframe app `gust/` — note the OS cache
+Under Dragon86 it is an App Store app: `public/store.json` lists every file in this folder, the store copies them into `~/system/apps/gust/`, and the window opens `index.html` from there — note the OS cache
 worker excludes nothing here, but navigations are never cached and its
 assets are static, so they cache normally.

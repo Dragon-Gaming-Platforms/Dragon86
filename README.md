@@ -273,8 +273,8 @@ count); Settings → **v86 filesystem** can re-unpack it if it is ever damaged.
 - **Terminal** — xterm.js front end, waiting for the **CheerpX** engine (message-bridge protocol v1 is wired)
 - **Scramjet** — web proxy (vendored at `/scramjet/`; traffic via a configurable Wisp server), a JSON-defined iframe app
 - **Dragon Gaming Platforms** — the org catalog player (`cdn.singlefile.html`), iframed live from the org's GitHub Pages site, also a JSON-defined iframe app
-- **GUST** — single-file web proxy vendored at `/gust/` with its fonts/icons downloaded and served locally (see `public/gust/VENDORED.md`), a JSON-defined iframe app
-- **Sandstone** — sandboxed-iframe web proxy, built from source and vendored at `/sandstone/` (see `public/sandstone/VENDORED.md`), a JSON-defined iframe app
+- **GUST** — single-file web proxy, installed from the App Store like any other app: its folder (`public/system-apps/gust/`) ships its fonts and icons, so nothing comes from a CDN (see its `VENDORED.md`)
+- **Sandstone** — sandboxed-iframe web proxy, built from source and installed from the App Store; its folder lives at `public/system-apps/sandstone/` (see its `VENDORED.md`)
 
 Text/code files in the Text Editor open in **Monaco** (the VS Code editor),
 vendored under `/monaco/` from the npm package — no CDN at runtime, with a
@@ -420,8 +420,8 @@ deleted and nothing else changes.
 - [xterm.js](https://github.com/xtermjs/xterm.js) (MIT) — terminal emulator
 - [coi-serviceworker](https://github.com/gzuidhof/coi-serviceworker) (MIT, © Guido Zuidhof and contributors) — vendored at `public/coi-serviceworker.js` with a local modification: it stamps COOP/COEP **only on document (navigation) responses**, letting all subresources pass through untouched; license in `third-party/`
 - [Scramjet](https://github.com/MercuryWorkshop/scramjet) (AGPL-3.0, Mercury Workshop) — web proxy vendored at `public/scramjet/` from its pinned npm builds; license text included there. NOTE: this makes the combined deployed site AGPL-relevant — keep the source link handy.
-- [GUST](https://github.com/nautilus-os/GUST) (AGPL-3.0, Nautilus Labs) — vendored at `public/gust/`; its Google Fonts / Font Awesome / iso-639-1 CDN resources were replaced with local copies.
-- [Sandstone](https://github.com/ading2210/sandstone) (AGPL-3.0-only, ading2210) — built from source and vendored at `public/sandstone/`.
+- [GUST](https://github.com/nautilus-os/GUST) (AGPL-3.0, Nautilus Labs) — vendored at `public/system-apps/gust/`; its Google Fonts / Font Awesome / iso-639-1 CDN resources were replaced with local copies.
+- [Sandstone](https://github.com/ading2210/sandstone) (AGPL-3.0-only, ading2210) — built from source and vendored at `public/system-apps/sandstone/`.
 - [Monaco Editor](https://github.com/microsoft/monaco-editor) (MIT, Microsoft) — `monaco-editor` npm package's minified build vendored at `public/monaco/`.
 - CheerpX is a trademark of Leaning Technologies; engine licensing applies (Community/Commercial)
 
