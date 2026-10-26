@@ -183,12 +183,6 @@ class V86Backend implements TerminalBackend {
   }
 
   /**
-   * The guest boots straight to bash on the serial console, so nothing runs
-   * a login. This types the few harmless lines a login would have done —
-   * mounts that already exist become no-ops — and brings the network up.
-   * Sent only when the user clicks the Terminal's "Prepare Shell" button.
-   */
-  /**
    * The machine's VGA text screen. v86 renders it into a container we never
    * show, but it keeps the text buffer regardless, and `get_text_screen()`
    * hands it over row by row — colours included when the machine was built
@@ -218,22 +212,6 @@ class V86Backend implements TerminalBackend {
       if (plain.length > cols) cols = plain.length;
     }
     return { cols: Math.max(cols, 1), rows: lines.length, lines };
-  }
-
-  prepareShell(): void {
-    if (!this.emu) return;
-    const lines = [
-      "mount -t devtmpfs devtmpfs /dev 2>/dev/null; " +
-        "mount -t proc proc /proc 2>/dev/null; " +
-        "mount -t sysfs sysfs /sys 2>/dev/null; " +
-        "mount -t devpts devpts /dev/pts 2>/dev/null",
-      "export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
-      "export TERM=xterm-256color HOME=/root",
-      "cd /root 2>/dev/null || cd /",
-      "echo '[dragon86] /dev, /proc, /sys mounted'",
-      "[ -x /networking.sh ] && /networking.sh",
-    ];
-    for (const line of lines) this.emu.serial0_send(line + "\n");
   }
 
   resize(cols: number, rows: number): void {

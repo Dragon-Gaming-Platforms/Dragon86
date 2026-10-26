@@ -61,10 +61,6 @@ export interface TerminalBackend {
    * the Terminal shows — which is what the Engine Viewer mirrors.
    */
   getScreen?: () => EngineScreen | null;
-  /** v86 "arch" guest only: type the first-run setup into the guest (mount
-      /dev, /proc, /sys so a bare `init=/bin/bash` behaves like a real
-      system). Explicit user action — nothing is injected behind their back. */
-  prepareShell?: () => void;
 }
 
 export interface BackendHandlers {
