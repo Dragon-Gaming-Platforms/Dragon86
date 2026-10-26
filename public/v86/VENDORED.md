@@ -19,10 +19,13 @@ Contents and provenance:
 - `git` (inside `initrd.gz`, not a separate file) — GNU Git 2.49.1,
   built by Dragon86 from the upstream `git/git` v2.49.1 source with
   `zig cc -target x86-linux-musl`, fully static, linked against zlib
-  1.3.1. Configured without curl/OpenSSL/expat/gettext (no network in
-  the guest, so `git clone https://…` is not available; local
+  1.3.1. Configured **without curl/OpenSSL/expat/gettext**, so it has no
+  HTTP or HTTPS transport at all: `git clone https://…` cannot work in
+  the guest, whatever the URL. (The guest does have a network — see
+  "Networking" below — it is the build of git that cannot use it.) Local
   repositories, commits, branches, merges, tags, bundles and
-  `file://`-style remotes all work). GPL-2.0, see `LICENSE.git`.
+  `file://`/path remotes all work, because none of that touches the
+  network. GPL-2.0, see `LICENSE.git`.
   Added to the initrd with `tools/initrd-append.py`, which copies the
   existing archive through byte-for-byte and inserts new entries
   before the trailer.
@@ -47,6 +50,47 @@ The kernel command line also blacklists `mcheck_init_device`: v86's
 CPU has no machine-check hardware for the Arch kernel to initialize.
 These warnings did not prevent booting, but the guest now boots
 without them; the shared-folder boot was retested after the change.
+
+## Networking, and why `git clone https://…` is not what it looks like
+
+The guest gets a NIC from the emulator (virtio-net), DHCP from v86 itself, and
+DNS + TCP through the relay URL set in Settings → v86 network (default
+`wss://relay.widgetry.org/`). `/networking.sh` brings the card up; there is no
+second network stack and no proxy inside the guest.
+
+Two things mislead people here, so both are now handled in the guest itself:
+
+1. **`ping` proves nothing.** v86 answers ICMP on its own virtual link; a ping
+   reply arrives even with the relay switched off. `d86-net check` walks the
+   chain that actually matters — interface, route, resolv.conf, a real DNS
+   lookup, a real TLS connection — and stops at the first broken link.
+
+2. **The bundled git has no HTTPS transport** (no curl, no OpenSSL — see the
+   `git` bullet above). `git clone https://github.com/owner/repo` therefore
+   fails before any packet is sent: with a URL git cannot parse as a transport
+   it dies with `repository '…' does not exist`, and otherwise with
+   `Unable to find remote helper for 'https'`. Neither message is about GitHub,
+   the repository, or the connection.
+
+`public/v86/scripts/` holds three files that the bridge (`src/bridge/v86.ts`,
+`installGuestTools`) copies into the guest root at every boot, so they are
+ordinary, editable files in Files:
+
+| asset | guest path | what it is |
+| --- | --- | --- |
+| `networking.sh` | `/networking.sh` | DHCP for the emulated card (unchanged) |
+| `d86-clone.sh` | `/usr/bin/d86-clone` | fetch a GitHub branch snapshot with busybox's TLS, unpack it, and make a one-commit repository with the guest's git |
+| `d86-net.sh` | `/usr/bin/d86-net` | the honest connectivity check above |
+| `guest-helpers.sh` | `/usr/share/d86/helpers.sh` | shell functions, sourced from a marked block appended to `/etc/profile`: `d86-clone`, `d86-net`, and a `git` wrapper that catches only `clone` with an http(s) URL |
+| `guest-readme.txt` | `/usr/share/d86/README.guest` | the same explanation, readable from inside the guest |
+
+`d86-clone` is a **snapshot import, not a clone**: it downloads GitHub's own
+tarball for one branch (the endpoint behind "Download ZIP"), so you get the
+current files and one commit, and `git log` shows no upstream history. That
+would need the git protocol over TLS, which this build of git cannot speak.
+The script says so every time it runs rather than pretending the clone was
+complete, and `--force` is required before it will pull a repository large
+enough to threaten browser storage.
 
 ## The filesystem: a real 9p server, not a sync
 

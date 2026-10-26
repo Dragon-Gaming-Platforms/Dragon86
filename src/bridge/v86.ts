@@ -223,25 +223,85 @@ class V86Backend implements TerminalBackend {
   }
 
   /**
-   * Put the guest's networking script where both guests can see it: in the
-   * OS filesystem, so it is editable in Files and shows up in the Arch
-   * guest's own root (the image has no such script of its own once we serve
-   * it — copy.sh's image ships one at /root, and ours does too).
+   * Copy one of public/v86/scripts/ into the guest root. The guest root is
+   * the OS filesystem, so these are ordinary files in Files: editable, and
+   * the same text the guest runs.
+   *
+   * Every write is idempotent — the boot after a page reload puts the same
+   * content back, so a re-seed or a half-finished write heals itself, and an
+   * edit made in Files survives until the next boot replaces the file.
    */
-  private async installNetworkingScript(root: string): Promise<void> {
+  private async installHostFile(asset: string, dest: string, mode = 0o644): Promise<boolean> {
     try {
-      const src = await fetch(`${BASE}scripts/networking.sh`);
-      if (!src.ok) return;
+      const src = await fetch(`${BASE}scripts/${asset}`);
+      if (!src.ok) {
+        logWarn("v86", `${asset}: HTTP ${src.status} from ${BASE}scripts/`);
+        return false;
+      }
       const body = await src.text();
-      const dest = `${root}/networking.sh`;
       const existing = await fs.promises.readFile(dest, "utf8").catch(() => null);
       if (existing !== body) {
         await fs.promises.writeFile(dest, body);
-        logInfo("v86", `networking.sh installed at ${dest}`);
+        logInfo("v86", `${asset} installed at ${dest}`);
       }
-      await fs.promises.chmod(dest, 0o755).catch(() => {});
+      await fs.promises.chmod(dest, mode).catch(() => {});
+      return true;
     } catch (err) {
-      logWarn("v86", "could not install networking.sh:", err);
+      logWarn("v86", `could not install ${asset}:`, err);
+      return false;
+    }
+  }
+
+  /**
+   * Guest-side scripts and the profile hook that makes them usable.
+   *
+   * - /networking.sh       — bring the emulated card up (copy.sh's job too)
+   * - /usr/bin/d86-clone   — fetch a GitHub snapshot (guest git has no HTTPS)
+   * - /usr/bin/d86-net     — check DNS/TLS for real, since ping is emulated
+   * - /usr/share/d86/      — helpers.sh (sourced from /etc/profile) + a note
+   *
+   * /etc/profile is where login shells look, so the helper functions are
+   * sourced from there rather than relying on executable bits landing on a
+   * 9p-backed file. The marked block is rewritten every boot, so a stale copy
+   * cannot keep pointing at a script that has moved.
+   */
+  private async installGuestTools(root: string): Promise<void> {
+    const PROFILE_BEGIN = "# >>> dragon86 guest helpers";
+    const PROFILE_END = "# <<< dragon86 guest helpers";
+    try {
+      await this.installHostFile("networking.sh", `${root}/networking.sh`, 0o755);
+      await ensureDir(`${root}/usr/bin`);
+      await ensureDir(`${root}/usr/share/d86`);
+      await this.installHostFile("d86-clone.sh", `${root}/usr/bin/d86-clone`, 0o755);
+      await this.installHostFile("d86-net.sh", `${root}/usr/bin/d86-net`, 0o755);
+      await this.installHostFile("guest-readme.txt", `${root}/usr/share/d86/README.guest`);
+      const helpers = await this.installHostFile(
+        "guest-helpers.sh",
+        `${root}/usr/share/d86/helpers.sh`,
+      );
+      if (!helpers) return;
+
+      const profilePath = `${root}/etc/profile`;
+      const current = await fs.promises.readFile(profilePath, "utf8").catch(() => null);
+      if (current === null) return; /* root not unpacked yet; next boot */
+      const block = [
+        PROFILE_BEGIN,
+        "# Written by Dragon86 at boot. Sources the guest helpers and says how to",
+        "# get a repository in here (the bundled git has no HTTPS transport).",
+        "[ -r /usr/share/d86/helpers.sh ] && . /usr/share/d86/helpers.sh",
+        PROFILE_END,
+        "",
+      ].join("\n");
+      const stripped = current
+        .replace(new RegExp(`${PROFILE_BEGIN}[\\s\\S]*?${PROFILE_END}\\n?`, "m"), "")
+        .replace(/\n*$/, "\n");
+      const next = `${stripped}${stripped.endsWith("\n") ? "" : "\n"}\n${block}`;
+      if (next !== current) {
+        await fs.promises.writeFile(profilePath, next);
+        logInfo("v86", "guest helpers hooked into /etc/profile");
+      }
+    } catch (err) {
+      logWarn("v86", "could not install the guest tools:", err);
     }
   }
 
@@ -294,14 +354,16 @@ class V86Backend implements TerminalBackend {
 
       const root = vfs.ENGINE_ROOT.v86;
       await ensureDir(root);
-      /* The script sits at the top of the guest root, so the guest sees it at
-         /networking.sh and you can edit it in Files. */
-      void this.installNetworkingScript(root);
 
       /* Guest / = ~/v86 (ZenFS). The kernel and initramfs are read from there
          too, so everything the machine runs is a file in the OS filesystem;
          they are unpacked/copied in on first boot. */
       const guestRoot = await ensureGuestRoot(root, { status: (t) => this.status(t) });
+      /* Scripts and the profile hook go in *after* the distro tree exists —
+         a first boot that unpacked over the top of them would lose them —
+         and before the machine starts, because the guest reads /etc/profile
+         on its very first login. */
+      await this.installGuestTools(root);
       if (this.disposed) return;
       /* A snapshot belongs to one particular root: it holds the guest's
          inodes (modes, qids) for files that were re-unpacked underneath it.
