@@ -16,6 +16,22 @@ wsproxy, `wisp://` wisp, `fetch` in-page, or `off`), press **Test** to
 check it from your browser, and run `/networking.sh` in the guest
 (same script copy.sh's images ship) for a status report.
 
+Two traps worth knowing before you conclude "the network is broken":
+
+- **`ping` always succeeds.** v86 answers ICMP on its own virtual link, so a
+  ping reply arrives even with the relay switched off. Use `d86-net check` in
+  the guest instead: it tests the interface, the route, `resolv.conf`, a real
+  DNS lookup and a real TLS connection, and stops at the first broken link.
+- **The guest's git has no HTTPS transport.** It is a static build without
+  curl or OpenSSL, so `git clone https://github.com/owner/repo` fails before a
+  packet is sent — usually as `repository '…' does not exist`, which is git's
+  message for a URL it cannot parse as a transport, not a verdict on GitHub.
+  Use `d86-clone https://github.com/owner/repo` in the guest: it fetches the
+  branch with busybox's TLS (which does work), unpacks it, and makes a real
+  one-commit repository with the guest's git. Snapshot, not history — the
+  script says so every run. `git clone <url>` is routed there automatically;
+  local paths, `file://` URLs and bundles still go to the real git.
+
 ### Filesystem apps (apps served from your files)
 
 An app can live in your filesystem instead of the build. Its files sit in a
@@ -175,7 +191,13 @@ How it hangs together (details in `public/v86/VENDORED.md`):
 - `/init` brings up virtio + 9p, mounts the share as `/newroot`, bind-mounts
   `/proc`, `/sys` and `/dev` in, then `chroot`s into it;
 - the share itself is served by `src/bridge/p9.ts`, a 9p2000.L server talking
-  straight to ZenFS — no HTTP, no image store, no per-device vendoring.
+  straight to ZenFS — no HTTP, no image store, no per-device vendoring;
+- at every boot the bridge also copies `public/v86/scripts/` into the guest
+  root (`/networking.sh`, `/usr/bin/d86-clone`, `/usr/bin/d86-net`,
+  `/usr/share/d86/`), and hooks the shell functions into a marked block at the
+  end of `/etc/profile` — so `d86-clone`, `d86-net` and the `git` wrapper are
+  there on the first login, and every one of those files is readable and
+  editable in Files like anything else in the distro.
 
 `~/v86/.dragon86-root.json` marks an unpacked root (version, timestamp, file
 count); Settings → **v86 filesystem** can re-unpack it if it is ever damaged.
