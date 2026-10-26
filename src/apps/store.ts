@@ -21,6 +21,7 @@ import { notify } from "../core/toast";
 import { showConfirm } from "../core/dialog";
 import { clearDefaultsForApp, requestDefaults } from "../core/filetypes";
 import { refreshDesktops } from "../core/desktop";
+import { forgetDesktopChoice } from "../core/desktop-apps";
 import {
   APPS_DIRS,
   getFsApps,
@@ -48,6 +49,10 @@ interface StoreApp {
   category?: string;
   publisher?: string;
   icon?: string;
+  /** Image inside the app folder, used as its icon once installed. */
+  "icon-path"?: string;
+  /** Set false to install an app that does not put an icon on the desktop. */
+  desktop?: boolean;
   base?: string;
   entry?: string;
   files?: string[];
@@ -197,17 +202,20 @@ export function openStore(win: Win): void {
       const hasEntry = await vfs.exists(`${entry.path}/index.html`);
       if (!registered && !hasEntry) continue;
       installedIds.add(entry.name);
-      if (registered) continue; /* the catalog card covers it */
+      /* A registered app the catalog does not list still deserves a card —
+         it is installed, it can be opened and uninstalled, and its own icon
+         is better than a generic square. */
       localApps.push({
         id: entry.name,
-        name: prettyName(entry.name),
-        sub: "Installed on this device",
+        name: registered?.name ?? prettyName(entry.name),
+        sub: registered?.sub || "Installed on this device",
         category: "Installed",
         publisher: "Local",
-        icon: "grid",
-        entry: "index.html",
-        description:
-          "This folder was added to system/apps directly rather than installed from the catalog, so the store knows nothing else about it. Uninstalling removes the folder and any registry entry that points at it.",
+        icon: registered?.icon ?? "grid",
+        entry: registered?.entry ?? "index.html",
+        description: registered
+          ? "This app is installed from a folder in system/apps rather than this catalog. Uninstalling removes the folder and its user-apps.json entry."
+          : "This folder was added to system/apps directly rather than installed from the catalog, so the store knows nothing else about it. Uninstalling removes the folder and any registry entry that points at it.",
         local: true,
       });
     }
@@ -377,10 +385,21 @@ export function openStore(win: Win): void {
     return box;
   }
 
+  /**
+   * The icon to draw for an app. Before an install there is only the catalog's
+   * promise (an image under public/icons, or a named OS icon); afterwards the
+   * app's own folder is the truth, because that is what the desktop and the
+   * start menu use — so the card shows exactly what you will get.
+   */
+  function appIcon(app: StoreApp): string {
+    const installed = getFsApps().find((a) => a.id === app.id);
+    return installed?.icon ?? app.icon ?? "grid";
+  }
+
   function card(app: StoreApp): HTMLElement {
     const node = el("div", "store-card");
     const head = el("div", "store-card-head");
-    head.append(icon(app.icon ?? "grid", "store-app-icon"));
+    head.append(icon(appIcon(app), "store-app-icon"));
     const title = el("div", "store-card-title");
     title.append(el("strong", undefined, app.name), el("span", undefined, app.sub ?? ""));
     head.append(title);
@@ -499,7 +518,7 @@ export function openStore(win: Win): void {
     content.append(back);
 
     const head = el("div", "store-detail-head");
-    head.append(icon(app.icon ?? "grid", "store-detail-icon"));
+    head.append(icon(appIcon(app), "store-detail-icon"));
     const info = el("div", "store-detail-info");
     info.append(el("h1", undefined, app.name), el("div", "store-publisher", app.publisher ?? "Unknown publisher"));
     const meta = el("div", "store-card-meta");
@@ -586,6 +605,8 @@ export function openStore(win: Win): void {
         name: app.name,
         sub: app.sub,
         icon: app.icon ?? "grid",
+        "icon-path": app["icon-path"],
+        desktop: app.desktop,
         entry: app.entry ?? "index.html",
         "folder-isolated": true,
         width: app.width,
@@ -651,7 +672,8 @@ export function openStore(win: Win): void {
       return;
     }
     await removeAppEntry(app.id);
-    const cleared = await clearDefaultsForApp(app.id);
+    await forgetDesktopChoice(app.id);
+    const cleaned = await clearDefaultsForApp(app.id);
     await reloadFsApps();
     await refreshInstalled();
     refreshDesktops();
@@ -661,7 +683,7 @@ export function openStore(win: Win): void {
       title: `${app.name} uninstalled`,
       body: [
         "Its folder and its entry are gone.",
-        cleared.length ? `Default app for ${cleared.map((e) => `.${e}`).join(", ")} reset.` : "",
+        cleaned.length ? `Default app for ${cleaned.map((e) => `.${e}`).join(", ")} reset.` : "",
       ]
         .filter(Boolean)
         .join(" "),

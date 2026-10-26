@@ -29,6 +29,7 @@ import {
   resetAsked,
 } from "../core/filetypes";
 import { fsAppsWithOpens, getFsApps, onFsAppsChange } from "../core/fs-apps";
+import { loadDesktopPrefs, onDesktop, setOnDesktop } from "../core/desktop-apps";
 import {
   hasPassword,
   setPassword,
@@ -383,9 +384,24 @@ export function openSettings(win: Win, startPage?: string): void {
           row.append(el("span", "app-list-opens", app.opens.map((o) => `.${o}`).join(" ")));
         }
         row.append(el("code", "app-list-dir", app.dir.replace(vfs.HOME, "~")));
+
+        /* An app and a desktop icon are separate things: this is where you
+           say which apps earn a shortcut, without uninstalling anything. */
+        const shown = onDesktop(app.id, app.onDesktop);
+        const toggle = el("button", "btn sm app-list-desktop", shown ? "On desktop" : "Off desktop");
+        toggle.title = shown
+          ? "Remove this app's icon from the desktop (the app stays installed)"
+          : "Put this app's icon on the desktop";
+        toggle.setAttribute("aria-pressed", String(shown));
+        toggle.addEventListener("click", async () => {
+          await setOnDesktop(app.id, !shown);
+          redrawList();
+        });
+        row.append(toggle);
         listHost.append(row);
       }
     };
+    void loadDesktopPrefs().then(redrawList);
     redrawList();
     const off = onFsAppsChange(redrawList);
     win.setOnClose(off);

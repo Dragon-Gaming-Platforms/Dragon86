@@ -18,6 +18,8 @@ import { getSettings, onSettingsChange } from "./settings";
 import * as vfs from "./vfs";
 import { openersFor, isDefault, extOf } from "./filetypes";
 import { moveToTrash } from "./trash";
+import { notify } from "./toast";
+import { loadDesktopPrefs, onDesktop, setOnDesktop, onDesktopAppsChange } from "./desktop-apps";
 import type { AppShortcut } from "./taskbar";
 
 export interface DesktopHandlers {
@@ -250,6 +252,9 @@ export function buildDesktop(getApps: () => AppShortcut[], handlers: DesktopHand
     const taken = new Set<string>();
 
     for (const app of getApps()) {
+      /* Not every app belongs here: the start menu lists everything that
+         exists, the desktop only what you put on it. */
+      if (!onDesktop(app.id, app.onDesktop ?? true)) continue;
       const key = `app:${app.id}`;
       present.add(key);
       iconsArea.append(makeIcon(key, app.name, app.icon, () => handlers.openApp(app.id), taken));
@@ -377,6 +382,27 @@ export function buildDesktop(getApps: () => AppShortcut[], handlers: DesktopHand
       const entries: CtxItem[] = [
         { label: "Open", iconHtml: icon("file").innerHTML, onClick: onOpen },
       ];
+
+      /* Apps can be taken off the desktop without being uninstalled: the app
+         and its files stay, only the shortcut goes. "(Add to Desktop)" is on
+         the app's own page instead — see Files and Settings → Apps. */
+      if (!filePath && key.startsWith("app:")) {
+        const appId = key.slice(4);
+        entries.push({
+          label: "Remove from Desktop",
+          iconHtml: icon("close").innerHTML,
+          onClick: async () => {
+            await setOnDesktop(appId, false);
+            notify({
+              title: `${label} removed from the desktop`,
+              body: "The app is still installed — it is in the start menu, and Add to Desktop brings it back.",
+              icon: "grid",
+              timeout: 6000,
+            });
+            void refreshIcons();
+          },
+        });
+      }
 
       if (filePath) {
         const openers = openersFor(filePath);
@@ -589,6 +615,7 @@ export function buildDesktop(getApps: () => AppShortcut[], handlers: DesktopHand
      Files app and the trash announce changes, and coming back to the tab
      re-reads the folder. */
   window.addEventListener("d86-desktop-changed", () => void refreshIcons());
+  onDesktopAppsChange(() => void refreshIcons());
   window.addEventListener("focus", () => void refreshIcons());
 
   /* Belt and braces for the same 0×0 problem: whenever the desktop first gets
@@ -606,7 +633,7 @@ export function buildDesktop(getApps: () => AppShortcut[], handlers: DesktopHand
     window.addEventListener("resize", onMaybeSized);
   }
 
-  void refreshIcons();
+  void loadDesktopPrefs().then(() => refreshIcons());
 }
 
 /** Ask every open desktop to re-read ~/Desktop (from anywhere in the OS). */

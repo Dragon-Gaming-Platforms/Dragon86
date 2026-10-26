@@ -67,8 +67,14 @@ export function createLauncher(wm: WindowManager) {
   }
 
   function openIframeAppAt(def: IframeAppDef, filePath?: string): void {
+    /* "title-template": "Preview - {file}" — the window says what it is
+       showing, not just which app is showing it. */
+    const title =
+      filePath && def.titleTemplate
+        ? def.titleTemplate.replace("{file}", vfs.baseName(filePath))
+        : def.name;
     const win = wm.create({
-      title: def.name,
+      title,
       icon: def.icon,
       width: def.width ?? 880,
       height: def.height ?? 600,

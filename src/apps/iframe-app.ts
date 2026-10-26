@@ -52,6 +52,13 @@ export interface IframeAppDef {
   fs?: { entry: string; isolated: boolean; dir: string };
   /** Extensions this app opens, e.g. ["nes"]. Set from user-apps.json. */
   opens?: string[];
+  /**
+   * Window title while opening a file, {file} standing for its name. Set from
+   * "title-template" in the manifest (Preview uses "Preview - {file}").
+   */
+  titleTemplate?: string;
+  /** Whether the app starts with a desktop icon (default true). */
+  onDesktop?: boolean;
   /** Put the iframe behind a sandbox (no allow-same-origin). */
   sandbox?: boolean;
 }

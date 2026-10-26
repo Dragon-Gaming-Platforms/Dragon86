@@ -54,6 +54,19 @@ interface RawApp {
   "folder-isolated"?: unknown;
   /** Extensions this app can open: ["nes"], [".nes", "*.zip"], "nes". */
   opens?: unknown;
+  /**
+   * An image inside the app folder to use as its icon:
+   *   "icon-path": "icon.svg"        → served as 9pf/<id>/icon.svg
+   * Absolute URLs are refused; the icon has to be a file the app ships.
+   */
+  "icon-path"?: unknown;
+  /** Start with a desktop icon? Default true. The start menu always lists it. */
+  desktop?: unknown;
+  /**
+   * Window title when the app opens a file, with {file} standing for its
+   * name: "title-template": "Preview - {file}". Default: the app's name.
+   */
+  "title-template"?: unknown;
 }
 
 interface LoadedApp {
@@ -77,6 +90,8 @@ export interface FsAppSummary {
   /** Entry file inside `dir` (usually index.html). */
   entry: string;
   opens: string[];
+  /** False when the manifest says "desktop": false. */
+  onDesktop: boolean;
 }
 
 /** "NES", ".nes", "*.nes" → "nes". */
@@ -105,6 +120,7 @@ export function getFsApps(): FsAppSummary[] {
     dir: a.dir,
     entry: a.def.fs?.entry ?? "index.html",
     opens: a.def.opens ?? [],
+    onDesktop: a.def.onDesktop ?? true,
   }));
 }
 
@@ -117,6 +133,16 @@ export function fsAppsWithOpens(ext?: string): FsAppSummary[] {
 
 export function getFsApp(id: string): FsAppSummary | null {
   return getFsApps().find((a) => a.id === id) ?? null;
+}
+
+/**
+ * The installed app a file *is* — its entry document. Used by "Add to
+ * Desktop" and "Remove from Desktop": an .html file that has a manifest and
+ * is listed as an app is that app's page, not a loose file.
+ */
+export function appForFile(path: string): FsAppSummary | null {
+  const want = path.replace(/\/+$/, "");
+  return getFsApps().find((a) => `${a.dir}/${a.entry}` === want) ?? null;
 }
 
 /** Listen for installs, removals and edits (desktop, start menu, Settings). */
@@ -203,10 +229,10 @@ async function readRegistries(dir: string): Promise<{ file: string; apps: RawApp
 /* ---------- the demo app, created once ---------- */
 
 /** The one manifest the OS owns a share of; user edits win after seeding. */
-const BUILTIN_VERSION = 2;
+const BUILTIN_VERSION = 3;
 
 /** Apps that ship in public/system-apps/ and get copied into the FS. */
-const BUILTIN_APPS = ["nes"] as const;
+const BUILTIN_APPS = ["nes", "preview"] as const;
 
 const BUILTIN_ENTRIES: Record<string, RawApp> = {
   hello: {
@@ -219,11 +245,46 @@ const BUILTIN_ENTRIES: Record<string, RawApp> = {
     width: 520,
     height: 420,
   },
+  /**
+   * Preview — the OS's answer to "show me this file". It is an ordinary
+   * filesystem app (public/system-apps/preview), but it ships installed and
+   * claims the types nobody else wants to render: pictures, sound, video,
+   * PDFs, 3D models and ISO disc images. `desktop: false` because it is
+   * reached by opening a file, not from a shelf — Add to Desktop exists if
+   * you would rather have the icon.
+   */
+  preview: {
+    id: "preview",
+    name: "Preview",
+    sub: "Images, audio, video, 3D models, PDF, ISO",
+    icon: "browser",
+    entry: "index.html",
+    "folder-isolated": true,
+    "icon-path": "icon.svg",
+    "title-template": "Preview - {file}",
+    desktop: false,
+    width: 880,
+    height: 640,
+    opens: [
+      // pictures
+      "png", "jpg", "jpeg", "jfif", "gif", "webp", "avif", "bmp", "ico", "svg",
+      "apng", "heic", "heif", "tif", "tiff",
+      // sound
+      "mp3", "wav", "ogg", "oga", "opus", "flac", "m4a", "aac", "weba", "aiff", "aif",
+      // video
+      "mp4", "m4v", "webm", "ogv", "mov", "mkv", "avi",
+      // documents and models
+      "pdf", "glb", "gltf", "stl", "obj", "ply",
+      // disc images
+      "iso", "img",
+    ],
+  },
   nes: {
     id: "nes",
     name: "NES",
     sub: "Emulator · test ROM",
     icon: "games",
+    "icon-path": "icon.svg",
     entry: "index.html",
     "folder-isolated": true,
     opens: ["nes"],
@@ -355,6 +416,11 @@ async function seedApps(): Promise<void> {
     const existing = apps[at] as RawApp;
     if (!existing.opens && entry.opens) existing.opens = entry.opens;
     if (!existing.icon && entry.icon) existing.icon = entry.icon;
+    if (!existing["icon-path"] && entry["icon-path"]) existing["icon-path"] = entry["icon-path"];
+    if (!existing["title-template"] && entry["title-template"]) {
+      existing["title-template"] = entry["title-template"];
+    }
+    if (existing.desktop === undefined && entry.desktop !== undefined) existing.desktop = entry.desktop;
   }
   await vfs.writeText(manifest, JSON.stringify({ seeded: BUILTIN_VERSION, apps }, null, 2));
 }
@@ -374,11 +440,24 @@ function toDef(raw: RawApp, dir: string): { def: IframeAppDef; isolated: boolean
     return null;
   }
   const entry = str(raw.entry, "index.html").replace(/^\/+/, "");
+  /* "icon-path": "icon.svg" wins over "icon": an app that ships its own
+     artwork uses it, and it is resolved through the app's own 9pf route so
+     the file has to exist in the app folder. */
+  const iconPath = str(raw["icon-path"], "").replace(/^\/+/, "");
+  const icon = iconPath
+    ? `img:9pf/${id}/${iconPath}`
+    : typeof raw.icon === "string"
+      ? raw.icon
+      : "browser";
+  const titleTemplate =
+    typeof raw["title-template"] === "string" ? raw["title-template"] : undefined;
   const def: IframeAppDef = {
     id,
     name: str(raw.name, id),
     sub: typeof raw.sub === "string" ? raw.sub : "Filesystem app",
-    icon: typeof raw.icon === "string" ? raw.icon : "browser",
+    icon,
+    titleTemplate,
+    onDesktop: raw.desktop === undefined ? true : truthy(raw.desktop),
     status:
       typeof raw.status === "string"
         ? raw.status

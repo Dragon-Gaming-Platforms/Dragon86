@@ -32,6 +32,60 @@ Two traps worth knowing before you conclude "the network is broken":
   script says so every run. `git clone <url>` is routed there automatically;
   local paths, `file://` URLs and bundles still go to the real git.
 
+### Preview — one place for everything you look at but do not edit
+
+**Preview** (`public/system-apps/preview/`) is the default app for pictures,
+sound, video, PDFs, 3D models and disc images. Opening any of those from
+Files, the desktop or `Open with ›` lands there, and the window is titled
+after the file (`Preview - holiday.png`).
+
+| kind | formats | how |
+| --- | --- | --- |
+| images | png, jpg/jpeg/jfif, gif, webp, avif, bmp, ico, svg, apng, heic/heif, tif/tiff | the browser decodes it; Preview adds zoom, rotate and a real-size button |
+| audio | mp3, wav, ogg/oga, opus, flac, m4a, aac, weba, aiff | `<audio>` plus a waveform decoded from the file itself |
+| video | mp4, m4v, webm, ogv, mov, mkv, avi | `<video>`, with the codec limit explained when it cannot play |
+| documents | pdf | the browser's own PDF viewer, with "open in tab" when it declines |
+| 3D models | glb, gltf, stl, obj, ply | parsed and drawn with WebGL — orbit, zoom, spin |
+| disc images | iso, img | ISO9660 volume label and a three-level listing of what is inside |
+
+Everything that needs parsing is parsed in `parsers.js` (pure functions, no
+DOM) and tested byte-for-byte in `tools/test-preview.mjs`. There is no
+three.js and no CDN: the model viewer is a small WebGL renderer, and the
+formats are read directly.
+
+Formats the browser itself cannot decode — HEIF outside Safari, ProRes `.mov`,
+a `.gltf` whose `.bin` lives next door — say so in plain words instead of
+showing a blank pane. That is the whole point of a preview: it should never
+leave you wondering whether the file or the app is broken.
+
+Preview ships with `"desktop": false`: it is reached by opening a file, not
+from a shelf. **Add to Desktop** (right-click its `index.html` in Files, or
+Settings → Apps) puts the icon there if you would rather launch it directly.
+
+### Desktop icons are a choice, not a side effect
+
+Installing an app no longer adds an icon you have to tidy away. The start menu
+lists everything installed; the desktop only holds what you put on it:
+
+- **Remove from Desktop** in an app icon's menu takes the icon away and leaves
+  the app installed.
+- **Add to Desktop** on the app's own page — right-click the app's
+  `index.html` in Files — puts it back.
+- Settings → **Apps** has a switch per app, plus the file types each claims.
+
+The choice lives in `~/system/desktop-apps.json`, visible in Files like the
+rest of your data. Apps can also ship with `"desktop": false` in their
+manifest, which is how Preview stays out of the way by default.
+
+### App icons
+
+An app can now carry its own artwork: `"icon-path": "icon.svg"` in its
+manifest points at an image inside the app folder, served through the app's
+own `9pf/<id>/` route. The desktop icon, the start menu entry and the App
+Store card all draw it — so what you see in the store before installing is
+the catalog's `icon`, and after installing it is the app's own file. Every
+bundled app ships an `icon.svg` next to its code.
+
 ### Filesystem apps (apps served from your files)
 
 An app can live in your filesystem instead of the build. Its files sit in a
@@ -110,7 +164,8 @@ and removable from the store or by hand.
         "entry": "index.html",
         "files": ["index.html", "app.js", "index.json"],
         "opens": ["nes"],                     // optional, see above
-        "description": "…"
+        "description": "…",
+        "icon-path": "icon.svg"              // optional: art inside the app folder
       }]
     }
 

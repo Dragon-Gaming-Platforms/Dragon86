@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+<title>Preview</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: #0c0d10; color: #e9edf2;
+    font: 13px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif;
+    display: flex; flex-direction: column; overflow: hidden;
+  }
+
+  header {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 12px; border-bottom: 1px solid #1e222a; background: #11141a;
+    flex: 0 0 auto; min-height: 44px;
+  }
+  header .name { font-weight: 600; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  header .meta { color: #8792a2; font-size: 11px; white-space: nowrap; }
+  header .spacer { flex: 1; }
+
+  .tools { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+  button {
+    font: 600 11px/1 system-ui, sans-serif; letter-spacing: .3px;
+    color: #dfe5ec; background: #191d25; border: 1px solid #2b313c;
+    border-radius: 6px; padding: 7px 10px; cursor: pointer;
+  }
+  button:hover { border-color: #4b5666; }
+  button:active { background: #232936; }
+  button[aria-pressed="true"] { border-color: #ff4d5a; color: #ff8b93; }
+
+  main { position: relative; flex: 1; min-height: 0; display: flex; overflow: hidden; }
+
+  /* images */
+  #stage {
+    flex: 1; min-width: 0; min-height: 0; overflow: auto;
+    display: flex; align-items: center; justify-content: center;
+    padding: 14px; background:
+      repeating-conic-gradient(#101319 0 25%, #0d1015 0 50%) 0 0 / 22px 22px;
+  }
+  #stage img {
+    display: block; max-width: 100%; max-height: 100%;
+    transform-origin: center center; image-rendering: auto;
+    box-shadow: 0 6px 28px rgba(0,0,0,.5);
+  }
+  #stage.pdf { overflow: hidden; padding: 0; }
+  #stage iframe { width: 100%; height: 100%; border: 0; background: #fff; }
+
+  /* audio + video */
+  .media { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+           gap: 14px; padding: 18px; min-width: 0; }
+  .media audio { width: min(560px, 100%); }
+  .media video { max-width: 100%; max-height: 100%; background: #000; border-radius: 8px;
+                 box-shadow: 0 8px 30px rgba(0,0,0,.55); }
+  .art {
+    width: 96px; height: 96px; border-radius: 14px; display: grid; place-items: center;
+    background: linear-gradient(150deg, #ff4d5a22, #4d7dff22); border: 1px solid #262c37;
+    color: #ff6b74; font-size: 34px; font-weight: 700;
+  }
+  .wave { width: min(560px, 100%); height: 90px; display: block; }
+
+  /* 3d */
+  #gl { display: block; width: 100%; height: 100%; touch-action: none; cursor: grab; }
+  #gl.dragging { cursor: grabbing; }
+  .overlay {
+    position: absolute; left: 12px; bottom: 12px; right: 12px;
+    color: #8d98a8; font-size: 11px; pointer-events: none; text-shadow: 0 1px 2px #000;
+  }
+
+  /* iso listing */
+  .listing { flex: 1; overflow: auto; padding: 8px 0; }
+  .listing .row {
+    display: flex; gap: 10px; align-items: baseline;
+    padding: 4px 14px; font-size: 12.5px; border-bottom: 1px solid #14181f;
+  }
+  .listing .row.dir { color: #8fb4ff; font-weight: 600; }
+  .listing .row .size { color: #7c8797; margin-left: auto; font-variant-numeric: tabular-nums; }
+  .listing .row .depth { color: #4d5665; }
+  .listing .head { padding: 10px 14px 6px; color: #8792a2; font-size: 11px; letter-spacing: .6px; text-transform: uppercase; }
+
+  /* empty / errors */
+  .empty { flex: 1; display: grid; place-items: center; padding: 24px; text-align: center; }
+  .empty .box { max-width: 460px; display: flex; flex-direction: column; gap: 10px; align-items: center; }
+  .empty h2 { font-size: 15px; margin: 0; color: #e9edf2; }
+  .empty p { margin: 0; color: #8d98a8; font-size: 12px; line-height: 1.6; }
+  .empty code { color: #ffb3b8; background: #1b1f27; padding: 2px 6px; border-radius: 4px; font-size: 11px; }
+  .warn { color: #ffca7a; font-size: 11px; }
+  footer {
+    flex: 0 0 auto; padding: 6px 12px; border-top: 1px solid #1e222a; background: #11141a;
+    color: #7c8797; font-size: 11px; display: flex; gap: 10px; align-items: center;
+    overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+  }
+</style>
+</head>
+<body>
+  <header>
+    <div style="min-width:0">
+      <div class="name" id="title">Preview</div>
+      <div class="meta" id="meta">nothing open</div>
+    </div>
+    <div class="spacer"></div>
+    <div class="tools" id="tools"></div>
+  </header>
+
+  <main id="main"></main>
+
+  <footer id="status">Ready.</footer>
+
+  <script src="./parsers.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>

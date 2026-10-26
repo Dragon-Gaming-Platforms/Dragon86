@@ -9,7 +9,8 @@
     "build": "tsc --noEmit && node tools/check-css-vars.mjs && node tools/test-coi-deregister.mjs && node tools/test-app-sw.mjs && vite build",
     "preview": "vite preview",
     "test:ui": "vite build --config tools/ui-smoke/vite.config.ts && node tools/ui-smoke/run.mjs",
-    "test:guest": "node tools/test-guest-scripts.mjs"
+    "test:guest": "node tools/test-guest-scripts.mjs",
+    "test:preview": "node tools/test-preview.mjs"
   },
   "dependencies": {
     "@xterm/addon-fit": "^0.11.0",
