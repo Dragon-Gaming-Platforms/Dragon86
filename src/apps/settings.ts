@@ -29,6 +29,7 @@ import {
   resetAsked,
 } from "../core/filetypes";
 import { fsAppsWithOpens, getFsApps, onFsAppsChange } from "../core/fs-apps";
+import { staticIframeApps } from "./iframe-app";
 import { loadDesktopPrefs, onDesktop, setOnDesktop } from "../core/desktop-apps";
 import {
   hasPassword,
@@ -365,11 +366,29 @@ export function openSettings(win: Win, startPage?: string): void {
     askRow.append(askBtn);
     host.append(askRow);
 
-    host.append(section("Installed apps", "Everything in ~/system/apps, with the types it opens."));
+    host.append(
+      section(
+        "Installed apps",
+        "Everything in ~/system/apps, with the types it opens — plus the fixed apps that ship with the OS.",
+      ),
+    );
     const listHost = el("div", "app-list");
     const redrawList = (): void => {
       listHost.textContent = "";
-      const apps = getFsApps();
+      /* Two kinds of app appear here: folders in ~/system/apps, and the fixed
+         pages that come with the OS (iframe-apps.json) — Preview is one of
+         those now, so it has no folder and no uninstall button, but it still
+         deserves a desktop switch. */
+      const fixed = staticIframeApps().map((def) => ({
+        id: def.id,
+        name: def.name,
+        sub: def.sub ?? "Fixed app — ships with Dragon86",
+        icon: def.icon,
+        opens: def.opens ?? [],
+        onDesktop: def.onDesktop ?? true,
+        dir: null as string | null,
+      }));
+      const apps = [...fixed, ...getFsApps()];
       if (!apps.length) {
         listHost.append(note("No filesystem apps yet — the App Store has some."));
         return;
@@ -383,7 +402,13 @@ export function openSettings(win: Win, startPage?: string): void {
         if (app.opens.length) {
           row.append(el("span", "app-list-opens", app.opens.map((o) => `.${o}`).join(" ")));
         }
-        row.append(el("code", "app-list-dir", app.dir.replace(vfs.HOME, "~")));
+        row.append(
+          el(
+            "code",
+            "app-list-dir",
+            app.dir ? app.dir.replace(vfs.HOME, "~") : "fixed page",
+          ),
+        );
 
         /* An app and a desktop icon are separate things: this is where you
            say which apps earn a shortcut, without uninstalling anything. */
@@ -496,10 +521,15 @@ export function openSettings(win: Win, startPage?: string): void {
     );
   }
 
-  /* ---------- Engine (CheerpX) ---------- */
+  /* ---------- Engine ---------- */
 
   function renderEngine(host: HTMLElement): void {
-    host.append(section("CheerpX hoster", "The page that runs the Linux engine, and the URL the Terminal talks to."));
+    host.append(
+      section(
+        "CheerpX hoster",
+        "Only used by the CheerpX engine. v86 needs no hoster at all — it boots inside this page.",
+      ),
+    );
     const row = el("div", "settings-row");
     row.dataset.setting = "CheerpX hoster URL";
     row.append(el("label", undefined, "Hoster URL"));
@@ -536,7 +566,11 @@ export function openSettings(win: Win, startPage?: string): void {
     const modes: { id: "embedded" | "tab" | "v86"; label: string; blurb: string }[] = [
       { id: "embedded", label: "Embedded", blurb: "CheerpX inside this page. Needs cross-origin isolation." },
       { id: "tab", label: "Separate tab", blurb: "CheerpX in its own tab; this page stays unrestricted." },
-      { id: "v86", label: "v86", blurb: "A small Linux that runs right here, no isolation at all." },
+      {
+        id: "v86",
+        label: "v86",
+        blurb: "Default. An Arch userland that boots inside this page — no isolation, no hoster, works on every browser.",
+      },
     ];
     const seg = el("div", "segmented");
     const noteEl = el("div", "settings-note");

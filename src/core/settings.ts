@@ -77,7 +77,10 @@ const DEFAULTS: Settings = {
   theme: "dragon",
   wallpaper: "ember",
   hosterUrl: "",
-  engineMode: "embedded",
+  /* v86 is the default: it runs entirely in this page (no isolation, no
+     hoster, no service worker), which is the only engine that works on every
+     browser Dragon86 targets. CheerpX is still there under Settings → Engine. */
+  engineMode: "v86",
   /* copy.sh's own public proxy: the same one its Arch demo uses, so the
      guest behaves the way it does there. Rate-limited and shared — set your
      own wisp/wsproxy URL in Settings for regular use. */

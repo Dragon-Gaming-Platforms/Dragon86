@@ -20,6 +20,7 @@ import {
 } from "../bridge/hoster";
 import { getV86Backend } from "../bridge/v86";
 import { isolationReport, logInfo, logWarn } from "../core/log";
+import { rememberEngine } from "./engine-viewer";
 
 const GREEN = "\x1b[38;2;46;204;113m";
 const RED = "\x1b[38;2;231;76;60m";
@@ -69,18 +70,25 @@ export function openTerminal(win: Win): void {
   const openTabBtn = el("button", "tool-btn", "Open Engine Tab");
   openTabBtn.title = "Open (or focus) the separate engine tab";
   openTabBtn.style.display = "none";
-  const prepareBtn = el("button", "tool-btn", "Prepare Shell");
-  prepareBtn.title =
-    "Mount /dev, /proc and /sys in the guest, set PATH, and bring the network up — " +
-    "the steps a normal login would have done";
-  prepareBtn.style.display = "none";
+  const viewEngineBtn = el("button", "tool-btn", "View Engine");
+  viewEngineBtn.title =
+    "Open the Engine Viewer: the VGA display of this terminal's v86 machine, live";
+  viewEngineBtn.style.display = "none";
   const devBtn = el("button", "tool-btn", "Dev Console");
   devBtn.title = "Toggle the built-in developer console (Eruda)";
-  toolbar.append(reconnectBtn, saveStateBtn, prepareBtn, openTabBtn, devBtn);
+  toolbar.append(reconnectBtn, saveStateBtn, viewEngineBtn, openTabBtn, devBtn);
 
-  prepareBtn.addEventListener("click", () => {
-    backend?.prepareShell?.();
-    term.focus();
+  viewEngineBtn.addEventListener("click", () => {
+    if (!backend?.getScreen) {
+      logWarn("terminal", "this engine has no display to show");
+      return;
+    }
+    /* The viewer mirrors the machine that owns this terminal, not "a" machine:
+       two terminals are two v86 instances, and each asks for its own. */
+    rememberEngine(backend);
+    /* The launcher owns window creation; this is the same seam the App Store
+       uses to open an app nobody here has a handle on. */
+    window.dispatchEvent(new CustomEvent("d86-launch-app", { detail: "engine-viewer" }));
   });
 
   saveStateBtn.addEventListener("click", () => {
@@ -232,7 +240,7 @@ export function openTerminal(win: Win): void {
     if (getSettings().engineMode === "v86") {
       openTabBtn.style.display = "none";
       saveStateBtn.style.display = "";
-      prepareBtn.style.display = "";
+      viewEngineBtn.style.display = "";
       logInfo(
         "terminal",
         `connect mode=v86 (in-page compatibility engine, no isolation needed) boot=${freshBoot ? "image" : "saved-state-if-present"}`,
@@ -272,6 +280,7 @@ export function openTerminal(win: Win): void {
         },
       }, freshBoot);
       backend = vb;
+      rememberEngine(vb);
       vb.connect();
       return;
     }

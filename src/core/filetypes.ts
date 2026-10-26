@@ -1,16 +1,19 @@
 /**
  * File types — who opens what.
  *
- * Three kinds of opener:
+ * Four kinds of opener:
  *
  *   1. the OS's own built-ins: the Text Editor for text, and "System" for
  *      everything else (the built-in viewer, apps/viewer.ts). Built-ins have
  *      no app folder, so menus name them after what they are;
- *   2. installed apps that declare `"opens": ["nes"]` in their
- *      user-apps.json entry (or in the App Store listing they came from).
- *      Such an app may ask, once, to become the default;
+ *   2. apps that declare `"opens": ["nes"]` — either a fixed iframe app from
+ *      src/apps/iframe-apps.json (Preview, which is nobody's folder) or an
+ *      installed app from user-apps.json (or the App Store listing it came
+ *      from). An installed app may ask, once, to become the default;
  *   3. the App Launcher, offered for any .html file that is not itself an
- *      installed app: it runs the page as an app for as long as it is open.
+ *      installed app: it runs the page as an app for as long as it is open;
+ *   4. "App shortcut" for `.d86` files — `~/system/apps/scramjet.d86` and
+ *      friends launch the fixed app they name (core/app-shortcuts.ts).
  *
  * The user's choices live in the filesystem, next to the apps themselves:
  *
@@ -22,19 +25,21 @@ import * as vfs from "./vfs";
 import { logInfo, logWarn } from "./log";
 import { notify } from "./toast";
 import { fsAppsWithOpens, getFsApps, normExt, type FsAppSummary } from "./fs-apps";
+import { staticIframeApps } from "../apps/iframe-app";
 
 export interface Opener {
   /** App id, or one of BUILTIN ids below. */
   id: string;
   name: string;
   icon: string;
-  kind: "app" | "editor" | "system" | "launcher";
+  kind: "app" | "editor" | "system" | "launcher" | "shortcut";
 }
 
 export const BUILTIN = {
   editor: "builtin:editor",
   system: "builtin:system",
   launcher: "builtin:launcher",
+  shortcut: "builtin:shortcut",
 } as const;
 
 const TEXT_EXT = new Set(
@@ -92,7 +97,19 @@ async function save(): Promise<void> {
   }
 }
 
+/** `foo.d86` — a shortcut to an app that is part of the OS (core/app-shortcuts). */
+export function shortcutOpener(): Opener {
+  return { id: BUILTIN.shortcut, name: "App shortcut", icon: "grid", kind: "shortcut" };
+}
+
 function builtinOpeners(ext: string): Opener[] {
+  /* A .d86 file *is* an app, so the first thing to offer is the app itself. */
+  if (ext === "d86") {
+    return [
+      shortcutOpener(),
+      { id: BUILTIN.editor, name: "Text Editor", icon: "editor", kind: "editor" },
+    ];
+  }
   if (TEXT_EXT.has(ext)) {
     return [
       { id: BUILTIN.editor, name: "Text Editor", icon: "editor", kind: "editor" },
@@ -114,14 +131,22 @@ function builtinOpeners(ext: string): Opener[] {
   return [{ id: BUILTIN.system, name: "System", icon: "browser", kind: "system" }];
 }
 
-/** Installed apps that claim this extension, in registry order. */
+/**
+ * Apps that claim this extension, in this order: fixed iframe apps (Preview
+ * first — it is the OS's own answer to "show me this file"), then installed
+ * apps in registry order.
+ */
 export function appOpeners(ext: string): Opener[] {
-  return fsAppsWithOpens(ext).map((app: FsAppSummary) => ({
-    id: app.id,
-    name: app.name,
-    icon: app.icon,
-    kind: "app" as const,
-  }));
+  const out: Opener[] = [];
+  for (const app of staticIframeApps()) {
+    if (!(app.opens ?? []).includes(ext)) continue;
+    out.push({ id: app.id, name: app.name, icon: app.icon, kind: "app" });
+  }
+  for (const app of fsAppsWithOpens(ext) as FsAppSummary[]) {
+    if (out.some((o) => o.id === app.id)) continue;
+    out.push({ id: app.id, name: app.name, icon: app.icon, kind: "app" });
+  }
+  return out;
 }
 
 /** True when this is a page that is not itself an installed app. */
@@ -155,8 +180,11 @@ export function openerById(id: string, path?: string): Opener | null {
   if (id === BUILTIN.editor) return { id, name: "Text Editor", icon: "editor", kind: "editor" };
   if (id === BUILTIN.system) return { id, name: "System", icon: "browser", kind: "system" };
   if (id === BUILTIN.launcher) return launcherOpener();
+  if (id === BUILTIN.shortcut) return shortcutOpener();
   const app = getFsApps().find((a) => a.id === id);
-  return app ? { id, name: app.name, icon: app.icon, kind: "app" } : null;
+  if (app) return { id, name: app.name, icon: app.icon, kind: "app" };
+  const fixed = staticIframeApps().find((a) => a.id === id);
+  return fixed ? { id, name: fixed.name, icon: fixed.icon, kind: "app" } : null;
 }
 
 export function defaultFor(ext: string): string | null {

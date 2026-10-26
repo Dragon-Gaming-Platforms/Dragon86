@@ -15,4 +15,4 @@ worker (it proxies inside sandboxed iframes). Remaining network need is the
 Wisp websocket server — default `wss://wisp.mercurywork.shop/` (upstream's
 example default), changeable in the app's Options panel.
 
-Runs in Dragon86 as the JSON iframe app `sandstone/`.
+Under Dragon86 it is an App Store app: `public/store.json` lists every file in this folder, the store copies them into `~/system/apps/sandstone/`, and the window opens `index.html` from there.

@@ -34,6 +34,18 @@ import { createFsResponder, type FsRequest } from "./fs-bridge";
 
 export type BackendStatus = "ready" | "offline";
 
+/**
+ * What a machine's own display currently shows, one string per text row.
+ * Rows may contain ANSI SGR colour escapes (v86 is asked for them), so the
+ * reader strips them when it only wants the characters — see
+ * apps/engine-viewer.ts.
+ */
+export interface EngineScreen {
+  cols: number;
+  rows: number;
+  lines: string[];
+}
+
 export interface TerminalBackend {
   connect(): void;
   write(data: string): void;
@@ -43,10 +55,12 @@ export interface TerminalBackend {
   openTab?: () => void;
   /** v86 only: snapshot the machine to on-device storage. */
   saveState?: () => Promise<void>;
-  /** v86 "arch" guest only: type the first-run setup into the guest (mount
-      /dev, /proc, /sys so a bare `init=/bin/bash` behaves like a real
-      system). Explicit user action — nothing is injected behind their back. */
-  prepareShell?: () => void;
+  /**
+   * v86 only: the machine's VGA text screen, as it is right now. This is the
+   * display the emulated BIOS and kernel draw on — not the serial console
+   * the Terminal shows — which is what the Engine Viewer mirrors.
+   */
+  getScreen?: () => EngineScreen | null;
 }
 
 export interface BackendHandlers {

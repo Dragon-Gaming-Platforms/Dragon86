@@ -147,7 +147,7 @@ export function buildTaskbar(wm: WindowManager, getApps: () => AppShortcut[]): v
 export function coreApps(launch: Record<string, () => void>): AppShortcut[] {
   return [
     { id: "files", name: "Files", icon: "folder", sub: "Explorer", launch: launch["files"]! },
-    { id: "terminal", name: "Terminal", icon: "terminal", sub: "CheerpX", launch: launch["terminal"]! },
+    { id: "terminal", name: "Terminal", icon: "terminal", sub: "Arch Linux · v86", launch: launch["terminal"]! },
     { id: "editor", name: "Text Editor", icon: "editor", sub: "Notes", launch: launch["editor"]! },
     { id: "store", name: "App Store", icon: "store", sub: "Get apps", launch: launch["store"]! },
     ...IFRAME_APPS.map((def) => ({
@@ -158,6 +158,16 @@ export function coreApps(launch: Record<string, () => void>): AppShortcut[] {
       onDesktop: def.onDesktop ?? true,
       launch: launch[def.id]!,
     })),
+    /* Part of the OS, but it is a place you go *from a terminal*: no icon on
+       the desktop, and it stays in the start menu for the last machine. */
+    {
+      id: "engine-viewer",
+      name: "Engine Viewer",
+      icon: "linux",
+      sub: "v86 screen",
+      onDesktop: false,
+      launch: launch["engine-viewer"]!,
+    },
     { id: "settings", name: "Settings", icon: "settings", sub: "System", launch: launch["settings"]! },
   ];
 }

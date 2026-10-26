@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Tests for the Preview app's parsers (public/system-apps/preview/parsers.js),
+ * Tests for the Preview app's parsers (public/preview/parsers.js),
  * run against files built here byte by byte.
  *
  * Preview is the default app for pictures, sound, video, PDFs, 3D models and
@@ -11,14 +11,14 @@
  *
  *   node tools/test-preview.mjs
  */
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import vm from "node:vm";
 import { JSDOM } from "jsdom";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const source = readFileSync(resolve(here, "../public/system-apps/preview/parsers.js"), "utf8");
+const source = readFileSync(resolve(here, "../public/preview/parsers.js"), "utf8");
 
 /* parsers.js attaches itself to `window` (or globalThis) and to module.exports. */
 const sandbox = { TextDecoder, atob, console, Uint8Array, Float32Array, DataView, JSON, Math, Error, parseInt, parseFloat, isNaN, Infinity };
@@ -295,26 +295,37 @@ check("ISO: a non-ISO image says why", /ISO9660|UDF/.test(threw), threw);
 
 /* ---------- the manifest agrees with the code ---------- */
 
-const html = readFileSync(resolve(here, "../public/system-apps/preview/index.html"), "utf8");
+const html = readFileSync(resolve(here, "../public/preview/index.html"), "utf8");
 check("index.html loads the parsers first", html.indexOf("parsers.js") < html.indexOf("app.js"));
-const appJs = readFileSync(resolve(here, "../public/system-apps/preview/app.js"), "utf8");
+const appJs = readFileSync(resolve(here, "../public/preview/app.js"), "utf8");
 for (const ext of ["png", "jpg", "gif", "svg", "heif", "wav", "mp3", "ogg", "mp4", "mov", "pdf", "glb", "stl", "obj", "iso"]) {
   check(`app.js knows .${ext}`, new RegExp(`\\b${ext}\\b`).test(appJs));
 }
-const manifest = readFileSync(resolve(here, "../public/system-apps/preview/index.json"), "utf8");
+/* Preview is a fixed page now (an iframe app, like Scramjet), so there is
+   no index.json file list: what ships is the folder itself. */
 for (const file of ["index.html", "app.js", "parsers.js", "icon.svg"]) {
-  check(`the app's file list ships ${file}`, manifest.includes(file));
+  check(`the page ships ${file}`, existsSync(resolve(here, `../public/preview/${file}`)));
 }
+const iframeApps = JSON.parse(readFileSync(resolve(here, "../src/apps/iframe-apps.json"), "utf8"));
+const previewDef = iframeApps.find((a) => a.id === "preview");
+check("Preview is registered as a fixed iframe app", Boolean(previewDef), JSON.stringify(iframeApps.map((a) => a.id)));
+check("its URL is the fixed page", previewDef?.url === "preview/", String(previewDef?.url));
+check("it has no desktop icon by default", previewDef?.desktop === false, String(previewDef?.desktop));
+check(
+  "it claims the file types it can render",
+  ["png", "pdf", "mp4", "glb", "iso"].every((e) => previewDef?.opens?.includes(e)),
+  JSON.stringify(previewDef?.opens),
+);
 
 /* ---------- the app itself, in a real DOM ---------- */
 /* Not a browser (jsdom has no WebGL, no media decoders), but enough to prove
    the wiring: the file arrives, the right branch runs, and the status line
    says something true about it. */
 {
-  const html = readFileSync(resolve(here, "../public/system-apps/preview/index.html"), "utf8");
-  const appSource = readFileSync(resolve(here, "../public/system-apps/preview/app.js"), "utf8");
+  const html = readFileSync(resolve(here, "../public/preview/index.html"), "utf8");
+  const appSource = readFileSync(resolve(here, "../public/preview/app.js"), "utf8");
   const dom = new JSDOM(html.replace(/<script[^>]*><\/script>/g, ""), {
-    url: "https://example.test/Dragon86/9pf/preview/index.html?file=%2Fhome%2Fuser%2FDesktop%2Fpart.stl",
+    url: "https://example.test/Dragon86/preview/index.html?file=%2Fhome%2Fuser%2FDesktop%2Fpart.stl",
     runScripts: "outside-only",
     pretendToBeVisual: true,
   });

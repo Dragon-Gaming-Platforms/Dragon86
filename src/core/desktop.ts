@@ -458,6 +458,9 @@ export function buildDesktop(getApps: () => AppShortcut[], handlers: DesktopHand
   function guessIcon(name: string): string {
     const ext = extOf(name);
     if (ext === "nes" || ext === "rom") return "games";
+    /* A .d86 file *is* an app shortcut (core/app-shortcuts), so it should not
+       look like a stray document. */
+    if (ext === "d86") return "grid";
     if (/^(png|jpe?g|gif|webp|avif|svg|bmp|ico)$/.test(ext)) return "image";
     if (/^(html?|url)$/.test(ext)) return "browser";
     if (/^(mp3|wav|ogg|flac|m4a)$/.test(ext)) return "audio";

@@ -33,7 +33,7 @@ Two traps worth knowing before you conclude "the network is broken":
 
 ### Preview — one place for everything you look at but do not edit
 
-**Preview** (`public/system-apps/preview/`) is the default app for pictures,
+**Preview** (`public/preview/`) is the default app for pictures,
 sound, video, PDFs, 3D models and disc images. Opening any of those from
 Files, the desktop or `Open with ›` lands there, and the window is titled
 after the file (`Preview - holiday.png`).
@@ -58,8 +58,13 @@ showing a blank pane. That is the whole point of a preview: it should never
 leave you wondering whether the file or the app is broken.
 
 Preview ships with `"desktop": false`: it is reached by opening a file, not
-from a shelf. **Add to Desktop** (right-click its `index.html` in Files, or
-Settings → Apps) puts the icon there if you would rather launch it directly.
+from a shelf. **Add to Desktop** (Settings → Apps, or the app's `preview.d86`
+shortcut in Files) puts the icon there if you would rather launch it directly.
+
+Preview is a fixed page, not an app folder: it is listed in
+`src/apps/iframe-apps.json` beside Scramjet, ships in `public/preview/`, and
+never appears in the App Store or in `~/system/apps/`. It is the default
+opener for every type it can render.
 
 ### Desktop icons are a choice, not a side effect
 
@@ -223,6 +228,38 @@ the live state ("Isolation: ON/off", "Service worker: controlling / not
 controlling"), and `tools/test-coi-deregister.mjs` (run by `npm run
 build`) asserts the contract.
 
+### Fixed apps live in the filesystem too: `.d86` shortcuts
+
+Some apps are pages that ship with the OS rather than folders you install —
+Preview, Scramjet, Dragon Gaming Platforms and the Engine Viewer. They still
+show up where apps live: each gets a file in `~/system/apps/`
+(`preview.d86`, `scramjet.d86`, `engine-viewer.d86`, …).
+
+The file *is* the shortcut. It contains the HTML that embeds the app:
+
+```html
+<!-- Dragon86 app shortcut: Scramjet. The app itself is
+     https://…/Dragon86/scramjet/ — a fixed page that ships with the OS. -->
+<iframe src="https://…/Dragon86/scramjet/" …></iframe>
+```
+
+So anything that only *reads* the file — the Text Editor, `cat` in the guest,
+a copy to another machine — gets the iframe markup, while opening it in the OS
+launches the real window ("App shortcut" is the default opener for `.d86`).
+They are written once, behind a version in `~/system/app-shortcuts.json`, so
+deleting one is a decision the OS does not undo on the next boot.
+
+### Engine Viewer: the machine's own screen
+
+The Terminal shows the guest's **serial** console. The machine also has a VGA
+display; the guest is booted with `console=tty0 console=ttyS0`, so the BIOS and
+the kernel log draw on both. **View Engine** in the Terminal toolbar opens the
+Engine Viewer on *that terminal's* machine: a canvas that mirrors the VGA text
+screen (colours included — v86 hands the rows over with ANSI escapes), fitted
+to the window and repainted only when the screen changes. It is part of the OS,
+so it has no desktop icon and no folder; it sits in the start menu, and
+`~/system/apps/engine-viewer.d86` points at it.
+
 ### The v86 guest: a lightweight Arch userland rooted in your files
 
 The v86 engine boots one guest: the vendored Arch Linux 32 kernel plus a
@@ -265,11 +302,13 @@ count); Settings → **v86 filesystem** can re-unpack it if it is ever damaged.
 - **Settings** — pages with a sidebar and a search box (appearance, apps, trash, engines, storage, about)
 - **System viewer** — the built-in opener for anything no app claims: image, page, PDF, audio/video, or a hex dump
 - **Text Editor** — open & edit any text file, `Ctrl+S` saves
-- **Terminal** — xterm.js front end, waiting for the **CheerpX** engine (message-bridge protocol v1 is wired)
+- **Terminal** — xterm.js front end. **v86 is the default engine**: an Arch userland that boots inside the page with no isolation and no hoster. CheerpX (embedded or its own tab) is still there under Settings → Engine
+- **Preview** — the default opener for pictures, sound, video, PDFs, 3D models and disc images; a fixed page (`public/preview/`), never in the App Store
+- **Engine Viewer** — the v86 machine's own VGA display, on a canvas. Reach it from the Terminal's **View Engine** button
 - **Scramjet** — web proxy (vendored at `/scramjet/`; traffic via a configurable Wisp server), a JSON-defined iframe app
 - **Dragon Gaming Platforms** — the org catalog player (`cdn.singlefile.html`), iframed live from the org's GitHub Pages site, also a JSON-defined iframe app
-- **GUST** — single-file web proxy vendored at `/gust/` with its fonts/icons downloaded and served locally (see `public/gust/VENDORED.md`), a JSON-defined iframe app
-- **Sandstone** — sandboxed-iframe web proxy, built from source and vendored at `/sandstone/` (see `public/sandstone/VENDORED.md`), a JSON-defined iframe app
+- **GUST** — single-file web proxy, installed from the App Store like any other app: its folder (`public/system-apps/gust/`) ships its fonts and icons, so nothing comes from a CDN (see its `VENDORED.md`)
+- **Sandstone** — sandboxed-iframe web proxy, built from source and installed from the App Store; its folder lives at `public/system-apps/sandstone/` (see its `VENDORED.md`)
 
 Text/code files in the Text Editor open in **Monaco** (the VS Code editor),
 vendored under `/monaco/` from the npm package — no CDN at runtime, with a
@@ -415,8 +454,8 @@ deleted and nothing else changes.
 - [xterm.js](https://github.com/xtermjs/xterm.js) (MIT) — terminal emulator
 - [coi-serviceworker](https://github.com/gzuidhof/coi-serviceworker) (MIT, © Guido Zuidhof and contributors) — vendored at `public/coi-serviceworker.js` with a local modification: it stamps COOP/COEP **only on document (navigation) responses**, letting all subresources pass through untouched; license in `third-party/`
 - [Scramjet](https://github.com/MercuryWorkshop/scramjet) (AGPL-3.0, Mercury Workshop) — web proxy vendored at `public/scramjet/` from its pinned npm builds; license text included there. NOTE: this makes the combined deployed site AGPL-relevant — keep the source link handy.
-- [GUST](https://github.com/nautilus-os/GUST) (AGPL-3.0, Nautilus Labs) — vendored at `public/gust/`; its Google Fonts / Font Awesome / iso-639-1 CDN resources were replaced with local copies.
-- [Sandstone](https://github.com/ading2210/sandstone) (AGPL-3.0-only, ading2210) — built from source and vendored at `public/sandstone/`.
+- [GUST](https://github.com/nautilus-os/GUST) (AGPL-3.0, Nautilus Labs) — vendored at `public/system-apps/gust/`; its Google Fonts / Font Awesome / iso-639-1 CDN resources were replaced with local copies.
+- [Sandstone](https://github.com/ading2210/sandstone) (AGPL-3.0-only, ading2210) — built from source and vendored at `public/system-apps/sandstone/`.
 - [Monaco Editor](https://github.com/microsoft/monaco-editor) (MIT, Microsoft) — `monaco-editor` npm package's minified build vendored at `public/monaco/`.
 - CheerpX is a trademark of Leaning Technologies; engine licensing applies (Community/Commercial)
 

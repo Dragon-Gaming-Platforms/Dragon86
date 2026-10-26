@@ -33,13 +33,17 @@ import { createP9Handler } from "./p9";
 import { ensureGuestRoot } from "./guest-root";
 import { createDirectFs, unionAsPromises, withSubmount } from "./union-fs";
 import { logInfo, logWarn } from "../core/log";
-import type { BackendHandlers, TerminalBackend } from "./hoster";
+import type { BackendHandlers, EngineScreen, TerminalBackend } from "./hoster";
 
 interface V86Emulator {
   add_listener(event: string, cb: (arg: number) => void): void;
   destroy(): void;
   serial0_send(data: string): void;
   save_state(): Promise<ArrayBuffer>;
+  /** One string per VGA text row; see the `ansi` option in start(). */
+  get_text_screen?: () => string[];
+  /** The screen adapter, which is where libv86 actually keeps that method. */
+  screen?: { get_text_screen?: () => string[] };
 }
 
 type V86Ctor = new (opts: Record<string, unknown>) => V86Emulator;
@@ -179,25 +183,35 @@ class V86Backend implements TerminalBackend {
   }
 
   /**
-   * The guest boots straight to bash on the serial console, so nothing runs
-   * a login. This types the few harmless lines a login would have done —
-   * mounts that already exist become no-ops — and brings the network up.
-   * Sent only when the user clicks the Terminal's "Prepare Shell" button.
+   * The machine's VGA text screen. v86 renders it into a container we never
+   * show, but it keeps the text buffer regardless, and `get_text_screen()`
+   * hands it over row by row — colours included when the machine was built
+   * with `ansi: true` (see start()). Plain rows come back padded to the
+   * screen width, so the widest row after stripping escapes is the column
+   * count; there is no size getter.
    */
-  prepareShell(): void {
-    if (!this.emu) return;
-    const lines = [
-      "mount -t devtmpfs devtmpfs /dev 2>/dev/null; " +
-        "mount -t proc proc /proc 2>/dev/null; " +
-        "mount -t sysfs sysfs /sys 2>/dev/null; " +
-        "mount -t devpts devpts /dev/pts 2>/dev/null",
-      "export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
-      "export TERM=xterm-256color HOME=/root",
-      "cd /root 2>/dev/null || cd /",
-      "echo '[dragon86] /dev, /proc, /sys mounted'",
-      "[ -x /networking.sh ] && /networking.sh",
-    ];
-    for (const line of lines) this.emu.serial0_send(line + "\n");
+  getScreen(): EngineScreen | null {
+    /* libv86 exposes the text rows on the screen adapter (the emulator keeps
+       it as `screen`); some builds also forward it on the emulator itself. */
+    const read =
+      this.emu?.get_text_screen?.bind(this.emu) ??
+      this.emu?.screen?.get_text_screen?.bind(this.emu.screen) ??
+      null;
+    if (!read) return null;
+    let lines: string[];
+    try {
+      lines = read();
+    } catch (err) {
+      logWarn("v86", "could not read the text screen", err);
+      return null;
+    }
+    if (!Array.isArray(lines) || !lines.length) return null;
+    let cols = 0;
+    for (const line of lines) {
+      const plain = line.replace(/\x1b\[[0-9;]*m/g, "");
+      if (plain.length > cols) cols = plain.length;
+    }
+    return { cols: Math.max(cols, 1), rows: lines.length, lines };
   }
 
   resize(cols: number, rows: number): void {
@@ -412,6 +426,10 @@ class V86Backend implements TerminalBackend {
           ? { net_device: { type: "virtio", relay_url: this.netDeviceUrl() } }
           : {}),
         autostart: true,
+        /* Ask v86 for the text screen with colour escapes rather than plain
+           characters: the Engine Viewer draws it, and losing every colour of
+           a boot log is a poor way to show what the machine is doing. */
+        ansi: true,
         disable_keyboard: true,
         disable_mouse: true,
         disable_speaker: true,
@@ -474,7 +492,7 @@ class V86Backend implements TerminalBackend {
       } else {
         /* v86's CPU has no machine-check hardware; skip only that dead
            initcall so the kernel does not report an MCE device failure. */
-        opts.cmdline = `console=ttyS0 tsc=reliable initcall_blacklist=mcheck_init_device d86cols=${this.cols} d86rows=${this.rows}`;
+        opts.cmdline = `console=tty0 console=ttyS0 tsc=reliable initcall_blacklist=mcheck_init_device d86cols=${this.cols} d86rows=${this.rows}`;
         logInfo("v86", this.freshBoot ? "cold-booting guest from the OS filesystem (Reconnect)" : "cold-booting guest");
       }
 

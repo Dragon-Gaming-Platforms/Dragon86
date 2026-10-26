@@ -299,6 +299,7 @@ export function openFiles(win: Win, startPath: string, handlers: FilesHandlers):
     if (entry.isDirectory) return "folder";
     const ext = extOf(entry.name);
     if (ext === "nes" || ext === "rom") return "games";
+    if (ext === "d86") return "grid";
     if (/^(png|jpe?g|gif|webp|avif|svg|bmp|ico)$/.test(ext)) return "image";
     if (/^(mp3|wav|ogg|flac|m4a)$/.test(ext)) return "audio";
     if (/^(mp4|webm|mkv|mov)$/.test(ext)) return "video";
