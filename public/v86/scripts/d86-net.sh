@@ -13,12 +13,16 @@
 #   1. the interface, its address, the default route, /etc/resolv.conf
 #   2. DNS      nslookup github.com        (a real resolver round trip)
 #   3. TCP+TLS  wget --spider https://github.com   (a real connection)
+#   4. git      git ls-remote https://github.com/git/git HEAD
+#               (the transport a clone actually uses: git's own helper,
+#                its libcurl, and the CA bundle it verifies against)
 #
 # Usage: d86-net [check]      exit 0 = internet works, 1 = something is off
 
 set -u
 
 WGET=${D86_WGET:-wget}
+GIT=${D86_GIT:-git}
 HOST=${D86_NET_HOST:-github.com}
 
 say() { printf 'd86-net: %s\n' "$*"; }
@@ -68,7 +72,31 @@ else
     exit 1
 fi
 
-say "the chain works: DNS and TLS are real, and so is the relay."
+# ---- 4. git's own transport ----
+# The step above proves the card, the resolver and TLS. This proves the piece
+# a clone uses: git's HTTPS helper (/usr/lib/git-core/git-remote-http) talking
+# to the server through libcurl, with the shipped CA bundle.
+if command -v "$GIT" >/dev/null 2>&1; then
+    g=$(timeout 30 "$GIT" ls-remote "https://$HOST/git/git" HEAD 2>&1)
+    case "$g" in
+        *"unable to find remote helper"*|*"not a git command"*)
+            bad "git has no HTTPS helper in $( "$GIT" --exec-path )"
+            say "that is a Dragon86 install problem: /usr/lib/git-core/git-remote-http
+  should have been written at boot. Reconnect the Terminal to reinstall it."
+            exit 1
+            ;;
+        *[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]*) ok "git transport to https://$HOST" ;;
+        *)
+            bad "git could not reach https://$HOST"
+            printf '%s\n' "$g" | sed 's/^/        /'
+            say "TLS worked with wget but git failed, so the difference is git's helper
+  or its CA bundle. Check /usr/lib/git-core and /etc/ssl/certs."
+            exit 1
+            ;;
+    esac
+fi
+
+say "the chain works: DNS, TLS, and git's own HTTPS transport are real."
 say "note: ping is not part of this — v86 answers ICMP itself, so it works"
 say "      even with the network completely dead."
 exit 0

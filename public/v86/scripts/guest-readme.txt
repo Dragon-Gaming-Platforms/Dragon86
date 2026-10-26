@@ -1,62 +1,62 @@
-Why `git clone https://…` fails in this guest, and what to do instead
-=====================================================================
+git, HTTPS, and what is actually in this guest
+==============================================
 
-Short version: the URL is fine. The git is the problem.
+`git clone https://github.com/owner/repo` works here. It is a real clone: real
+history, real branches, `git log` all the way back.
 
-The git in this guest is a static build made for Dragon86 with no curl and no
-OpenSSL (see public/v86/VENDORED.md in the Dragon86 sources). Without those,
-git has no "https" transport to hand a request to. So:
+How
+---
 
-  * `git clone https://github.com/owner/repo`
-      → git never reaches the network. Depending on the argument it either
-        dies with "repository 'https://…' does not exist" (its message for
-        anything it cannot parse as a transport URL) or "Unable to find
-        remote helper for 'https'". Neither is about GitHub, the repo, or
-        your connection.
+The git binary in this guest is a static build configured without curl, so it
+has no HTTP transport of its own — git never puts TLS inside git itself. Upstream
+git ships those transports as separate programs, and looks them up in its exec
+path (`git --exec-path`, which for this build is /usr/lib/git-core):
 
-  * `git clone /path/to/repo`, `file:///path/to/repo`, `git clone x.bundle`,
-    `git init`, `add`, `commit`, `branch`, `merge`, `log`, `diff`, `tag`,
-    `push`/`pull` against a local path
-      → these all work. That is ordinary git doing local work, which needs
-        no network.
+  /usr/lib/git-core/git-remote-http    real binary, static, libcurl + mbedTLS
+  /usr/lib/git-core/git-remote-https   symlink to it (git picks by URL scheme)
+  /etc/ssl/certs/ca-certificates.crt   the CA roots it verifies against
 
-What does work, for getting a repository in here
-------------------------------------------------
+Those are written into this filesystem by Dragon86 at boot (see
+public/v86/VENDORED.md in the Dragon86 sources for provenance and
+tools/build-git-remote-http.sh for the build). They are ordinary files here —
+visible and replaceable, like everything else on this share.
 
-  d86-clone https://github.com/owner/repo [directory]
+What works
+----------
 
-It downloads GitHub's own tarball for one branch with busybox wget (busybox
-*does* have TLS), unpacks it, and then uses this guest's git to make a real
-repository out of the result: one commit, the current files, a clean
-`git status`.
+  git clone https://github.com/owner/repo        real clone, full history
+  git clone https://github.com/owner/repo -b dev
+  git fetch / pull / push (over https, with your credentials if you have them)
+  git ls-remote https://github.com/owner/repo    just the refs
+  git clone /path/to/repo, file:///path, *.bundle
 
-  d86-clone https://github.com/owner/repo     → ./repo
-  d86-clone owner/repo /Documents/repo        → visible in Dragon86's Files
-  d86-clone https://github.com/owner/repo -b dev
-  d86-clone https://github.com/owner/repo --force   (very large repositories)
+If a clone fails now, the message is about the network, not about git: v86's
+relay carries the guest's TCP, so check Dragon86 -> Settings -> v86 network, then
 
-What you do not get is upstream history — `git log` shows the single import
-commit. History needs the git protocol over TLS, which this git cannot speak.
-The script says so every time rather than pretending the clone was complete.
+  d86-net check
 
-The `git` in this shell is a thin wrapper (from /usr/share/d86/helpers.sh,
-sourced by /etc/profile) that catches exactly one case — `clone` with an
-http(s) URL, which could never work — explains itself, and runs d86-clone.
-Everything else goes to the real git. `command git clone <url>` still tries
-real git, if you want to see the error for yourself.
+The fallback: d86-clone
+-----------------------
+
+  d86-clone https://github.com/owner/repo [directory] [-b branch]
+
+This predates the HTTPS transport and is still useful for very large
+repositories or when you only want the files: it downloads GitHub's own tarball
+for one branch and makes a single-commit repository. No upstream history — the
+import commit says so.
 
 About `ping`
 ------------
 
-`ping 1.1.1.1` always succeeds here, even with the network completely dead:
-v86, the emulator, answers ICMP on its own virtual link. A ping reply is not
-evidence of anything.
+`ping 1.1.1.1` always succeeds here, even with the network completely dead: v86,
+the emulator, answers ICMP on its own virtual link. A ping reply is not evidence
+of anything.
 
   d86-net check
 
 That walks the chain that matters — interface, route, resolv.conf, a real DNS
-lookup, and a real TLS connection — and stops at the first broken link. If it
-fails, the usual culprit is the relay in Dragon86 → Settings → v86 network.
+lookup, a real TLS connection, and then git's own transport — and stops at the
+first broken link.
 
   /networking.sh          bring the emulated card up (DHCP)
   /networking.sh status   interface, routes, DNS as the guest sees them

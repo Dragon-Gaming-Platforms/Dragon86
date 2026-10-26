@@ -17,28 +17,21 @@ if [ -r "$D86_BIN/d86-net" ]; then
     d86-net() { bash "$D86_BIN/d86-net" "$@"; }
 fi
 
-# `git clone <http(s) url>` cannot work in this guest: the bundled git is a
-# static build with no curl and no OpenSSL, so it has no HTTPS transport at
-# all. That is why it either says "repository 'https://…' does not exist"
-# (git never got as far as the network) or "unable to find remote helper".
+# `git` is not wrapped. It used to be, because this git is a static build
+# configured without curl and so had no HTTPS transport: a wrapper caught
+# `git clone http(s)://…` and quietly turned it into a d86-clone snapshot
+# import. That is fixed at the source instead — the guest's /usr/lib/git-core
+# now holds git's own HTTPS helper (git-remote-http/https, static, with
+# libcurl + mbedTLS, plus a CA bundle), so `git clone https://…` is a real
+# clone with real history and the wrapper is gone.
 #
-# So this one case is handed to d86-clone, which uses busybox's TLS instead,
-# and says plainly what it does differently. Everything else — local paths,
-# file:// URLs, bundles, and every other git command — goes straight to the
-# real git, untouched.
-if [ -r "$D86_BIN/d86-clone" ]; then
-    git() {
-        case "${1:-}:${2:-}" in
-            clone:http://*|clone:https://*)
-                printf '%s\n' \
-                    'guest git has no HTTPS support (static build: no curl, no OpenSSL),' \
-                    'so this is a snapshot import rather than a history clone — one' \
-                    'commit, current files, no upstream log.  d86-clone --help'
-                shift
-                d86-clone "$@"
-                return $?
-                ;;
-        esac
-        command git "$@"
-    }
+# d86-clone is still here for the case the transport cannot help with: a
+# repository so large that a tarball is the only sane way to get it down.
+
+# Point git at the CA bundle explicitly as well. The helper was compiled with
+# that path as its default, but an exported variable survives a helper being
+# replaced by a locally built one.
+if [ -r /etc/ssl/certs/ca-certificates.crt ] && [ -z "${CURL_CA_BUNDLE:-}" ]; then
+    CURL_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
+    export CURL_CA_BUNDLE
 fi

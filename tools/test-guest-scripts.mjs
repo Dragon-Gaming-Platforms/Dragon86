@@ -24,6 +24,7 @@ import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
+import { gunzipSync } from "node:zlib";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const repo = resolve(here, "..");
@@ -269,7 +270,8 @@ export D86_BIN="${fakeBin}"
 . "${resolve(scripts, "guest-helpers.sh")}"
 type -t d86-clone >/dev/null && echo HAS-CLONE
 type -t d86-net >/dev/null && echo HAS-NET
-echo "--- wrapper:"; git clone https://github.com/owner/repo
+echo "GIT-IS $(type -t git)"
+echo "--- clone url:"; git clone https://github.com/owner/repo
 echo "--- passthrough local:"; git clone ./somewhere
 echo "--- passthrough other:"; git status
 `;
@@ -279,15 +281,17 @@ const helperRun = spawnSync("bash", ["-c", profile], {
 });
 const hout = helperRun.stdout;
 check("the helpers define d86-clone and d86-net", /HAS-CLONE/.test(hout) && /HAS-NET/.test(hout));
+/* git is no longer wrapped: the guest ships git's own HTTPS helper, so a
+   clone URL must reach the real git instead of being diverted to d86-clone. */
 check(
-  "the git wrapper explains itself for a clone URL",
-  /no HTTPS support/.test(hout) && /snapshot import/.test(hout),
+  "git is not wrapped any more",
+  /GIT-IS file/.test(hout),
   hout.split("\n").slice(0, 4).join(" | "),
 );
 check(
-  "the wrapper then runs d86-clone rather than real git",
-  /STUB-D86-CLONE https:\/\/github\.com\/owner\/repo/.test(hout) && !/REAL-GIT clone https/.test(hout),
-  hout.slice(hout.indexOf("--- wrapper"), hout.indexOf("--- passthrough local")).slice(0, 300),
+  "an https clone goes straight to the real git",
+  /REAL-GIT clone https:\/\/github\.com\/owner\/repo/.test(hout) && !/STUB-D86-CLONE/.test(hout),
+  hout.slice(hout.indexOf("--- clone url"), hout.indexOf("--- passthrough local")).slice(0, 300),
 );
 check(
   "a local clone still goes to the real git",
@@ -318,6 +322,32 @@ check(
 const net = read("d86-net.sh");
 check("d86-net says why ping is not a test", /emulator answers ICMP|answers ICMP itself/i.test(net));
 
+/* ---- 8b. git's HTTPS transport is really in the tree ---- */
+/* `git clone https://…` works only if git's helper is installed where this
+   git looks for it and the CA bundle the helper trusts is there. Both are
+   shipped assets, so check the bytes, not the docs. */
+const helper = readFileSync(resolve(repo, "public/v86/git-remote-http.gz"));
+{
+  const inflated = gunzipSync(helper);
+  check("the shipped git HTTPS helper is an ELF32 static binary",
+    inflated[0] === 0x7f && inflated[1] === 0x45 && inflated[4] === 1 &&
+      inflated.subarray(16, 18).equals(Buffer.from([2, 0])) &&
+      inflated.readUInt16LE(18) === 3 &&
+      !inflated.includes(Buffer.from("/lib/ld-linux")) &&
+      inflated.length > 1_000_000,
+    `${inflated.length} bytes`);
+}
+const bundle = readFileSync(resolve(repo, "public/v86/ca-certificates.crt"), "utf8");
+check("the CA bundle has real roots in it",
+  (bundle.match(/-----BEGIN CERTIFICATE-----/g) || []).length > 50,
+  `${(bundle.match(/-----BEGIN CERTIFICATE-----/g) || []).length} certificates`);
+check("the bridge installs the helper into git's exec path",
+  /usr\/lib\/git-core/.test(readFileSync(resolve(repo, "src/bridge/v86.ts"), "utf8")));
+check("the profile hook points libcurl at the bundle",
+  /CURL_CA_BUNDLE=\/etc\/ssl\/certs\/ca-certificates\.crt/.test(read("guest-helpers.sh")));
+check("d86-net checks git's own transport, not just TLS",
+  /ls-remote/.test(read("d86-net.sh")));
+
 /* ---- 9. the installer installs files that exist ---- */
 /* A rename on either side of this would silently leave the guest without the
    scripts, so read the asset names straight out of the bridge. */
@@ -326,6 +356,11 @@ const assets = [...bridge.matchAll(/installHostFile\(\s*"([^"]+)"/g)].map((m) =>
 check("the bridge installs at least the guest scripts", assets.length >= 4, assets.join(", "));
 for (const asset of assets) {
   check(`public/v86/scripts/${asset} exists`, existsSync(resolve(scripts, asset)));
+}
+const binaries = [...bridge.matchAll(/installHostBinary\(\s*"([^"]+)"/g)].map((m) => m[1]);
+check("the bridge installs the git transport binaries", binaries.length >= 2, binaries.join(", "));
+for (const asset of binaries) {
+  check(`public/v86/${asset} exists`, existsSync(resolve(repo, "public/v86", asset)));
 }
 
 rmSync(work, { recursive: true, force: true });

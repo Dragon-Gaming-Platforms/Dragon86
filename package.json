@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "test:ui": "vite build --config tools/ui-smoke/vite.config.ts && node tools/ui-smoke/run.mjs",
     "test:guest": "node tools/test-guest-scripts.mjs",
-    "test:preview": "node tools/test-preview.mjs"
+    "test:preview": "node tools/test-preview.mjs",
+    "test:vm": "vite build --config tools/vm/vite.config.ts && node tools/vm/boot.mjs"
   },
   "dependencies": {
     "@xterm/addon-fit": "^0.11.0",
