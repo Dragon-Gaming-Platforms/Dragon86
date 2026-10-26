@@ -1736,6 +1736,14 @@
   font-family: var(--font-mono);
   font-size: 0.72rem;
 }
+.app-list-desktop {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+.app-list-desktop[aria-pressed="true"] {
+  border-color: var(--theme-accent);
+  color: var(--theme-accent);
+}
 .app-list-dir {
   color: var(--text-dim);
   font-family: var(--font-mono);

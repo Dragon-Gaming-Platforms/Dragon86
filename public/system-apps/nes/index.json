@@ -1,3 +1,10 @@
 {
-  "files": ["index.html", "app.js", "jsnes.min.js", "test.nes", "LICENSE.jsnes"]
+  "files": [
+    "index.html",
+    "app.js",
+    "jsnes.min.js",
+    "test.nes",
+    "LICENSE.jsnes",
+    "icon.svg"
+  ]
 }

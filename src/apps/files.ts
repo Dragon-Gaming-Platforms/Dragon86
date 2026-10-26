@@ -16,6 +16,9 @@ import * as vfs from "../core/vfs";
 import type { Win } from "../core/wm";
 import { extOf, isDefault, openersFor, canLaunchAsApp } from "../core/filetypes";
 import { TRASH, isUnlocked, moveToTrash, restore, unlockTrash, emptyTrash } from "../core/trash";
+import { appForFile } from "../core/fs-apps";
+import { onDesktop, setOnDesktop } from "../core/desktop-apps";
+import { notify } from "../core/toast";
 import { refreshDesktops } from "../core/desktop";
 
 export interface FilesHandlers {
@@ -233,6 +236,33 @@ export function openFiles(win: Win, startPath: string, handlers: FilesHandlers):
           })),
         });
       }
+    }
+
+    /* An .html file that has a manifest and is listed as an app is that app's
+       page. Putting the app on the desktop (or taking it off) belongs here,
+       next to the file — that is where you go looking for the app itself. */
+    const owningApp = entry.isDirectory ? null : appForFile(entry.path);
+    if (owningApp) {
+      const shown = onDesktop(owningApp.id, owningApp.onDesktop);
+      items.push({
+        label: shown ? "Remove from Desktop" : "Add to Desktop",
+        iconHtml: icon(shown ? "close" : "grid").innerHTML,
+        onClick: async () => {
+          await setOnDesktop(owningApp.id, !shown);
+          notify({
+            title: shown
+              ? `${owningApp.name} removed from the desktop`
+              : `${owningApp.name} added to the desktop`,
+            body: shown
+              ? "Still installed: it stays in the start menu, and this menu puts the icon back."
+              : "Its icon is on the desktop now, and it stays there after a reload.",
+            icon: owningApp.icon,
+            timeout: 5000,
+          });
+          refreshDesktops();
+          void render();
+        },
+      });
     }
 
     items.push({

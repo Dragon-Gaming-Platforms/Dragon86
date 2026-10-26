@@ -290,6 +290,17 @@ check(
   toasts.some((t) => /Snake installed/.test(t)),
   toasts.join(" | ").slice(0, 200),
 );
+const installedSnakeIcon =
+  [...(storeWindowEl()?.querySelectorAll(".store-card") ?? [])]
+    .find((n) => n.textContent.includes("Snake"))
+    ?.querySelector(".store-app-icon img")
+    ?.getAttribute("src") ?? "";
+check(
+  "an installed app shows the icon its folder ships",
+  installedSnakeIcon.includes("9pf/snake/icon.svg"),
+  installedSnakeIcon,
+);
+
 check(
   "installed apps ask to be the default opener",
   toasts.some((t) => /can open .nes files/.test(t)),
@@ -595,6 +606,175 @@ check(
   "Install returns when the app folder is deleted elsewhere",
   calcLabels.includes("Install"),
   calcLabels.join(" | ") || "(no card)",
+);
+
+/* ---- Preview: the default app for pictures, sound, video, models ---- */
+/* It is a bundled system app with no desktop icon of its own: it is reached
+   by opening a file, and the start menu still lists it. */
+const previewOnDesktop = [...document.querySelectorAll(".desktop-icon")].some((n) =>
+  n.textContent.trim().startsWith("Preview"),
+);
+check("Preview ships without a desktop icon", !previewOnDesktop);
+
+const startMenuHasPreview = await (async () => {
+  document.querySelector(".start-btn").dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  await wait(200);
+  const found = [...document.querySelectorAll(".start-app")].some((n) => n.textContent.includes("Preview"));
+  document.querySelector(".start-btn").dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  await wait(150);
+  return found;
+})();
+check("…but the start menu lists it", startMenuHasPreview);
+
+/* A .png made through the desktop menu: double-clicking it must land in
+   Preview, titled after the file. */
+document.getElementById("desktop").dispatchEvent(
+  new window.MouseEvent("contextmenu", { bubbles: true, cancelable: true, clientX: 700, clientY: 500 }),
+);
+await tick();
+[...document.querySelectorAll(".ctx-item")]
+  .find((b) => b.textContent.includes("New Text File"))
+  ?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+await tick();
+document.querySelector(".dlg input").value = "photo.png";
+[...document.querySelectorAll(".dlg-actions .btn")].find((b) => b.textContent === "OK")?.click();
+await wait(500);
+
+const pngIcon = [...document.querySelectorAll(".desktop-icon")].find((n) => n.textContent.includes("photo.png"));
+check("a picture file shows on the desktop", Boolean(pngIcon));
+pngIcon?.dispatchEvent(new window.MouseEvent("dblclick", { bubbles: true }));
+await wait(600);
+const previewWin = [...document.querySelectorAll(".d86-window")].find((w) => {
+  const frame = w.querySelector("iframe");
+  return frame && String(frame.getAttribute("src")).includes("9pf/preview");
+});
+check("opening a .png goes to Preview", Boolean(previewWin));
+check(
+  "the Preview window is titled after the file",
+  /Preview - photo\.png/.test(previewWin?.querySelector(".titlebar, .win-title, header")?.textContent ?? previewWin?.textContent ?? ""),
+  previewWin?.textContent?.slice(0, 80),
+);
+check(
+  "Preview is handed the file path",
+  String(previewWin?.querySelector("iframe")?.getAttribute("src")).includes("file=%2Fhome%2Fuser%2FDesktop%2Fphoto.png") ||
+    String(previewWin?.querySelector("iframe")?.getAttribute("src")).includes("file=/home/user/Desktop/photo.png"),
+  String(previewWin?.querySelector("iframe")?.getAttribute("src")),
+);
+
+/* ---- Remove from Desktop / Add to Desktop ---- */
+const nesDesktopIcon = [...document.querySelectorAll(".desktop-icon")].find((n) =>
+  n.textContent.trim().startsWith("NES"),
+);
+check("NES has a desktop icon to start with", Boolean(nesDesktopIcon));
+nesDesktopIcon?.dispatchEvent(
+  new window.MouseEvent("contextmenu", { bubbles: true, cancelable: true, clientX: 60, clientY: 60 }),
+);
+await tick();
+const removeItem = [...document.querySelectorAll(".ctx-item")].find((b) =>
+  b.textContent.includes("Remove from Desktop"),
+);
+check("an app's menu offers Remove from Desktop", Boolean(removeItem));
+removeItem?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+await wait(500);
+check(
+  "the app leaves the desktop",
+  ![...document.querySelectorAll(".desktop-icon")].some((n) => n.textContent.trim().startsWith("NES")),
+);
+const stillInMenu = await (async () => {
+  document.querySelector(".start-btn").dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  await wait(200);
+  const found = [...document.querySelectorAll(".start-app")].some((n) => n.textContent.includes("NES"));
+  document.querySelector(".start-btn").dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  await wait(150);
+  return found;
+})();
+check("…but stays installed and in the start menu", stillInMenu);
+check(
+  "the choice is written to the filesystem",
+  await (async () => {
+    const filesWinX = [...document.querySelectorAll(".d86-window")].find((w) => w.querySelector(".fm-root"));
+    const pathInputX = filesWinX.querySelector(".fm-path-input");
+    pathInputX.value = "/home/user/system";
+    pathInputX.dispatchEvent(new window.KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+    await wait(400);
+    return [...filesWinX.querySelectorAll(".fm-row")].some((r) => r.textContent.includes("desktop-apps.json"));
+  })(),
+);
+
+/* Put it back from the app's own page: Files → system/apps/nes → index.html */
+const filesWinY = [...document.querySelectorAll(".d86-window")].find((w) => w.querySelector(".fm-root"));
+const pathInputY = filesWinY.querySelector(".fm-path-input");
+pathInputY.value = "/home/user/system/apps/nes";
+pathInputY.dispatchEvent(new window.KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+await wait(400);
+const nesIndexRow = [...filesWinY.querySelectorAll(".fm-row")].find((r) => r.textContent.includes("index.html"));
+check("the app's html is visible in Files", Boolean(nesIndexRow));
+nesIndexRow?.dispatchEvent(
+  new window.MouseEvent("contextmenu", { bubbles: true, cancelable: true, clientX: 70, clientY: 70 }),
+);
+await tick();
+const addItem = [...document.querySelectorAll(".ctx-item")].find((b) =>
+  b.textContent.includes("Add to Desktop"),
+);
+check("the app's page offers Add to Desktop", Boolean(addItem));
+addItem?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+await wait(600);
+check(
+  "Add to Desktop brings the icon back",
+  [...document.querySelectorAll(".desktop-icon")].some((n) => n.textContent.trim().startsWith("NES")),
+  [...document.querySelectorAll(".desktop-icon")].map((n) => n.textContent.trim()).join(" | ").slice(0, 160),
+);
+
+/* Icon art: an app that ships icon.svg shows that image, not a generic glyph. */
+const snakeCardIcon = (async () => {
+  const storeW = [...document.querySelectorAll(".d86-window")].find((w) => w.querySelector(".store-body"));
+  [...storeW.querySelectorAll(".store-tab")].find((b) => b.textContent.includes("Games"))?.click();
+  await wait(400);
+  const cardEl = [...storeW.querySelectorAll(".store-card")].find((n) => n.textContent.includes("Snake"));
+  return cardEl?.querySelector(".store-app-icon img")?.getAttribute("src") ?? "";
+})();
+check(
+  "store cards draw the catalog's icon image before install",
+  String(await snakeCardIcon).includes("icons/apps/snake.svg"),
+  String(await snakeCardIcon),
+);
+
+const nesCardIcon = await (async () => {
+  const storeW = [...document.querySelectorAll(".d86-window")].find((w) => w.querySelector(".store-body"));
+  const cardEl = [...storeW.querySelectorAll(".store-card")].find((n) => n.textContent.includes("NES"));
+  return cardEl?.querySelector(".store-app-icon img")?.getAttribute("src") ?? "";
+})();
+check(
+  "…and the app's own installed icon afterwards",
+  nesCardIcon.includes("9pf/nes/icon.svg"),
+  nesCardIcon || (() => {
+    const storeW = [...document.querySelectorAll(".d86-window")].find((w) => w.querySelector(".store-body"));
+    return [...storeW.querySelectorAll(".store-card")].map((n) => n.querySelector(".store-card-head")?.innerHTML?.slice(0, 120)).join(" || ");
+  })(),
+);
+
+/* Settings → Apps gives every app a desktop switch, including the ones that
+   ship without an icon (Preview). */
+const settingsWin2 = [...document.querySelectorAll(".d86-window")].find((w) =>
+  w.textContent.includes("Settings"),
+);
+[...settingsWin2.querySelectorAll(".settings-nav-item")].find((b) => b.textContent.includes("Apps"))?.click();
+await wait(400);
+const previewRow = [...settingsWin2.querySelectorAll(".app-list-row")].find((r) =>
+  r.textContent.includes("Preview"),
+);
+check("Settings lists Preview", Boolean(previewRow));
+check(
+  "…with a desktop switch that starts Off",
+  previewRow?.querySelector(".app-list-desktop")?.textContent.includes("Off desktop"),
+  previewRow?.querySelector(".app-list-desktop")?.textContent,
+);
+previewRow?.querySelector(".app-list-desktop")?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+await wait(500);
+check(
+  "turning it on puts Preview on the desktop",
+  [...document.querySelectorAll(".desktop-icon")].some((n) => n.textContent.trim().startsWith("Preview")),
+  [...document.querySelectorAll(".desktop-icon")].map((n) => n.textContent.trim()).join(" | ").slice(0, 200),
 );
 
 /* ---- Snake, played for real ---- */

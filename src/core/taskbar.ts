@@ -12,6 +12,8 @@ export interface AppShortcut {
   name: string;
   icon: string;
   sub?: string;
+  /** False when the app's manifest says it does not start on the desktop. */
+  onDesktop?: boolean;
   launch: () => void;
 }
 
@@ -153,6 +155,7 @@ export function coreApps(launch: Record<string, () => void>): AppShortcut[] {
       name: def.name,
       icon: def.icon,
       sub: def.sub,
+      onDesktop: def.onDesktop ?? true,
       launch: launch[def.id]!,
     })),
     { id: "settings", name: "Settings", icon: "settings", sub: "System", launch: launch["settings"]! },

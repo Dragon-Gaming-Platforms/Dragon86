@@ -8,14 +8,24 @@
       "sub": "Play NES games from your files",
       "category": "Games",
       "publisher": "Dragon Gaming Platforms",
-      "icon": "games",
+      "icon": "img:icons/apps/nes.svg",
       "base": "system-apps/nes/",
       "entry": "index.html",
-      "files": ["index.html", "app.js", "jsnes.min.js", "test.nes", "LICENSE.jsnes"],
-      "opens": ["nes"],
+      "files": [
+        "index.html",
+        "app.js",
+        "jsnes.min.js",
+        "test.nes",
+        "LICENSE.jsnes",
+        "icon.svg"
+      ],
+      "opens": [
+        "nes"
+      ],
       "width": 560,
       "height": 620,
-      "description": "A real NES emulator that runs in a window. It ships with a handwritten test ROM so you can see it is alive; drop in a cartridge image from your own files and it plays. Once installed it offers to become the default app for .nes files."
+      "description": "A real NES emulator that runs in a window. It ships with a handwritten test ROM so you can see it is alive; drop in a cartridge image from your own files and it plays. Once installed it offers to become the default app for .nes files.",
+      "icon-path": "icon.svg"
     },
     {
       "id": "snake",
@@ -23,13 +33,19 @@
       "sub": "The classic, with a score and a speed curve",
       "category": "Games",
       "publisher": "Dragon Gaming Platforms",
-      "icon": "games",
+      "icon": "img:icons/apps/snake.svg",
       "base": "system-apps/snake/",
       "entry": "index.html",
-      "files": ["index.html", "app.js", "index.json"],
+      "files": [
+        "index.html",
+        "app.js",
+        "index.json",
+        "icon.svg"
+      ],
       "width": 460,
       "height": 560,
-      "description": "Grid-based snake with a score, a speed curve, and swipe controls for phones. Arrow keys or WASD on a keyboard. The board waits for your first key or tap, and the game pauses itself when the window loses focus. No scoreboard, no accounts, no pop-ups."
+      "description": "Grid-based snake with a score, a speed curve, and swipe controls for phones. Arrow keys or WASD on a keyboard. The board waits for your first key or tap, and the game pauses itself when the window loses focus. No scoreboard, no accounts, no pop-ups.",
+      "icon-path": "icon.svg"
     },
     {
       "id": "calculator",
@@ -37,13 +53,19 @@
       "sub": "Arithmetic that keeps working offline",
       "category": "Utilities",
       "publisher": "Dragon Gaming Platforms",
-      "icon": "grid",
+      "icon": "img:icons/apps/calculator.svg",
       "base": "system-apps/calculator/",
       "entry": "index.html",
-      "files": ["index.html", "app.js", "index.json"],
+      "files": [
+        "index.html",
+        "app.js",
+        "index.json",
+        "icon.svg"
+      ],
       "width": 340,
       "height": 470,
-      "description": "A pocket calculator: add, subtract, multiply and divide, plus percent, sign flip and clear. Tap the buttons or use the number keys, Enter for equals and Escape to clear. It keeps twelve digits on screen, then switches to precision notation. Deliberately dull — a calculator that wants to be clever is a calculator that lies."
+      "description": "A pocket calculator: add, subtract, multiply and divide, plus percent, sign flip and clear. Tap the buttons or use the number keys, Enter for equals and Escape to clear. It keeps twelve digits on screen, then switches to precision notation. Deliberately dull — a calculator that wants to be clever is a calculator that lies.",
+      "icon-path": "icon.svg"
     }
   ]
 }

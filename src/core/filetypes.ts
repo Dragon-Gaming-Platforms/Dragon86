@@ -223,6 +223,9 @@ export async function requestDefaults(): Promise<void> {
   store.asked ??= {};
   let changed = false;
   for (const app of fsAppsWithOpens()) {
+    /* Collect this app's *unclaimed* types first, then ask once. An app that
+       opens forty extensions (Preview) must not fire forty toasts. */
+    const free: string[] = [];
     for (const raw of app.opens) {
       const ext = normExt(raw);
       if (!ext) continue;
@@ -237,17 +240,34 @@ export async function requestDefaults(): Promise<void> {
       }
       store.asked[ext] = app.id;
       changed = true;
+      free.push(ext);
+    }
+    if (!free.length) continue;
+
+    const claim = () => {
+      for (const ext of free) void setDefault(ext, app.id);
+    };
+    if (free.length === 1) {
+      const ext = free[0];
       notify({
         title: `${app.name} can open .${ext} files`,
         body: `Make ${app.name} the default app for .${ext}? Change it any time in Settings → Default apps.`,
         icon: app.icon,
         timeout: 0,
         actions: [
-          {
-            label: "Set as default",
-            primary: true,
-            onClick: () => void setDefault(ext, app.id),
-          },
+          { label: "Set as default", primary: true, onClick: claim },
+          { label: "Not now", onClick: () => void save() },
+        ],
+      });
+    } else {
+      const shown = free.slice(0, 6).map((e) => `.${e}`).join(", ");
+      notify({
+        title: `${app.name} can open ${free.length} file types`,
+        body: `Including ${shown}${free.length > 6 ? " and more" : ""}. Make ${app.name} the default app for these? Change it any time in Settings → Default apps.`,
+        icon: app.icon,
+        timeout: 0,
+        actions: [
+          { label: `Set for ${free.length} types`, primary: true, onClick: claim },
           { label: "Not now", onClick: () => void save() },
         ],
       });
