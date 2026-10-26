@@ -68,6 +68,66 @@
       "icon-path": "icon.svg"
     },
     {
+      "id": "monaco",
+      "name": "Monaco Editor",
+      "sub": "The editor behind VS Code, for your own files",
+      "category": "Utilities",
+      "publisher": "Dragon Gaming Platforms (vendored)",
+      "icon": "img:icons/apps/monaco.svg",
+      "base": "system-apps/monaco/",
+      "entry": "index.html",
+      "files": [
+        "index.html",
+        "app.js",
+        "icon.svg"
+      ],
+      "width": 900,
+      "height": 600,
+      "description": "A full code editor with syntax highlighting for dozens of languages, multi-cursor editing and bracket matching. It reads and writes the same filesystem as Files, so saving a script here is the same as saving it anywhere else. Not installed by default: the Text Editor is always there, and this is for when you want the heavy one. Typefaces and the whole editor are served from the OS itself, with nothing fetched from a CDN.",
+      "icon-path": "icon.svg",
+      "opens": [
+        "js",
+        "mjs",
+        "cjs",
+        "ts",
+        "tsx",
+        "jsx",
+        "json",
+        "jsonc",
+        "html",
+        "htm",
+        "css",
+        "scss",
+        "less",
+        "md",
+        "markdown",
+        "py",
+        "sh",
+        "bash",
+        "zsh",
+        "xml",
+        "svg",
+        "yml",
+        "yaml",
+        "toml",
+        "ini",
+        "c",
+        "h",
+        "cpp",
+        "cs",
+        "go",
+        "rs",
+        "java",
+        "php",
+        "rb",
+        "sql",
+        "lua",
+        "txt",
+        "log",
+        "csv"
+      ]
+    },
+    {
       "id": "gust",
       "name": "GUST",
       "sub": "Web proxy that runs from your own files",
@@ -127,6 +187,28 @@
       "height": 620,
       "description": "Runs proxied pages inside a sandboxed iframe, with its own home page and stylesheet shipped in the folder. No service worker, no external assets.",
       "icon-path": "icon.png"
+    },
+    {
+      "id": "cheerpj",
+      "name": "CheerpJ",
+      "sub": "Run .jar files \u2014 Java in the browser",
+      "category": "Utilities",
+      "publisher": "Dragon Gaming Platforms (runtime by Leaning Technologies)",
+      "icon": "img:icons/apps/cheerpj.svg",
+      "base": "system-apps/cheerpj/",
+      "entry": "index.html",
+      "files": [
+        "index.html",
+        "app.js",
+        "icon.svg"
+      ],
+      "width": 920,
+      "height": 640,
+      "description": "CheerpJ is a full Java runtime in WebAssembly: pick a .jar from your files and it runs, unmodified. Programs with a Swing or AWT interface get their own display inside the window; console programs print underneath it. Once installed it offers to open .jar files, so double-clicking one in Files runs it here. The Java runtime itself is downloaded from Leaning Technologies' CDN on first use \u2014 it is far too large to vendor \u2014 so the first run needs a network connection.",
+      "icon-path": "icon.svg",
+      "opens": [
+        "jar"
+      ]
     }
   ]
 }

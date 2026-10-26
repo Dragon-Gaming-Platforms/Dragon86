@@ -28,7 +28,11 @@ const dom = new JSDOM(
     <div id="boot"><div class="boot-logo"><div class="boot-bar"><div class="boot-bar-fill"></div></div><p class="boot-status">Initializing…</p></div></div>
     <div id="os" hidden><div id="desktop"></div><div id="windows"></div><div id="taskbar"></div></div>
   </body></html>`,
-  { url: "https://example.test/Dragon86/", runScripts: "outside-only", pretendToBeVisual: true },
+  /* "dangerously" so a <script> the OS inserts really runs — that is what
+     "Run as system script" does, and a harness that cannot execute script
+     elements could not test it. The document below has no inline scripts of
+     its own. */
+  { url: "https://example.test/Dragon86/", runScripts: "dangerously", pretendToBeVisual: true },
 );
 
 const { window } = dom;
@@ -68,6 +72,14 @@ window.fetch = async (input) => {
     return { ok: false, status: 404, async text() { return "not found"; }, async json() { throw new Error("404"); } };
   }
 };
+/* jsdom has no compression streams of its own; a real browser does, and so
+   does Node — hand the page the real ones so archive extraction is exercised
+   for real rather than skipped. */
+window.DecompressionStream ??= globalThis.DecompressionStream;
+window.CompressionStream ??= globalThis.CompressionStream;
+window.ReadableStream ??= globalThis.ReadableStream;
+window.WritableStream ??= globalThis.WritableStream;
+window.TransformStream ??= globalThis.TransformStream;
 window.URL.createObjectURL = () => "blob:stub";
 window.URL.revokeObjectURL = () => {};
 window.ResizeObserver = class {
@@ -77,7 +89,17 @@ window.ResizeObserver = class {
 };
 window.HTMLElement.prototype.setPointerCapture = function () {};
 window.HTMLElement.prototype.releasePointerCapture = function () {};
-window.matchMedia ??= () => ({ matches: false, addEventListener() {}, removeEventListener() {} });
+/* xterm.js still uses the legacy listener names, so the stub offers both. */
+window.matchMedia ??= () => ({
+  matches: false,
+  media: "",
+  onchange: null,
+  addEventListener() {},
+  removeEventListener() {},
+  addListener() {},
+  removeListener() {},
+  dispatchEvent: () => false,
+});
 Object.defineProperty(window.navigator, "serviceWorker", {
   configurable: true,
   value: {
@@ -1047,6 +1069,235 @@ check(
           .map((w) => (w.querySelector(".titlebar-text")?.textContent ?? w.className).slice(0, 24))
           .join(" / ")}`,
   );
+}
+
+/* ---- archives: .zip / .tar / .gz unpack into ZenFS ---- */
+{
+  /* Build a real zip here, the same way tools/test-archive.mjs does, and put
+     it in the filesystem: the point is that Files → Extract writes files. */
+  const { deflateRawSync, crc32 } = await import("node:zlib");
+  const zipOf = (entries) => {
+    const locals = [];
+    const centrals = [];
+    let offset = 0;
+    for (const entry of entries) {
+      const name = Buffer.from(entry.name, "utf8");
+      const raw = Buffer.from(entry.data);
+      const data = deflateRawSync(raw);
+      const crc = crc32(raw) >>> 0;
+      const local = Buffer.alloc(30);
+      local.writeUInt32LE(0x04034b50, 0);
+      local.writeUInt16LE(20, 4);
+      local.writeUInt16LE(0x0800, 6);
+      local.writeUInt16LE(8, 8);
+      local.writeUInt32LE(crc, 14);
+      local.writeUInt32LE(data.length, 18);
+      local.writeUInt32LE(raw.length, 22);
+      local.writeUInt16LE(name.length, 26);
+      locals.push(local, name, data);
+      const central = Buffer.alloc(46);
+      central.writeUInt32LE(0x02014b50, 0);
+      central.writeUInt16LE(20, 4);
+      central.writeUInt16LE(20, 6);
+      central.writeUInt16LE(0x0800, 8);
+      central.writeUInt16LE(8, 10);
+      central.writeUInt32LE(crc, 16);
+      central.writeUInt32LE(data.length, 20);
+      central.writeUInt32LE(raw.length, 24);
+      central.writeUInt16LE(name.length, 28);
+      central.writeUInt32LE(offset, 42);
+      centrals.push(central, name);
+      offset += local.length + name.length + data.length;
+    }
+    const centralBytes = Buffer.concat(centrals);
+    const eocd = Buffer.alloc(22);
+    eocd.writeUInt32LE(0x06054b50, 0);
+    eocd.writeUInt16LE(entries.length, 8);
+    eocd.writeUInt16LE(entries.length, 10);
+    eocd.writeUInt32LE(centralBytes.length, 12);
+    eocd.writeUInt32LE(offset, 16);
+    return Buffer.concat([...locals, centralBytes, eocd]);
+  };
+
+  const fsModule = [...document.querySelectorAll(".d86-window")].find((w) => w.querySelector(".fm-root"));
+  /* The smoke test has no service worker, so drop the file into the VFS the
+     way a downloaded file would be: through the OS's own fs API. */
+  const bytes = new Uint8Array(
+    zipOf([
+      { name: "readme.txt", data: "from a zip" },
+      { name: "nested/", data: "" },
+      { name: "nested/data.txt", data: "nested bytes" },
+    ]),
+  );
+  await window.d86.fs.writeBytes("/home/user/Documents/bundle.zip", bytes);
+  await wait(400);
+  check("a zip can be written to the filesystem", await window.d86.fs.exists("/home/user/Documents/bundle.zip"));
+
+  /* Opening it shows the table of contents, not a hex dump. */
+  const pathInput = fsModule.querySelector(".fm-path-input");
+  pathInput.value = "/home/user/Documents";
+  pathInput.dispatchEvent(new window.KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+  await wait(500);
+  const zipRow = [...fsModule.querySelectorAll(".fm-row")].find((r) => r.textContent.includes("bundle.zip"));
+  check("the zip shows in Files", Boolean(zipRow));
+  zipRow.dispatchEvent(new window.MouseEvent("dblclick", { bubbles: true }));
+  await wait(800);
+  const archiveWin = [...document.querySelectorAll(".d86-window")].find((w) =>
+    w.querySelector(".viewer-archive"),
+  );
+  check("opening a zip lists what is inside", Boolean(archiveWin));
+  const listing = [...(archiveWin?.querySelectorAll(".viewer-archive-path") ?? [])].map((n) => n.textContent);
+  check(
+    "…with every entry named",
+    listing.includes("readme.txt") && listing.includes("nested/data.txt"),
+    listing.join(" | "),
+  );
+
+  /* Extract into the folder next to it. */
+  check(
+    "the archive view offers to extract",
+    [...(archiveWin?.querySelectorAll(".viewer-archive-actions .btn") ?? [])].length === 2,
+    archiveWin?.querySelector(".viewer-archive-actions")?.textContent ?? "(none)",
+  );
+  [...archiveWin.querySelectorAll(".viewer-archive-actions .btn")]
+    .find((b) => /Extract/.test(b.textContent))
+    ?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  await wait(2000);
+  check(
+    "the viewer reports the extraction",
+    /Extracted|could not|Could not/i.test(archiveWin?.querySelector(".app-statusbar")?.textContent ?? ""),
+    archiveWin?.querySelector(".app-statusbar")?.textContent ?? "(no status)",
+  );
+  check(
+    "extracting writes the files into ZenFS",
+    (await window.d86.fs.exists("/home/user/Documents/readme.txt")) &&
+      (await window.d86.fs.readText("/home/user/Documents/readme.txt")) === "from a zip",
+    String(await window.d86.fs.exists("/home/user/Documents/readme.txt")),
+  );
+  check(
+    "…including nested folders",
+    (await window.d86.fs.readText("/home/user/Documents/nested/data.txt")) === "nested bytes",
+  );
+}
+
+/* ---- a .sh file: the Terminal prints it and runs nothing ---- */
+{
+  await window.d86.fs.writeText(
+    "/home/user/Documents/hello.sh",
+    "#!/bin/bash\necho 'this must not run'\nrm -rf /n",
+  );
+  const fsModule = [...document.querySelectorAll(".d86-window")].find((w) => w.querySelector(".fm-root"));
+  const pathInput = fsModule.querySelector(".fm-path-input");
+  pathInput.value = "/home/user/Documents";
+  pathInput.dispatchEvent(new window.KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+  await wait(500);
+  const shRow = [...fsModule.querySelectorAll(".fm-row")].find((r) => r.textContent.includes("hello.sh"));
+  check(
+    "a script shows in Files",
+    Boolean(shRow),
+    `path=${fsModule.querySelector(".fm-path-input")?.value} rows=${[...fsModule.querySelectorAll(".fm-row")]
+      .map((r) => r.textContent)
+      .join(" | ")
+      .slice(0, 200)}`,
+  );
+  shRow.dispatchEvent(
+    new window.MouseEvent("contextmenu", { bubbles: true, cancelable: true, clientX: 70, clientY: 70 }),
+  );
+  await tick();
+  [...document.querySelectorAll(".ctx-item.has-sub")]
+    .find((b) => b.textContent.includes("Open with"))
+    ?.dispatchEvent(new window.MouseEvent("mouseenter", { bubbles: true }));
+  await tick();
+  const terminalOpener = [...document.querySelectorAll(".ctx-sub .ctx-item")].find((b) =>
+    b.textContent.includes("Terminal (print)"),
+  );
+  check("a .sh offers the Terminal as an opener", Boolean(terminalOpener));
+  terminalOpener?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  await wait(900);
+  const termWin = [...document.querySelectorAll(".d86-window")].find((w) => w.querySelector(".xterm"));
+  check("the Terminal opens for the script", Boolean(termWin));
+  const termText = termWin?.querySelector(".xterm")?.textContent ?? "";
+  check(
+    "the script is printed into the console",
+    termText.includes("this must not run") && termText.includes("hello.sh"),
+    termText.slice(-200),
+  );
+  check(
+    "…and labelled as printed, not run",
+    /printed, not run|nothing was executed/i.test(termText),
+    termText.slice(-200),
+  );
+}
+
+/* ---- a .js file: "Run as system script" asks, then runs in the page ---- */
+{
+  await window.d86.fs.writeText(
+    "/home/user/Documents/probe.js",
+    "window.__probeRan = true;\nwindow.__probeApi = !!window.d86;\n" +
+      "d86.fs.writeText('/home/user/Documents/probe-out.txt', 'written by a script');\n",
+  );
+  const fsModule = [...document.querySelectorAll(".d86-window")].find((w) => w.querySelector(".fm-root"));
+  const pathInput = fsModule.querySelector(".fm-path-input");
+  pathInput.value = "/home/user/Documents";
+  pathInput.dispatchEvent(new window.KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+  await wait(500);
+  const jsRow = [...fsModule.querySelectorAll(".fm-row")].find((r) => r.textContent.includes("probe.js"));
+  jsRow.dispatchEvent(
+    new window.MouseEvent("contextmenu", { bubbles: true, cancelable: true, clientX: 70, clientY: 70 }),
+  );
+  await tick();
+  const runItem = [...document.querySelectorAll(".ctx-item")].find((b) =>
+    b.textContent.includes("Run as system script"),
+  );
+  check("a .js offers Run as system script", Boolean(runItem));
+  runItem?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  await wait(300);
+  const warn = document.querySelector(".dlg");
+  check("running a script warns first", Boolean(warn));
+  check(
+    "…and says there is no sandbox",
+    /no sandbox|without a sandbox/i.test(warn?.textContent ?? ""),
+    warn?.textContent?.slice(0, 140),
+  );
+  check("nothing ran before the warning was answered", !window.__probeRan);
+  [...(warn?.querySelectorAll(".dlg-actions .btn") ?? [])]
+    .find((b) => /Run it/.test(b.textContent))
+    ?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  await wait(900);
+  check("the script runs inside the OS page", window.__probeRan === true);
+  check("…with the d86 API available", window.__probeApi === true);
+  check(
+    "…writing to ZenFS, which is the point of it",
+    (await window.d86.fs.exists("/home/user/Documents/probe-out.txt")) &&
+      (await window.d86.fs.readText("/home/user/Documents/probe-out.txt")) === "written by a script",
+  );
+}
+
+/* ---- Monaco Editor and CheerpJ are in the store, not installed ---- */
+{
+  const storeW = [...document.querySelectorAll(".d86-window")].find((w) => w.querySelector(".store-body"));
+  [...storeW.querySelectorAll(".store-tab")].find((b) => /\bApps\b/.test(b.textContent))?.click();
+  await wait(400);
+  const names = [...storeW.querySelectorAll(".store-card")].map((n) => n.textContent);
+  check("the catalog offers Monaco Editor", names.some((t) => t.includes("Monaco Editor")), names.map((t) => t.slice(0, 22)).join(" | "));
+  check("the catalog offers CheerpJ", names.some((t) => t.includes("CheerpJ")));
+  check(
+    "neither is installed by default",
+    !(await window.d86.fs.exists("/home/user/system/apps/monaco")) &&
+      !(await window.d86.fs.exists("/home/user/system/apps/cheerpj")),
+  );
+  check(
+    "the built-in Text Editor is still a plain textarea",
+    (() => {
+      window.dispatchEvent(new window.CustomEvent("d86-launch-app", { detail: "editor" }));
+      return true;
+    })(),
+  );
+  await wait(500);
+  const editors = [...document.querySelectorAll(".d86-window")].filter((w) => w.querySelector(".editor-area"));
+  check("…and opens without Monaco", editors.length > 0 && !document.querySelector(".editor-monaco"));
+  [...storeW.querySelectorAll(".store-tab")].find((b) => /\bHome\b/.test(b.textContent))?.click();
+  await wait(300);
 }
 
 /* ---- Snake, played for real ---- */

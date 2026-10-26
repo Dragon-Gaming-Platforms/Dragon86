@@ -114,20 +114,48 @@ function zipName(bytes: Uint8Array): string {
  * stream (a zip entry); `gzip` is a gzip member (a .gz file).
  */
 export async function decompress(data: Uint8Array, format: "deflate-raw" | "gzip"): Promise<Uint8Array> {
-  if (typeof DecompressionStream === "undefined") {
+  if (typeof DecompressionStream === "undefined" || typeof ReadableStream === "undefined") {
     throw new ArchiveError(
       "this browser has no DecompressionStream, so archives cannot be unpacked here",
     );
   }
-  const stream = new Blob([data as unknown as BlobPart]).stream().pipeThrough(new DecompressionStream(format));
+  /* Feed the bytes through a stream we build ourselves: no Blob, no Response,
+     nothing that a strict browser setting can take away. */
+  const source = new ReadableStream<Uint8Array>({
+    start(controller) {
+      controller.enqueue(data.slice());
+      controller.close();
+    },
+  });
+  /* The DOM type says BufferSource in, BufferSource out; the bytes are the
+     same either way. */
+  const decoder = new DecompressionStream(format) as unknown as ReadableWritablePair<
+    Uint8Array,
+    Uint8Array
+  >;
+  const reader = source.pipeThrough(decoder).getReader();
+  const chunks: Uint8Array[] = [];
+  let total = 0;
   try {
-    const out = await new Response(stream).arrayBuffer();
-    return new Uint8Array(out);
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      if (!value) continue;
+      chunks.push(value);
+      total += value.length;
+    }
   } catch (err) {
     throw new ArchiveError(
       `could not decompress ${format === "gzip" ? "gzip" : "deflate"} data: ${(err as Error).message}`,
     );
   }
+  const out = new Uint8Array(total);
+  let at = 0;
+  for (const chunk of chunks) {
+    out.set(chunk, at);
+    at += chunk.length;
+  }
+  return out;
 }
 
 /* ---------- zip ---------- */

@@ -28,7 +28,16 @@ const DIM = "\x1b[38;2;102;102;102m";
 const BOLD = "\x1b[1m";
 const RESET = "\x1b[0m";
 
-export function openTerminal(win: Win): void {
+export interface TerminalOptions {
+  /**
+   * A shell script to *print* into the console. Not run: nothing here feeds
+   * the guest's stdin, because a script pasted into a root shell is a
+   * command, not a document. The console is where you read it.
+   */
+  print?: { path: string; text: string };
+}
+
+export function openTerminal(win: Win, options: TerminalOptions = {}): void {
   const root = el("div", "app-root");
   const toolbar = el("div", "app-toolbar");
   const status = el("div", "app-statusbar");
@@ -188,6 +197,25 @@ export function openTerminal(win: Win): void {
     return out;
   };
 
+  /* A script printed into the console: shown once, right after the console
+     is cleared for a connection, so it is not wiped by the engine's banner. */
+  let pendingPrint = options.print ?? null;
+  const flushPrint = (): void => {
+    if (!pendingPrint) return;
+    const { path, text } = pendingPrint;
+    pendingPrint = null;
+    const name = path.slice(path.lastIndexOf("/") + 1);
+    const body = text.replace(/\r\n/g, "\n");
+    const lines = body.split("\n");
+    term.writeln("");
+    term.writeln(`${DIM}── ${path} — printed, not run ─────────────────${RESET}`);
+    for (const line of lines) term.writeln(line);
+    if (lines[lines.length - 1] === "") lines.pop();
+    term.writeln(`${DIM}── end of ${name} · ${lines.length} line(s) · nothing was executed ──${RESET}`);
+    term.writeln("");
+    setChip("offline", `Printed ${name} (not run)`);
+  };
+
   const banner = () => {
     term.clear();
     term.writeln(`${BOLD}${RED}  ╔══════════════════════════════════════════╗${RESET}`);
@@ -249,6 +277,7 @@ export function openTerminal(win: Win): void {
       backend = null;
       setChip("connecting", "Connecting…");
       term.clear();
+      flushPrint();
       term.writeln(`${DIM}Starting the v86 compatibility engine (Arch userland, in-page).${RESET}`);
       term.writeln(`${DIM}Its whole root filesystem is ~/v86 in your Files — edit anything there and the guest sees it.${RESET}`);
       term.writeln(`${DIM}First boot unpacks the distro into your filesystem once; after that it just boots.${RESET}`);
@@ -300,6 +329,7 @@ export function openTerminal(win: Win): void {
     }
     setChip("connecting", "Connecting…");
     term.clear();
+    flushPrint();
     term.writeln(`${DIM}Connecting to engine: ${url}${RESET}`);
     term.writeln(`${DIM}First boot builds the engine and can take ~20 s — later opens are instant.${RESET}`);
     term.writeln(`${DIM}Diagnostics: open the "Dev Console" button above and watch [D86:bridge] logs.${RESET}`);

@@ -228,6 +228,93 @@ the live state ("Isolation: ON/off", "Service worker: controlling / not
 controlling"), and `tools/test-coi-deregister.mjs` (run by `npm run
 build`) asserts the contract.
 
+### Archives unpack themselves: .zip, .tar, .gz
+
+There is no archive library here. The browser already decompresses — that is
+what `DecompressionStream` is — so `src/core/archive.ts` only had to learn the
+*containers*: the zip central directory (stored and deflate entries, zip64,
+UTF-8 names, trailing comments, encrypted entries refused with a sentence), tar
+blocks (ustar, GNU long names, base-256 sizes, pax headers skipped), and the
+gzip header. `src/core/archive-fs.ts` is the half that writes into ZenFS:
+entry paths are checked before use (no `..`, no absolute paths), per-file and
+total sizes are capped, and nothing is overwritten unless asked.
+
+In the OS:
+
+- **Files** → right-click a zip/tar/gz → **Extract here** or **Extract to
+  `<name>`/**. (Archives get their own icon.)
+- **Opening** one shows its table of contents: every entry, the unpacked
+  total, and the same two extract buttons.
+- A plain `.gz` holds one file; it lands under the name in the gzip header, or
+  the `.gz`'s own name without the suffix. `.tar.gz`/`.tgz` are gunzipped once
+  and then read as tars.
+
+`tools/test-archive.mjs` builds real archives with Node's zlib and checks the
+parts that break quietly: names, sizes, offsets, UTF-8, GNU long names, gzip
+headers, and that the second entry of a zip is not read from the first one's
+bytes. It runs as part of `npm run build`.
+
+### Scripts: printing, running, and `window.d86`
+
+**A `.sh` file opens in the Terminal — printed, not run.** "Open with →
+Terminal (print)" (also on the desktop's file menu) opens a Terminal window and
+writes the file into the console, with a line above and below saying what it is.
+Nothing is executed and nothing is sent to the guest: a script pasted into a
+root shell is a command, not a document. Reading a script before running it is
+the point.
+
+**A `.js` file can be run as a system script.** Right-click → *Run as system
+script*. It asks first — a dialog that says the file runs inside Dragon86 with
+no sandbox and can read and write anything in your filesystem — and then
+inserts the file into this page as a real `<script>`. There is no worker and no
+isolated realm; a reload removes whatever it added (files stay).
+
+Scripts get an API (`src/core/dev-api.ts`), installed at boot as `window.d86`:
+
+```js
+// install an app the OS then knows about — no store, no folder copy
+await d86.fs.mkdir("~/system/apps/greeter");
+await d86.fs.writeText("~/system/apps/greeter/index.html", "<h1>Hello</h1>");
+await d86.apps.register({ id: "greeter", name: "Greeter", icon: "grid" });
+d86.apps.launch("greeter");
+```
+
+| call | |
+| --- | --- |
+| `d86.fs.readText/readBytes/writeText/writeBytes/list/mkdir/remove/exists/stat` | the same ZenFS the Files app shows (`~` works) |
+| `d86.apps.list/register/reload/launch` | installed apps, and adding one from a script |
+| `d86.open(path)` | open a file the way the OS would |
+| `d86.notify({title, body})`, `d86.log(...)` | a toast, and a tagged console line |
+| `d86.script.path` | the file being run |
+
+Writes announce themselves, so files a script creates appear in Files and on
+the desktop without a reload. The same object is reachable from a same-origin
+app's page as `parent.d86` — that is how the Monaco Editor app saves your files.
+
+### Monaco Editor is an app now; the Text Editor is the OS's own
+
+The built-in **Text Editor** is a plain textarea: always there, no download,
+no dependency (`src/apps/plain-editor.ts`). **Monaco Editor** — the editor
+behind VS Code, vendored under `public/monaco/` — is an App Store app you
+install when you want syntax highlighting and multi-cursor editing. It reads
+and writes through `parent.d86`, so it is the same filesystem, not a copy.
+Installing it does not steal your double-clicks: text and shell scripts stay
+with the Text Editor until you say otherwise (its "Set as default" toast, or
+Settings → Default apps).
+
+### CheerpJ: .jar files in the App Store
+
+**CheerpJ** (App Store → Utilities) runs unmodified Java. Pick a `.jar` from
+your files and it runs: GUI programs get a display (Swing/AWT draw into the
+window), console programs print below it. Once installed it offers to open
+`.jar` files, so double-clicking one in Files runs it.
+
+The honest limit: the Java runtime itself is **not vendored** — it is tens of
+megabytes of WebAssembly from Leaning Technologies — so it is loaded from
+`https://cjrtnc.leaningtech.com/4.3/loader.js` on first use. The jar, though,
+is yours: it is passed to CheerpJ through the OS's own file route
+(`9pf/@open/<path>`), not copied anywhere.
+
 ### Fixed apps live in the filesystem too: `.d86` shortcuts
 
 Some apps are pages that ship with the OS rather than folders you install —
@@ -301,7 +388,8 @@ count); Settings → **v86 filesystem** can re-unpack it if it is ever damaged.
 - **App Store** — installs apps from `store.json` straight into `system/apps/`
 - **Settings** — pages with a sidebar and a search box (appearance, apps, trash, engines, storage, about)
 - **System viewer** — the built-in opener for anything no app claims: image, page, PDF, audio/video, or a hex dump
-- **Text Editor** — open & edit any text file, `Ctrl+S` saves
+- **Text Editor** — the OS's own editor: plain text, `Ctrl+S` saves, no dependency. It opens every text type by default
+- **Monaco Editor** — an App Store app (not installed by default): the editor behind VS Code, reading and writing the same files (see below)
 - **Terminal** — xterm.js front end. **v86 is the default engine**: an Arch userland that boots inside the page with no isolation and no hoster. CheerpX (embedded or its own tab) is still there under Settings → Engine
 - **Preview** — the default opener for pictures, sound, video, PDFs, 3D models and disc images; a fixed page (`public/preview/`), never in the App Store
 - **Engine Viewer** — the v86 machine's own VGA display, on a canvas. Reach it from the Terminal's **View Engine** button

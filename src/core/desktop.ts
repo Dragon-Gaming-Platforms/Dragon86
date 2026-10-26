@@ -21,6 +21,7 @@ import { moveToTrash } from "./trash";
 import { notify } from "./toast";
 import { loadDesktopPrefs, onDesktop, setOnDesktop, onDesktopAppsChange } from "./desktop-apps";
 import type { AppShortcut } from "./taskbar";
+import { runSystemScript } from "./system-scripts";
 
 export interface DesktopHandlers {
   openApp: (id: string) => void;
@@ -404,6 +405,16 @@ export function buildDesktop(getApps: () => AppShortcut[], handlers: DesktopHand
         });
       }
 
+      if (filePath && /\.m?js$/i.test(vfs.baseName(filePath))) {
+        entries.push({
+          label: "Run as system script",
+          hint: "no sandbox",
+          iconHtml: icon("terminal").innerHTML,
+          danger: true,
+          onClick: () => void runSystemScript(filePath),
+        });
+      }
+
       if (filePath) {
         const openers = openersFor(filePath);
         if (openers.length >= 1) {
@@ -462,6 +473,7 @@ export function buildDesktop(getApps: () => AppShortcut[], handlers: DesktopHand
        look like a stray document. */
     if (ext === "d86") return "grid";
     if (/^(zip|tar|tgz|gz|gzip)$/.test(ext)) return "archive";
+    if (ext === "jar") return "linux";
     if (/^(png|jpe?g|gif|webp|avif|svg|bmp|ico)$/.test(ext)) return "image";
     if (/^(html?|url)$/.test(ext)) return "browser";
     if (/^(mp3|wav|ogg|flac|m4a)$/.test(ext)) return "audio";

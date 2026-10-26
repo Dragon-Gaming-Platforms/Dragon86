@@ -12,7 +12,9 @@
  *      from). An installed app may ask, once, to become the default;
  *   3. the App Launcher, offered for any .html file that is not itself an
  *      installed app: it runs the page as an app for as long as it is open;
- *   4. "App shortcut" for `.d86` files — `~/system/apps/scramjet.d86` and
+ *   4. the Terminal, offered for shell scripts: it prints the file into the
+ *      console and runs nothing (apps/terminal.ts);
+ *   5. "App shortcut" for `.d86` files — `~/system/apps/scramjet.d86` and
  *      friends launch the fixed app they name (core/app-shortcuts.ts).
  *
  * The user's choices live in the filesystem, next to the apps themselves:
@@ -32,7 +34,7 @@ export interface Opener {
   id: string;
   name: string;
   icon: string;
-  kind: "app" | "editor" | "system" | "launcher" | "shortcut";
+  kind: "app" | "editor" | "system" | "launcher" | "shortcut" | "terminal";
 }
 
 export const BUILTIN = {
@@ -40,6 +42,7 @@ export const BUILTIN = {
   system: "builtin:system",
   launcher: "builtin:launcher",
   shortcut: "builtin:shortcut",
+  terminal: "builtin:terminal",
 } as const;
 
 const TEXT_EXT = new Set(
@@ -50,6 +53,9 @@ const TEXT_EXT = new Set(
 );
 
 const PAGE_EXT = new Set(["html", "htm"]);
+
+/** Shell scripts: the editor edits them, the Terminal prints them. */
+const SHELL_EXT = new Set(["sh", "bash", "zsh", "ksh", "dash", "profile", "bashrc", "zshrc"]);
 
 const FILE = `${vfs.HOME}/system/default-apps.json`;
 
@@ -98,6 +104,16 @@ async function save(): Promise<void> {
 }
 
 /** `foo.d86` — a shortcut to an app that is part of the OS (core/app-shortcuts). */
+/**
+ * The Terminal, as a way to open a shell script: it prints the file into the
+ * console and runs nothing. Listing a script before running it is what you
+ * actually want most of the time, and pasting one into a root shell is not
+ * something a double-click should ever do.
+ */
+export function terminalOpener(): Opener {
+  return { id: BUILTIN.terminal, name: "Terminal (print)", icon: "terminal", kind: "terminal" };
+}
+
 export function shortcutOpener(): Opener {
   return { id: BUILTIN.shortcut, name: "App shortcut", icon: "grid", kind: "shortcut" };
 }
@@ -108,6 +124,15 @@ function builtinOpeners(ext: string): Opener[] {
     return [
       shortcutOpener(),
       { id: BUILTIN.editor, name: "Text Editor", icon: "editor", kind: "editor" },
+    ];
+  }
+  if (SHELL_EXT.has(ext)) {
+    /* Editor first, so a double-click still edits; the Terminal is one
+       menu item away and says what it does. */
+    return [
+      { id: BUILTIN.editor, name: "Text Editor", icon: "editor", kind: "editor" },
+      terminalOpener(),
+      { id: BUILTIN.system, name: "System", icon: "browser", kind: "system" },
     ];
   }
   if (TEXT_EXT.has(ext)) {
@@ -181,6 +206,7 @@ export function openerById(id: string, path?: string): Opener | null {
   if (id === BUILTIN.system) return { id, name: "System", icon: "browser", kind: "system" };
   if (id === BUILTIN.launcher) return launcherOpener();
   if (id === BUILTIN.shortcut) return shortcutOpener();
+  if (id === BUILTIN.terminal) return terminalOpener();
   const app = getFsApps().find((a) => a.id === id);
   if (app) return { id, name: app.name, icon: app.icon, kind: "app" };
   const fixed = staticIframeApps().find((a) => a.id === id);
@@ -190,6 +216,10 @@ export function openerById(id: string, path?: string): Opener | null {
 export function defaultFor(ext: string): string | null {
   const chosen = store.defaults?.[ext];
   if (chosen) return chosen;
+  /* Text stays with the OS's own editor until someone says otherwise. An
+     installed code editor claims text types, and it will ask (requestDefaults)
+     — but a fresh install must not quietly take over double-clicking a .txt. */
+  if (TEXT_EXT.has(ext) || SHELL_EXT.has(ext)) return BUILTIN.editor;
   /* No choice yet: an app that claims the type wins over the built-in,
      which is the point of an app asking for it. */
   const claim = appOpeners(ext)[0];

@@ -22,6 +22,7 @@ import { notify } from "../core/toast";
 import { refreshDesktops } from "../core/desktop";
 import { archiveBaseName, isArchiveName } from "../core/archive";
 import { extractArchive, extractDirFor } from "../core/archive-fs";
+import { isRunnableScript, runSystemScript } from "../core/system-scripts";
 
 export interface FilesHandlers {
   openFile: (path: string) => void;
@@ -241,6 +242,19 @@ export function openFiles(win: Win, startPath: string, handlers: FilesHandlers):
       );
     }
 
+    /* A .js file can be *run* — in the OS page, with no sandbox. It asks
+       first (core/system-scripts.ts); the item is here because the file is
+       here, and it is styled as dangerous because it is. */
+    if (!entry.isDirectory && isRunnableScript(entry.name)) {
+      items.push({
+        label: "Run as system script",
+        hint: "no sandbox",
+        iconHtml: icon("terminal").innerHTML,
+        danger: true,
+        onClick: () => void runSystemScript(entry.path),
+      });
+    }
+
     if (!entry.isDirectory && handlers.openWith) {
       const openers = openersFor(entry.path);
       if (openers.length >= 1 || canLaunchAsApp(entry.path)) {
@@ -341,6 +355,7 @@ export function openFiles(win: Win, startPath: string, handlers: FilesHandlers):
     if (ext === "nes" || ext === "rom") return "games";
     if (ext === "d86") return "grid";
     if (isArchiveName(entry.name)) return "archive";
+    if (ext === "jar") return "linux";
     if (/^(png|jpe?g|gif|webp|avif|svg|bmp|ico)$/.test(ext)) return "image";
     if (/^(mp3|wav|ogg|flac|m4a)$/.test(ext)) return "audio";
     if (/^(mp4|webm|mkv|mov)$/.test(ext)) return "video";

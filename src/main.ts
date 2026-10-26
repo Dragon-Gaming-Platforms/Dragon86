@@ -15,6 +15,7 @@ import { loadFsApps, onFsAppsChange, startFsAppBridge } from "./core/fs-apps";
 import { loadDefaults, requestDefaults } from "./core/filetypes";
 import { initTrash } from "./core/trash";
 import { ensureAppShortcuts } from "./core/app-shortcuts";
+import { installDevApi } from "./core/dev-api";
 
 async function boot(): Promise<void> {
   /* Isolation is what lets the embedded CheerpX hoster get
@@ -58,6 +59,13 @@ async function boot(): Promise<void> {
   const wmHost = document.getElementById("windows")!;
   const wm = new WindowManager(wmHost);
   const launcher = createLauncher(wm);
+
+  /* window.d86 — the API system scripts (and same-origin apps) use. Installed
+     before anything else can run a script. */
+  installDevApi({
+    launch: (id) => launcher.launch[id]?.(),
+    open: (path) => launcher.openFile(path),
+  });
 
   /* The app list is a function, not a snapshot: installing something in the
      App Store has to show up on the desktop and in the start menu without a
