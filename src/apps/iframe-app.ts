@@ -12,8 +12,17 @@
  *                                     // "img:icons/my-app.png" for a
  *                                     // vendored image under public/
  *     "width": 900, "height": 600,    // initial window size (optional)
- *     "status": "Status bar text"     // optional
+ *     "status": "Status bar text",    // optional
+ *     "desktop": false,               // optional: no desktop icon
+ *     "title-template": "My App - {file}",  // optional window title
+ *     "opens": ["png", "pdf"]         // optional: file types it opens
  *   }
+ *
+ * Every entry also gets a shortcut file in the filesystem —
+ * `~/system/apps/<id>.d86`, written at boot — so an iframe app is visible
+ * where apps live even though its code is a fixed page, not a folder. The
+ * file holds the plain HTML that embeds the app; opening it launches the
+ * window (see core/fs-apps.ts and core/filetypes.ts).
  *
  * URL rules (enforced at runtime):
  * - Relative URLs ("scramjet/", "games/index.html") resolve against the
@@ -63,7 +72,26 @@ export interface IframeAppDef {
   sandbox?: boolean;
 }
 
-export const IFRAME_APPS: IframeAppDef[] = appsJson as IframeAppDef[];
+/**
+ * The JSON keys are kebab-case ("title-template") because they sit next to
+ * user-apps.json, which uses the same style; the runtime object is camelCase.
+ * `desktop` is accepted as the JSON spelling of `onDesktop`.
+ */
+interface RawIframeApp extends IframeAppDef {
+  desktop?: boolean;
+  "title-template"?: string;
+}
+
+function normalize(raw: RawIframeApp): IframeAppDef {
+  const { desktop, "title-template": titleTemplate, ...rest } = raw;
+  return {
+    ...rest,
+    onDesktop: desktop ?? raw.onDesktop ?? true,
+    titleTemplate: titleTemplate ?? raw.titleTemplate,
+  };
+}
+
+export const IFRAME_APPS: IframeAppDef[] = (appsJson as RawIframeApp[]).map(normalize);
 
 /** Ids that came from the filesystem registry the last time it was read. */
 let fsAppIds = new Set<string>();
@@ -88,6 +116,16 @@ export function registerFsApps(defs: IframeAppDef[]): void {
   fsAppIds = keep;
 }
 
+/** The fixed apps from iframe-apps.json (not installed from the filesystem). */
+export function staticIframeApps(): IframeAppDef[] {
+  return IFRAME_APPS.filter((a) => !a.fs);
+}
+
+/** The fixed app with this id, if any. */
+export function staticIframeApp(id: string): IframeAppDef | null {
+  return IFRAME_APPS.find((a) => a.id === id && !a.fs) ?? null;
+}
+
 /** Register a one-off app (an .html file run through the App Launcher). */
 export function registerTransientApp(def: IframeAppDef): void {
   const at = IFRAME_APPS.findIndex((a) => a.id === def.id);
@@ -108,7 +146,11 @@ export function resolveAppUrl(def: IframeAppDef, filePath?: string): string | nu
   }
   if (!def.url) return null;
   const resolved = new URL(def.url, base);
-  return resolved.origin === window.location.origin ? resolved.href : null;
+  if (resolved.origin !== window.location.origin) return null;
+  /* A fixed app that opens files (Preview) is handed the path the same way:
+     the page decides what to do with it. */
+  if (filePath) resolved.searchParams.set("file", filePath);
+  return resolved.href;
 }
 
 export function openIframeApp(win: Win, def: IframeAppDef, filePath?: string): void {

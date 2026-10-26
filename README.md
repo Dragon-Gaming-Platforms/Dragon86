@@ -33,7 +33,7 @@ Two traps worth knowing before you conclude "the network is broken":
 
 ### Preview — one place for everything you look at but do not edit
 
-**Preview** (`public/system-apps/preview/`) is the default app for pictures,
+**Preview** (`public/preview/`) is the default app for pictures,
 sound, video, PDFs, 3D models and disc images. Opening any of those from
 Files, the desktop or `Open with ›` lands there, and the window is titled
 after the file (`Preview - holiday.png`).
@@ -58,8 +58,13 @@ showing a blank pane. That is the whole point of a preview: it should never
 leave you wondering whether the file or the app is broken.
 
 Preview ships with `"desktop": false`: it is reached by opening a file, not
-from a shelf. **Add to Desktop** (right-click its `index.html` in Files, or
-Settings → Apps) puts the icon there if you would rather launch it directly.
+from a shelf. **Add to Desktop** (Settings → Apps, or the app's `preview.d86`
+shortcut in Files) puts the icon there if you would rather launch it directly.
+
+Preview is a fixed page, not an app folder: it is listed in
+`src/apps/iframe-apps.json` beside Scramjet, ships in `public/preview/`, and
+never appears in the App Store or in `~/system/apps/`. It is the default
+opener for every type it can render.
 
 ### Desktop icons are a choice, not a side effect
 

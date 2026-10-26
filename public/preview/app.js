@@ -1,7 +1,8 @@
 /*
  * Preview — the default app for pictures, sound, video, PDFs, 3D models and
- * disc images. A filesystem app like any other (see ~/system/apps/preview/):
- * it is handed the file the OS wants opened as ?file=<absolute path> and
+ * disc images. It is a fixed page (public/preview/, deployed with the OS and
+ * opened in a window as an iframe app), never a folder in your filesystem.
+ * It is handed the file the OS wants opened as ?file=<absolute path> and
  * reads it through /9pf/@open, so anything in your home folder works.
  *
  * Why one app instead of six: "what opens this?" is a question the OS should
@@ -12,8 +13,10 @@
  */
 
 const P = window.PreviewParsers;
-const HERE = location.pathname;
-const BASE = HERE.slice(0, HERE.indexOf("/9pf/") + 1);
+/* Preview is a fixed page of its own (public/preview/, served from the OS
+   base), not a filesystem app, so the OS base is one level up from here:
+   /Dragon86/preview/index.html → /Dragon86/ — where 9pf/@open lives. */
+const BASE = new URL("../", location.href).href;
 
 const el = {
   title: document.getElementById("title"),

@@ -76,7 +76,11 @@ interface LoadedApp {
   isolated: boolean;
 }
 
-const loaded = new Map<string, LoadedApp>();
+/* The live registry. Reading builds a new map and swaps it in, so the OS
+   never sees a half-built list: the alternative (clear, then fill) left a
+   window where every installed app had vanished, which is how a fresh
+   install could miss its own "can open .nes files" question. */
+let loaded = new Map<string, LoadedApp>();
 /** Apps registered for one open window only (the App Launcher). */
 const transient = new Map<string, LoadedApp>();
 const appListeners = new Set<() => void>();
@@ -229,10 +233,16 @@ async function readRegistries(dir: string): Promise<{ file: string; apps: RawApp
 /* ---------- the demo app, created once ---------- */
 
 /** The one manifest the OS owns a share of; user edits win after seeding. */
-const BUILTIN_VERSION = 3;
+const BUILTIN_VERSION = 4;
 
-/** Apps that ship in public/system-apps/ and get copied into the FS. */
-const BUILTIN_APPS = ["nes", "preview"] as const;
+/**
+ * Apps that ship in public/system-apps/ and get copied into the FS *once*,
+ * on the first boot of a new install. Nothing here is re-seeded afterwards,
+ * which is what makes uninstalling one stick: the store deletes the folder
+ * and the registry entry, and a later boot must not quietly put them back.
+ * (NES used to be on this list; it is an App Store app now.)
+ */
+const BUILTIN_APPS = [] as const;
 
 const BUILTIN_ENTRIES: Record<string, RawApp> = {
   hello: {
@@ -244,52 +254,6 @@ const BUILTIN_ENTRIES: Record<string, RawApp> = {
     "folder-isolated": true,
     width: 520,
     height: 420,
-  },
-  /**
-   * Preview — the OS's answer to "show me this file". It is an ordinary
-   * filesystem app (public/system-apps/preview), but it ships installed and
-   * claims the types nobody else wants to render: pictures, sound, video,
-   * PDFs, 3D models and ISO disc images. `desktop: false` because it is
-   * reached by opening a file, not from a shelf — Add to Desktop exists if
-   * you would rather have the icon.
-   */
-  preview: {
-    id: "preview",
-    name: "Preview",
-    sub: "Images, audio, video, 3D models, PDF, ISO",
-    icon: "browser",
-    entry: "index.html",
-    "folder-isolated": true,
-    "icon-path": "icon.svg",
-    "title-template": "Preview - {file}",
-    desktop: false,
-    width: 880,
-    height: 640,
-    opens: [
-      // pictures
-      "png", "jpg", "jpeg", "jfif", "gif", "webp", "avif", "bmp", "ico", "svg",
-      "apng", "heic", "heif", "tif", "tiff",
-      // sound
-      "mp3", "wav", "ogg", "oga", "opus", "flac", "m4a", "aac", "weba", "aiff", "aif",
-      // video
-      "mp4", "m4v", "webm", "ogv", "mov", "mkv", "avi",
-      // documents and models
-      "pdf", "glb", "gltf", "stl", "obj", "ply",
-      // disc images
-      "iso", "img",
-    ],
-  },
-  nes: {
-    id: "nes",
-    name: "NES",
-    sub: "Emulator · test ROM",
-    icon: "games",
-    "icon-path": "icon.svg",
-    entry: "index.html",
-    "folder-isolated": true,
-    opens: ["nes"],
-    width: 560,
-    height: 620,
   },
 };
 
@@ -383,15 +347,15 @@ async function seedBundledApp(id: string): Promise<void> {
  * `user-apps.json` mentions the bundled apps. The merge runs once per
  * BUILTIN_VERSION: after that the file is the user's, so deleting an entry
  * stays deleted.
+ *
+ * "Once" includes the demo files. They used to be written on *every* boot
+ * with writeIfMissing, which is why uninstalling Hello (or NES) deleted the
+ * folder and then got it straight back: the app was never really gone. All
+ * of it now happens behind the version gate, so an uninstall is final.
  */
 async function seedApps(): Promise<void> {
   const dir = APPS_DIRS[0];
   await vfs.ensureDir(dir);
-
-  await writeIfMissing(`${dir}/hello/index.html`, DEMO_HTML);
-  await writeIfMissing(`${dir}/hello/app.js`, DEMO_JS);
-  await writeIfMissing(`${dir}/hello/data.json`, DEMO_DATA);
-  for (const id of BUILTIN_APPS) await seedBundledApp(id);
 
   const manifest = `${dir}/user-apps.json`;
   let parsed: { seeded?: number; apps?: RawApp[] } = { apps: [] };
@@ -401,7 +365,48 @@ async function seedApps(): Promise<void> {
     logWarn("os", `filesystem apps: ${manifest} is not valid JSON — leaving it alone`, err);
     return;
   }
-  if ((parsed.seeded ?? 0) >= BUILTIN_VERSION) return;
+  const had = parsed.seeded ?? 0;
+  if (had >= BUILTIN_VERSION) return;
+  /* A manifest from before seeding existed is a fresh device; one from an
+     older build is an existing device that is being upgraded. The two want
+     different things: a fresh device gets the demo apps, an upgraded one must
+     not get anything it deliberately removed. */
+  const fresh = had === 0 && !(Array.isArray(parsed.apps) && parsed.apps.length);
+
+  if (had < 4) {
+    /* v4: two apps stopped being filesystem apps. Preview is a fixed page now
+       (iframe-apps.json) and NES is an App Store app, so a device seeded by
+       an older build has a folder and a registry entry for each that no
+       longer belong there. Remove them once. */
+    parsed.apps = (Array.isArray(parsed.apps) ? parsed.apps : []).filter(
+      (a) => !(a && ((a as RawApp).id === "preview" || (a as RawApp).id === "nes")),
+    );
+    for (const gone of ["preview", "nes"]) {
+      const folder = `${dir}/${gone}`;
+      if (!(await exists(folder))) continue;
+      try {
+        await vfs.removePath(folder);
+        logInfo("os", `removed ${gone} from system/apps (it is not a filesystem app any more)`);
+      } catch (err) {
+        logWarn("os", `could not remove the old ${gone} folder`, err);
+      }
+    }
+  }
+
+  if (!fresh) {
+    /* Nothing to install, but the version still has to move forward, or the
+       migration above would run on every single boot. */
+    await vfs.writeText(
+      manifest,
+      JSON.stringify({ seeded: BUILTIN_VERSION, apps: Array.isArray(parsed.apps) ? parsed.apps : [] }, null, 2),
+    );
+    return;
+  }
+
+  await writeIfMissing(`${dir}/hello/index.html`, DEMO_HTML);
+  await writeIfMissing(`${dir}/hello/app.js`, DEMO_JS);
+  await writeIfMissing(`${dir}/hello/data.json`, DEMO_DATA);
+  for (const id of BUILTIN_APPS) await seedBundledApp(id);
 
   const apps: RawApp[] = Array.isArray(parsed.apps) ? parsed.apps : [];
   for (const [id, entry] of Object.entries(BUILTIN_ENTRIES)) {
@@ -478,7 +483,37 @@ function toDef(raw: RawApp, dir: string): { def: IframeAppDef; isolated: boolean
 }
 
 /** Read every registry and hand the apps to the frame registry. */
-export async function loadFsApps(): Promise<IframeAppDef[]> {
+/**
+ * Reading the registry clears it and reads it back, so it must not run twice
+ * at once: two overlapping loads each clear the list, and the loser leaves
+ * the OS looking at an empty registry until its own read finishes. That race
+ * is why a freshly installed app could be missing from "Open with" and why
+ * its "can open .nes files" question never appeared — the ask ran in the
+ * window where the list was momentarily empty. One load at a time; a request
+ * that arrives during a load marks it dirty and gets a fresh read after.
+ */
+let inFlight: Promise<IframeAppDef[]> | null = null;
+let loadAgain = false;
+
+export function loadFsApps(): Promise<IframeAppDef[]> {
+  if (inFlight) {
+    loadAgain = true;
+    return inFlight;
+  }
+  inFlight = (async () => {
+    let defs = await readFsApps();
+    while (loadAgain) {
+      loadAgain = false;
+      defs = await readFsApps();
+    }
+    return defs;
+  })().finally(() => {
+    inFlight = null;
+  });
+  return inFlight;
+}
+
+async function readFsApps(): Promise<IframeAppDef[]> {
   try {
     const moved = await vfs.migrateLegacyShared();
     if (moved) logInfo("os", `folded ${moved} files from the old v86/shared folder into your home`);
@@ -492,21 +527,22 @@ export async function loadFsApps(): Promise<IframeAppDef[]> {
   }
 
   const defs: IframeAppDef[] = [];
-  loaded.clear();
+  const next = new Map<string, LoadedApp>();
   for (const dir of APPS_DIRS) {
     for (const { file, apps } of await readRegistries(dir)) {
       for (const raw of apps) {
         const made = toDef(raw, dir);
         if (!made) continue;
-        if (loaded.has(made.def.id)) {
+        if (next.has(made.def.id)) {
           logWarn("os", `filesystem apps: duplicate id ${made.def.id} in ${file} — ignored`);
           continue;
         }
-        loaded.set(made.def.id, { def: made.def, dir: made.def.fs!.dir, isolated: made.isolated });
+        next.set(made.def.id, { def: made.def, dir: made.def.fs!.dir, isolated: made.isolated });
         defs.push(made.def);
       }
     }
   }
+  loaded = next;
   registerFsApps(defs);
   logInfo("os", `filesystem apps: ${defs.length} loaded${defs.length ? ` (${defs.map((d) => d.id).join(", ")})` : ""}`);
   return defs;

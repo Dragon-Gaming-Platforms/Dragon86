@@ -29,6 +29,7 @@ import {
   resetAsked,
 } from "../core/filetypes";
 import { fsAppsWithOpens, getFsApps, onFsAppsChange } from "../core/fs-apps";
+import { staticIframeApps } from "./iframe-app";
 import { loadDesktopPrefs, onDesktop, setOnDesktop } from "../core/desktop-apps";
 import {
   hasPassword,
@@ -365,11 +366,29 @@ export function openSettings(win: Win, startPage?: string): void {
     askRow.append(askBtn);
     host.append(askRow);
 
-    host.append(section("Installed apps", "Everything in ~/system/apps, with the types it opens."));
+    host.append(
+      section(
+        "Installed apps",
+        "Everything in ~/system/apps, with the types it opens — plus the fixed apps that ship with the OS.",
+      ),
+    );
     const listHost = el("div", "app-list");
     const redrawList = (): void => {
       listHost.textContent = "";
-      const apps = getFsApps();
+      /* Two kinds of app appear here: folders in ~/system/apps, and the fixed
+         pages that come with the OS (iframe-apps.json) — Preview is one of
+         those now, so it has no folder and no uninstall button, but it still
+         deserves a desktop switch. */
+      const fixed = staticIframeApps().map((def) => ({
+        id: def.id,
+        name: def.name,
+        sub: def.sub ?? "Fixed app — ships with Dragon86",
+        icon: def.icon,
+        opens: def.opens ?? [],
+        onDesktop: def.onDesktop ?? true,
+        dir: null as string | null,
+      }));
+      const apps = [...fixed, ...getFsApps()];
       if (!apps.length) {
         listHost.append(note("No filesystem apps yet — the App Store has some."));
         return;
@@ -383,7 +402,13 @@ export function openSettings(win: Win, startPage?: string): void {
         if (app.opens.length) {
           row.append(el("span", "app-list-opens", app.opens.map((o) => `.${o}`).join(" ")));
         }
-        row.append(el("code", "app-list-dir", app.dir.replace(vfs.HOME, "~")));
+        row.append(
+          el(
+            "code",
+            "app-list-dir",
+            app.dir ? app.dir.replace(vfs.HOME, "~") : "fixed page",
+          ),
+        );
 
         /* An app and a desktop icon are separate things: this is where you
            say which apps earn a shortcut, without uninstalling anything. */
