@@ -176,6 +176,8 @@ class V86Backend implements TerminalBackend {
   private nudgeTimer: ReturnType<typeof setInterval> | null = null;
   private acpiEnabled = false;
   private screenWarned = false;
+  /** v86's own screen: the element its adapter draws the display into. */
+  private screenHost: HTMLDivElement | null = null;
   /** Set by connect(): this backend has been asked to run a machine. */
   private started = false;
 
@@ -207,6 +209,34 @@ class V86Backend implements TerminalBackend {
       }
     }
     return screen;
+  }
+
+  /**
+   * The element v86's screen adapter draws into. Created here (before the
+   * machine starts, because the constructor needs it) but kept out of the
+   * document: the Terminal shows the serial console, and only the Engine
+   * Viewer mounts this.
+   */
+  screenElement(): HTMLElement | null {
+    return this.screenHost;
+  }
+
+  private ensureScreenHost(): HTMLDivElement {
+    if (this.screenHost) return this.screenHost;
+    /* v86 looks for a div and a canvas inside the container and creates them
+       if they are missing (copy.sh's page ships them for the same reason).
+       Creating them here means they can be styled by class instead of by the
+       ids that page happens to use — and two machines on one page must not
+       share ids. */
+    const host = document.createElement("div");
+    host.className = "engine-screen-host";
+    const text = document.createElement("div");
+    text.className = "engine-screen-text";
+    const canvas = document.createElement("canvas");
+    canvas.className = "engine-screen-canvas";
+    host.append(text, canvas);
+    this.screenHost = host;
+    return host;
   }
 
   /**
@@ -431,14 +461,14 @@ class V86Backend implements TerminalBackend {
           ? { net_device: { type: "virtio", relay_url: this.netDeviceUrl() } }
           : {}),
         autostart: true,
-        /* Screen options are read from `opts.screen` (libv86 does
-           `f = b.screen || {}`), and `ansi` is what makes the text adapter
-           hand rows over with colour escapes instead of bare characters.
-           A top-level `ansi` is silently ignored — which is why the Engine
-           Viewer used to show nothing useful. No `container`: the adapter
-           keeps the text buffer in memory and draws nothing itself, which is
-           exactly what a mirrored view wants. */
-        screen: { ansi: true },
+        /* v86's own screen, in a container of ours (see ensureScreenHost):
+           this is how copy.sh/v86 shows a machine — the emulator renders the
+           text console as coloured rows in a div, and a canvas underneath for
+           graphical modes. Handing it a container is what makes the Engine
+           Viewer show the machine's real display instead of a drawing of it.
+           The container stays out of the document until the viewer opens, and
+           v86 draws into it regardless. */
+        screen: { container: this.ensureScreenHost() },
         disable_keyboard: true,
         disable_mouse: true,
         disable_speaker: true,

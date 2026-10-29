@@ -293,11 +293,16 @@ async function main() {
     if (screen.rows < 20) problems.push(`the text screen reports only ${screen.rows} rows`);
     if (screen.cols < 40) problems.push(`the text screen reports only ${screen.cols} columns`);
     if (!filled) problems.push("the text screen is blank after boot (nothing was drawn on the VGA)");
-    /* The guest paints its own boot screen on tty0 (tools/guest-init/init) so
-       the Engine Viewer has something to show once the kernel stops logging. */
+    /* The guest paints a live panel on tty0 (tools/guest-init/init) so the
+       Engine Viewer has the machine's real console to show, not a dead screen. */
     const vgaText = screen.lines.map(stripEscapes).join("\n");
-    for (const expected of ["Dragon86 Linux (v86 engine)", "[ 4/4 ] ready."]) {
+    for (const expected of ["Dragon86 Linux (v86 engine)", "Last typed in the Terminal", "Memory"]) {
       if (!vgaText.includes(expected)) problems.push(`the VGA screen is missing ${JSON.stringify(expected)}`);
+    }
+    /* The panel is a *console* screen: it has to be in colour for the viewer to
+       show colours, and the boot has to have cleared the screen to draw it. */
+    if (!/\x1b\[[0-9;]*[0-9]m/.test(screen.lines.join(""))) {
+      problems.push("the VGA screen has no colour escapes at all");
     }
     /* Colour is what makes a boot log readable: the app asks for ansi rows. */
     if (!/\x1b\[[0-9;]*m/.test(screen.lines.join(""))) {

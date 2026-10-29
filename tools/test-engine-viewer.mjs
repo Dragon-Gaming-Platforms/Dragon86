@@ -178,9 +178,19 @@ const { textScreenFrom, hasTextScreen, rowsWithText, stripEscapes } = screenModu
 
   check("the bridge reads the screen through v86-screen", /textScreenFrom\(this\.emu\)/.test(bridge));
   check("the bridge tells the truth about liveness", /isRunning\(\): boolean/.test(bridge));
-  /* v86 reads screen options from `opts.screen`; a top-level `ansi` is ignored. */
-  check("the machine is asked for ansi rows", /screen: \{ ansi: true \}/.test(bridge));
-  check("…not a top-level ansi flag", !/^\s*ansi: true,/m.test(bridge));
+
+  /* v86 draws its own screen into a container we give it — that element is
+     what the viewer mounts. Screen options must be under `opts.screen`: a
+     top-level `container`/`ansi` is silently ignored by libv86. */
+  check("the machine is given a screen container", /screen: \{ container: this\.ensureScreenHost\(\) \}/.test(bridge));
+  check("…created before the machine starts", /ensureScreenHost\(\): HTMLDivElement/.test(bridge));
+  check("…and handed to the viewer", /screenElement\(\): HTMLElement \| null/.test(bridge));
+  check("…not a top-level screen option", !/^\s*ansi: true,/m.test(bridge) && !/^\s*container:/m.test(bridge));
+
+  /* The viewer must show that element, not a re-drawing of the screen. */
+  check("the viewer mounts the machine's screen", /screenElement\?\.\(\)/.test(source));
+  check("…scaled to the window", /translate\(-50%, -50%\) scale\(/.test(source));
+  check("…and takes it back out when the window closes", /mount\(null\)/.test(source));
 }
 
 console.log(failed ? `\n${failed} check(s) failed` : "\nall checks passed");

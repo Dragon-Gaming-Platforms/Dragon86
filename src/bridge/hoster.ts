@@ -62,6 +62,16 @@ export interface TerminalBackend {
    */
   getScreen?: () => EngineScreen | null;
   /**
+   * The element the machine draws its display into — v86's own screen, the
+   * same renderer copy.sh/v86 uses: text rows with real colours, a blinking
+   * cursor, and a canvas underneath for graphical modes. The Engine Viewer
+   * puts this element on screen rather than re-drawing the screen itself.
+   *
+   * Null before the machine exists, or for a backend with no display of its
+   * own (the remote hoster draws inside an iframe).
+   */
+  screenElement?: () => HTMLElement | null;
+  /**
    * True while this backend still owns a live machine. The Engine Viewer
    * needs to tell "there is no machine" from "the machine is up but its
    * display is not readable yet" — the two used to be the same message, and

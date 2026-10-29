@@ -2363,18 +2363,74 @@
 }
 
 /* ---------- Engine Viewer ----------
-   The v86 machine's VGA display, drawn on a canvas. The stage is centred and
-   clips nothing: the canvas is sized to fit the grid, so a 80×25 console
-   scales up on a big window and stays readable on a phone. */
+   The machine's own screen. v86 renders a text console as coloured rows in a
+   div (with a blinking cursor) and graphical modes onto a canvas; both live in
+   .engine-screen-host, which is scaled with a transform to fill the stage.
+   The transform is why the stage is a positioning context: the host keeps its
+   natural layout size, so `offsetWidth` stays the real console width and the
+   scale cannot feed back on itself. */
 .engine-stage {
   flex: 1;
   min-height: 0;
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: auto;
+  overflow: hidden;
   padding: 10px;
   background: #0a0a0c;
+}
+.engine-screen-host {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: max-content;
+  transform: translate(-50%, -50%) scale(1);
+  transform-origin: center center;
+  /* v86 writes the rows as plain divs with spans; this is the console's font
+     and line box, and it must not be inherited from the OS UI. */
+  font: 15px/15px ui-monospace, SFMono-Regular, Menlo, Consolas, "Courier New", monospace;
+  white-space: pre;
+  color: #a8a8a8;
+  background: #000;
+  border-radius: 4px;
+  box-shadow: 0 0 0 1px var(--border-color), 0 10px 30px rgba(0, 0, 0, 0.45);
+  overflow: hidden;
+}
+/* v86 writes one div per text row into this, each holding spans with an
+   inline colour per run. `position: relative` is load-bearing: the cursor is
+   an absolutely-positioned child placed at its static position, so it needs a
+   positioned ancestor. The font must be a real monospace at a whole-pixel
+   line height, or the rows and the cursor drift apart. */
+.engine-screen-text {
+  position: relative;
+  white-space: pre;
+  font: bold 15px/normal ui-monospace, SFMono-Regular, Menlo, Consolas, "Courier New", monospace;
+  color: #a8a8a8;
+  background: #000;
+}
+.engine-screen-canvas {
+  display: block;
+  background: #000;
+  image-rendering: pixelated;
+}
+/* v86's own blink classes — the emulator adds them, the page supplies the
+   animation (copy.sh/v86 does the same in its stylesheet). */
+.engine-screen-host .blink {
+  animation: engine-blink 0.6s step-start infinite;
+}
+.engine-screen-host .blinking-cursor {
+  animation: engine-cursor-blink 0.6s step-start infinite;
+}
+@keyframes engine-blink {
+  50% {
+    color: transparent;
+  }
+}
+@keyframes engine-cursor-blink {
+  50% {
+    background-color: transparent;
+  }
 }
 .engine-canvas {
   display: block;
