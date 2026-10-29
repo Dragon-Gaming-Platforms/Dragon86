@@ -2414,6 +2414,17 @@
   background: #000;
   image-rendering: pixelated;
 }
+/* Focus is what decides whether typing reaches the machine, so it has to be
+   visible: the screen is the only thing in the OS that looks like a terminal
+   yet passes keys somewhere else. */
+.engine-viewer:focus {
+  outline: none;
+}
+.engine-screen-host:focus-visible,
+.engine-screen-host:focus {
+  outline: 2px solid var(--theme-accent);
+  outline-offset: 2px;
+}
 /* v86's own blink classes — the emulator adds them, the page supplies the
    animation (copy.sh/v86 does the same in its stylesheet). */
 .engine-screen-host .blink {

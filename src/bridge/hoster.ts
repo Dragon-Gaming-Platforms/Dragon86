@@ -72,6 +72,11 @@ export interface TerminalBackend {
    */
   screenElement?: () => HTMLElement | null;
   /**
+   * Keystrokes from the Engine Viewer, as PS/2 scancodes. Present only on a
+   * backend whose screen is a real console somebody can type into.
+   */
+  sendScancodes?: (codes: number[]) => void;
+  /**
    * True while this backend still owns a live machine. The Engine Viewer
    * needs to tell "there is no machine" from "the machine is up but its
    * display is not readable yet" — the two used to be the same message, and

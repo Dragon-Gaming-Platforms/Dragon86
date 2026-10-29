@@ -13,8 +13,15 @@
  * window scales that to fit. Nothing is re-drawn here, so the colours, the
  * font metrics and the cursor are the machine's, not an imitation.
  *
+ * It is writable, too. Keys pressed while the screen has focus are sent to the
+ * emulated PS/2 keyboard (bridge/v86-keys.ts) and land on the guest's VGA
+ * console, which runs a login shell of its own on tty1 — a second terminal on
+ * the same machine, not a picture of one. Ctrl-C, Ctrl-D, Tab completion,
+ * arrows in the line editor and `vim` all work, because the guest's own
+ * keyboard driver is doing the decoding. The page never sees those keys.
+ *
  * The canvas below is the fallback for a backend with no element of its own
- * (and for tests): it mirrors the text buffer instead.
+ * (and for tests): it mirrors the text buffer instead, and takes no input.
  *
  * The window never holds a machine *snapshot*: it asks for the current one on
  * every frame. So it can be opened before the Terminal (it attaches when the
@@ -28,6 +35,7 @@ import { logInfo, logWarn } from "../core/log";
 import type { Win } from "../core/wm";
 import type { EngineScreen, TerminalBackend } from "../bridge/hoster";
 import { rowsWithText } from "../bridge/v86-screen";
+import { scancodesForEvent } from "../bridge/v86-keys";
 
 /** The machine last handed to the viewer, so the start menu can find one. */
 let lastEngine: TerminalBackend | null = null;
@@ -78,9 +86,8 @@ export function openEngineViewer(win: Win, backend?: TerminalBackend | null): vo
   const hint = el(
     "div",
     "engine-hint",
-    "The machine's own screen, as the emulator draws it: the Arch console, its colours, " +
-      "and the kernel log on the way up. The shell you type into is the serial console, " +
-      "in the Terminal window — this screen mirrors the machine and takes no input.",
+    "The machine's own console — click it and type. Keys go to the guest's keyboard; " +
+      "it has its own login shell here, separate from the Terminal's.",
   );
   root.append(stage, hint, status);
   win.el.append(root);
@@ -93,6 +100,8 @@ export function openEngineViewer(win: Win, backend?: TerminalBackend | null): vo
   let mounted: HTMLElement | null = null;
   /** This window's place in the queue; the newest one gets the screen. */
   const seq = ++viewerSeq;
+  /** Take the keyboard as soon as the screen is on the page (see mount). */
+  let wantsFocus = true;
 
   /**
    * Which machine to show: the most recently attached one (attach is the
@@ -144,6 +153,52 @@ export function openEngineViewer(win: Win, backend?: TerminalBackend | null): vo
     if (line.trim()) ctx.fillText(line.trim(), 16, y);
   };
 
+  /* ---------- the keyboard ---------- */
+
+  /** True while the keyboard is in the machine's screen (or this window). */
+  const focused = (): boolean => {
+    const active = document.activeElement;
+    return Boolean(active && (active === root || (mounted && active === mounted)));
+  };
+
+  /** The machine that should receive keys right now, if any. */
+  const keyTarget = (): TerminalBackend | null => {
+    const live = current();
+    if (!live || !running(live) || !live.sendScancodes) return null;
+    return live;
+  };
+
+  /**
+   * Send one key event to the machine, or let it through. Everything is
+   * swallowed while the screen has focus: Ctrl-C belongs to the guest's line
+   * editor, `Tab` to its completion, and an arrow key to its history — not to
+   * the desktop, the window manager, or the browser's scroll.
+   */
+  const onKey = (event: KeyboardEvent, down: boolean): void => {
+    const live = keyTarget();
+    if (!live) return;
+    const codes = scancodesForEvent(event, down);
+    if (!codes.length) return;
+    event.preventDefault();
+    /* Also stop it reaching the OS's own shortcut handlers. */
+    event.stopPropagation();
+    live.sendScancodes?.(codes);
+  };
+
+  const onKeyDown = (event: KeyboardEvent) => onKey(event, true);
+  const onKeyUp = (event: KeyboardEvent) => onKey(event, false);
+  root.addEventListener("keydown", onKeyDown);
+  root.addEventListener("keyup", onKeyUp);
+
+  /** Put the keyboard where the user clicked. */
+  const takeFocus = (): void => {
+    const target = mounted ?? root;
+    if (!target.hasAttribute("tabindex")) target.tabIndex = -1;
+    target.focus({ preventScroll: true });
+  };
+  root.addEventListener("pointerdown", takeFocus);
+  root.tabIndex = -1;
+
   /**
    * Mount the machine's own display element. v86 created it before the machine
    * started and has been drawing into it ever since; it is only now put on
@@ -175,6 +230,12 @@ export function openEngineViewer(win: Win, backend?: TerminalBackend | null): vo
     screenOwner = { element, seq, release };
     element.classList.add("engine-screen");
     stage.append(element);
+    /* Opened on a running machine: put the keyboard in it straight away, so
+       "View Engine" then typing works without a click first. */
+    if (wantsFocus) {
+      wantsFocus = false;
+      takeFocus();
+    }
   };
 
   /**
@@ -254,7 +315,8 @@ export function openEngineViewer(win: Win, backend?: TerminalBackend | null): vo
       const rows = view.screen?.rows ?? 0;
       const size = cols && rows ? ` · ${cols}×${rows} characters` : "";
       const zoom = scale ? ` · ${Math.round(scale * 100)}%` : "";
-      status.textContent = `The machine's own screen${size}${zoom} · live`;
+      const focus = focused() ? "typing goes to the machine" : "click the screen to type";
+      status.textContent = `The machine's own screen${size}${zoom} · ${focus}`;
       return;
     }
 
@@ -368,6 +430,9 @@ export function openEngineViewer(win: Win, backend?: TerminalBackend | null): vo
 
   win.setOnClose(() => {
     alive = false;
+    root.removeEventListener("keydown", onKeyDown);
+    root.removeEventListener("keyup", onKeyUp);
+    root.removeEventListener("pointerdown", takeFocus);
     if (timer !== null) window.clearInterval(timer);
     timer = null;
     observer?.disconnect();

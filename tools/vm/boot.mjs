@@ -273,6 +273,41 @@ async function main() {
     answers.push(clean);
     console.log(`\n$ ${cmd}\n${clean.trim()}`);
   }
+  /* ---- typing into the machine's own console ----
+     This is what "writable Engine Viewer" means end to end: bytes on the PS/2
+     keyboard controller, the guest's own keyboard driver, its VGA console on
+     tty1, and a shell there. The mapping is the viewer's
+     (src/bridge/v86-keys.ts), not a harness copy. */
+  {
+    const { scancodesFor } = await import("../../src/bridge/v86-keys.ts");
+    const KEY_OF_CHAR = (ch) => {
+      if (ch >= "a" && ch <= "z") return [`Key${ch.toUpperCase()}`, false];
+      if (ch >= "A" && ch <= "Z") return [`Key${ch}`, true];
+      if (ch >= "0" && ch <= "9") return [`Digit${ch}`, false];
+      const map = { " ": "Space", "-": "Minus", ".": "Period", "/": "Slash", "=": "Equal", _: "Minus" };
+      if (ch === "_") return ["Minus", true];
+      return map[ch] ? [map[ch], false] : [null, false];
+    };
+    const tap = async (code, shift = false) => {
+      const codes = [
+        ...(shift ? [0x2a] : []),
+        ...scancodesFor(code, true),
+        ...scancodesFor(code, false),
+        ...(shift ? [0xaa] : []),
+      ];
+      await emu.keyboard_send_scancodes(codes);
+    };
+    /* tty1 is the machine's VGA console; the guest's init runs a login shell
+       there (run_console_session), so nothing has to be started here. */
+    const probe = process.env.VGA_TEXT ?? "echo VGA-OK";
+    for (const ch of probe) {
+      const [code, shift] = KEY_OF_CHAR(ch);
+      if (code) await tap(code, shift);
+    }
+    await tap("Enter");
+    await new Promise((r) => setTimeout(r, 2500));
+  }
+
   /* ---- the Engine Viewer's screen reader, against a real machine ----
      This is the seam that broke: the emulator does not expose the text screen
      where it looks obvious, so the viewer said "no v86 machine" for a machine
@@ -293,11 +328,15 @@ async function main() {
     if (screen.rows < 20) problems.push(`the text screen reports only ${screen.rows} rows`);
     if (screen.cols < 40) problems.push(`the text screen reports only ${screen.cols} columns`);
     if (!filled) problems.push("the text screen is blank after boot (nothing was drawn on the VGA)");
-    /* The guest paints a live panel on tty0 (tools/guest-init/init) so the
-       Engine Viewer has the machine's real console to show, not a dead screen. */
+    /* The VGA console is a real console: the guest's init runs a login shell
+       on tty1, so the screen shows a prompt and answers what is typed into it
+       (the block above typed through the keyboard controller). */
     const vgaText = screen.lines.map(stripEscapes).join("\n");
-    for (const expected of ["Dragon86 Linux (v86 engine)", "Last typed in the Terminal", "Memory"]) {
+    for (const expected of ["Dragon86 Linux (v86 engine)", "VGA-OK"]) {
       if (!vgaText.includes(expected)) problems.push(`the VGA screen is missing ${JSON.stringify(expected)}`);
+    }
+    if (!vgaText.includes("dragon86:")) {
+      problems.push("the VGA console has no shell prompt (is a login shell running on tty1?)");
     }
     /* The panel is a *console* screen: it has to be in colour for the viewer to
        show colours, and the boot has to have cleared the screen to draw it. */
