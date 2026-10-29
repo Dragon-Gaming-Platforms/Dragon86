@@ -60,3 +60,18 @@ first broken link.
 
   /networking.sh          bring the emulated card up (DHCP)
   /networking.sh status   interface, routes, DNS as the guest sees them
+
+The machine's screen
+--------------------
+
+This machine has two consoles. The shell is on the serial line — the Terminal
+window in Dragon86. Its screen (the VGA text console, `console=tty0`) is what
+the Engine Viewer window shows. It is not a second shell and it takes no input:
+it carries the kernel's own messages, and a panel repainted every few seconds
+with uptime, memory, where `/` comes from, the network address and the last
+commands typed in the Terminal.
+
+  echo hi > /dev/tty0      write a line onto the machine's screen
+
+This Arch userland has no X server and the kernel here has no framebuffer
+driver, so there is no graphical session to start — the console is the machine.

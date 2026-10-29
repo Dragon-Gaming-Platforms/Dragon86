@@ -1064,9 +1064,22 @@ check(
   /* The machine's *own* screen: v86 draws the text console into a container
      we hand it, and the viewer mounts that element rather than re-drawing the
      screen. This is what makes the window show the machine's real display. */
+  /* The exact shape v86's screen adapter builds inside the container it is
+     given: a text div holding one div per row (each with coloured spans), and
+     a canvas for graphical modes. */
   const ownScreen = document.createElement("div");
   ownScreen.className = "engine-screen-host";
-  ownScreen.innerHTML = '<div><span style="color:#a8a8a8">Dragon86 Linux (v86 engine)</span></div>';
+  const ownText = document.createElement("div");
+  ownText.className = "engine-screen-text";
+  const row = document.createElement("div");
+  row.innerHTML = '<span style="color:#a8a8a8;background-color:#000">Dragon86 Linux (v86 engine)</span>';
+  ownText.append(row);
+  const cursor = document.createElement("div");
+  cursor.className = "cursor blinking-cursor";
+  ownText.firstChild.firstChild.appendChild(cursor);
+  const ownCanvas = document.createElement("canvas");
+  ownCanvas.className = "engine-screen-canvas";
+  ownScreen.append(ownText, ownCanvas);
   const withScreen = {
     getScreen: () => ({ cols: 80, rows: 25, lines: ["Dragon86 Linux (v86 engine)"] }),
     screenElement: () => ownScreen,
@@ -1088,6 +1101,27 @@ check(
     "…and says it is the machine's screen",
     /machine's own screen/.test(liveView?.querySelector(".app-statusbar")?.textContent ?? ""),
     liveView?.querySelector(".app-statusbar")?.textContent,
+  );
+  /* The styles the machine's screen needs, from the real stylesheet: the rows
+     must not wrap, the text div must be the cursor's containing block (the
+     cursor is placed absolutely at its static position), and the blink
+     animation v86 asks for by class name must exist. */
+  const textStyle = window.getComputedStyle(ownText);
+  check("the machine's rows do not wrap", textStyle.whiteSpace === "pre", textStyle.whiteSpace);
+  check(
+    "…and are the cursor's containing block",
+    textStyle.position === "relative",
+    textStyle.position,
+  );
+  check(
+    "the blink animation exists",
+    /@keyframes engine-cursor-blink/.test(css ?? ""),
+    "no keyframes",
+  );
+  check(
+    "the screen scales about its centre",
+    /translate\(-50%, -50%\)/.test(window.getComputedStyle(ownScreen).transform ?? ""),
+    window.getComputedStyle(ownScreen).transform,
   );
 
   /* A machine that exists but has stopped (its Terminal was closed) is a

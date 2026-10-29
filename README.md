@@ -339,28 +339,46 @@ deleting one is a decision the OS does not undo on the next boot.
 ### Engine Viewer: the machine's own screen
 
 The Terminal shows the guest's **serial** console. The machine also has a VGA
-display; the guest is booted with `console=tty0 console=ttyS0`, so the BIOS and
-the kernel log draw on both. **View Engine** in the Terminal toolbar opens the
-Engine Viewer on *that terminal's* machine: a canvas that mirrors the VGA text
-screen (colours included — v86 hands the rows over with ANSI escapes), fitted
-to the window and repainted only when the screen changes. It is part of the OS,
-so it has no desktop icon and no folder; it sits in the start menu, and
-`~/system/apps/engine-viewer.d86` points at it.
+display, and this window shows *that* — the way copy.sh/v86 shows a machine.
+**View Engine** in the Terminal toolbar opens it on that terminal's machine.
 
-It asks the machine for its screen every frame rather than holding a copy, so
-the order does not matter: open it from the start menu before any Terminal and
-it attaches when a machine starts, or open it from a booted Terminal and it
-shows that machine immediately. It distinguishes the three states out loud —
-no machine yet, a machine still booting, and a machine whose Terminal has been
-closed — because saying "no v86 machine" for a running one was a bug.
+It is the machine's own rendering, not a copy of it. v86 is given a screen
+container when the machine is built (`src/bridge/v86.ts` creates it before
+`new V86(...)`, because the constructor needs it), and its screen adapter draws
+into it from then on: one div per text row, each row a set of spans carrying
+the console's own background and foreground colours, a blinking cursor, and a
+canvas underneath for graphical modes. The Engine Viewer mounts that element
+and scales it to the window with a transform, so the font, the colours, the
+cursor — everything — is the machine's, not an imitation. If a guest ever
+switches to a graphical mode, the canvas is what appears, with nothing to
+change on this side.
 
-The guest also paints its own boot screen on the VGA (`tools/guest-init/init`),
-which is what this window shows after the kernel stops logging: the banner,
-then `[ 1/4 ]`…`[ 4/4 ] ready.` as the 9p share comes up. The screen is a mirror
-of the machine's text buffer — it is not a second terminal, and typing there
-does nothing.
+The window asks the machine for its screen every frame rather than holding a
+copy, so the order does not matter: open it from the start menu before any
+Terminal and it attaches when a machine starts, or open it from a booted
+Terminal and it shows that machine immediately. It distinguishes the states
+out loud — no machine yet, a machine still booting, a machine whose Terminal
+has been closed — because saying "no v86 machine" for a running one was a bug.
+A machine has one screen and an element lives in one place, so if two Engine
+Viewers are open the newest one shows it and the other says where it went.
 
-The screen lives on libv86's *screen adapter*, not on the emulator object:
+The screen has something to show because the guest paints it
+(`tools/guest-init/init`): a coloured panel with the host name, uptime, load,
+memory, where its root filesystem comes from, its network address, and the last
+few commands typed in the Terminal — repainted every five seconds. Before that
+it draws the boot progress (`[ 1/4 ]`…`[ 4/4 ] ready.`) as the 9p share comes
+up, and before *that* the BIOS and the kernel log are there, because the guest
+boots with `console=tty0 console=ttyS0`.
+
+Some honest limits: this Arch userland has no X server and the vendored kernel
+has no framebuffer driver (`/proc/fb` is empty, there is no `/dev/fb0`), so the
+guest is a text-mode machine — copy.sh's own Arch profile is a text console
+too. The screen is a mirror: it takes no input, and the shell you type into is
+the serial console in the Terminal window. The console grid is the VGA's 80×25.
+
+The text buffer is also readable as rows — that is what the status bar counts,
+and what the fallback canvas draws for a backend with no element of its own. It
+lives on libv86's *screen adapter*, not on the emulator object:
 `emu.get_text_screen` and `emu.screen` do not exist. `src/bridge/v86-screen.ts`
 is the one place that knows this (including that the adapter appears a few
 milliseconds after the constructor and that the method needs its own `this`),
@@ -412,7 +430,7 @@ count); Settings → **v86 filesystem** can re-unpack it if it is ever damaged.
 - **Monaco Editor** — an App Store app (not installed by default): the editor behind VS Code, reading and writing the same files (see below)
 - **Terminal** — xterm.js front end. **v86 is the default engine**: an Arch userland that boots inside the page with no isolation and no hoster. CheerpX (embedded or its own tab) is still there under Settings → Engine
 - **Preview** — the default opener for pictures, sound, video, PDFs, 3D models and disc images; a fixed page (`public/preview/`), never in the App Store
-- **Engine Viewer** — the v86 machine's own VGA display, on a canvas. Reach it from the Terminal's **View Engine** button
+- **Engine Viewer** — the v86 machine's own display, drawn by the emulator. Reach it from the Terminal's **View Engine** button
 - **Scramjet** — web proxy (vendored at `/scramjet/`; traffic via a configurable Wisp server), a JSON-defined iframe app
 - **Dragon Gaming Platforms** — the org catalog player (`cdn.singlefile.html`), iframed live from the org's GitHub Pages site, also a JSON-defined iframe app
 - **GUST** — single-file web proxy, installed from the App Store like any other app: its folder (`public/system-apps/gust/`) ships its fonts and icons, so nothing comes from a CDN (see its `VENDORED.md`)
