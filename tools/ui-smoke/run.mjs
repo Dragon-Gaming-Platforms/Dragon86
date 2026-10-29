@@ -1194,6 +1194,19 @@ check(
       liveView?.querySelector(".app-statusbar")?.textContent,
     );
 
+    /* Paste: a console has no "insert text", so the pasted text is typed. */
+    sentKeys.length = 0;
+    const paste = new window.Event("paste", { bubbles: true, cancelable: true });
+    paste.clipboardData = { getData: () => "ok\n" };
+    ownScreen.dispatchEvent(paste);
+    check(
+      "pasting into the console types it",
+      sentKeys.map((codes) => codes.map((c) => c.toString(16).padStart(2, "0")).join(" ")).join(" | ") ===
+        "18 98 | 25 a5 | 1c 9c",
+      sentKeys.map((codes) => codes.join(",")).join(" | "),
+    );
+    check("…and the browser does not also paste", paste.defaultPrevented === true);
+
     /* A machine that has stopped must not receive keys. */
     window.d86.engine.attach({ getScreen: () => null, isRunning: () => false });
     sentKeys.length = 0;

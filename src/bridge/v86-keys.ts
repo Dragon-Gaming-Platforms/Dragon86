@@ -228,6 +228,79 @@ function legacyCodeFor(key: string | undefined): string | null {
   return key;
 }
 
+/** Character → [physical key, needs Shift], for text typed or pasted in. */
+const SHIFT_CHARS: Record<string, string> = {
+  "!": "Digit1",
+  "@": "Digit2",
+  "#": "Digit3",
+  $: "Digit4",
+  "%": "Digit5",
+  "^": "Digit6",
+  "&": "Digit7",
+  "*": "Digit8",
+  "(": "Digit9",
+  ")": "Digit0",
+  _: "Minus",
+  "+": "Equal",
+  "{": "BracketLeft",
+  "}": "BracketRight",
+  ":": "Semicolon",
+  '"': "Quote",
+  "~": "Backquote",
+  "|": "Backslash",
+  "<": "Comma",
+  ">": "Period",
+  "?": "Slash",
+};
+
+const PLAIN_CHARS: Record<string, string> = {
+  "-": "Minus",
+  "=": "Equal",
+  "[": "BracketLeft",
+  "]": "BracketRight",
+  ";": "Semicolon",
+  "'": "Quote",
+  "`": "Backquote",
+  "\\": "Backslash",
+  ",": "Comma",
+  ".": "Period",
+  "/": "Slash",
+  " ": "Space",
+};
+
+/** The physical key and Shift state that produce `ch`, or null. */
+export function keyForChar(ch: string): { code: string; shift: boolean } | null {
+  if (ch >= "a" && ch <= "z") return { code: `Key${ch.toUpperCase()}`, shift: false };
+  if (ch >= "A" && ch <= "Z") return { code: `Key${ch}`, shift: true };
+  if (ch >= "0" && ch <= "9") return { code: `Digit${ch}`, shift: false };
+  if (ch in PLAIN_CHARS) return { code: PLAIN_CHARS[ch], shift: false };
+  if (ch in SHIFT_CHARS) return { code: SHIFT_CHARS[ch], shift: true };
+  if (ch === "\n" || ch === "\r") return { code: "Enter", shift: false };
+  if (ch === "\t") return { code: "Tab", shift: false };
+  return null;
+}
+
+/**
+ * Text as a stream of key presses — what pasting into the console does. Each
+ * entry is one keystroke's worth of scancodes, sent in order: a console has no
+ * "insert this string" call, so a paste has to be typed, Shift and all.
+ */
+export function scancodesForText(text: string): number[][] {
+  const out: number[][] = [];
+  for (const ch of text) {
+    const key = keyForChar(ch);
+    if (!key) continue;
+    const codes = [
+      ...(key.shift ? [0x2a] : []),
+      ...scancodesFor(key.code, true),
+      ...scancodesFor(key.code, false),
+      ...(key.shift ? [0xaa] : []),
+    ];
+    out.push(codes);
+  }
+  return out;
+}
+
 /**
  * Keys typed into the viewer that the *OS* would otherwise claim: the guest
  * gets them, the page does not. Ctrl/Alt/Meta combinations are the reason this

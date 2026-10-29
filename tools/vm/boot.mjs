@@ -279,32 +279,21 @@ async function main() {
      tty1, and a shell there. The mapping is the viewer's
      (src/bridge/v86-keys.ts), not a harness copy. */
   {
-    const { scancodesFor } = await import("../../src/bridge/v86-keys.ts");
-    const KEY_OF_CHAR = (ch) => {
-      if (ch >= "a" && ch <= "z") return [`Key${ch.toUpperCase()}`, false];
-      if (ch >= "A" && ch <= "Z") return [`Key${ch}`, true];
-      if (ch >= "0" && ch <= "9") return [`Digit${ch}`, false];
-      const map = { " ": "Space", "-": "Minus", ".": "Period", "/": "Slash", "=": "Equal", _: "Minus" };
-      if (ch === "_") return ["Minus", true];
-      return map[ch] ? [map[ch], false] : [null, false];
-    };
-    const tap = async (code, shift = false) => {
-      const codes = [
-        ...(shift ? [0x2a] : []),
-        ...scancodesFor(code, true),
-        ...scancodesFor(code, false),
-        ...(shift ? [0xaa] : []),
-      ];
-      await emu.keyboard_send_scancodes(codes);
+    const { scancodesForText } = await import("../../src/bridge/v86-keys.ts");
+    const send = async (codes) => {
+      if (codes.length) await emu.keyboard_send_scancodes(codes);
     };
     /* tty1 is the machine's VGA console; the guest's init runs a login shell
-       there (run_console_session), so nothing has to be started here. */
-    const probe = process.env.VGA_TEXT ?? "echo VGA-OK";
-    for (const ch of probe) {
-      const [code, shift] = KEY_OF_CHAR(ch);
-      if (code) await tap(code, shift);
+       there (run_console_session), so nothing has to be started here. The text
+       goes through the same mapping a paste in the viewer uses. */
+    /* The marker is always typed, whatever extra text a run asks for: it is
+       what the assertion below looks for. */
+    const lines = [process.env.VGA_TEXT, "echo VGA-MARK"].filter(Boolean);
+    for (const line of lines) {
+      for (const codes of scancodesForText(line)) await send(codes);
+      await send(scancodesForText("\n").flat());
+      await new Promise((r) => setTimeout(r, 400));
     }
-    await tap("Enter");
     await new Promise((r) => setTimeout(r, 2500));
   }
 
@@ -332,7 +321,7 @@ async function main() {
        on tty1, so the screen shows a prompt and answers what is typed into it
        (the block above typed through the keyboard controller). */
     const vgaText = screen.lines.map(stripEscapes).join("\n");
-    for (const expected of ["Dragon86 Linux (v86 engine)", "VGA-OK"]) {
+    for (const expected of ["Dragon86 Linux (v86 engine)", "VGA-MARK"]) {
       if (!vgaText.includes(expected)) problems.push(`the VGA screen is missing ${JSON.stringify(expected)}`);
     }
     if (!vgaText.includes("dragon86:")) {

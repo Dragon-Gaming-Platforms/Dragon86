@@ -358,7 +358,8 @@ runs a login shell of its own. So the Engine Viewer is a *second terminal on the
 same machine* — same filesystem, separate session and history, usable at the
 same time as the Terminal. `ls`, `vim`, Tab completion, Ctrl-C, Ctrl-D, arrows
 in the line editor: all of it works, because the guest's own keyboard driver is
-decoding the keys.
+decoding the keys. Pasting is supported too: a text console has no "insert this
+string", so pasted text is typed at it, Shift and all (`scancodesForText`).
 
 How the keys travel: `src/bridge/v86-keys.ts` maps `KeyboardEvent.code` (the
 *physical* key) to PS/2 set-1 scancodes — release sets the high bit, and

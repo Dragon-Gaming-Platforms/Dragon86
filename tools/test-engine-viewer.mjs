@@ -249,6 +249,19 @@ const { scancodesFor, scancodesForEvent, keyFor } = keysModule;
   check("uppercase A maps to the same key", hex(scancodesForEvent({ key: "A" }, true)) === "1e");
   check("punctuation maps", hex(scancodesForEvent({ key: "/" }, true)) === "35");
   check("Enter by name maps", hex(scancodesForEvent({ key: "Enter" }, true)) === "1c");
+
+  /* Paste: a console has no "insert string", so text is typed — Shift and
+     all. This is what the viewer's paste handler sends. */
+  const { scancodesForText, keyForChar } = keysModule;
+  const typed = (text) => scancodesForText(text).map((codes) => hex(codes)).join(" | ");
+  check("plain text types itself", typed("hi") === "23 a3 | 17 97", typed("hi"));
+  check("a capital is Shift + the key", typed("A") === "2a 1e 9e aa", typed("A"));
+  check("shifted punctuation too", typed("!") === "2a 02 82 aa", typed("!"));
+  check("quotes and underscores", typed("_\"") === '2a 0c 8c aa | 2a 28 a8 aa', typed('_"'));
+  check("a newline is Enter", typed("\n") === "1c 9c");
+  check("a tab is Tab", typed("\t") === "0f 8f");
+  check("characters with no key are dropped", scancodesForText("😀").length === 0);
+  check("keyForChar knows the keyboard", keyForChar("q")?.code === "KeyQ" && keyForChar(" " )?.code === "Space");
 }
 
 /* ---- the viewer routes keys to the machine, not to the OS ---- */

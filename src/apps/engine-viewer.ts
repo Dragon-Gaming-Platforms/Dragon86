@@ -35,7 +35,7 @@ import { logInfo, logWarn } from "../core/log";
 import type { Win } from "../core/wm";
 import type { EngineScreen, TerminalBackend } from "../bridge/hoster";
 import { rowsWithText } from "../bridge/v86-screen";
-import { scancodesForEvent } from "../bridge/v86-keys";
+import { scancodesForEvent, scancodesForText } from "../bridge/v86-keys";
 
 /** The machine last handed to the viewer, so the start menu can find one. */
 let lastEngine: TerminalBackend | null = null;
@@ -187,8 +187,25 @@ export function openEngineViewer(win: Win, backend?: TerminalBackend | null): vo
 
   const onKeyDown = (event: KeyboardEvent) => onKey(event, true);
   const onKeyUp = (event: KeyboardEvent) => onKey(event, false);
+
+  /**
+   * Pasting into the console: a text console has no "insert this string" call,
+   * so the text is typed — one keystroke at a time, Shift and all. Without
+   * this, paste on a focused console would silently do nothing.
+   */
+  const onPaste = (event: ClipboardEvent): void => {
+    const live = keyTarget();
+    if (!live) return;
+    const text = event.clipboardData?.getData("text");
+    if (!text) return;
+    event.preventDefault();
+    event.stopPropagation();
+    for (const codes of scancodesForText(text)) live.sendScancodes?.(codes);
+  };
+
   root.addEventListener("keydown", onKeyDown);
   root.addEventListener("keyup", onKeyUp);
+  root.addEventListener("paste", onPaste);
 
   /** Put the keyboard where the user clicked. */
   const takeFocus = (): void => {
@@ -432,6 +449,7 @@ export function openEngineViewer(win: Win, backend?: TerminalBackend | null): vo
     alive = false;
     root.removeEventListener("keydown", onKeyDown);
     root.removeEventListener("keyup", onKeyUp);
+    root.removeEventListener("paste", onPaste);
     root.removeEventListener("pointerdown", takeFocus);
     if (timer !== null) window.clearInterval(timer);
     timer = null;
