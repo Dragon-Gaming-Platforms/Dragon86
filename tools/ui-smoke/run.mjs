@@ -1061,6 +1061,69 @@ check(
     liveView?.textContent?.slice(0, 160),
   );
 
+  /* The machine's *own* screen: v86 draws the text console into a container
+     we hand it, and the viewer mounts that element rather than re-drawing the
+     screen. This is what makes the window show the machine's real display. */
+  /* The exact shape v86's screen adapter builds inside the container it is
+     given: a text div holding one div per row (each with coloured spans), and
+     a canvas for graphical modes. */
+  const ownScreen = document.createElement("div");
+  ownScreen.className = "engine-screen-host";
+  const ownText = document.createElement("div");
+  ownText.className = "engine-screen-text";
+  const row = document.createElement("div");
+  row.innerHTML = '<span style="color:#a8a8a8;background-color:#000">Dragon86 Linux (v86 engine)</span>';
+  ownText.append(row);
+  const cursor = document.createElement("div");
+  cursor.className = "cursor blinking-cursor";
+  ownText.firstChild.firstChild.appendChild(cursor);
+  const ownCanvas = document.createElement("canvas");
+  ownCanvas.className = "engine-screen-canvas";
+  ownScreen.append(ownText, ownCanvas);
+  const withScreen = {
+    getScreen: () => ({ cols: 80, rows: 25, lines: ["Dragon86 Linux (v86 engine)"] }),
+    screenElement: () => ownScreen,
+    isRunning: () => true,
+  };
+  window.d86.engine.attach(withScreen);
+  await wait(400);
+  const stageEl = liveView?.querySelector(".engine-stage");
+  check(
+    "the viewer mounts the machine's own screen",
+    Boolean(stageEl?.querySelector(".engine-screen-host")),
+    stageEl?.innerHTML?.slice(0, 120),
+  );
+  check(
+    "…instead of drawing its own canvas",
+    stageEl?.querySelector("canvas.engine-canvas")?.hidden === true,
+  );
+  check(
+    "…and says it is the machine's screen",
+    /machine's own screen/.test(liveView?.querySelector(".app-statusbar")?.textContent ?? ""),
+    liveView?.querySelector(".app-statusbar")?.textContent,
+  );
+  /* The styles the machine's screen needs, from the real stylesheet: the rows
+     must not wrap, the text div must be the cursor's containing block (the
+     cursor is placed absolutely at its static position), and the blink
+     animation v86 asks for by class name must exist. */
+  const textStyle = window.getComputedStyle(ownText);
+  check("the machine's rows do not wrap", textStyle.whiteSpace === "pre", textStyle.whiteSpace);
+  check(
+    "…and are the cursor's containing block",
+    textStyle.position === "relative",
+    textStyle.position,
+  );
+  check(
+    "the blink animation exists",
+    /@keyframes engine-cursor-blink/.test(css ?? ""),
+    "no keyframes",
+  );
+  check(
+    "the screen scales about its centre",
+    /translate\(-50%, -50%\)/.test(window.getComputedStyle(ownScreen).transform ?? ""),
+    window.getComputedStyle(ownScreen).transform,
+  );
+
   /* A machine that exists but has stopped (its Terminal was closed) is a
      different message from never having had one. */
   window.d86.engine.attach({ getScreen: () => null, isRunning: () => false });
@@ -1071,6 +1134,24 @@ check(
     /has stopped/i.test(liveStatus) && !/no v86 machine/i.test(liveStatus),
     liveStatus,
   );
+
+  /* Closing the viewer must hand the element back, not destroy it: the
+     Terminal's machine keeps running, and the viewer can be opened again. */
+  window.d86.engine.attach(withScreen);
+  await wait(300);
+  liveView
+    ?.querySelector(".d86-win-btn.close")
+    ?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  await wait(300);
+  /* Another Engine Viewer window may still be open and takes the screen over
+     (it is one element, shown in one place). What must be true is that the
+     closed window no longer holds it. */
+  check(
+    "closing the viewer un-mounts the screen",
+    !stageEl?.contains(ownScreen),
+    ownScreen.isConnected ? "still mounted somewhere" : "detached",
+  );
+  check("…without emptying it", /Dragon86 Linux/.test(ownScreen.textContent ?? ""));
   window.d86.engine.attach(null);
 }
 
