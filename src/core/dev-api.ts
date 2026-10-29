@@ -28,6 +28,11 @@
  *   d86.apps.reload()           → Promise<void>   re-read the registry
  *   d86.apps.launch(id)         → void            open a window
  *
+ *   d86.engine.attach(source)   → void            show this machine in Engine Viewer
+ *                                                  (a TerminalBackend; see
+ *                                                  bridge/hoster.ts)
+ *   d86.engine.screen()         → {cols,rows,lines} | null  the live VGA text
+ *
  *   d86.open(path)              → void            open a file the way the OS would
  *   d86.notify({ title, body }) → void            a toast in the corner
  *   d86.log(...args)            → void            console, tagged [D86:script]
@@ -42,6 +47,8 @@ import { logInfo, logWarn } from "./log";
 import { notify } from "./toast";
 import { fs as zenfs } from "@zenfs/core";
 import { getFsApps, reloadFsApps, upsertAppEntry } from "./fs-apps";
+import { rememberEngine, engineForViewer } from "../apps/engine-viewer";
+import type { EngineScreen, TerminalBackend } from "../bridge/hoster";
 
 export interface D86FsEntry {
   name: string;
@@ -83,6 +90,12 @@ export interface D86Api {
     register(entry: D86AppEntry): Promise<void>;
     reload(): Promise<void>;
     launch(id: string): void;
+  };
+  engine: {
+    /** Point the Engine Viewer at a machine (the Terminal does this itself). */
+    attach(source: TerminalBackend | null): void;
+    /** What the viewer would draw right now, or null when there is nothing. */
+    screen(): EngineScreen | null;
   };
   open(path: string): void;
   notify(opts: { title: string; body?: string; icon?: string; timeout?: number }): void;
@@ -188,6 +201,12 @@ export function installDevApi(hooks: { launch: (id: string) => void; open: (path
       launch: (id) => {
         window.dispatchEvent(new CustomEvent("d86-launch-app", { detail: id }));
       },
+    },
+    engine: {
+      attach: (source) => {
+        rememberEngine(source ?? null);
+      },
+      screen: () => engineForViewer()?.getScreen?.() ?? null,
     },
     open: (path) => hooks.open(resolveScriptPath(path)),
     notify: (opts) =>

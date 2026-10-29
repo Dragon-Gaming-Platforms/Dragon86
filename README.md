@@ -347,6 +347,26 @@ to the window and repainted only when the screen changes. It is part of the OS,
 so it has no desktop icon and no folder; it sits in the start menu, and
 `~/system/apps/engine-viewer.d86` points at it.
 
+It asks the machine for its screen every frame rather than holding a copy, so
+the order does not matter: open it from the start menu before any Terminal and
+it attaches when a machine starts, or open it from a booted Terminal and it
+shows that machine immediately. It distinguishes the three states out loud —
+no machine yet, a machine still booting, and a machine whose Terminal has been
+closed — because saying "no v86 machine" for a running one was a bug.
+
+The guest also paints its own boot screen on the VGA (`tools/guest-init/init`),
+which is what this window shows after the kernel stops logging: the banner,
+then `[ 1/4 ]`…`[ 4/4 ] ready.` as the 9p share comes up. The screen is a mirror
+of the machine's text buffer — it is not a second terminal, and typing there
+does nothing.
+
+The screen lives on libv86's *screen adapter*, not on the emulator object:
+`emu.get_text_screen` and `emu.screen` do not exist. `src/bridge/v86-screen.ts`
+is the one place that knows this (including that the adapter appears a few
+milliseconds after the constructor and that the method needs its own `this`),
+and `tools/vm/boot.mjs` checks it against a real booted machine, so a libv86
+bump that moves it again fails the build instead of the window.
+
 ### The v86 guest: a lightweight Arch userland rooted in your files
 
 The v86 engine boots one guest: the vendored Arch Linux 32 kernel plus a

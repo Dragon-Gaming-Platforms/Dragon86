@@ -1,7 +1,15 @@
 #!/usr/bin/env node
 /**
- * Tests for src/apps/ansi-text.ts — the VGA text-row parser behind the
- * Engine Viewer.
+ * Tests for the Engine Viewer's two pure pieces:
+ *   - src/apps/ansi-text.ts     — the VGA text-row parser (colour escapes)
+ *   - src/bridge/v86-screen.ts  — where the machine's screen is read from
+ *
+ * The second one is the bug this file now guards: the emulator does not
+ * expose `get_text_screen` where it looks obvious. It lives on the screen
+ * adapter under `screen_adapter`, the method reads its own buffer (so it
+ * cannot be detached from `this`), and the adapter appears a few
+ * milliseconds after the constructor — all three states have to be handled
+ * without claiming "no v86 machine".
  *
  * v86 hands the machine's screen over as text rows with ANSI SGR escapes
  * (truecolour, `\x1b[48;2;r;g;bm` for the background and
@@ -92,13 +100,87 @@ const bgs = (row) => parseRow(row).map((r) => r.bg);
   );
 }
 
+/* ---- where the screen comes from (src/bridge/v86-screen.ts) ---- */
+const screenModule = await import("../src/bridge/v86-screen.ts");
+const { textScreenFrom, hasTextScreen, rowsWithText, stripEscapes } = screenModule;
+{
+  /* A stand-in for libv86's adapter: a method that needs its own `this`,
+     exactly like the real one (which reads `this.text_screen`). */
+  const adapter = {
+    text_screen: ["\x1b[48;2;0;0;0m\x1b[38;2;168;168;168mhello\x1b[0m", "  world", ""],
+    get_text_screen() {
+      return this.text_screen;
+    },
+  };
+
+  check("the adapter is where the screen is read", textScreenFrom({ screen_adapter: adapter })?.rows === 3);
+  let detached = "no throw";
+  try {
+    detached = adapter.get_text_screen.call(null);
+  } catch (err) {
+    /* This is the bug that made the viewer read nothing: a method taken off
+       the adapter and called without it cannot see the screen. */
+    detached = `threw: ${err.message}`;
+  }
+  check("…so the detached method does not work", detached.startsWith("threw:"), detached);
+  check("…and it is still called with its owner", textScreenFrom({ screen_adapter: adapter })?.lines[1] === "  world");
+  check("hasTextScreen is true with an adapter", hasTextScreen({ screen_adapter: adapter }));
+  check("hasTextScreen: the old emu.screen path still works", hasTextScreen({ screen: adapter }));
+  check("hasTextScreen: a top-level get_text_screen still works", hasTextScreen(adapter));
+  check("no adapter yet → null, not a throw", textScreenFrom({}) === null);
+  check("no emulator → null", textScreenFrom(null) === null && textScreenFrom(undefined) === null);
+  check("hasTextScreen is false before the adapter exists", !hasTextScreen({}));
+
+  const blank = { get_text_screen: () => [] };
+  check("an empty screen is null, not an exception", textScreenFrom(blank) === null);
+  const thrower = {
+    get_text_screen() {
+      throw new Error("not in text mode");
+    },
+  };
+  check("a throwing adapter is null, not a crash", textScreenFrom(thrower) === null);
+  check("a non-array answer is null", textScreenFrom({ get_text_screen: () => "nope" }) === null);
+
+  /* Column count: there is no size getter, so it is the widest row after the
+     escapes are removed. Padded rows from a real screen make this exact. */
+  const wide = { get_text_screen: () => ["\x1b[31mabc\x1b[0m", "abcdefgh"] };
+  const measured = textScreenFrom(wide);
+  check("columns = the widest row, escapes excluded", measured?.cols === 8, String(measured?.cols));
+  const narrow = textScreenFrom({ get_text_screen: () => [""] });
+  check("a screen of blank rows still has a width", narrow?.cols === 1 && narrow?.rows === 1);
+
+  check("stripEscapes leaves the characters", stripEscapes("\x1b[1;32mok\x1b[0m") === "ok");
+  check("rowsWithText counts the written rows", rowsWithText(textScreenFrom(wide)) === 2);
+  check(
+    "rowsWithText ignores whitespace",
+    rowsWithText({ cols: 4, rows: 2, lines: ["    ", "\x1b[2J  "] }) === 0,
+  );
+}
+
 /* ---- the viewer really uses it ---- */
 {
-  const source = readFileSync(new URL("../src/apps/engine-viewer.ts", import.meta.url), "utf8");
+  const read = (p) => readFileSync(new URL(p, import.meta.url), "utf8");
+  const source = read("../src/apps/engine-viewer.ts");
+  const bridge = read("../src/bridge/v86.ts");
   check("the Engine Viewer draws from the parser", /from "\.\/ansi-text"/.test(source));
   check("…cell by cell", /parseRow\(screen\.lines\[row\]\)/.test(source));
   check("…on a canvas", /createElement\("canvas"\)/.test(source));
   check("…reading the machine's screen", /getScreen\?\.\(\)/.test(source));
+  check("…through the shared screen reader", /from "\.\.\/bridge\/v86-screen"/.test(source));
+  check("…asking each machine on every frame", /engineForViewer\(\)/.test(source));
+
+  /* The three states must be distinguishable: "no machine", "a machine whose
+     Terminal was closed", "a machine still booting". One message for all
+     three is exactly the bug that was reported. */
+  check("the viewer knows a machine may be stopped", /state: "stopped"/.test(source));
+  check("the viewer knows a machine may be booting", /state: "waiting"/.test(source));
+  check("…and only says \"no machine\" for none", /No v86 machine has been started yet/.test(source));
+
+  check("the bridge reads the screen through v86-screen", /textScreenFrom\(this\.emu\)/.test(bridge));
+  check("the bridge tells the truth about liveness", /isRunning\(\): boolean/.test(bridge));
+  /* v86 reads screen options from `opts.screen`; a top-level `ansi` is ignored. */
+  check("the machine is asked for ansi rows", /screen: \{ ansi: true \}/.test(bridge));
+  check("…not a top-level ansi flag", !/^\s*ansi: true,/m.test(bridge));
 }
 
 console.log(failed ? `\n${failed} check(s) failed` : "\nall checks passed");

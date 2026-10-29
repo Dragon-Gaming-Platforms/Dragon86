@@ -999,6 +999,81 @@ check(
   );
 }
 
+/* ---- Engine Viewer, with a machine running ----
+   The reported bug: opening the viewer from a booted Terminal said there was
+   no v86 machine. Two things had to be true and neither was: the Terminal had
+   to hand the viewer a machine (it does — d86.engine.attach is the same call
+   the "View Engine" button makes), and the viewer had to ask that machine for
+   its screen on every frame instead of trusting a snapshot. This drives the
+   second half with a stand-in machine whose adapter only appears on the
+   second frame, which is what a real one does while it is constructing. */
+{
+  const adapter = {
+    rows: [
+      "\x1b[48;2;0;0;0m\x1b[38;2;168;168;168mSeaBIOS (version rel-1.16.2)\x1b[0m",
+      "\x1b[48;2;0;0;0m\x1b[38;2;168;168;168m  Dragon86 Linux (v86 engine)\x1b[0m",
+      "\x1b[48;2;0;0;0m\x1b[38;2;168;168;168m  [ 4/4 ] ready.\x1b[0m",
+    ],
+    get_text_screen() {
+      return this.rows;
+    },
+  };
+  let frames = 0;
+  const machine = {
+    getScreen() {
+      /* Frame 1: the adapter is not there yet (a machine mid-construction). */
+      frames++;
+      if (frames < 2) return null;
+      return { cols: 40, rows: adapter.rows.length, lines: adapter.get_text_screen.call(adapter) };
+    },
+    isRunning: () => true,
+  };
+  window.d86.engine.attach(machine);
+  check(
+    "a machine that is still constructing has no screen yet",
+    window.d86.engine.screen() === null,
+    `frame ${frames}`,
+  );
+
+  /* Open a second viewer while that machine runs. */
+  document.querySelector(".start-btn").dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  await wait(250);
+  const viewerEntry = [...document.querySelectorAll(".start-app")].find((n) =>
+    n.textContent.includes("Engine Viewer"),
+  );
+  document.querySelector(".start-btn").dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  await wait(120);
+  viewerEntry?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  await wait(500);
+  const liveView = [...document.querySelectorAll(".d86-window")]
+    .filter((w) => w.textContent.includes("Engine Viewer"))
+    .at(-1);
+  check("the viewer attaches to the running machine", frames >= 2, `${frames} frame(s) asked`);
+  check(
+    "…and reports the VGA screen, not \"no machine\"",
+    /VGA text screen/.test(liveView?.textContent ?? "") &&
+      !/no v86 machine/i.test(liveView?.textContent ?? ""),
+    liveView?.textContent?.slice(0, 160),
+  );
+  check(
+    "…with the size and the rows that have text",
+    /40×3/.test(liveView?.textContent ?? ""),
+    liveView?.textContent?.slice(0, 160),
+  );
+
+  /* A machine that exists but has stopped (its Terminal was closed) is a
+     different message from never having had one. */
+  window.d86.engine.attach({ getScreen: () => null, isRunning: () => false });
+  await wait(400);
+  const liveStatus = liveView?.querySelector(".app-statusbar")?.textContent ?? "";
+  check(
+    "a stopped machine says so, and is not called \"no machine\"",
+    /has stopped/i.test(liveStatus) && !/no v86 machine/i.test(liveStatus),
+    liveStatus,
+  );
+  window.d86.engine.attach(null);
+}
+
 /* ---- uninstalling an app that shipped installed ----
    Hello is seeded into ~/system/apps by the OS itself. Uninstalling it used to
    do nothing at all: the next load re-created the folder (writeIfMissing) and

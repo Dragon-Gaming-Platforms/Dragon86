@@ -34,15 +34,20 @@ import { ensureGuestRoot } from "./guest-root";
 import { createDirectFs, unionAsPromises, withSubmount } from "./union-fs";
 import { logInfo, logWarn } from "../core/log";
 import type { BackendHandlers, EngineScreen, TerminalBackend } from "./hoster";
+import { textScreenFrom } from "./v86-screen";
 
 interface V86Emulator {
   add_listener(event: string, cb: (arg: number) => void): void;
   destroy(): void;
   serial0_send(data: string): void;
   save_state(): Promise<ArrayBuffer>;
-  /** One string per VGA text row; see the `ansi` option in start(). */
+  /**
+   * libv86 keeps the VGA text buffer in its screen adapter and assigns it a
+   * few milliseconds after construction — see bridge/v86-screen.ts.
+   */
+  screen_adapter?: { get_text_screen?: () => string[] };
+  /** Forwarded by some builds; not present in the vendored one. */
   get_text_screen?: () => string[];
-  /** The screen adapter, which is where libv86 actually keeps that method. */
   screen?: { get_text_screen?: () => string[] };
 }
 
@@ -170,6 +175,9 @@ class V86Backend implements TerminalBackend {
   private startTimer: ReturnType<typeof setTimeout> | null = null;
   private nudgeTimer: ReturnType<typeof setInterval> | null = null;
   private acpiEnabled = false;
+  private screenWarned = false;
+  /** Set by connect(): this backend has been asked to run a machine. */
+  private started = false;
 
   constructor(
     private handlers: BackendHandlers,
@@ -177,41 +185,38 @@ class V86Backend implements TerminalBackend {
   ) {}
 
   connect(): void {
+    this.started = true;
     /* The guest's serial size rides the kernel cmdline, so give the
        terminal a beat to report its real size before we construct. */
     this.startTimer = setTimeout(() => void this.start(), 300);
   }
 
   /**
-   * The machine's VGA text screen. v86 renders it into a container we never
-   * show, but it keeps the text buffer regardless, and `get_text_screen()`
-   * hands it over row by row — colours included when the machine was built
-   * with `ansi: true` (see start()). Plain rows come back padded to the
-   * screen width, so the widest row after stripping escapes is the column
-   * count; there is no size getter.
+   * The machine's VGA text screen, as it is right now — null when there is
+   * nothing to read (no machine, or it has not finished constructing).
+   * bridge/v86-screen.ts knows where libv86 keeps it and why.
    */
   getScreen(): EngineScreen | null {
-    /* libv86 exposes the text rows on the screen adapter (the emulator keeps
-       it as `screen`); some builds also forward it on the emulator itself. */
-    const read =
-      this.emu?.get_text_screen?.bind(this.emu) ??
-      this.emu?.screen?.get_text_screen?.bind(this.emu.screen) ??
-      null;
-    if (!read) return null;
-    let lines: string[];
-    try {
-      lines = read();
-    } catch (err) {
-      logWarn("v86", "could not read the text screen", err);
-      return null;
+    const screen = textScreenFrom(this.emu);
+    if (screen === null && this.emu && !this.disposed) {
+      /* Once, not every frame: an adapter that never appears is worth a line
+         in the log, but not one per 140 ms. */
+      if (!this.screenWarned) {
+        this.screenWarned = true;
+        logInfo("v86", "the machine has no readable text screen yet (still constructing?)");
+      }
     }
-    if (!Array.isArray(lines) || !lines.length) return null;
-    let cols = 0;
-    for (const line of lines) {
-      const plain = line.replace(/\x1b\[[0-9;]*m/g, "");
-      if (plain.length > cols) cols = plain.length;
-    }
-    return { cols: Math.max(cols, 1), rows: lines.length, lines };
+    return screen;
+  }
+
+  /**
+   * True from the moment the Terminal asks this backend to start until it is
+   * disposed — including the gap before the emulator object exists, which is
+   * why it is not simply `Boolean(this.emu)`: a machine that is still starting
+   * is not a machine that has stopped.
+   */
+  isRunning(): boolean {
+    return !this.disposed && (Boolean(this.emu) || this.started);
   }
 
   resize(cols: number, rows: number): void {
@@ -426,10 +431,14 @@ class V86Backend implements TerminalBackend {
           ? { net_device: { type: "virtio", relay_url: this.netDeviceUrl() } }
           : {}),
         autostart: true,
-        /* Ask v86 for the text screen with colour escapes rather than plain
-           characters: the Engine Viewer draws it, and losing every colour of
-           a boot log is a poor way to show what the machine is doing. */
-        ansi: true,
+        /* Screen options are read from `opts.screen` (libv86 does
+           `f = b.screen || {}`), and `ansi` is what makes the text adapter
+           hand rows over with colour escapes instead of bare characters.
+           A top-level `ansi` is silently ignored — which is why the Engine
+           Viewer used to show nothing useful. No `container`: the adapter
+           keeps the text buffer in memory and draws nothing itself, which is
+           exactly what a mirrored view wants. */
+        screen: { ansi: true },
         disable_keyboard: true,
         disable_mouse: true,
         disable_speaker: true,

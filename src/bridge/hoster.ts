@@ -61,6 +61,13 @@ export interface TerminalBackend {
    * the Terminal shows — which is what the Engine Viewer mirrors.
    */
   getScreen?: () => EngineScreen | null;
+  /**
+   * True while this backend still owns a live machine. The Engine Viewer
+   * needs to tell "there is no machine" from "the machine is up but its
+   * display is not readable yet" — the two used to be the same message, and
+   * it was wrong about the second one.
+   */
+  isRunning?: () => boolean;
 }
 
 export interface BackendHandlers {
