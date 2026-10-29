@@ -1080,10 +1080,13 @@ check(
   const ownCanvas = document.createElement("canvas");
   ownCanvas.className = "engine-screen-canvas";
   ownScreen.append(ownText, ownCanvas);
+  /** Every scancode the viewer sends, so a key press can be read back. */
+  const sentKeys = [];
   const withScreen = {
     getScreen: () => ({ cols: 80, rows: 25, lines: ["Dragon86 Linux (v86 engine)"] }),
     screenElement: () => ownScreen,
     isRunning: () => true,
+    sendScancodes: (codes) => sentKeys.push(codes),
   };
   window.d86.engine.attach(withScreen);
   await wait(400);
@@ -1134,6 +1137,84 @@ check(
     /has stopped/i.test(liveStatus) && !/no v86 machine/i.test(liveStatus),
     liveStatus,
   );
+
+  /* ---- it is writable: typing on the screen goes to the machine ----
+     The keys must reach the guest and must NOT reach the page: Ctrl-C in a
+     console is the guest's, not a browser shortcut, and Tab is completion. */
+  {
+    /* The stopped-machine check above detached the screen; put the running one
+       back (the viewer re-mounts it on the next frame). */
+    window.d86.engine.attach(withScreen);
+    await wait(400);
+    check("the screen is mounted again", Boolean(stageEl?.querySelector(".engine-screen-host")));
+
+    sentKeys.length = 0;
+    const press = (init) => {
+      const down = new window.KeyboardEvent("keydown", { bubbles: true, cancelable: true, ...init });
+      ownScreen.dispatchEvent(down);
+      const up = new window.KeyboardEvent("keyup", { bubbles: true, cancelable: true, ...init });
+      ownScreen.dispatchEvent(up);
+      return { prevented: down.defaultPrevented, bubbled: down.bubbles };
+    };
+    press({ code: "KeyL", key: "l" });
+    const flat = () => sentKeys.flat().map((c) => c.toString(16).padStart(2, "0")).join(" ");
+    check("typing on the screen reaches the machine", flat() === "26 a6", flat());
+
+    sentKeys.length = 0;
+    const enter = press({ code: "Enter", key: "Enter" });
+    check("Enter reaches the machine", flat() === "1c 9c", flat());
+    check("…and the page does not also act on it", enter.prevented === true);
+
+    sentKeys.length = 0;
+    press({ code: "ControlLeft", key: "Control" });
+    press({ code: "KeyC", key: "c" });
+    check(
+      "Ctrl-C reaches the machine as a modifier sequence",
+      flat() === "1d 9d 2e ae",
+      flat(),
+    );
+
+    sentKeys.length = 0;
+    press({ code: "ArrowUp", key: "ArrowUp" });
+    check("an extended key arrives with its prefix", flat() === "e0 48 e0 c8", flat());
+
+    /* A key the mapping does not know must not be swallowed. */
+    sentKeys.length = 0;
+    const unknown = press({ code: "AudioVolumeUp", key: "AudioVolumeUp" });
+    check("an unmapped key is left to the browser", sentKeys.length === 0 && !unknown.prevented);
+
+    /* Focus is what decides this: clicking the screen takes it. */
+    document.body.focus?.();
+    ownScreen.dispatchEvent(new window.MouseEvent("pointerdown", { bubbles: true }));
+    check("clicking the screen gives it the keyboard", document.activeElement === ownScreen);
+    await wait(300);
+    check(
+      "…and the status bar says typing goes to the machine",
+      /typing goes to the machine/.test(liveView?.querySelector(".app-statusbar")?.textContent ?? ""),
+      liveView?.querySelector(".app-statusbar")?.textContent,
+    );
+
+    /* Paste: a console has no "insert text", so the pasted text is typed. */
+    sentKeys.length = 0;
+    const paste = new window.Event("paste", { bubbles: true, cancelable: true });
+    paste.clipboardData = { getData: () => "ok\n" };
+    ownScreen.dispatchEvent(paste);
+    check(
+      "pasting into the console types it",
+      sentKeys.map((codes) => codes.map((c) => c.toString(16).padStart(2, "0")).join(" ")).join(" | ") ===
+        "18 98 | 25 a5 | 1c 9c",
+      sentKeys.map((codes) => codes.join(",")).join(" | "),
+    );
+    check("…and the browser does not also paste", paste.defaultPrevented === true);
+
+    /* A machine that has stopped must not receive keys. */
+    window.d86.engine.attach({ getScreen: () => null, isRunning: () => false });
+    sentKeys.length = 0;
+    ownScreen.dispatchEvent(new window.KeyboardEvent("keydown", { bubbles: true, cancelable: true, code: "KeyA", key: "a" }));
+    check("a stopped machine is not typed into", sentKeys.length === 0);
+    window.d86.engine.attach(withScreen);
+    await wait(400);
+  }
 
   /* Closing the viewer must hand the element back, not destroy it: the
      Terminal's machine keeps running, and the viewer can be opened again. */

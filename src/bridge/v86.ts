@@ -46,6 +46,12 @@ interface V86Emulator {
    * few milliseconds after construction — see bridge/v86-screen.ts.
    */
   screen_adapter?: { get_text_screen?: () => string[] };
+  /**
+   * Raw PS/2 scancodes into the emulated keyboard controller. Public API, and
+   * it does not need the keyboard adapter (which the machine disables so it
+   * cannot capture the whole page's keystrokes).
+   */
+  keyboard_send_scancodes?: (codes: number[]) => Promise<void> | void;
   /** Forwarded by some builds; not present in the vendored one. */
   get_text_screen?: () => string[];
   screen?: { get_text_screen?: () => string[] };
@@ -212,6 +218,25 @@ class V86Backend implements TerminalBackend {
   }
 
   /**
+   * Keys pressed in the Engine Viewer, as PS/2 scancodes (bridge/v86-keys.ts
+   * builds them). Straight to the emulated controller: the guest's own
+   * keyboard driver decodes them, so Shift/Caps/layout all behave, and the
+   * VGA console's shell on tty1 is the thing that receives them.
+   *
+   * The machine is built with `disable_keyboard: true` — that flag turns off
+   * v86's *capture* of page-wide key events, not the keyboard itself. An OS
+   * window must not forward every keystroke in every app to a guest.
+   */
+  sendScancodes(codes: number[]): void {
+    if (!this.emu || this.disposed || !codes.length) return;
+    try {
+      void this.emu.keyboard_send_scancodes?.(codes);
+    } catch (err) {
+      logWarn("v86", "could not send keys to the machine:", err);
+    }
+  }
+
+  /**
    * The element v86's screen adapter draws into. Created here (before the
    * machine starts, because the constructor needs it) but kept out of the
    * document: the Terminal shows the serial console, and only the Engine
@@ -235,6 +260,11 @@ class V86Backend implements TerminalBackend {
     const canvas = document.createElement("canvas");
     canvas.className = "engine-screen-canvas";
     host.append(text, canvas);
+    /* Focusable, so the viewer can give it the keyboard: keys go to the
+       machine only while this element (or the window around it) has focus. */
+    host.tabIndex = 0;
+    host.setAttribute("role", "application");
+    host.setAttribute("aria-label", "The v86 machine's console");
     this.screenHost = host;
     return host;
   }

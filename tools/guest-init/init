@@ -59,6 +59,14 @@ exec >/dev/ttyS0 2>&1
 # (a local server, a test, `git clone http://127.0.0.1:…`) fails.
 ip link set lo up 2>/dev/null
 
+# The emulated PS/2 keyboard (v86's i8042) — what the Engine Viewer types
+# into. Their absence was invisible until the screen was made writable: the
+# console had a shell but no way to reach it.
+modprobe serio 2>/dev/null
+modprobe libps2 2>/dev/null
+modprobe i8042 2>/dev/null
+modprobe atkbd 2>/dev/null
+
 modprobe virtio_pci_legacy_dev 2>/dev/null
 modprobe virtio_pci_modern_dev 2>/dev/null
 modprobe virtio_pci
@@ -193,88 +201,49 @@ if mount_root && [ -x /newroot/usr/bin/bash ]; then
 
 # ---------------------------------------------------------------------------
 # The machine's screen (console=tty0 → the VGA display the Engine Viewer
-# mirrors). With the shell on the serial line, the VGA would otherwise show
-# the last kernel message and then nothing at all, which looks like a broken
-# viewer. So the screen gets a live console panel instead: who this machine
-# is, what it is doing, and what was last typed into it. Refreshed every few
-# seconds; the kernel's own log lines can still appear, and the next repaint
-# tidies them away.
+# window shows). With the shell on the serial line, this screen would be dead
+# text — so give it a login shell of its own on tty1, the way a real machine
+# has one on its first console. Keys pressed in the Engine Viewer are sent to
+# the emulated PS/2 keyboard (src/bridge/v86-keys.ts) and land here.
 #
-# Colours are the console's 16, not truecolour: this is a VGA text screen.
-# Nothing here reads from tty0 — the keyboard belongs to the Terminal.
+# This is not the Terminal's shell: tty1 is a separate session with its own
+# history, and both can be used at the same time. Same machine, same files.
 # ---------------------------------------------------------------------------
-if [ -w /dev/tty0 ]; then
-  # One key/value line from /proc, for the memory and load readouts.
-  proc_field() {
-    awk -v k="$1" '$1 == k ":" { print $2; exit }' "/proc/$2" 2>/dev/null
-  }
-
-  human_mb() {
-    # kB → "24 MB" (this machine is small; MB is the only unit that matters).
-    echo "$((${1:-0} / 1024)) MB"
-  }
-
-  guest_uptime() {
-    up=$(cut -d' ' -f1 /proc/uptime 2>/dev/null | cut -d. -f1)
-    up=${up:-0}
-    printf '%dm %02ds' "$((up / 60))" "$((up % 60))"
-  }
-
-  guest_ip() {
-    ip -4 -o addr show eth0 2>/dev/null | awk '{ print $4; exit }'
-  }
-
-  recent_commands() {
-    # The shell runs in the distro at /newroot; its history is the best
-    # description of what the person at the Terminal is doing.
-    hist=/newroot/root/.bash_history
-    [ -r "$hist" ] || return 0
-    tail -n 6 "$hist" 2>/dev/null | sed 's/^/    $ /'
-  }
-
-  panel() {
-    [ -w /dev/tty0 ] || return 0
-    mem_total=$(proc_field MemTotal meminfo)
-    mem_free=$(proc_field MemFree meminfo)
-    used=$(( (${mem_total:-0} - ${mem_free:-0}) ))
-    set -- $(cut -d' ' -f1 /proc/loadavg 2>/dev/null)
-    load=${1:-0.00}
-    {
-      printf '\033[H\033[2J'
-      printf '\033[1;36m  Dragon86 Linux (v86 engine)\033[0m\033[36m%s\033[0m\n' \
-        "                       Arch userland"
-      printf '\033[34m  ------------------------------------------------------------------------------\033[0m\n'
-      printf '\033[37m  This is the machine'"'"'s screen.\033[0m  \033[33mType into the Terminal.\033[0m\n\n'
-      printf '\033[36m  Up\033[0m        %s   \033[36mLoad\033[0m %s\n' "$(guest_uptime)" "$load"
-      printf '\033[36m  Memory\033[0m    %s used of %s   \033[36mFree\033[0m %s\n' \
-        "$(human_mb "$used")" "$(human_mb "${mem_total:-0}")" "$(human_mb "${mem_free:-0}")"
-      printf '\033[36m  Root\033[0m      %s\n' "$(awk '$2 == "/newroot" { print "the v86/ folder in Dragon86 (" $3 ", read-write)"; exit }' /proc/mounts 2>/dev/null || echo "not mounted")"
-      addr=$(guest_ip)
-      [ -n "$addr" ] || addr="no lease yet - the card retries /networking.sh at boot"
-      printf '\033[36m  Network\033[0m   %s\n' "$addr"
-      printf '\033[34m  ------------------------------------------------------------------------------\033[0m\n'
-      printf '\033[36m  Last typed in the Terminal\033[0m\n'
-      tail_out=$(recent_commands)
-      [ -n "$tail_out" ] && printf '%s\n' "$tail_out"
-      [ -n "$tail_out" ] || printf '\033[2m    nothing yet\033[0m\n'
-      printf '\n\033[2m  Read-only mirror of the machine; it repaints every 5 seconds.\033[0m\n'
-    } >/dev/tty0 2>/dev/null
-  }
-
-  # Repaint until the share goes away (a crashed session tears the mount down).
-  (
-    while mountpoint -q /newroot 2>/dev/null; do
-      panel
-      sleep 5
-    done
-    panel >/dev/null 2>&1
-  ) &
-fi
-
+run_console_session() {
+  # TERM=linux: the console's own terminal type, which is what makes the
+  # distro's tools use the console's colours (16, not 256).
+  export TERM=linux HOME=/root
+  exec >/dev/tty1 2>&1
+  clear
+  echo ""
+  echo "  Dragon86 Linux (v86 engine)"
+  echo "  ----------------------------------------------------------"
+  echo "  This is the machine's own console - type here."
+  echo "  The same machine also has a shell on the serial line (Terminal)."
+  echo "  Everything is one filesystem: / is your v86/ folder in Dragon86."
+  echo ""
+  while :; do
+    # setsid -c: a session leader with tty1 as its controlling terminal, so
+    # job control (Ctrl-C, Ctrl-Z, fg) behaves like a real console.
+    if [ -x /newroot/usr/bin/setsid ]; then
+      chroot /newroot /usr/bin/setsid -c /usr/bin/bash -l </dev/tty1 >/dev/tty1 2>&1
+    else
+      chroot /newroot /usr/bin/bash -l </dev/tty1 >/dev/tty1 2>&1
+    fi
+    echo ""
+    echo "  Session ended. Respawning in 2s (the Terminal still works)."
+    sleep 2
+    clear
+  done
+}
 
   vga "  [ 4/4 ] ready." "" \
-      "  Shell: the Terminal window.  Files: Files > v86." \
-      "  This screen is read-only here; keep it open to watch the machine."
+      "  Shell: on this screen, or in the Terminal window."
+  # /dev is bind-mounted into the distro by setup_mounts, so the console shell
+  # starts after that; it runs from here (the initramfs) so /dev/tty1 exists
+  # before the chroot.
+  setup_mounts
+  ( run_console_session ) &
   clear 2>/dev/null
   echo ""
   echo "  Dragon86 Linux (v86 · Arch userland) — compatibility engine"

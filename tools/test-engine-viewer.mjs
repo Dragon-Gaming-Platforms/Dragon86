@@ -193,5 +193,95 @@ const { textScreenFrom, hasTextScreen, rowsWithText, stripEscapes } = screenModu
   check("…and takes it back out when the window closes", /mount\(null\)/.test(source));
 }
 
+/* ---- the keyboard (src/bridge/v86-keys.ts) ----
+   The viewer is writable: keys become PS/2 set-1 scancodes on the machine's
+   keyboard controller. Getting this wrong is silent — a wrong byte is just a
+   key nobody pressed — so the codes are pinned here. */
+const keysModule = await import("../src/bridge/v86-keys.ts");
+const { scancodesFor, scancodesForEvent, keyFor } = keysModule;
+{
+  const hex = (codes) => codes.map((c) => c.toString(16).padStart(2, "0")).join(" ");
+  check("a letter is one byte", hex(scancodesFor("KeyA", true)) === "1e", hex(scancodesFor("KeyA", true)));
+  check(
+    "…and its release sets the high bit",
+    hex(scancodesFor("KeyA", false)) === "9e",
+    hex(scancodesFor("KeyA", false)),
+  );
+  check("Enter is 0x1c", hex(scancodesFor("Enter", true)) === "1c");
+  check("Backspace is 0x0e", hex(scancodesFor("Backspace", true)) === "0e");
+  check("Tab is 0x0f", hex(scancodesFor("Tab", true)) === "0f");
+  check("Escape is 0x01", hex(scancodesFor("Escape", true)) === "01");
+  /* The keys that came later are two bytes, prefix first — and a release is
+     the prefix *and* the released code (0xE0 0xC8 for an Up arrow). */
+  check(
+    "an arrow is prefixed with 0xE0",
+    hex(scancodesFor("ArrowUp", true)) === "e0 48",
+    hex(scancodesFor("ArrowUp", true)),
+  );
+  check(
+    "…and releases the second byte",
+    hex(scancodesFor("ArrowUp", false)) === "e0 c8",
+    hex(scancodesFor("ArrowUp", false)),
+  );
+  check("Home/End/Delete are extended too", ["Home", "End", "Delete"].every((k) => keyFor(k)?.extended));
+  check("right Ctrl is extended, left is not", keyFor("ControlRight")?.extended && !keyFor("ControlLeft")?.extended);
+  check("modifiers have codes", hex(scancodesFor("ShiftLeft", true)) === "2a");
+  check("function keys have codes", hex(scancodesFor("F5", true)) === "3f");
+  check("an unknown key sends nothing", scancodesFor("F13", true).length === 0 && keyFor("Nope") === null);
+
+  /* Ctrl-C is the guest's, not the page's: three bytes, no modifier magic. */
+  const ctrlC = [
+    ...scancodesFor("ControlLeft", true),
+    ...scancodesFor("KeyC", true),
+    ...scancodesFor("KeyC", false),
+    ...scancodesFor("ControlLeft", false),
+  ];
+  check("Ctrl-C is a real key sequence", hex(ctrlC) === "1d 2e ae 9d", hex(ctrlC));
+
+  /* Events: `repeat` is left to the guest (a held key would flood it), and a
+     browser that only sends `key` still works. */
+  check("auto-repeat is not re-sent", scancodesForEvent({ code: "KeyA", repeat: true }, true).length === 0);
+  check(
+    "…but the release still is",
+    hex(scancodesForEvent({ code: "KeyA", repeat: true }, false)) === "9e",
+  );
+  check("a bare key name still maps", hex(scancodesForEvent({ key: "a" }, true)) === "1e");
+  check("uppercase A maps to the same key", hex(scancodesForEvent({ key: "A" }, true)) === "1e");
+  check("punctuation maps", hex(scancodesForEvent({ key: "/" }, true)) === "35");
+  check("Enter by name maps", hex(scancodesForEvent({ key: "Enter" }, true)) === "1c");
+
+  /* Paste: a console has no "insert string", so text is typed — Shift and
+     all. This is what the viewer's paste handler sends. */
+  const { scancodesForText, keyForChar } = keysModule;
+  const typed = (text) => scancodesForText(text).map((codes) => hex(codes)).join(" | ");
+  check("plain text types itself", typed("hi") === "23 a3 | 17 97", typed("hi"));
+  check("a capital is Shift + the key", typed("A") === "2a 1e 9e aa", typed("A"));
+  check("shifted punctuation too", typed("!") === "2a 02 82 aa", typed("!"));
+  check("quotes and underscores", typed("_\"") === '2a 0c 8c aa | 2a 28 a8 aa', typed('_"'));
+  check("a newline is Enter", typed("\n") === "1c 9c");
+  check("a tab is Tab", typed("\t") === "0f 8f");
+  check("characters with no key are dropped", scancodesForText("😀").length === 0);
+  check("keyForChar knows the keyboard", keyForChar("q")?.code === "KeyQ" && keyForChar(" " )?.code === "Space");
+}
+
+/* ---- the viewer routes keys to the machine, not to the OS ---- */
+{
+  const read = (p) => readFileSync(new URL(p, import.meta.url), "utf8");
+  const source = read("../src/apps/engine-viewer.ts");
+  const bridge = read("../src/bridge/v86.ts");
+  const hoster = read("../src/bridge/hoster.ts");
+  check("the viewer listens for keys", /root\.addEventListener\("keydown"/.test(source));
+  check("…and maps them with v86-keys", /scancodesForEvent\(event, down\)/.test(source));
+  check("…swallowing them from the OS", /event\.preventDefault\(\)/.test(source) && /event\.stopPropagation\(\)/.test(source));
+  check("…sending them only to a live machine", /live\.sendScancodes\?\.\(codes\)/.test(source));
+  check("…and taking focus when clicked", /pointerdown/.test(source) && /takeFocus/.test(source));
+  check("…and when opened on a running machine", /wantsFocus/.test(source));
+  check("the backend can send scancodes", /sendScancodes\(codes: number\[\]\): void/.test(bridge));
+  check("…through libv86's keyboard controller", /keyboard_send_scancodes/.test(bridge));
+  check("…without capturing page keys", /disable_keyboard: true/.test(bridge));
+  check("the interface offers them", /sendScancodes\?:/.test(hoster));
+  check("the screen element can take focus", /host\.tabIndex = 0/.test(bridge));
+}
+
 console.log(failed ? `\n${failed} check(s) failed` : "\nall checks passed");
 process.exit(failed ? 1 : 0);
