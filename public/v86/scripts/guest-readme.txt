@@ -64,14 +64,20 @@ first broken link.
 The machine's screen
 --------------------
 
-This machine has two consoles. The shell is on the serial line — the Terminal
-window in Dragon86. Its screen (the VGA text console, `console=tty0`) is what
-the Engine Viewer window shows. It is not a second shell and it takes no input:
-it carries the kernel's own messages, and a panel repainted every few seconds
-with uptime, memory, where `/` comes from, the network address and the last
-commands typed in the Terminal.
+This machine has two consoles, and both are usable at the same time.
 
-  echo hi > /dev/tty0      write a line onto the machine's screen
+The **Terminal** window is on the serial line (`ttyS0`) — the shell you land in.
+
+The **Engine Viewer** window is the machine's VGA display (`tty1`). It has its
+own login shell: click the screen and type. Keys go to the emulated PS/2
+keyboard, so this is a real console, not a picture of one — `vim`, Tab
+completion, Ctrl-C, Ctrl-Z and `fg` all behave. `TERM` there is `linux`.
+
+They share everything else: same kernel, same `/` (your `v86/` folder in
+Files), same home directory. Only the sessions are separate, so a long command
+in one does not block the other.
+
+  echo hi > /dev/tty1      write a line onto the machine's screen
 
 This Arch userland has no X server and the kernel here has no framebuffer
 driver, so there is no graphical session to start — the console is the machine.

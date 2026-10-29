@@ -336,7 +336,7 @@ launches the real window ("App shortcut" is the default opener for `.d86`).
 They are written once, behind a version in `~/system/app-shortcuts.json`, so
 deleting one is a decision the OS does not undo on the next boot.
 
-### Engine Viewer: the machine's own screen
+### Engine Viewer: the machine's own screen — and it is writable
 
 The Terminal shows the guest's **serial** console. The machine also has a VGA
 display, and this window shows *that* — the way copy.sh/v86 shows a machine.
@@ -349,32 +349,49 @@ into it from then on: one div per text row, each row a set of spans carrying
 the console's own background and foreground colours, a blinking cursor, and a
 canvas underneath for graphical modes. The Engine Viewer mounts that element
 and scales it to the window with a transform, so the font, the colours, the
-cursor — everything — is the machine's, not an imitation. If a guest ever
-switches to a graphical mode, the canvas is what appears, with nothing to
-change on this side.
+cursor — everything — is the machine's. If a guest ever switches to a graphical
+mode, the canvas is what appears.
+
+**You can type in it.** Click the screen and keys go to the emulated PS/2
+keyboard, which lands on the guest's VGA console: tty1, where the guest's init
+runs a login shell of its own. So the Engine Viewer is a *second terminal on the
+same machine* — same filesystem, separate session and history, usable at the
+same time as the Terminal. `ls`, `vim`, Tab completion, Ctrl-C, Ctrl-D, arrows
+in the line editor: all of it works, because the guest's own keyboard driver is
+decoding the keys.
+
+How the keys travel: `src/bridge/v86-keys.ts` maps `KeyboardEvent.code` (the
+*physical* key) to PS/2 set-1 scancodes — release sets the high bit, and
+arrows / Home / End / Delete / Insert / Page Up-Down / right Ctrl-Alt arrive
+behind a `0xE0` prefix. Only physical keys are sent, never characters: the
+guest applies Shift, Caps Lock and the layout itself, so Ctrl-C goes over as
+"ctrl down, c down, c up, ctrl up". The machine is built with
+`disable_keyboard: true`, which turns off v86's *page-wide* capture — an OS
+window must not feed every keystroke in every app to a guest — and the viewer
+calls `keyboard_send_scancodes` itself, only while its screen has focus. Keys
+the viewer handles are swallowed (`preventDefault` + `stopPropagation`), so
+Ctrl-C in the console is the guest's, not a browser or window-manager shortcut.
+A machine whose Terminal has been closed is never typed into.
+
+The guest side is two modules and a shell: `i8042`/`atkbd` are loaded at boot
+(they simply never were, which is why the console had no keyboard), and
+`run_console_session` in `tools/guest-init/init` keeps a login shell alive on
+tty1 with `TERM=linux`.
 
 The window asks the machine for its screen every frame rather than holding a
 copy, so the order does not matter: open it from the start menu before any
 Terminal and it attaches when a machine starts, or open it from a booted
-Terminal and it shows that machine immediately. It distinguishes the states
-out loud — no machine yet, a machine still booting, a machine whose Terminal
-has been closed — because saying "no v86 machine" for a running one was a bug.
-A machine has one screen and an element lives in one place, so if two Engine
+Terminal and it shows that machine immediately. It distinguishes the states out
+loud — no machine yet, a machine still booting, a machine whose Terminal has
+been closed — because saying "no v86 machine" for a running one was a bug. A
+machine has one screen and an element lives in one place, so if two Engine
 Viewers are open the newest one shows it and the other says where it went.
 
-The screen has something to show because the guest paints it
-(`tools/guest-init/init`): a coloured panel with the host name, uptime, load,
-memory, where its root filesystem comes from, its network address, and the last
-few commands typed in the Terminal — repainted every five seconds. Before that
-it draws the boot progress (`[ 1/4 ]`…`[ 4/4 ] ready.`) as the 9p share comes
-up, and before *that* the BIOS and the kernel log are there, because the guest
-boots with `console=tty0 console=ttyS0`.
-
-Some honest limits: this Arch userland has no X server and the vendored kernel
+Some honest limits. This Arch userland has no X server and the vendored kernel
 has no framebuffer driver (`/proc/fb` is empty, there is no `/dev/fb0`), so the
 guest is a text-mode machine — copy.sh's own Arch profile is a text console
-too. The screen is a mirror: it takes no input, and the shell you type into is
-the serial console in the Terminal window. The console grid is the VGA's 80×25.
+too. The console grid is the VGA's 80×25. There is no mouse to route: without X,
+nothing would read it.
 
 The text buffer is also readable as rows — that is what the status bar counts,
 and what the fallback canvas draws for a backend with no element of its own. It
