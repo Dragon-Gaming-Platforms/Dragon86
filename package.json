@@ -12,7 +12,7 @@
     "test:guest": "node tools/test-guest-scripts.mjs",
     "test:preview": "node tools/test-preview.mjs",
     "test:archive": "node --experimental-strip-types tools/test-archive.mjs",
-    "test:vm": "vite build --config tools/vm/vite.config.ts && node tools/vm/boot.mjs"
+    "test:vm": "vite build --config tools/vm/vite.config.ts && node --experimental-strip-types tools/vm/boot.mjs"
   },
   "dependencies": {
     "@xterm/addon-fit": "^0.11.0",

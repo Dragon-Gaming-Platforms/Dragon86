@@ -208,7 +208,11 @@ async function main() {
      write error"). */
   const initrdPath = process.env.INITRD ? resolve(process.env.INITRD) : resolve(repo, "public/v86/initrd.gz");
   const archive = await fsp.readFile(initrdPath);
-  const cmdlineBase = process.env.CMDLINE ?? "console=ttyS0 tsc=reliable initcall_blacklist=mcheck_init_device d86cols=100 d86rows=32";
+  /* Same consoles as the app: kernel log on the VGA, shell on the serial line.
+     (bridge/v86.ts builds this line; keep the two in step.) */
+  const cmdlineBase =
+    process.env.CMDLINE ??
+    "console=tty0 console=ttyS0 tsc=reliable initcall_blacklist=mcheck_init_device d86cols=100 d86rows=32";
   if (reuse) {
     console.log(`[harness] reusing the extracted root at ${ROOT}`);
   } else {
@@ -233,6 +237,8 @@ async function main() {
     disable_mouse: true,
     disable_speaker: true,
     filesystem: { handle9p: p9.createP9Handler(ROOT, fsImpl) },
+    /* What the app asks for (bridge/v86.ts): text rows with colour escapes. */
+    screen: { ansi: true },
   });
   emu.add_listener("serial0-output-byte", onByte);
   globalThis.__emu = emu;
@@ -267,6 +273,38 @@ async function main() {
     answers.push(clean);
     console.log(`\n$ ${cmd}\n${clean.trim()}`);
   }
+  /* ---- the Engine Viewer's screen reader, against a real machine ----
+     This is the seam that broke: the emulator does not expose the text screen
+     where it looks obvious, so the viewer said "no v86 machine" for a machine
+     that was running. Read it exactly the way the app does. */
+  const { textScreenFrom, rowsWithText, stripEscapes } = await import(
+    "../../src/bridge/v86-screen.ts"
+  );
+  const screen = textScreenFrom(emu);
+  const filled = screen ? rowsWithText(screen) : 0;
+  console.log(`\n[screen] adapter=${typeof emu.screen_adapter} keys=${emu.screen_adapter ? Object.keys(emu.screen_adapter).join(",") : "-"} proto=${emu.screen_adapter ? Object.getOwnPropertyNames(Object.getPrototypeOf(emu.screen_adapter)).join(",") : "-"} rows=${screen?.rows ?? 0} cols=${screen?.cols ?? 0} with-text=${filled}`);
+  if (screen) {
+    for (const row of screen.lines.filter((l) => stripEscapes(l).trim())) {
+      console.log(`[screen]   ${stripEscapes(row).trim()}`);
+    }
+  }
+  if (!screen) problems.push("the Engine Viewer could not read the machine's text screen");
+  else {
+    if (screen.rows < 20) problems.push(`the text screen reports only ${screen.rows} rows`);
+    if (screen.cols < 40) problems.push(`the text screen reports only ${screen.cols} columns`);
+    if (!filled) problems.push("the text screen is blank after boot (nothing was drawn on the VGA)");
+    /* The guest paints its own boot screen on tty0 (tools/guest-init/init) so
+       the Engine Viewer has something to show once the kernel stops logging. */
+    const vgaText = screen.lines.map(stripEscapes).join("\n");
+    for (const expected of ["Dragon86 Linux (v86 engine)", "[ 4/4 ] ready."]) {
+      if (!vgaText.includes(expected)) problems.push(`the VGA screen is missing ${JSON.stringify(expected)}`);
+    }
+    /* Colour is what makes a boot log readable: the app asks for ansi rows. */
+    if (!/\x1b\[[0-9;]*m/.test(screen.lines.join(""))) {
+      problems.push("the text screen came back without colour escapes (screen: { ansi: true } not applied)");
+    }
+  }
+
   /* The guest's root is the share: /init and /newroot only exist in the
      initramfs, so seeing them means the 9p mount did not become /. */
   if (/\bnewroot\b/.test(answers[1] ?? "")) problems.push("the shell is running in the initramfs, not on the 9p root");

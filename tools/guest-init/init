@@ -30,6 +30,25 @@ for p in $(cat /proc/cmdline); do
 done
 stty -F /dev/ttyS0 rows "$ROWS" cols "$COLS" 2>/dev/null
 
+# The machine's screen (console=tty0 on the cmdline) is the VGA text console —
+# it is what the Engine Viewer window mirrors. The shell lives on the serial
+# line below, but the *screen* gets the boot story a few lines at a time:
+# without this it shows BIOS output and then nothing but the last kernel
+# message, which looks like a broken viewer.
+# Absent tty0 (a container, a harness without a screen) → silently skipped.
+vga() {
+  [ -w /dev/tty0 ] || return 0
+  printf '%s\n' "$@" >/dev/tty0 2>/dev/null
+}
+
+vga "" \
+    "  Dragon86 Linux (v86 engine)" \
+    "  ----------------------------" \
+    "  This is the machine's VGA screen - the Engine Viewer shows it." \
+    "  The shell is on the serial console: open a Terminal." \
+    "" \
+    "  [ 1/4 ] initramfs up; mounting Dragon86 filesystem..."
+
 # Talk to the serial line directly from here on. init's stdout is /dev/console,
 # which the kernel mirrors onto the boot console as well — the same tty twice —
 # so every line would be printed twice on screen.
@@ -155,6 +174,8 @@ run_session() {
   fi
 }
 
+vga "  [ 2/4 ] waiting for the 9p share (/home/user/v86)..."
+
 if mount_root; then
   # A distro unpacked by an older build can have lost its permission bits
   # (a 9p write lands 0644, and a chmod during unpack that the backend
@@ -168,6 +189,10 @@ if mount_root; then
 fi
 
 if mount_root && [ -x /newroot/usr/bin/bash ]; then
+  vga "  [ 3/4 ] share mounted; starting the shell on the serial line..."
+  vga "  [ 4/4 ] ready." "" \
+      "  Shell: the Terminal window.  Files: Files > v86." \
+      "  This screen is read-only here; keep it open to watch the machine."
   clear 2>/dev/null
   echo ""
   echo "  Dragon86 Linux (v86 · Arch userland) — compatibility engine"
@@ -213,6 +238,10 @@ fi
     sleep 2
   done
 ) &
+vga "" \
+    "  [ ! ] the Dragon86 filesystem (/home/user/v86) is not serving." \
+    "        Recovery shell on the serial line; the Terminal says why."
+
 export HOME=/root
 export TERM=xterm-256color
 clear 2>/dev/null
