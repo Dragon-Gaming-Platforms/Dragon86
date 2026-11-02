@@ -222,8 +222,8 @@ function openDrakeForge(win: Win, root: HTMLElement, status: HTMLElement, def: I
     root.append(frame, status);
   } else {
     message.textContent = mode === "embedded"
-      ? "Embedded DrakeForge needs Dragon86 to be cross-origin isolated and on the same origin. Open it in a separate tab instead. DrakeForge Pages must be deployed first."
-      : "DrakeForge opens in a separate tab. Its Pages site must be deployed first. This standalone workspace does not sync Dragon86 files.";
+      ? "Embedded DrakeForge needs Dragon86 to be cross-origin isolated and on the same origin. Open it in a separate tab instead."
+      : "DrakeForge opens in a separate tab. This standalone workspace does not sync Dragon86 files.";
     panel.append(message, button);
     root.append(panel, status);
   }
