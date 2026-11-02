@@ -620,3 +620,12 @@ DrakeForge must be deployed separately. This initial launcher does **not**
 connect Dragon86's filesystem or terminal: the standalone workspace has its own
 storage. The connected `/dragon86` route and fs1 handshake still need deployment
 and end-to-end testing before they can be integrated as an app.
+
+The connected-mode groundwork in `src/bridge/drakeforge-session.ts` is not
+wired into the launcher yet. It proposes a unique BroadcastChannel for each
+launch (`?channel=dragon86-drakeforge-<uuid>`) to avoid mixing IDE traffic
+with the existing shared CheerpX channel. DrakeForge must support that channel
+and disable its other transports for a session before this can be enabled.
+A random channel prevents accidental cross-talk, not access by malicious
+same-origin scripts. Embedding also requires actual cross-origin isolation;
+Dragon86's COI service-worker code is currently disabled by default.
