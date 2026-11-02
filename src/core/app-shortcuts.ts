@@ -20,7 +20,7 @@ import { staticIframeApp, staticIframeApps } from "../apps/iframe-app";
 export const SHORTCUT_EXT = "d86";
 
 /** Bump when a new fixed app appears: existing devices then get its file. */
-const SHORTCUT_VERSION = 1;
+const SHORTCUT_VERSION = 2;
 
 const DIR = `${vfs.HOME}/system/apps`;
 const MANIFEST = `${vfs.HOME}/system/app-shortcuts.json`;
@@ -139,6 +139,9 @@ export async function ensureAppShortcuts(): Promise<void> {
 
     const written: string[] = [];
     for (const app of fixedApps()) {
+      /* Version 2 only adds DrakeForge; do not resurrect shortcuts users
+         removed under version 1. */
+      if (version === 1 && app.id !== "drakeforge") continue;
       const path = shortcutPath(app.id);
       /* Never overwrite a file that is there: it may have been edited, and a
          boot must not quietly undo an edit. */

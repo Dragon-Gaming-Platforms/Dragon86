@@ -73,5 +73,15 @@
     "width": 920,
     "height": 620,
     "status": "Dragon Gaming Platforms: catalog live from the org site"
+  },
+  {
+    "id": "drakeforge",
+    "name": "DrakeForge",
+    "sub": "Code editor and development workspace",
+    "url": "https://dragon-gaming-platforms.github.io/DrakeForge/standalone",
+    "icon": "editor",
+    "width": 1000,
+    "height": 700,
+    "status": "DrakeForge standalone \u2014 Dragon86 filesystem is not connected"
   }
 ]
