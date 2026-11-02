@@ -40,6 +40,7 @@
 import { el } from "../core/dom";
 import type { Win } from "../core/wm";
 import { logInfo, logWarn } from "../core/log";
+import { getSettings } from "../core/settings";
 import appsJson from "./iframe-apps.json";
 
 export interface IframeAppDef {
@@ -158,6 +159,11 @@ export function openIframeApp(win: Win, def: IframeAppDef, filePath?: string): v
   const status = el("div", "app-statusbar");
   status.textContent = filePath ? `${fileName(filePath)} — ${def.name}` : (def.status ?? def.name);
 
+  if (def.id === "drakeforge") {
+    openDrakeForge(win, root, status, def);
+    return;
+  }
+
   const url = resolveAppUrl(def, filePath);
   if (!url) {
     const err = el(
@@ -193,4 +199,33 @@ export function openIframeApp(win: Win, def: IframeAppDef, filePath?: string): v
 
 function fileName(path: string): string {
   return path.slice(path.lastIndexOf("/") + 1);
+}
+
+/** DrakeForge owns its IDE UI. This is only a launcher for its standalone
+ * route; it does not connect the terminal or claim to share OS files. */
+function openDrakeForge(win: Win, root: HTMLElement, status: HTMLElement, def: IframeAppDef): void {
+  const url = def.url!;
+  const mode = getSettings().engineMode;
+  const panel = el("div", "iframe-app-error");
+  const message = el("p");
+  const button = el("a", "", "Open DrakeForge in a new tab");
+  button.href = url;
+  button.target = "_blank";
+  button.rel = "noopener noreferrer";
+  status.textContent = "Standalone workspace — Dragon86 files are not connected";
+  if (mode === "embedded" && window.crossOriginIsolated && new URL(url).origin === window.location.origin) {
+    const frame = document.createElement("iframe");
+    frame.className = "browser-frame";
+    frame.title = "DrakeForge";
+    frame.src = url;
+    frame.allow = "cross-origin-isolated; clipboard-read; clipboard-write; fullscreen";
+    root.append(frame, status);
+  } else {
+    message.textContent = mode === "embedded"
+      ? "Embedded DrakeForge needs Dragon86 to be cross-origin isolated and on the same origin. Open it in a separate tab instead. DrakeForge Pages must be deployed first."
+      : "DrakeForge opens in a separate tab. Its Pages site must be deployed first. This standalone workspace does not sync Dragon86 files.";
+    panel.append(message, button);
+    root.append(panel, status);
+  }
+  win.el.append(root);
 }

@@ -606,3 +606,17 @@ deleted and nothing else changes.
 ## License
 
 TBD by Dragon Gaming Platforms (keep ZenFS's LGPL obligations in mind when shipping).
+
+### DrakeForge launcher
+
+DrakeForge is a built-in app, not an engine or an App Store install. The IDE
+and its interface are maintained in the DrakeForge repository. The launcher
+opens its standalone route, `https://dragon-gaming-platforms.github.io/DrakeForge/standalone`.
+With the Engine setting on Embedded, it uses an iframe only when Dragon86 is
+cross-origin isolated and both sites share an origin; otherwise it offers a
+separate tab. Separate tab and v86 settings also offer a separate tab.
+
+DrakeForge must be deployed separately. This initial launcher does **not**
+connect Dragon86's filesystem or terminal: the standalone workspace has its own
+storage. The connected `/dragon86` route and fs1 handshake still need deployment
+and end-to-end testing before they can be integrated as an app.

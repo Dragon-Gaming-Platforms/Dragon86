@@ -164,6 +164,16 @@ check("desktop icons rendered", icons.length > 0, `${icons.length} icons`);
 check("App Store is on the desktop", [...icons].some((n) => n.textContent.includes("App Store")));
 check("no boot errors", errors.length === 0, errors.map(String).join(" | ").slice(0, 300));
 
+/* DrakeForge is a built-in launcher, not an engine or Store install. */
+check("DrakeForge is on the desktop", [...icons].some((n) => n.textContent.includes("DrakeForge")));
+window.dispatchEvent(new window.CustomEvent("d86-launch-app", { detail: "drakeforge" }));
+await tick();
+const drakeWin = [...document.querySelectorAll(".d86-window")].find((w) => w.querySelector(".title-text")?.textContent.includes("DrakeForge"));
+const drakeLink = drakeWin?.querySelector('a[target="_blank"]');
+check("DrakeForge v86 mode offers a separate tab", drakeLink?.href === "https://dragon-gaming-platforms.github.io/DrakeForge/standalone");
+check("DrakeForge honestly labels standalone files", drakeWin?.textContent.includes("not connected"));
+drakeWin?.querySelector(".d86-win-btn.close")?.click();
+
 /* icon positions: absolute, snapped to the grid */
 const first = icons[0];
 check("icons are positioned", first.style.left !== "" && first.style.top !== "", `${first.style.left},${first.style.top}`);
@@ -920,7 +930,7 @@ check(
   pathInput.dispatchEvent(new window.KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
   await wait(500);
   const names = [...filesW.querySelectorAll(".fm-row")].map((r) => r.textContent);
-  for (const id of ["preview", "scramjet", "engine-viewer"]) {
+  for (const id of ["preview", "scramjet", "drakeforge", "engine-viewer"]) {
     check(
       `${id}.d86 is in system/apps`,
       names.some((t) => t.includes(`${id}.d86`)),
