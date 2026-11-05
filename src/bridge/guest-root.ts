@@ -26,7 +26,7 @@ const BASE = `${import.meta.env.BASE_URL}v86/`;
 
 /**
  * Bump when the seeding rules change (not when the initramfs changes — that
- * is detected by size). Forces a re-seed on the next boot.
+ * is detected by size and hash). Forces a re-seed on the next boot.
  */
 const SEED_VERSION = 2;
 
@@ -45,7 +45,21 @@ interface Marker {
   v: number;
   at: number;
   initrdBytes: number;
+  /** FNV-1a of the initramfs the root was unpacked from. Markers written
+      before this field existed fail the check once and re-seed — which is
+      wanted: those roots may hold an init older than the app's. */
+  initrdHash?: number;
   files: number;
+}
+
+/** FNV-1a, 32-bit — cheap and good enough to tell two initramfs builds apart. */
+export function fnv1a(data: Uint8Array): number {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < data.length; i++) {
+    h ^= data[i];
+    h = Math.imul(h, 0x01000193);
+  }
+  return h >>> 0;
 }
 
 /* ---------- gzip ---------- */
@@ -137,24 +151,56 @@ async function readMarker(root: string): Promise<Marker | null> {
   }
 }
 
-/** Fetch a boot artifact from the app, unless ZenFS already has it. */
+/** Byte-for-byte equality (sizes first; a full compare of ~15 MB is milliseconds). */
+function sameBytes(a: Uint8Array, b: Uint8Array): boolean {
+  if (a.byteLength !== b.byteLength) return false;
+  for (let i = 0; i < a.byteLength; i++) if (a[i] !== b[i]) return false;
+  return true;
+}
+
+/**
+ * The boot artifact the app currently ships, kept in sync in ZenFS.
+ *
+ * The copy in `~/v86/boot` is *checked against the app on every boot*, not
+ * trusted forever: an earlier version returned the ZenFS copy unseen, so a
+ * root seeded by an old deployment kept booting the old initramfs — and an
+ * old init means no keyboard modules and no tty1 shell, which is exactly "the
+ * Engine Viewer shows the screen but typing does nothing".
+ *
+ * `no-cache` = revalidate, not "don't cache": GitHub Pages answers 304 when
+ * nothing changed (the bytes then come from the browser's HTTP cache) and
+ * fresh bytes when the image was rebuilt. When the network is down and a
+ * copy exists, the copy boots — with a log line saying it was not checked.
+ */
 async function ensureArtifact(root: string, name: string, url: string): Promise<Uint8Array> {
   const path = `${root}/boot/${name}`;
+  let local: Uint8Array | null = null;
   if (await exists(path)) {
     const data = new Uint8Array(await fs.promises.readFile(path));
-    if (data.byteLength > 1024) return data;
+    if (data.byteLength > 1024) local = data;
   }
-  /* `no-cache` = revalidate, not "don't cache": GitHub Pages answers 304
-     when nothing changed (cheap) and fresh bytes when the image was
-     rebuilt. Without this, a browser happily kept serving the previous
-     initrd aloud — which is how a fixed guest can look unfixed. */
-  const res = await fetch(url, { cache: "no-cache" });
-  if (!res.ok) throw new Error(`${url}: HTTP ${res.status}`);
-  const data = new Uint8Array(await res.arrayBuffer());
-  await ensureDir(`${root}/boot`);
-  await fs.promises.writeFile(path, data);
-  logInfo("guest", `${name} copied into the OS filesystem (${(data.byteLength / 1048576).toFixed(1)} MB)`);
-  return data;
+  try {
+    const res = await fetch(url, { cache: "no-cache" });
+    if (!res.ok) throw new Error(`${url}: HTTP ${res.status}`);
+    const fresh = new Uint8Array(await res.arrayBuffer());
+    if (fresh.byteLength <= 1024) throw new Error(`${url}: implausibly small (${fresh.byteLength} bytes)`);
+    if (local && sameBytes(local, fresh)) return local;
+    await ensureDir(`${root}/boot`);
+    await fs.promises.writeFile(path, fresh);
+    logInfo(
+      "guest",
+      local
+        ? `${name}: the app ships a different build — replaced the copy in ~/v86/boot (${(fresh.byteLength / 1048576).toFixed(1)} MB)`
+        : `${name} copied into the OS filesystem (${(fresh.byteLength / 1048576).toFixed(1)} MB)`,
+    );
+    return fresh;
+  } catch (err) {
+    if (local) {
+      logWarn("guest", `${name}: could not check the app's copy (offline?) — booting the one already in ~/v86/boot`, err);
+      return local;
+    }
+    throw err;
+  }
 }
 
 /**
@@ -173,11 +219,22 @@ export async function ensureGuestRoot(
   const initrd = await ensureArtifact(root, "initrd.gz", `${BASE}initrd.gz`);
 
   const marker = await readMarker(root);
-  const seeded = marker?.v === SEED_VERSION && marker.initrdBytes === initrd.byteLength;
+  const initrdHash = fnv1a(initrd);
+  /* Same version, same size *and* same hash: a root unpacked from exactly
+     this initramfs. Markers from before the hash existed fail here once and
+     the tree is re-unpacked — those roots may carry an older init than the
+     app (the artifact check above used to trust the ZenFS copy unseen). */
+  const seeded =
+    marker?.v === SEED_VERSION &&
+    marker.initrdBytes === initrd.byteLength &&
+    marker.initrdHash === initrdHash;
   if (seeded && !opts.force && (await exists(`${root}/bin/bash`))) {
     logInfo("guest", `running the distro already in the OS filesystem (${marker?.files ?? "?"} files)`);
     await repairModes(root);
     return { root, kernel, initrd, reused: true };
+  }
+  if (marker && !seeded && !opts.force) {
+    logInfo("guest", "the guest root was unpacked from a different initramfs — re-unpacking the distro");
   }
 
   say("unpacking the distro into your filesystem (one time)…");
@@ -253,7 +310,7 @@ export async function ensureGuestRoot(
 
   await fs.promises.writeFile(
     `${root}/${MARKER}`,
-    JSON.stringify({ v: SEED_VERSION, at: Date.now(), initrdBytes: initrd.byteLength, files } satisfies Marker),
+    JSON.stringify({ v: SEED_VERSION, at: Date.now(), initrdBytes: initrd.byteLength, initrdHash, files } satisfies Marker),
   );
 
   say(

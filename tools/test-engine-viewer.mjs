@@ -283,5 +283,25 @@ const { scancodesFor, scancodesForEvent, keyFor } = keysModule;
   check("the screen element can take focus", /host\.tabIndex = 0/.test(bridge));
 }
 
+/* ---- the guest root cannot go stale ----
+   The viewer's keys only land if the guest's init loaded the keyboard
+   modules and started the tty1 shell. That init lives in the initramfs, and
+   an earlier ensureArtifact trusted the ZenFS copy forever — a root seeded
+   by an old deployment kept booting the old init, which is exactly "the
+   screen shows but typing does nothing". These checks pin the fix. */
+{
+  const read = (p) => readFileSync(new URL(p, import.meta.url), "utf8");
+  const source = read("../src/bridge/guest-root.ts");
+  check("boot artifacts are revalidated against the app", /cache: "no-cache"/.test(source));
+  check(
+    "…even when ZenFS already has a copy",
+    /if \(local && sameBytes\(local, fresh\)\) return local;/.test(source),
+  );
+  check("…and a changed build replaces the copy", /replaced the copy in ~\/v86\/boot/.test(source));
+  check("…while offline still boots the existing copy", /could not check the app's copy/.test(source));
+  check("the seed marker hashes the initramfs", /marker\.initrdHash === initrdHash/.test(source));
+  check("…and the hash is written with the marker", /initrdHash, files \} satisfies Marker/.test(source));
+}
+
 console.log(failed ? `\n${failed} check(s) failed` : "\nall checks passed");
 process.exit(failed ? 1 : 0);
