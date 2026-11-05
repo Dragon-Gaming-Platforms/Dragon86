@@ -15,9 +15,9 @@ import {
   setSettings,
   THEMES,
   WALLPAPERS,
+  type MachineArch,
   type ThemeId,
 } from "../core/settings";
-import { DEFAULT_HOSTER_URL } from "../bridge/hoster";
 import * as vfs from "../core/vfs";
 import type { Win } from "../core/wm";
 import {
@@ -67,10 +67,9 @@ const SEARCH_INDEX: SearchHit[] = [
   { page: "apps", pageTitle: "Apps", label: "App Store catalog", keywords: "store.json url source repo" },
   { page: "trash", pageTitle: "Trash", label: "Trash passphrase", keywords: "password lock bin delete" },
   { page: "trash", pageTitle: "Trash", label: "Empty the trash", keywords: "clear wipe bin" },
-  { page: "engine", pageTitle: "Engine", label: "CheerpX hoster URL", keywords: "terminal linux bridge cheerpx" },
-  { page: "engine", pageTitle: "Engine", label: "Where the engine runs", keywords: "embedded tab separate isolation" },
-  { page: "v86", pageTitle: "v86", label: "Guest filesystem", keywords: "linux root unpack reset distro" },
-  { page: "v86", pageTitle: "v86", label: "v86 network", keywords: "relay wisp network internet" },
+  { page: "engine", pageTitle: "Engine", label: "Machine architecture", keywords: "terminal linux cpu arch x86 arm 32-bit 64-bit" },
+  { page: "v86", pageTitle: "Machine", label: "Guest filesystem", keywords: "linux root unpack reset distro" },
+  { page: "v86", pageTitle: "Machine", label: "v86 network", keywords: "relay wisp network internet" },
   { page: "storage", pageTitle: "Storage", label: "Disk usage", keywords: "space quota bytes indexeddb" },
   { page: "storage", pageTitle: "Storage", label: "Factory reset", keywords: "erase wipe delete everything" },
   { page: "about", pageTitle: "About", label: "System information", keywords: "version build vendor engines" },
@@ -137,12 +136,12 @@ export function openSettings(win: Win, startPage?: string): void {
       title: "Engine",
       icon: "terminal",
       group: "System",
-      keywords: "cheerpx terminal hoster isolation",
+      keywords: "terminal architecture cpu x86 arm emulator",
       render: renderEngine,
     },
     {
       id: "v86",
-      title: "v86 Linux",
+      title: "Machine",
       icon: "linux",
       group: "System",
       keywords: "linux guest filesystem network relay",
@@ -526,97 +525,64 @@ export function openSettings(win: Win, startPage?: string): void {
   function renderEngine(host: HTMLElement): void {
     host.append(
       section(
-        "CheerpX hoster",
-        "Only used by the CheerpX engine. v86 needs no hoster at all — it boots inside this page.",
+        "Machine architecture",
+        "The CPU the Terminal's machine has. Dragon86 picks the right emulator behind the scenes — " +
+          "you choose hardware, not software. Takes effect the next time a Terminal connects (hit Reconnect in an open one).",
       ),
     );
-    const row = el("div", "settings-row");
-    row.dataset.setting = "CheerpX hoster URL";
-    row.append(el("label", undefined, "Hoster URL"));
-    const hosterInput = el("input", "input");
-    hosterInput.placeholder = DEFAULT_HOSTER_URL;
-    hosterInput.value = getSettings().hosterUrl;
-    const saveHost = el("button", "btn", "Save");
-    saveHost.addEventListener("click", () => {
-      setSettings({ hosterUrl: hosterInput.value.trim() });
-      hosterInput.value = getSettings().hosterUrl;
-      refreshEffective();
-      saveHost.textContent = "Saved ✓";
-      setTimeout(() => (saveHost.textContent = "Save"), 1400);
-    });
-    const defaultHost = el("button", "btn", "Use default");
-    defaultHost.addEventListener("click", () => {
-      setSettings({ hosterUrl: "" });
-      hosterInput.value = "";
-      refreshEffective();
-    });
-    row.append(hosterInput, saveHost, defaultHost);
-    const effective = el("div", "settings-note");
-    const refreshEffective = (): void => {
-      const custom = getSettings().hosterUrl.trim();
-      effective.textContent = custom ? `Using ${custom}` : `Using ${DEFAULT_HOSTER_URL}`;
-    };
-    refreshEffective();
-    host.append(row, effective);
-
-    host.append(section("Where it runs", "Isolation is decided when the page loads, so changing this reloads Dragon86."));
     const modeRow = el("div", "settings-row");
-    modeRow.dataset.setting = "Where the engine runs";
-    modeRow.append(el("label", undefined, "Mode"));
-    const modes: { id: "embedded" | "tab" | "v86"; label: string; blurb: string }[] = [
-      { id: "embedded", label: "Embedded", blurb: "CheerpX inside this page. Needs cross-origin isolation." },
-      { id: "tab", label: "Separate tab", blurb: "CheerpX in its own tab; this page stays unrestricted." },
+    modeRow.dataset.setting = "Machine architecture";
+    modeRow.append(el("label", undefined, "Architecture"));
+    const modes: { id: MachineArch; label: string; blurb: string }[] = [
       {
-        id: "v86",
-        label: "v86",
-        blurb: "Default. An Arch userland that boots inside this page — no isolation, no hoster, works on every browser.",
+        id: "x86_32",
+        label: "x86 (32-bit)",
+        blurb: "Default. Boots the installed Arch userland; runs on every browser Dragon86 targets.",
+      },
+      {
+        id: "x86_64",
+        label: "x86-64",
+        blurb:
+          "A 64-bit x86 machine. It boots the same installed 32-bit distro, the way real x86-64 hardware boots a 32-bit OS.",
+      },
+      {
+        id: "arm64",
+        label: "ARM64",
+        blurb:
+          "Emulatable, but no ARM64 kernel or distro is installed — the Terminal will say so instead of booting nothing.",
       },
     ];
     const seg = el("div", "segmented");
     const noteEl = el("div", "settings-note");
-    const applyMode = (mode: "embedded" | "tab" | "v86", reload: boolean): void => {
-      if (getSettings().engineMode !== mode) setSettings({ engineMode: mode });
+    const applyMode = (mode: MachineArch): void => {
+      if (getSettings().arch !== mode) setSettings({ arch: mode });
       seg.querySelectorAll(".seg").forEach((n) => n.classList.remove("active"));
       seg.querySelector(`[data-mode="${mode}"]`)?.classList.add("active");
       noteEl.textContent = modes.find((m) => m.id === mode)?.blurb ?? "";
-      if (!reload) return;
-      noteEl.textContent += " Reloading…";
-      /* Leaving isolation needs the worker gone before the reload, or the
-         reloaded page is still controlled and still carries COOP/COEP. */
-      if (mode === "embedded") {
-        setTimeout(() => location.reload(), 700);
-        return;
-      }
-      const sw = navigator.serviceWorker;
-      const drop =
-        sw && typeof sw.getRegistrations === "function"
-          ? sw.getRegistrations().then((regs) => Promise.all(regs.map((r) => r.unregister())))
-          : Promise.resolve();
-      void drop.catch(() => {}).then(() => setTimeout(() => location.reload(), 400));
     };
     for (const mode of modes) {
-      const b = el("button", `seg ${getSettings().engineMode === mode.id ? "active" : ""}`.trim(), mode.label);
+      const b = el("button", `seg ${getSettings().arch === mode.id ? "active" : ""}`.trim(), mode.label);
       b.dataset.mode = mode.id;
-      b.addEventListener("click", () => applyMode(mode.id, getSettings().engineMode !== mode.id));
+      b.addEventListener("click", () => applyMode(mode.id));
       seg.append(b);
     }
-    noteEl.textContent = modes.find((m) => m.id === getSettings().engineMode)?.blurb ?? "";
+    noteEl.textContent = modes.find((m) => m.id === getSettings().arch)?.blurb ?? "";
     modeRow.append(seg);
     host.append(modeRow, noteEl);
   }
 
-  /* ---------- v86 ---------- */
+  /* ---------- machine ---------- */
 
   function renderV86(host: HTMLElement): void {
     host.append(
       section(
         "Guest filesystem",
-        "The guest's / is ~/v86 in your files, unpacked from the vendored kernel and initramfs. Everything the distro runs is a file you can open here.",
+        "The guest's / is YOUR / — the same root Files shows, with the distro unpacked into it from the vendored kernel and initramfs. Everything the distro runs is a file you can open here.",
       ),
     );
     const info = el("div", "settings-note");
     const refreshRoot = async (): Promise<void> => {
-      const data = await guestRootInfo(vfs.ENGINE_ROOT.v86);
+      const data = await guestRootInfo(vfs.GUEST_ROOT);
       info.textContent = data
         ? `${data.files.toLocaleString()} files, unpacked ${new Date(data.at).toLocaleString()}. /Documents, /Downloads and /Desktop inside the guest are your own folders.`
         : "Not unpacked yet — it happens the first time the Terminal connects.";
@@ -627,9 +593,9 @@ export function openSettings(win: Win, startPage?: string): void {
     const row = el("div", "settings-row");
     row.dataset.setting = "Guest filesystem";
     const reseedBtn = el("button", "btn", "Re-unpack the distro");
-    reseedBtn.title = "Extract the distro into ~/v86 again on the next boot";
+    reseedBtn.title = "Extract the distro into / again on the next boot";
     reseedBtn.addEventListener("click", () => {
-      void resetGuestRoot(vfs.ENGINE_ROOT.v86).then(async () => {
+      void resetGuestRoot(vfs.GUEST_ROOT).then(async () => {
         await refreshRoot();
         info.textContent = "It will be unpacked again the next time the Terminal connects.";
       });
@@ -732,7 +698,7 @@ export function openSettings(win: Win, startPage?: string): void {
     const facts: [string, string][] = [
       ["OS", "Dragon86 0.15.0 (dev build)"],
       ["Vendor", "Dragon Gaming Platforms"],
-      ["Engines", "CheerpX (embedded / separate tab) · v86 (guest whose / is ~/v86)"],
+      ["Machine", "x86 (32-bit) · x86-64 · ARM64 (no OS installed) — emulated in-page"],
       ["Filesystem", "ZenFS · IndexedDB + /tmp in memory"],
       ["Storage", "Local to this browser — no account, no server"],
       [

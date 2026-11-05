@@ -33,7 +33,7 @@
 import { el } from "../core/dom";
 import { logInfo, logWarn } from "../core/log";
 import type { Win } from "../core/wm";
-import type { EngineScreen, TerminalBackend } from "../bridge/hoster";
+import type { EngineScreen, TerminalBackend } from "../bridge/engine";
 import { rowsWithText } from "../bridge/v86-screen";
 import { scancodesForEvent, scancodesForText } from "../bridge/v86-keys";
 

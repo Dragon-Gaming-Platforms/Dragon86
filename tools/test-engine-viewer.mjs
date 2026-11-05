@@ -269,7 +269,7 @@ const { scancodesFor, scancodesForEvent, keyFor } = keysModule;
   const read = (p) => readFileSync(new URL(p, import.meta.url), "utf8");
   const source = read("../src/apps/engine-viewer.ts");
   const bridge = read("../src/bridge/v86.ts");
-  const hoster = read("../src/bridge/hoster.ts");
+  const iface = read("../src/bridge/engine.ts");
   check("the viewer listens for keys", /root\.addEventListener\("keydown"/.test(source));
   check("…and maps them with v86-keys", /scancodesForEvent\(event, down\)/.test(source));
   check("…swallowing them from the OS", /event\.preventDefault\(\)/.test(source) && /event\.stopPropagation\(\)/.test(source));
@@ -279,7 +279,7 @@ const { scancodesFor, scancodesForEvent, keyFor } = keysModule;
   check("the backend can send scancodes", /sendScancodes\(codes: number\[\]\): void/.test(bridge));
   check("…through libv86's keyboard controller", /keyboard_send_scancodes/.test(bridge));
   check("…without capturing page keys", /disable_keyboard: true/.test(bridge));
-  check("the interface offers them", /sendScancodes\?:/.test(hoster));
+  check("the interface offers them", /sendScancodes\?:/.test(iface));
   check("the screen element can take focus", /host\.tabIndex = 0/.test(bridge));
 }
 
@@ -297,7 +297,7 @@ const { scancodesFor, scancodesForEvent, keyFor } = keysModule;
     "…even when ZenFS already has a copy",
     /if \(local && sameBytes\(local, fresh\)\) return local;/.test(source),
   );
-  check("…and a changed build replaces the copy", /replaced the copy in ~\/v86\/boot/.test(source));
+  check("…and a changed build replaces the copy", /replaced the copy in \/boot/.test(source));
   check("…while offline still boots the existing copy", /could not check the app's copy/.test(source));
   check("the seed marker hashes the initramfs", /marker\.initrdHash === initrdHash/.test(source));
   check("…and the hash is written with the marker", /initrdHash, files \} satisfies Marker/.test(source));

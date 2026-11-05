@@ -20,7 +20,7 @@
  * real file in Node, and tools/vm/boot.mjs checks it against a booted machine.
  */
 
-import type { EngineScreen } from "./hoster";
+import type { EngineScreen } from "./engine";
 
 /** Anything that might hold a text screen — the real emulator, or a stand-in. */
 export interface TextScreenSource {
