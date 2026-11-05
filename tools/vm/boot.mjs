@@ -176,13 +176,20 @@ const fsImpl = {
 
 /* ---------- boot ---------- */
 
+/* Which emulator build to boot: public/v86 (default) or a fork that keeps
+   the same API — ENGINE_DIR=public/v64 boots the vendored v64 build. The
+   guest (kernel, initramfs, 9p root) stays the same either way; this is how
+   a fork is proven against the real guest before any UI offers it. */
+const ENGINE_DIR = process.env.ENGINE_DIR ?? "public/v86";
+
 /* libv86.js is a classic script. Under "type": "module" a require() of a .js
    file is treated as ESM and its module.exports never lands, so hand the
    emulator the same bytes under a .cjs name. */
 const LIBV86 = resolve(here, "build/libv86.cjs");
 mkdirSync(dirname(LIBV86), { recursive: true });
-writeFileSync(LIBV86, readFileSync(resolve(repo, "public/v86/libv86.js")));
+writeFileSync(LIBV86, readFileSync(resolve(repo, `${ENGINE_DIR}/libv86.js`)));
 const { V86 } = require(LIBV86);
+console.log(`[harness] engine: ${ENGINE_DIR}`);
 
 let serial = "";
 const decoder = new TextDecoder();
@@ -223,14 +230,25 @@ async function main() {
   const kernel = await fsp.readFile(resolve(repo, "public/v86/bzImage"));
 
   const emu = new V86({
-    wasm_path: resolve(repo, "public/v86/v86.wasm"),
+    wasm_path: resolve(repo, `${ENGINE_DIR}/v86.wasm`),
     memory_size: 128 * 1024 * 1024,
-    vga_memory_size: 2 * 1024 * 1024,
-    bios: { url: resolve(repo, "public/v86/bios/seabios.bin") },
-    vga_bios: { url: resolve(repo, "public/v86/bios/vgabios.bin") },
+    /* v64 renamed vga_memory_size to vram_size and rejects the old name,
+       and it loads its display as a plugin beside the bundle — which this
+       harness moved, so the plugin needs its real path. */
+    ...(ENGINE_DIR.includes("v64")
+      ? {
+          vram_size: 2 * 1024 * 1024,
+          graphics_adapter_path: resolve(repo, `${ENGINE_DIR}/v86-bochs-vga.js`),
+        }
+      : { vga_memory_size: 2 * 1024 * 1024 }),
+    bios: { url: resolve(repo, `${ENGINE_DIR}/bios/seabios.bin`) },
+    vga_bios: { url: resolve(repo, `${ENGINE_DIR}/bios/vgabios.bin`) },
     bzimage: { buffer: kernel.buffer.slice(kernel.byteOffset, kernel.byteOffset + kernel.byteLength) },
     initrd: { buffer: archive.buffer.slice(archive.byteOffset, archive.byteOffset + archive.byteLength) },
     cmdline: cmdlineBase,
+    /* v64 requires this; v86 ignores it. "bochs_vga" is the display v86
+       always had, and the one our guest drives. */
+    graphics_adapter: "bochs_vga",
     acpi: true,
     autostart: true,
     disable_keyboard: true,
