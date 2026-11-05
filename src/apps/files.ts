@@ -86,8 +86,7 @@ export function openFiles(win: Win, startPath: string, handlers: FilesHandlers):
     { name: "Downloads", ic: "download", path: vfs.SPECIAL_DIRS.Downloads },
     { name: "Desktop", ic: "desktop", path: vfs.SPECIAL_DIRS.Desktop },
     { name: "Trash", ic: "trash", path: TRASH, locked: true },
-    { name: "v86", ic: "linux", path: vfs.ENGINE_ROOT.v86 },
-    { name: "CheerpX", ic: "browser", path: vfs.ENGINE_ROOT.cheerpx },
+    { name: "System (/)", ic: "linux", path: vfs.GUEST_ROOT },
   ];
 
   function renderSidebar(): void {

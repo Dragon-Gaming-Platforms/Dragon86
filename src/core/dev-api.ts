@@ -30,7 +30,7 @@
  *
  *   d86.engine.attach(source)   → void            show this machine in Engine Viewer
  *                                                  (a TerminalBackend; see
- *                                                  bridge/hoster.ts)
+ *                                                  bridge/engine.ts)
  *   d86.engine.screen()         → {cols,rows,lines} | null  the live VGA text
  *
  *   d86.open(path)              → void            open a file the way the OS would
@@ -48,7 +48,7 @@ import { notify } from "./toast";
 import { fs as zenfs } from "@zenfs/core";
 import { getFsApps, reloadFsApps, upsertAppEntry } from "./fs-apps";
 import { rememberEngine, engineForViewer } from "../apps/engine-viewer";
-import type { EngineScreen, TerminalBackend } from "../bridge/hoster";
+import type { EngineScreen, TerminalBackend } from "../bridge/engine";
 
 export interface D86FsEntry {
   name: string;

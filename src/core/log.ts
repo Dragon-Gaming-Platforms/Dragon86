@@ -34,7 +34,7 @@ export function logError(scope: LogScope, msg: string, ...rest: unknown[]): void
   console.error(fmt(scope, msg), ...rest);
 }
 
-/** Snapshot of the isolation facts that decide whether CheerpX can run. */
+/** Snapshot of the page isolation facts (diagnostics only — nothing needs COI now). */
 export function isolationReport(): Record<string, unknown> {
   return {
     origin: window.location.origin,

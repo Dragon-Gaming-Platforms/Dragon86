@@ -1,39 +1,49 @@
 /**
- * v86 backend — the Terminal's compatibility engine.
+ * The Terminal's machine — the in-page emulator backend.
  *
- * Runs the vendored v86 emulator (public/v86/: npm `v86`, SeaBIOS, the
- * vendored Arch 32 kernel and initramfs with Arch's GNU bash/coreutils)
- * directly in this page. Unlike CheerpX it needs no cross-origin isolation
- * and no service worker, so it works in Android WebView and other locked-down
- * browsers.
+ * Two vendored emulator builds share this file, chosen by the architecture
+ * in Settings (the user picks hardware, not an emulator):
  *
- * The guest's root filesystem is *the OS filesystem*. There is no disk image
- * and no copy to keep in sync: `~/v86` in ZenFS is what the guest mounts as
- * `/` over 9p (src/bridge/p9.ts speaks 9p2000.L straight to ZenFS through
- * v86's `handle9p`). So `/bin/bash`, `/etc/profile` and everything else the
- * distro runs are ordinary files in Dragon86 — visible in Files, editable in
- * the Text Editor, and writable from inside the guest. Your home folders are
- * grafted in at `/Downloads`, `/Documents` and `/Desktop`, so the guest and
- * the Files app are looking at the same directories.
+ *   x86_32 → public/v86/  (upstream v86 — the proven default; runs on
+ *                          every browser Dragon86 targets)
+ *   x86_64 → public/v64/  (the v64 fork: an x86-64 machine; it boots the
+ *                          same 32-bit distro, the way real x86-64
+ *                          hardware boots a 32-bit OS)
+ *   arm64  → public/v64/  (v64's ARM64 machine — but no ARM64 distro is
+ *                          installed, so the Terminal refuses honestly;
+ *                          see apps/terminal.ts)
  *
- * The distro itself is unpacked into `~/v86` on first boot from the vendored
+ * Both keep the same JS API (V86, handle9p, keyboard_send_scancodes), which
+ * is why one backend class serves both. Neither needs cross-origin
+ * isolation or a service worker.
+ *
+ * The guest's root filesystem is *the OS filesystem* — literally `/` in
+ * ZenFS, the persistent system root (core/vfs.ts). No disk image, no copy
+ * to keep in sync: the guest mounts our `/` over 9p (src/bridge/p9.ts
+ * speaks 9p2000.L straight to ZenFS through the emulator's `handle9p`). So
+ * `/bin/bash`, `/etc/profile` and everything else the distro runs are
+ * ordinary files in Dragon86, and the guest's /home/user *is* your home.
+ *
+ * The distro itself is unpacked into `/` on first boot from the vendored
  * initramfs (src/bridge/guest-root.ts) — one artifact to keep correct, and
  * what the guest runs is exactly what you can edit.
  *
  * State: "Save State" (Terminal toolbar) snapshots the whole machine
- * (v86 save_state) into IndexedDB, gzip-compressed. A normal start resumes
- * from it; Reconnect deliberately boots fresh.
+ * (save_state) into IndexedDB, gzip-compressed, stamped with the
+ * architecture that took it (the two engines' state formats are not
+ * interchangeable). A normal start resumes from it; Reconnect deliberately
+ * boots fresh.
  */
 
 import { fs } from "@zenfs/core";
 import * as vfs from "../core/vfs";
 import { ensureDir } from "../core/vfs";
-import { getSettings } from "../core/settings";
+import { getSettings, type MachineArch } from "../core/settings";
 import { createP9Handler } from "./p9";
-import { ensureGuestRoot } from "./guest-root";
-import { createDirectFs, unionAsPromises, withSubmount } from "./union-fs";
+import { ensureGuestRoot, at } from "./guest-root";
+import { createDirectFs, unionAsPromises } from "./union-fs";
 import { logInfo, logWarn } from "../core/log";
-import type { BackendHandlers, EngineScreen, TerminalBackend } from "./hoster";
+import type { BackendHandlers, EngineScreen, TerminalBackend } from "./engine";
 import { textScreenFrom } from "./v86-screen";
 
 interface V86Emulator {
@@ -59,25 +69,44 @@ interface V86Emulator {
 
 type V86Ctor = new (opts: Record<string, unknown>) => V86Emulator;
 
-const BASE = `${import.meta.env.BASE_URL}v86/`;
 const STATE_DB = "dragon86-v86state";
 const STATE_KEY = "latest";
 
-let libPromise: Promise<V86Ctor> | null = null;
+/** The vendored build an architecture runs on (see the file header). */
+/** Guest-side assets (scripts, git transport, CA bundle) ship once, under
+ * public/v86/ — they are distro files, identical for every engine. */
+const ASSET_BASE = `${import.meta.env.BASE_URL}v86/`;
 
-function loadLib(): Promise<V86Ctor> {
-  if (libPromise) return libPromise;
-  libPromise = new Promise((resolve, reject) => {
+export function engineDirFor(arch: MachineArch): "v86" | "v64" {
+  return arch === "x86_32" ? "v86" : "v64";
+}
+
+function engineBase(arch: MachineArch): string {
+  return `${import.meta.env.BASE_URL}${engineDirFor(arch)}/`;
+}
+
+/**
+ * One library per engine directory. Both builds are classic scripts that
+ * set `window.V86`, so the constructor is captured right after each script
+ * loads — loading the second engine later must not swap the first one's
+ * constructor out from under a running machine.
+ */
+const libPromises = new Map<string, Promise<V86Ctor>>();
+
+function loadLib(base: string): Promise<V86Ctor> {
+  const had = libPromises.get(base);
+  if (had) return had;
+  const p = new Promise<V86Ctor>((resolve, reject) => {
     const w = window as unknown as { V86?: V86Ctor };
-    if (w.V86) return resolve(w.V86);
     const s = document.createElement("script");
-    s.src = `${BASE}libv86.js`;
+    s.src = `${base}libv86.js`;
     s.onload = () => (w.V86 ? resolve(w.V86) : reject(new Error("V86 global missing")));
-    s.onerror = () => reject(new Error("failed to load libv86.js"));
+    s.onerror = () => reject(new Error(`failed to load ${base}libv86.js`));
     document.head.append(s);
   });
-  libPromise.catch(() => { libPromise = null; });
-  return libPromise;
+  libPromises.set(base, p);
+  p.catch(() => libPromises.delete(base));
+  return p;
 }
 
 /* ---------- saved-state store (IndexedDB; see header) ---------- */
@@ -134,16 +163,23 @@ interface SavedState {
   /** Kept for snapshots written by older builds, which could also run a
       second (image-store) guest. Anything not "dragon" is ignored. */
   guest?: string;
+  /** Architecture (= engine) the snapshot was taken on. The two engines'
+      state formats are not interchangeable; missing means x86_32 (v86). */
+  arch?: MachineArch;
 }
 
 interface LoadedState { buffer: ArrayBuffer; acpi: boolean }
 
-async function loadSavedState(): Promise<LoadedState | null> {
+async function loadSavedState(arch: MachineArch): Promise<LoadedState | null> {
   try {
     const rec = (await idbGet(STATE_KEY)) as SavedState | undefined;
     if (!rec) return null;
     if (rec.guest && rec.guest !== "dragon") {
       logInfo("v86", "saved state belongs to a guest this build no longer has; booting fresh");
+      return null;
+    }
+    if ((rec.arch ?? "x86_32") !== arch) {
+      logInfo("v86", `saved state was taken on ${rec.arch ?? "x86_32"}, current machine is ${arch}; booting fresh`);
       return null;
     }
     const acpi = rec.acpi === true;
@@ -190,6 +226,9 @@ class V86Backend implements TerminalBackend {
   constructor(
     private handlers: BackendHandlers,
     private freshBoot = false,
+    /** Captured at creation: a Settings change must not retarget a machine
+        that is already running. */
+    private arch: MachineArch = getSettings().arch,
   ) {}
 
   connect(): void {
@@ -312,9 +351,9 @@ class V86Backend implements TerminalBackend {
    */
   private async installHostFile(asset: string, dest: string, mode = 0o644): Promise<boolean> {
     try {
-      const src = await fetch(`${BASE}scripts/${asset}`);
+      const src = await fetch(`${ASSET_BASE}scripts/${asset}`);
       if (!src.ok) {
-        logWarn("v86", `${asset}: HTTP ${src.status} from ${BASE}scripts/`);
+        logWarn("v86", `${asset}: HTTP ${src.status} from ${ASSET_BASE}scripts/`);
         return false;
       }
       const body = await src.text();
@@ -342,9 +381,9 @@ class V86Backend implements TerminalBackend {
    */
   private async installHostBinary(asset: string, dest: string, mode = 0o755): Promise<boolean> {
     try {
-      const res = await fetch(`${BASE}${asset}`);
+      const res = await fetch(`${ASSET_BASE}${asset}`);
       if (!res.ok) {
-        logWarn("v86", `${asset}: HTTP ${res.status} from ${BASE}`);
+        logWarn("v86", `${asset}: HTTP ${res.status} from ${ASSET_BASE}`);
         return false;
       }
       let bytes = new Uint8Array(await res.arrayBuffer());
@@ -387,20 +426,20 @@ class V86Backend implements TerminalBackend {
     const PROFILE_BEGIN = "# >>> dragon86 guest helpers";
     const PROFILE_END = "# <<< dragon86 guest helpers";
     try {
-      await this.installHostFile("networking.sh", `${root}/networking.sh`, 0o755);
-      await ensureDir(`${root}/usr/bin`);
-      await ensureDir(`${root}/usr/share/d86`);
-      await this.installHostFile("d86-clone.sh", `${root}/usr/bin/d86-clone`, 0o755);
-      await this.installHostFile("d86-net.sh", `${root}/usr/bin/d86-net`, 0o755);
-      await this.installHostFile("guest-readme.txt", `${root}/usr/share/d86/README.guest`);
+      await this.installHostFile("networking.sh", at(root, "networking.sh"), 0o755);
+      await ensureDir(at(root, "usr/bin"));
+      await ensureDir(at(root, "usr/share/d86"));
+      await this.installHostFile("d86-clone.sh", at(root, "usr/bin/d86-clone"), 0o755);
+      await this.installHostFile("d86-net.sh", at(root, "usr/bin/d86-net"), 0o755);
+      await this.installHostFile("guest-readme.txt", at(root, "usr/share/d86/README.guest"));
       await this.installGitTransport(root);
       const helpers = await this.installHostFile(
         "guest-helpers.sh",
-        `${root}/usr/share/d86/helpers.sh`,
+        at(root, "usr/share/d86/helpers.sh"),
       );
       if (!helpers) return;
 
-      const profilePath = `${root}/etc/profile`;
+      const profilePath = at(root, "etc/profile");
       const current = await fs.promises.readFile(profilePath, "utf8").catch(() => null);
       if (current === null) return; /* root not unpacked yet; next boot */
       const block = [
@@ -440,7 +479,7 @@ class V86Backend implements TerminalBackend {
    * a clone verifies github.com against the same roots a browser would.
    */
   private async installGitTransport(root: string): Promise<void> {
-    const dir = `${root}/usr/lib/git-core`;
+    const dir = at(root, "usr/lib/git-core");
     const ok = await this.installHostBinary("git-remote-http.gz", `${dir}/git-remote-http`, 0o755);
     if (!ok) return;
     const target = `${dir}/git-remote-https`;
@@ -454,14 +493,20 @@ class V86Backend implements TerminalBackend {
         .symlink("git-remote-http", target)
         .catch(() => this.installHostBinary("git-remote-http.gz", target, 0o755));
     }
-    await this.installHostBinary("ca-certificates.crt", `${root}/etc/ssl/certs/ca-certificates.crt`, 0o644);
+    await this.installHostBinary("ca-certificates.crt", at(root, "etc/ssl/certs/ca-certificates.crt"), 0o644);
   }
 
   private async start(): Promise<void> {
     this.startTimer = null;
     try {
+      const arch = this.arch;
+      const BASE = engineBase(arch);
+      const isV64 = engineDirFor(arch) === "v64";
       const wantSaved = !this.freshBoot;
-      const [V86, loaded] = await Promise.all([loadLib(), wantSaved ? loadSavedState() : Promise.resolve(null)]);
+      const [V86, loaded] = await Promise.all([
+        loadLib(BASE),
+        wantSaved ? loadSavedState(arch) : Promise.resolve(null),
+      ]);
       let saved = loaded;
       if (this.disposed) return;
       if (saved && !savedThisSession) {
@@ -478,6 +523,19 @@ class V86Backend implements TerminalBackend {
         memory_size: 128 * 1024 * 1024,
         bios: { url: `${BASE}bios/seabios.bin` },
         vga_bios: { url: `${BASE}bios/vgabios.bin` },
+        /* v64 only. Its display is a plugin loaded beside the bundle
+           (bochs_vga = the display v86 always had), its x86-64 machine is
+           an option, and it renamed vga_memory_size to vram_size. Upstream
+           v86 must not see these keys — it has no graphics_adapter and no
+           cpu_type, and warns on unknown options. Proven against the real
+           guest by tools/vm/boot.mjs (ENGINE_DIR/CPU_TYPE). */
+        ...(isV64
+          ? {
+              graphics_adapter: "bochs_vga",
+              graphics_adapter_path: `${BASE}v86-bochs-vga.js`,
+              ...(arch === "x86_64" ? { cpu_type: "x86_64" } : {}),
+            }
+          : {}),
         /* Give fresh guests v86's ACPI tables. Without them, SeaBIOS
            leaves the Arch kernel to fall back to a bogus MP table,
            producing harmless-but-alarming RSDP/APIC/IOAPIC errors. */
@@ -512,12 +570,13 @@ class V86Backend implements TerminalBackend {
           : "network: off — the guest gets loopback only",
       );
 
-      const root = vfs.ENGINE_ROOT.v86;
+      const root = vfs.GUEST_ROOT;
       await ensureDir(root);
 
-      /* Guest / = ~/v86 (ZenFS). The kernel and initramfs are read from there
-         too, so everything the machine runs is a file in the OS filesystem;
-         they are unpacked/copied in on first boot. */
+      /* Guest / = ZenFS / (the persistent system root). The kernel and
+         initramfs are read from /boot, so everything the machine runs is a
+         file in the OS filesystem; they are unpacked/copied in on first
+         boot. */
       const guestRoot = await ensureGuestRoot(root, { status: (t) => this.status(t) });
       /* Scripts and the profile hook go in *after* the distro tree exists —
          a first boot that unpacked over the top of them would lose them —
@@ -538,22 +597,19 @@ class V86Backend implements TerminalBackend {
       }
       this.status(
         guestRoot.reused
-          ? "booting the distro from your filesystem (~/v86)"
-          : "booting the freshly unpacked distro from your filesystem (~/v86)",
+          ? "booting the distro from your filesystem (/)"
+          : "booting the freshly unpacked distro from your filesystem (/)",
       );
       opts.bzimage = { buffer: guestRoot.kernel.buffer.slice(0) };
       opts.initrd = { buffer: guestRoot.initrd.buffer.slice(0) };
 
-      /* One 9p share, mounted by the guest at /. Your home folders are
-         grafted straight into it, so /Downloads, /Documents and /Desktop
-         inside the guest are the same directories the Files app shows —
-         read and write, no copy, no separate "shared" folder. */
-      let rootFs = createDirectFs(root);
-      for (const name of [...vfs.HOME_DIRS, "system"]) {
-        await ensureDir(`${vfs.HOME}/${name}`);
-        rootFs = withSubmount(rootFs, `/${name}`, createDirectFs(`${vfs.HOME}/${name}`));
-      }
-      opts.filesystem = { handle9p: createP9Handler(root, unionAsPromises(rootFs) as never) };
+      /* One 9p share, mounted by the guest at /: the OS root itself. No
+         grafting needed any more — /home/user in the guest is your home
+         because it is the same directory, and /home/user/system holds the
+         filesystem apps. */
+      for (const name of vfs.HOME_DIRS) await ensureDir(`${vfs.HOME}/${name}`);
+      await ensureDir(`${vfs.HOME}/system`);
+      opts.filesystem = { handle9p: createP9Handler(root, unionAsPromises(createDirectFs(root)) as never) };
 
       if (saved) {
         opts.initial_state = { buffer: saved.buffer };
@@ -643,6 +699,7 @@ class V86Backend implements TerminalBackend {
       savedAt: Date.now(),
       acpi: this.acpiEnabled,
       guest: "dragon",
+      arch: this.arch,
     };
     await idbPut(STATE_KEY, rec);
     savedThisSession = true;

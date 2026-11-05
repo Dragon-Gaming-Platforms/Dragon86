@@ -10,7 +10,7 @@ import { WindowManager } from "./core/wm";
 import { buildDesktop, refreshDesktops } from "./core/desktop";
 import { buildTaskbar, coreApps } from "./core/taskbar";
 import { createLauncher } from "./apps/registry";
-import { isolationReport, logInfo, logWarn } from "./core/log";
+import { isolationReport, logInfo } from "./core/log";
 import { loadFsApps, onFsAppsChange, startFsAppBridge } from "./core/fs-apps";
 import { loadDefaults, requestDefaults } from "./core/filetypes";
 import { initTrash } from "./core/trash";
@@ -18,19 +18,10 @@ import { ensureAppShortcuts } from "./core/app-shortcuts";
 import { installDevApi } from "./core/dev-api";
 
 async function boot(): Promise<void> {
-  /* Isolation is what lets the embedded CheerpX hoster get
-     SharedArrayBuffer. The coi-serviceworker (index.html) makes this page
-     isolated from the second load onward; log it every boot so diagnostics
-     always show which state we're in. */
+  /* Nothing in Dragon86 needs cross-origin isolation anymore (the in-page
+     emulators run without SharedArrayBuffer); log the state every boot so
+     diagnostics always show which state we're in. */
   logInfo("os", "boot environment:", isolationReport());
-  if (!window.crossOriginIsolated) {
-    logWarn(
-      "os",
-      "not cross-origin isolated yet — first visit installs the COI " +
-        "service worker and reloads; the engine cannot start until this " +
-        "reports true.",
-    );
-  }
   const status = document.querySelector<HTMLParagraphElement>(".boot-status");
   const barFill = document.querySelector<HTMLElement>(".boot-bar-fill");
 

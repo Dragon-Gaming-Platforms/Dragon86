@@ -1,26 +1,29 @@
 /**
  * Terminal — xterm.js front end.
  *
- * v1 behavior (per spec): show "engine not connected" until a CheerpX hoster
- * URL is configured in Settings. The bridge protocol lives in bridge/hoster.ts
- * and is the only thing that changes when the hoster repo lands.
+ * The machine behind it is an in-page emulator (bridge/v86.ts) chosen by
+ * the architecture in Settings: 32-bit x86 (the v86 build) or x86-64 (the
+ * v64 build), both booting the installed distro from the OS filesystem's
+ * own `/`. ARM64 is emulatable (v64) but no ARM64 distro is installed, so
+ * it refuses honestly instead of pretending.
  */
 
 import { Terminal } from "@xterm/xterm";
 import { FitAddon } from "@xterm/addon-fit";
 import "@xterm/xterm/css/xterm.css";
 import { el } from "../core/dom";
-import { getSettings, onSettingsChange } from "../core/settings";
+import { getSettings, onSettingsChange, type MachineArch } from "../core/settings";
 import type { Win } from "../core/wm";
-import {
-  getBackend,
-  getTabBackend,
-  DEFAULT_HOSTER_URL,
-  type TerminalBackend,
-} from "../bridge/hoster";
+import type { TerminalBackend } from "../bridge/engine";
 import { getV86Backend } from "../bridge/v86";
 import { isolationReport, logInfo, logWarn } from "../core/log";
 import { rememberEngine } from "./engine-viewer";
+
+const ARCH_LABEL: Record<MachineArch, string> = {
+  x86_32: "x86 (32-bit)",
+  x86_64: "x86-64",
+  arm64: "ARM64",
+};
 
 const GREEN = "\x1b[38;2;46;204;113m";
 const RED = "\x1b[38;2;231;76;60m";
@@ -74,18 +77,15 @@ export function openTerminal(win: Win, options: TerminalOptions = {}): void {
 
   const reconnectBtn = el("button", "tool-btn", "Reconnect");
   const saveStateBtn = el("button", "tool-btn", "Save State");
-  saveStateBtn.title = "Save the v86 machine state on this device; the next v86 start resumes from it";
+  saveStateBtn.title = "Save the machine state on this device; the next start resumes from it";
   saveStateBtn.style.display = "none";
-  const openTabBtn = el("button", "tool-btn", "Open Engine Tab");
-  openTabBtn.title = "Open (or focus) the separate engine tab";
-  openTabBtn.style.display = "none";
   const viewEngineBtn = el("button", "tool-btn", "View Engine");
   viewEngineBtn.title =
-    "Open the Engine Viewer: the VGA display of this terminal's v86 machine, live";
+    "Open the Engine Viewer: the VGA display of this terminal's machine, live";
   viewEngineBtn.style.display = "none";
   const devBtn = el("button", "tool-btn", "Dev Console");
   devBtn.title = "Toggle the built-in developer console (Eruda)";
-  toolbar.append(reconnectBtn, saveStateBtn, viewEngineBtn, openTabBtn, devBtn);
+  toolbar.append(reconnectBtn, saveStateBtn, viewEngineBtn, devBtn);
 
   viewEngineBtn.addEventListener("click", () => {
     if (!backend?.getScreen) {
@@ -121,9 +121,7 @@ export function openTerminal(win: Win, options: TerminalOptions = {}): void {
   /* --- Eruda developer console, contained in this window ---
      Loaded lazily on first click so it costs nothing until needed. It lives
      inside `devHost` (inside this terminal window only) and captures this
-     page's console — including all [D86:bridge] diagnostics. Note: logs from
-     *inside* the hoster iframe appear in the real browser DevTools console,
-     not in Eruda (which instruments this frame only). */
+     page's console — including all [D86] diagnostics. */
   let erudaMod: typeof import("eruda")["default"] | null = null;
   let devOpen = false;
   devBtn.addEventListener("click", () => {
@@ -163,7 +161,7 @@ export function openTerminal(win: Win, options: TerminalOptions = {}): void {
   let backend: TerminalBackend | null = null;
 
   /* Output display filter — fixes the "staircase" output.
-     The guest sends bare \n (LF) and CheerpX's emulated console does NOT
+     The guest sends bare \n (LF) and an emulated serial console does NOT
      perform the ONLCR translation a real TTY does (\n → \r\n). xterm.js
      therefore moves the cursor down but never back to column 0, so every
      line starts where the previous one ended and output stairs rightward
@@ -216,39 +214,34 @@ export function openTerminal(win: Win, options: TerminalOptions = {}): void {
     setChip("offline", `Printed ${name} (not run)`);
   };
 
-  const banner = () => {
+  /** Honest refusal: v64 can emulate an ARM64 machine, but Dragon86 ships
+      no ARM64 kernel or distro, so there is nothing truthful to boot. */
+  const noDistroBanner = (arch: MachineArch) => {
     term.clear();
     term.writeln(`${BOLD}${RED}  ╔══════════════════════════════════════════╗${RESET}`);
-    term.writeln(`${BOLD}${RED}  ║        DRAGON86  ·  CHEERPX TERMINAL     ║${RESET}`);
+    term.writeln(`${BOLD}${RED}  ║        DRAGON86  ·  TERMINAL             ║${RESET}`);
     term.writeln(`${BOLD}${RED}  ╚══════════════════════════════════════════╝${RESET}`);
     term.writeln("");
-    term.writeln(`  ${DIM}xterm.js is online. The Linux engine is not.${RESET}`);
-    term.writeln("");
     term.writeln(`  ${GREEN}●${RESET} Terminal emulator : ready`);
-    term.writeln(`  ${RED}●${RESET} CheerpX engine     : not connected`);
+    term.writeln(`  ${RED}●${RESET} ${ARCH_LABEL[arch]} machine : no operating system installed`);
     term.writeln("");
-    term.writeln(`  The engine lives in the CheerpX-Bridge hoster repo and connects`);
-    term.writeln(`  over the message bridge. It is usually found automatically at:`);
+    term.writeln(`  The ${ARCH_LABEL[arch]} machine can be emulated, but Dragon86 does not`);
+    term.writeln(`  ship a kernel or distro for it yet — there is nothing to boot.`);
     term.writeln("");
-    term.writeln(`    ${BOLD}${DEFAULT_HOSTER_URL}${RESET}`);
+    term.writeln(`  Pick ${BOLD}x86 (32-bit)${RESET} or ${BOLD}x86-64${RESET} in Settings → Engine: both boot`);
+    term.writeln(`  the installed Arch userland from your filesystem's own /.`);
     term.writeln("");
-    term.writeln(`  If it never comes up, check ${BOLD}Settings → Engine${RESET} (a custom`);
-    term.writeln(`  URL overrides the default) and hit ${BOLD}Reconnect${RESET}.`);
-    term.writeln("");
-    term.writeln(`  ${DIM}Engine protocol: v1 · PTY byte-stream + control channel${RESET}`);
-    term.writeln("");
-    setChip("offline", "Not connected");
+    setChip("offline", `No ${ARCH_LABEL[arch]} operating system installed`);
   };
 
-  /* The window title says which engine is behind this terminal. It is the
-     first thing visible and it used to say "CheerpX" no matter what, which is
-     exactly the wrong answer on a device where CheerpX cannot run. */
+  /* The window title says which machine is behind this terminal. The user
+     picks an architecture; the emulator behind it is an implementation
+     detail (bridge/v86.ts). */
   const engineLabel = (): string => {
-    const s = getSettings();
-    if (s.engineMode === "v86") {
-      return "Terminal — v86 · Arch Linux";
-    }
-    return s.engineMode === "tab" ? "Terminal — CheerpX (separate tab)" : "Terminal — CheerpX";
+    const arch = getSettings().arch;
+    return arch === "arm64"
+      ? `Terminal — ${ARCH_LABEL.arm64} (no OS installed)`
+      : `Terminal — ${ARCH_LABEL[arch]} · Arch Linux`;
   };
   const refreshTitle = () => win.setTitle(engineLabel());
   refreshTitle();
@@ -265,110 +258,61 @@ export function openTerminal(win: Win, options: TerminalOptions = {}): void {
 
   const connect = async (freshBoot = false) => {
     refreshTitle();
-    if (getSettings().engineMode === "v86") {
-      openTabBtn.style.display = "none";
-      saveStateBtn.style.display = "";
-      viewEngineBtn.style.display = "";
-      logInfo(
-        "terminal",
-        `connect mode=v86 (in-page compatibility engine, no isolation needed) boot=${freshBoot ? "image" : "saved-state-if-present"}`,
-      );
-      backend?.dispose();
-      backend = null;
-      setChip("connecting", "Connecting…");
-      term.clear();
-      flushPrint();
-      term.writeln(`${DIM}Starting the v86 compatibility engine (Arch userland, in-page).${RESET}`);
-      term.writeln(`${DIM}Its whole root filesystem is ~/v86 in your Files — edit anything there and the guest sees it.${RESET}`);
-      term.writeln(`${DIM}First boot unpacks the distro into your filesystem once; after that it just boots.${RESET}`);
-      term.writeln(
-        `${DIM}/Documents, /Downloads and /Desktop in the guest are the ones in your Files — same folders, both ways.${RESET}`,
-      );
-      if (freshBoot) {
-        term.writeln(`${DIM}Reconnect: fresh boot from the guest image — saved state is not loaded.${RESET}`);
-      }
-      term.writeln(`${DIM}No cross-origin isolation needed — this is the WebView-friendly engine.${RESET}`);
-      term.writeln(`${DIM}Network is emulated by v86; in the guest run /networking.sh to bring the card up.${RESET}`);
-      term.writeln(`${DIM}In the guest:  git clone https://…  works,  d86-net check  tests the link.${RESET}`);
-      /* A snapshot can only be resumed safely within the session that took
-         it: it remembers the guest's open files, and those are handles in a
-         9p server that no longer exists after a reload. Resuming one was
-         "Session ended" forever, so a new page always cold-boots. */
-      const vb = getV86Backend({
-        onData: (data) => term.write(filterOutput(data)),
-        onNotice: (text) => term.writeln(`${DIM}[v86] ${text}${RESET}`),
-        onStatus: (s) => {
-          if (s === "ready") {
-            setChip("online", "Arch online");
-            term.focus();
-          } else {
-            setChip("connecting", "Still starting…");
-            term.writeln(`${RED}The v86 engine is still booting.${RESET}`);
-            term.writeln(`${DIM}Keep this window open — bash appears automatically when ready, or hit Reconnect.${RESET}`);
-          }
-        },
-      }, freshBoot);
-      backend = vb;
-      rememberEngine(vb);
-      vb.connect();
-      return;
-    }
-    const url = getSettings().hosterUrl.trim() || DEFAULT_HOSTER_URL;
-    saveStateBtn.style.display = "none";
-    const tabMode = getSettings().engineMode === "tab";
-    openTabBtn.style.display = tabMode ? "" : "none";
-    logInfo(
-      "terminal",
-      `connect url=${url || "(none)"} mode=${tabMode ? "tab (separate engine tab)" : "embedded (iframe)"} coi=${window.crossOriginIsolated}`,
-    );
+    const arch = getSettings().arch;
     backend?.dispose();
     backend = null;
-    if (!url) {
-      banner();
+    if (arch === "arm64") {
+      saveStateBtn.style.display = "none";
+      viewEngineBtn.style.display = "none";
+      flushPrint();
+      noDistroBanner(arch);
       return;
     }
+    saveStateBtn.style.display = "";
+    viewEngineBtn.style.display = "";
+    logInfo(
+      "terminal",
+      `connect arch=${arch} (in-page engine, no isolation needed) boot=${freshBoot ? "image" : "saved-state-if-present"}`,
+    );
     setChip("connecting", "Connecting…");
     term.clear();
     flushPrint();
-    term.writeln(`${DIM}Connecting to engine: ${url}${RESET}`);
-    term.writeln(`${DIM}First boot builds the engine and can take ~20 s — later opens are instant.${RESET}`);
-    term.writeln(`${DIM}Diagnostics: open the "Dev Console" button above and watch [D86:bridge] logs.${RESET}`);
-    if (tabMode) {
-      term.writeln(
-        `${DIM}Engine mode: separate tab. If no engine tab opened, click "Open Engine Tab" above (popup blockers trust direct clicks).${RESET}`,
-      );
+    term.writeln(`${DIM}Starting the ${ARCH_LABEL[arch]} machine (Arch userland, in-page).${RESET}`);
+    term.writeln(`${DIM}Its root filesystem is YOUR filesystem: the guest's / is the / that Files shows.${RESET}`);
+    term.writeln(`${DIM}First boot unpacks the distro into / once; after that it just boots.${RESET}`);
+    term.writeln(`${DIM}/home/user in the guest is your home — Documents, Downloads and Desktop included.${RESET}`);
+    if (arch === "x86_64") {
+      term.writeln(`${DIM}x86-64 machine: the installed distro is 32-bit and boots the way it would on real 64-bit hardware.${RESET}`);
     }
-    const b = (tabMode ? getTabBackend : getBackend)(url, {
+    if (freshBoot) {
+      term.writeln(`${DIM}Reconnect: fresh boot from the guest image — saved state is not loaded.${RESET}`);
+    }
+    term.writeln(`${DIM}Network is emulated; in the guest run /networking.sh to bring the card up.${RESET}`);
+    term.writeln(`${DIM}In the guest:  git clone https://…  works,  d86-net check  tests the link.${RESET}`);
+    /* A snapshot can only be resumed safely within the session that took
+       it: it remembers the guest's open files, and those are handles in a
+       9p server that no longer exists after a reload. Resuming one was
+       "Session ended" forever, so a new page always cold-boots. */
+    const vb = getV86Backend({
       onData: (data) => term.write(filterOutput(data)),
-      onFsLive: () => {
-        term.writeln(`${GREEN}Shared folder live: guest /home/user/shared is your Dragon86 Files folder.${RESET}`);
-      },
+      onNotice: (text) => term.writeln(`${DIM}[engine] ${text}${RESET}`),
       onStatus: (s) => {
         if (s === "ready") {
-          setChip("online", "CheerpX online");
-          term.writeln(`${GREEN}Engine handshake complete.${RESET}`);
-          term.writeln(`${DIM}Debian bash — have fun.${RESET}`);
-          term.write("\r\n");
-          /* Tell the PTY its real size so wrapping and full-screen apps
-             are correct from the very first prompt. */
-          b.resize(term.cols, term.rows);
+          setChip("online", `Arch online · ${ARCH_LABEL[arch]}`);
           term.focus();
         } else {
           setChip("connecting", "Still starting…");
-          term.writeln(`${RED}The engine is still booting.${RESET}`);
-          term.writeln(
-            `${DIM}Keep this window open — bash will appear here automatically` +
-              ` when the engine is ready (cold boot can take ~20 s), or hit Reconnect.\x1b[0m`,
-          );
+          term.writeln(`${RED}The machine is still booting.${RESET}`);
+          term.writeln(`${DIM}Keep this window open — bash appears automatically when ready, or hit Reconnect.${RESET}`);
         }
       },
-    });
-    backend = b;
-    b.connect();
+    }, freshBoot);
+    backend = vb;
+    rememberEngine(vb);
+    vb.connect();
   };
 
   reconnectBtn.addEventListener("click", () => void connect(true));
-  openTabBtn.addEventListener("click", () => backend?.openTab?.());
 
   /* Closing the window must shut the engine down. Without this the machine
      kept running invisibly: reopening the Terminal started a *second* emulator

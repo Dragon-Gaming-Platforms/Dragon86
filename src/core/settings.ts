@@ -2,26 +2,19 @@
 
 export type ThemeId = "dragon" | "cyberpunk" | "purple" | "matrix" | "amoled" | "sunset";
 
-export type EngineMode = "embedded" | "tab" | "v86";
+/**
+ * The CPU architecture of the Terminal's machine. The user picks hardware,
+ * not an emulator: the right engine is chosen behind the scenes
+ * (bridge/v86.ts — the vendored v86 build for 32-bit x86, the vendored v64
+ * build for x86-64 and ARM64).
+ */
+export type MachineArch = "x86_32" | "x86_64" | "arm64";
 
 export interface Settings {
   theme: ThemeId;
   wallpaper: string;
-  hosterUrl: string;
-  /**
-   * Where the CheerpX engine runs:
-   * - "embedded": hidden iframe inside this page. Requires Dragon86 itself
-   *   to be cross-origin isolated (coi-serviceworker ON).
-   * - "tab": hoster opened as its own top-level browser tab (it isolates
-   *   itself); Dragon86 does NOT need isolation, so coi-serviceworker is
-   *   deregistered and the OS page is unrestricted.
-   * - "v86": the vendored v86 emulator (public/v86/) runs a lightweight
-   *   Arch userland right inside this page. No isolation, no hoster, no
-   *   service worker
-   *   needed — the compatibility engine for WebView/locked-down browsers.
-   *   Its /shared folder is the OS virtual filesystem (see bridge/v86.ts).
-   */
-  engineMode: EngineMode;
+  /** Which machine the Terminal boots — see MachineArch. */
+  arch: MachineArch;
   /**
    * v86 network backend. Empty/"off" = no NIC at all (the guest sees only
    * loopback). Anything else is v86's relay URL, which decides the backend by
@@ -76,11 +69,10 @@ export const WALLPAPERS: { id: string; name: string; css: string }[] = [
 const DEFAULTS: Settings = {
   theme: "dragon",
   wallpaper: "ember",
-  hosterUrl: "",
-  /* v86 is the default: it runs entirely in this page (no isolation, no
-     hoster, no service worker), which is the only engine that works on every
-     browser Dragon86 targets. CheerpX is still there under Settings → Engine. */
-  engineMode: "v86",
+  /* 32-bit x86 is the default: it is the only architecture with an
+     installed distro today (the Arch userland), and its engine runs on
+     every browser Dragon86 targets. */
+  arch: "x86_32",
   /* copy.sh's own public proxy: the same one its Arch demo uses, so the
      guest behaves the way it does there. Rate-limited and shared — set your
      own wisp/wsproxy URL in Settings for regular use. */

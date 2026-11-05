@@ -239,6 +239,10 @@ async function main() {
       ? {
           vram_size: 2 * 1024 * 1024,
           graphics_adapter_path: resolve(repo, `${ENGINE_DIR}/v86-bochs-vga.js`),
+          /* v64 only: pick the emulated CPU. CPU_TYPE=x86_64 proves the
+             64-bit machine boots the same 32-bit guest, the way real
+             x86-64 hardware would. Omitted → the fork's default. */
+          ...(process.env.CPU_TYPE ? { cpu_type: process.env.CPU_TYPE } : {}),
         }
       : { vga_memory_size: 2 * 1024 * 1024 }),
     bios: { url: resolve(repo, `${ENGINE_DIR}/bios/seabios.bin`) },
@@ -339,7 +343,7 @@ async function main() {
        on tty1, so the screen shows a prompt and answers what is typed into it
        (the block above typed through the keyboard controller). */
     const vgaText = screen.lines.map(stripEscapes).join("\n");
-    for (const expected of ["Dragon86 Linux (v86 engine)", "VGA-MARK"]) {
+    for (const expected of ["Dragon86 Linux", "VGA-MARK"]) {
       if (!vgaText.includes(expected)) problems.push(`the VGA screen is missing ${JSON.stringify(expected)}`);
     }
     if (!vgaText.includes("dragon86:")) {

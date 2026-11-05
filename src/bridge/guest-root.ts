@@ -130,6 +130,11 @@ export function parseCpio(buf: Uint8Array): CpioEntry[] {
 
 /* ---------- seeding ---------- */
 
+/** `root`-relative path, tolerating root = "/" (no double slashes). */
+export function at(root: string, rel: string): string {
+  return `${root}/${rel}`.replace(/\/{2,}/g, "/");
+}
+
 async function exists(path: string): Promise<boolean> {
   try {
     await fs.promises.stat(path);
@@ -145,7 +150,7 @@ async function ensureDir(path: string): Promise<void> {
 
 async function readMarker(root: string): Promise<Marker | null> {
   try {
-    return JSON.parse(await fs.promises.readFile(`${root}/${MARKER}`, "utf8")) as Marker;
+    return JSON.parse(await fs.promises.readFile(at(root, MARKER), "utf8")) as Marker;
   } catch {
     return null;
   }
@@ -161,7 +166,7 @@ function sameBytes(a: Uint8Array, b: Uint8Array): boolean {
 /**
  * The boot artifact the app currently ships, kept in sync in ZenFS.
  *
- * The copy in `~/v86/boot` is *checked against the app on every boot*, not
+ * The copy in `/boot` is *checked against the app on every boot*, not
  * trusted forever: an earlier version returned the ZenFS copy unseen, so a
  * root seeded by an old deployment kept booting the old initramfs — and an
  * old init means no keyboard modules and no tty1 shell, which is exactly "the
@@ -173,7 +178,7 @@ function sameBytes(a: Uint8Array, b: Uint8Array): boolean {
  * copy exists, the copy boots — with a log line saying it was not checked.
  */
 async function ensureArtifact(root: string, name: string, url: string): Promise<Uint8Array> {
-  const path = `${root}/boot/${name}`;
+  const path = at(root, `boot/${name}`);
   let local: Uint8Array | null = null;
   if (await exists(path)) {
     const data = new Uint8Array(await fs.promises.readFile(path));
@@ -185,18 +190,18 @@ async function ensureArtifact(root: string, name: string, url: string): Promise<
     const fresh = new Uint8Array(await res.arrayBuffer());
     if (fresh.byteLength <= 1024) throw new Error(`${url}: implausibly small (${fresh.byteLength} bytes)`);
     if (local && sameBytes(local, fresh)) return local;
-    await ensureDir(`${root}/boot`);
+    await ensureDir(at(root, "boot"));
     await fs.promises.writeFile(path, fresh);
     logInfo(
       "guest",
       local
-        ? `${name}: the app ships a different build — replaced the copy in ~/v86/boot (${(fresh.byteLength / 1048576).toFixed(1)} MB)`
+        ? `${name}: the app ships a different build — replaced the copy in /boot (${(fresh.byteLength / 1048576).toFixed(1)} MB)`
         : `${name} copied into the OS filesystem (${(fresh.byteLength / 1048576).toFixed(1)} MB)`,
     );
     return fresh;
   } catch (err) {
     if (local) {
-      logWarn("guest", `${name}: could not check the app's copy (offline?) — booting the one already in ~/v86/boot`, err);
+      logWarn("guest", `${name}: could not check the app's copy (offline?) — booting the one already in /boot`, err);
       return local;
     }
     throw err;
@@ -204,7 +209,7 @@ async function ensureArtifact(root: string, name: string, url: string): Promise<
 }
 
 /**
- * Make sure `~/v86` is a bootable Arch root and hand back the kernel and
+ * Make sure the system root (`/` in ZenFS) is a bootable Arch root and hand back the kernel and
  * initramfs to boot it with. Cheap when it has already been done.
  */
 export async function ensureGuestRoot(
@@ -213,7 +218,7 @@ export async function ensureGuestRoot(
 ): Promise<GuestRoot> {
   const say = opts.status ?? (() => {});
   await ensureDir(root);
-  await ensureDir(`${root}/boot`);
+  await ensureDir(at(root, "boot"));
 
   const kernel = await ensureArtifact(root, "vmlinuz", `${BASE}bzImage`);
   const initrd = await ensureArtifact(root, "initrd.gz", `${BASE}initrd.gz`);
@@ -228,7 +233,7 @@ export async function ensureGuestRoot(
     marker?.v === SEED_VERSION &&
     marker.initrdBytes === initrd.byteLength &&
     marker.initrdHash === initrdHash;
-  if (seeded && !opts.force && (await exists(`${root}/bin/bash`))) {
+  if (seeded && !opts.force && (await exists(at(root, "bin/bash")))) {
     logInfo("guest", `running the distro already in the OS filesystem (${marker?.files ?? "?"} files)`);
     await repairModes(root);
     return { root, kernel, initrd, reused: true };
@@ -246,13 +251,13 @@ export async function ensureGuestRoot(
   /* Directories first: a file cannot be created before its parent exists. */
   const dirs = entries.filter((e) => (e.mode & 0o170000) === 0o040000);
   const rest = entries.filter((e) => (e.mode & 0o170000) !== 0o040000);
-  for (const d of dirs) await ensureDir(`${root}/${d.name}`);
+  for (const d of dirs) await ensureDir(at(root, d.name));
 
   let files = 0;
   let bytes = 0;
   let noMode = 0;
   for (const e of rest) {
-    const target = `${root}/${e.name}`;
+    const target = at(root, e.name);
     try {
       if (e.link !== undefined) {
         await ensureDir(target.slice(0, target.lastIndexOf("/")));
@@ -273,7 +278,7 @@ export async function ensureGuestRoot(
 
   /* Things a 9p root needs that an initramfs never carried. */
   for (const dir of ["root", "tmp", "proc", "sys", "dev", "home", "mnt", "run"]) {
-    await ensureDir(`${root}/${dir}`);
+    await ensureDir(at(root, dir));
   }
 
   /* The initramfs keeps everything in /usr/bin and has bare /bin, /sbin and
@@ -282,7 +287,7 @@ export async function ensureGuestRoot(
      resolve — so make them symlinks, but only while the directories are
      empty, so a guest that has since put files there is left alone. */
   for (const [link, target] of [["bin", "usr/bin"], ["sbin", "usr/bin"], ["lib", "usr/lib"]] as const) {
-    const path = `${root}/${link}`;
+    const path = at(root, link);
     try {
       const st = await fs.promises.stat(path);
       if (!st.isDirectory()) continue;
@@ -309,7 +314,7 @@ export async function ensureGuestRoot(
   await repairModes(root);
 
   await fs.promises.writeFile(
-    `${root}/${MARKER}`,
+    at(root, MARKER),
     JSON.stringify({ v: SEED_VERSION, at: Date.now(), initrdBytes: initrd.byteLength, initrdHash, files } satisfies Marker),
   );
 
@@ -330,7 +335,7 @@ export async function ensureGuestRoot(
  * a broken console; anything else that lost its bits is the guest's problem.
  */
 async function repairModes(root: string): Promise<void> {
-  const must = [`${root}/usr/bin/bash`, `${root}/usr/bin/setsid`, `${root}/usr/bin/ls`];
+  const must = [at(root, "usr/bin/bash"), at(root, "usr/bin/setsid"), at(root, "usr/bin/ls")];
   for (const path of must) {
     try {
       const st = await fs.promises.stat(path);
@@ -351,5 +356,5 @@ export async function guestRootInfo(root: string): Promise<Marker | null> {
 
 /** Drop the marker so the next boot re-unpacks over the existing tree. */
 export async function resetGuestRoot(root: string): Promise<void> {
-  await fs.promises.unlink(`${root}/${MARKER}`).catch(() => {});
+  await fs.promises.unlink(at(root, MARKER)).catch(() => {});
 }

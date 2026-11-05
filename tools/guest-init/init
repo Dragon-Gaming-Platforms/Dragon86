@@ -216,11 +216,11 @@ run_console_session() {
   exec >/dev/tty1 2>&1
   clear
   echo ""
-  echo "  Dragon86 Linux (v86 engine)"
+  echo "  Dragon86 Linux"
   echo "  ----------------------------------------------------------"
   echo "  This is the machine's own console - type here."
   echo "  The same machine also has a shell on the serial line (Terminal)."
-  echo "  Everything is one filesystem: / is your v86/ folder in Dragon86."
+  echo "  Everything is one filesystem: / here IS the / in Dragon86's Files."
   echo ""
   while :; do
     # setsid -c: a session leader with tty1 as its controlling terminal, so
@@ -246,11 +246,11 @@ run_console_session() {
   ( run_console_session ) &
   clear 2>/dev/null
   echo ""
-  echo "  Dragon86 Linux (v86 · Arch userland) — compatibility engine"
+  echo "  Dragon86 Linux (Arch userland, in-page machine)"
   echo "  ----------------------------------------------------------"
-  echo "  / is your Dragon86 filesystem (v86/ in Files) — edit it there."
-  echo "  /Documents, /Downloads and /Desktop are the ones in Files."
-  echo "  /system/apps holds the OS's filesystem apps. Network: /networking.sh"
+  echo "  / here IS the / in Dragon86's Files — edit either side, both see it."
+  echo "  Your home is /home/user: Documents, Downloads and Desktop included."
+  echo "  Network: /networking.sh"
   echo ""
   # A shell that dies on its own (rather than exiting) leaves us here. Give
   # it a few tries, and if it dies almost immediately assume the share is

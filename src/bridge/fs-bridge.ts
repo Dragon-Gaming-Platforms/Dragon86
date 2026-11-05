@@ -1,16 +1,17 @@
 /**
- * fs-bridge — Dragon86's filesystem served to the CheerpX hoster.
+ * fs-bridge — Dragon86's filesystem served to DrakeForge (BrowserPod).
  *
- * This is the CheerpX counterpart of p9.ts. v86 can take a raw 9p
- * server over its virtio channel; CheerpX can't (its filesystem
+ * This is the postMessage counterpart of p9.ts, kept solely for the
+ * future DrakeForge connection — the IDE's BrowserPod engine runs in
+ * another tab and cannot speak raw 9p over virtio (its filesystem
  * devices are fixed: DataDevice = JS writes / guest reads, IDBDevice =
- * guest read-write / JS reads back). So for CheerpX the wire is the
- * hoster bridge itself: protocol v2 `fs-req`/`fs-res` messages, served
+ * guest read-write / JS reads back). So here the wire is the DrakeForge
+ * session bridge itself: protocol v2 `fs-req`/`fs-res` messages, served
  * here directly from ZenFS. The guest-visible root ("/" in fs-req
- * paths) is the OS home (/home/user); the hoster mounts it at
+ * paths) is the OS home (/home/user); the other side mounts it at
  * /home/user/shared in the guest. See docs/cheerpx-fs-protocol.md.
  *
- * File-level, not byte-range: CheerpX's JS-facing device APIs are
+ * File-level, not byte-range: BrowserPod's JS-facing device APIs are
  * whole-file (writeFile / readFileAsBlob), so the protocol is too.
  * Stateful handles would buy nothing here.
  */
@@ -178,7 +179,7 @@ export function createFsResponder(
       res.ok = true;
       if (!logged) {
         logged = true;
-        logInfo("bridge", `fs1 share live: CheerpX /home/user/shared ↔ OS ${root} (protocol v2)`);
+        logInfo("bridge", `fs1 share live: guest /home/user/shared ↔ OS ${root} (protocol v2)`);
       }
     } catch (err) {
       const e = err as { code?: string; message?: string };

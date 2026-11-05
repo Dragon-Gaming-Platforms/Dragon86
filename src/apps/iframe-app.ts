@@ -40,7 +40,6 @@
 import { el } from "../core/dom";
 import type { Win } from "../core/wm";
 import { logInfo, logWarn } from "../core/log";
-import { getSettings } from "../core/settings";
 import appsJson from "./iframe-apps.json";
 
 export interface IframeAppDef {
@@ -202,10 +201,15 @@ function fileName(path: string): string {
 }
 
 /** DrakeForge owns its IDE UI. This is only a launcher for its standalone
- * route; it does not connect the terminal or claim to share OS files. */
+ * route; it does not connect the terminal or claim to share OS files.
+ *
+ * It can only be embedded when this page is cross-origin isolated AND the
+ * IDE is same-origin — BrowserPod needs SharedArrayBuffer. Dragon86 does
+ * not run isolated (nothing else needs it since the CheerpX engine was
+ * removed), so in practice DrakeForge opens in its own tab, where it
+ * isolates itself. */
 function openDrakeForge(win: Win, root: HTMLElement, status: HTMLElement, def: IframeAppDef): void {
   const url = def.url!;
-  const mode = getSettings().engineMode;
   const panel = el("div", "iframe-app-error");
   const message = el("p");
   const button = el("a", "", "Open DrakeForge in a new tab");
@@ -213,7 +217,7 @@ function openDrakeForge(win: Win, root: HTMLElement, status: HTMLElement, def: I
   button.target = "_blank";
   button.rel = "noopener noreferrer";
   status.textContent = "Standalone workspace — Dragon86 files are not connected";
-  if (mode === "embedded" && window.crossOriginIsolated && new URL(url).origin === window.location.origin) {
+  if (window.crossOriginIsolated && new URL(url).origin === window.location.origin) {
     const frame = document.createElement("iframe");
     frame.className = "browser-frame";
     frame.title = "DrakeForge";
@@ -221,9 +225,9 @@ function openDrakeForge(win: Win, root: HTMLElement, status: HTMLElement, def: I
     frame.allow = "cross-origin-isolated; clipboard-read; clipboard-write; fullscreen";
     root.append(frame, status);
   } else {
-    message.textContent = mode === "embedded"
-      ? "Embedded DrakeForge needs Dragon86 to be cross-origin isolated and on the same origin. Open it in a separate tab instead."
-      : "DrakeForge opens in a separate tab. This standalone workspace does not sync Dragon86 files.";
+    message.textContent =
+      "DrakeForge opens in a separate tab (it needs an isolation this page does not carry). " +
+      "This standalone workspace does not sync Dragon86 files.";
     panel.append(message, button);
     root.append(panel, status);
   }

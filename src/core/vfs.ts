@@ -2,8 +2,13 @@
  * VFS — ZenFS-backed virtual filesystem.
  *
  * Mounts:
- *   /home → IndexedDB (persistent, "the hard drive")
- *   /tmp  → InMemory   (scratch, cleared on reload)
+ *   /     → IndexedDB (persistent) — the system root. The distro the
+ *           Terminal's engine boots lives HERE (/bin, /etc, /usr …): the
+ *           guest's `/` *is* this filesystem, served over 9p. Installed by
+ *           the App Store / first Terminal run, see bridge/guest-root.ts.
+ *   /home → IndexedDB (persistent, its own store — this is where user data
+ *           always lived, and it stays in that store untouched)
+ *   /tmp  → InMemory   (scratch, cleared on reload — for the guest too)
  *
  * Everything here is async on purpose: browser backends are async at heart.
  */
@@ -14,31 +19,19 @@ import { IndexedDB } from "@zenfs/dom";
 export const HOME = "/home/user";
 
 /**
- * Engine roots. The guest's filesystem shows up in the OS tree under the
- * engine it belongs to, so `/` in the guest maps to one of these:
- *
- *   ~/v86/…           the v86 machine's root filesystem — the guest's `/`
- *                     is this folder, served over 9p
- *   ~/Downloads/…     also at /Downloads inside the v86 guest (HOME_DIRS)
- *   ~/CheerpX/…       the CheerpX engine's equivalent home
- *
- * `~` here is HOME: /home/user, the persistent IndexedDB mount.
+ * The guest's root filesystem is the OS root filesystem. No more ~/v86
+ * subtree: the distro is unpacked straight into `/`, and the engine's 9p
+ * share serves `/`. The guest's /home/user is your /home/user.
  */
-export const ENGINE_ROOT = {
-  v86: `${HOME}/v86`,
-  cheerpx: `${HOME}/CheerpX`,
-} as const;
+export const GUEST_ROOT = "/";
 
-export const SHARED_DIR = {
-  /* CheerpX only: the hoster mounts its guest's /home/user/shared here. */
-  cheerpx: `${ENGINE_ROOT.cheerpx}/shared`,
-} as const;
+/** Where the distro used to live (pre-refactor installs); only read by the
+    one-time migration notice, never written. */
+export const LEGACY_V86_ROOT = `${HOME}/v86`;
 
 /**
- * Your home folders, grafted into the v86 guest at `/`: the guest sees
- * `/Downloads`, `/Documents` and `/Desktop` and they *are* these. There is
- * no separate "shared" folder any more — everything in the guest is your
- * filesystem already.
+ * Your home folders. Inside the guest they are exactly where Unix puts
+ * them: /home/user/Documents and friends — same directory, both ways.
  */
 export const HOME_DIRS = ["Desktop", "Documents", "Downloads"] as const;
 
@@ -54,16 +47,14 @@ export async function initVfs(): Promise<void> {
   if (ready) return;
   await configure({
     mounts: {
+      /* The system root gets its own IndexedDB store; /home keeps the store
+         it always had, so existing user data is untouched by this mount. */
+      "/": { backend: IndexedDB, storeName: "dragon86-root" },
       "/home": IndexedDB,
       "/tmp": InMemory,
     },
   });
   for (const dir of Object.values(SPECIAL_DIRS)) {
-    await ensureDir(dir);
-  }
-  /* The engine folders exist from the first boot so Files shows the layout
-     the guest lives in, even before an engine has ever run. */
-  for (const dir of [ENGINE_ROOT.v86, ENGINE_ROOT.cheerpx, SHARED_DIR.cheerpx]) {
     await ensureDir(dir);
   }
   const welcome = `${HOME}/Documents/Welcome.txt`;
@@ -79,8 +70,8 @@ export async function initVfs(): Promise<void> {
         "What's here:",
         "  - Files app  : browse, create, rename, delete",
         "  - Text Editor: opens any text file, Ctrl+S saves",
-        "  - Terminal   : waits for the CheerpX engine (see Settings)",
-        "  - Settings   : themes, wallpaper, engine host URL",
+        "  - Terminal   : a real Arch Linux machine, booted in this page",
+        "  - Settings   : themes, wallpaper, machine architecture",
         "",
         "No login. No server. Just your machine, in a tab.",
       ].join("\n"),
@@ -248,7 +239,7 @@ export async function factoryReset(): Promise<void> {
  * already exists) and removes the folder. Runs once, cheap when absent.
  */
 export async function migrateLegacyShared(): Promise<number> {
-  const legacy = `${ENGINE_ROOT.v86}/shared`;
+  const legacy = `${LEGACY_V86_ROOT}/shared`;
   const n = await fs.promises.stat(legacy).catch(() => null);
   if (!n || !n.isDirectory()) return 0;
 
