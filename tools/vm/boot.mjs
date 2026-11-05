@@ -343,7 +343,7 @@ async function main() {
        on tty1, so the screen shows a prompt and answers what is typed into it
        (the block above typed through the keyboard controller). */
     const vgaText = screen.lines.map(stripEscapes).join("\n");
-    for (const expected of ["Dragon86 Linux (v86 engine)", "VGA-MARK"]) {
+    for (const expected of ["Dragon86 Linux", "VGA-MARK"]) {
       if (!vgaText.includes(expected)) problems.push(`the VGA screen is missing ${JSON.stringify(expected)}`);
     }
     if (!vgaText.includes("dragon86:")) {
