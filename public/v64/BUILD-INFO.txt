@@ -1,4 +1,4 @@
 Vendored build of v64 — not written by hand.
 Source: https://github.com/Marukon/v64 @ b54882e1ff47d5c24da2870d41274f82531b8b9c
-Built:  2026-11-05T23:06:55Z by GitHub Actions run 42126743889
+Built:  2026-11-05T23:30:30Z by GitHub Actions run 42129382984
 Rebuild: run the 'Build v64' workflow (it overwrites this directory).
