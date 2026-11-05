@@ -1,0 +1,101 @@
+name: Build v64
+
+# Builds the v64 emulator (a v86 fork: x86 32/64-bit + ARM64, same JS API)
+# from a pinned upstream commit and commits the build output to public/v64/
+# on the branch the workflow ran on.
+#
+# Why a workflow: the build needs Rust (wasm32 target), clang and the Closure
+# Compiler — toolchains the development sandbox cannot install. Upstream's own
+# CI runs `make all` on ubuntu-latest, which is exactly what this does.
+#
+# Triggers: pushing this file (first build) or a manual dispatch (rebuilds).
+# The result is vendored output only — v64's source stays upstream.
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/build-v64.yml"
+
+permissions:
+  contents: write
+
+concurrency: build-v64
+
+env:
+  V64_REPO: Marukon/v64
+  V64_COMMIT: b54882e1ff47d5c24da2870d41274f82531b8b9c
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Checkout Dragon86
+        uses: actions/checkout@v4
+
+      - name: Checkout v64 (pinned)
+        uses: actions/checkout@v4
+        with:
+          repository: Marukon/v64
+          ref: b54882e1ff47d5c24da2870d41274f82531b8b9c
+          path: v64-src
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Setup Rust toolchain
+        run: |
+          rustup toolchain install stable --profile minimal
+          rustup target add wasm32-unknown-unknown
+
+      - name: Cache crates
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: ${{ runner.os }}-v64-cargo-${{ env.V64_COMMIT }}
+
+      - name: Build v64 (make all)
+        working-directory: v64-src
+        run: |
+          rustc --version
+          java -version
+          node --version
+          make all build/v86-fallback.wasm
+
+      - name: Vendor the build into public/v64
+        run: |
+          rm -rf public/v64
+          mkdir -p public/v64/bios
+          cp v64-src/build/libv86.js public/v64/
+          cp v64-src/build/*.mjs public/v64/ 2>/dev/null || true
+          cp v64-src/build/cpu-worker.js v64-src/build/vcpu-worker.js public/v64/ 2>/dev/null || true
+          cp v64-src/build/v86*.wasm public/v64/
+          for f in v64-src/build/v86-*.js; do [ -e "$f" ] && cp "$f" public/v64/; done
+          if [ -d v64-src/build/glbridge ]; then cp -r v64-src/build/glbridge public/v64/glbridge; fi
+          cp v64-src/bios/seabios.bin v64-src/bios/vgabios.bin v64-src/bios/COPYING.LESSER public/v64/bios/
+          cp v64-src/LICENSE v64-src/LICENSE.MIT public/v64/
+          {
+            echo "Vendored build of v64 — not written by hand."
+            echo "Source: https://github.com/${V64_REPO} @ ${V64_COMMIT}"
+            echo "Built:  $(date -u +%Y-%m-%dT%H:%M:%SZ) by GitHub Actions run ${{ github.run_id }}"
+            echo "Rebuild: run the 'Build v64' workflow (it overwrites this directory)."
+          } > public/v64/BUILD-INFO.txt
+          ls -la public/v64
+          du -sh public/v64
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A public/v64
+          if git diff --cached --quiet; then
+            echo "build output unchanged — nothing to commit"
+          else
+            git commit -m "Vendor v64 build (${V64_REPO} @ ${V64_COMMIT})"
+            git push origin "HEAD:${{ github.ref_name }}"
+          fi
