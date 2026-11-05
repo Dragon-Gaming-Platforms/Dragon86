@@ -134,10 +134,11 @@ export function createLauncher(wm: WindowManager) {
   }
 
   /**
-   * A `.d86` file in ~/system/apps is a shortcut to an app that is part of
-   * the OS. Opening it launches that app; if the app is gone (an old build's
-   * shortcut), the file still opens in the editor, because the file is HTML
-   * and that is what it says.
+   * A `.d86` file (the auto-generated pointers in ~/applications, or one
+   * copied anywhere else) is a shortcut to an app: a fixed one, or a
+   * filesystem app from ~/system/apps. Opening it launches that app; if the
+   * app is gone (uninstalled, or an old build's pointer), the file still
+   * opens in the editor, because the file is HTML and that is what it says.
    */
   function openShortcut(path: string): void {
     const id = appIdFromShortcut(path);
@@ -145,7 +146,7 @@ export function createLauncher(wm: WindowManager) {
       openEngineViewerAt();
       return;
     }
-    const def = IFRAME_APPS.find((a) => a.id === id && !a.fs);
+    const def = IFRAME_APPS.find((a) => a.id === id);
     if (def) {
       openIframeAppAt(def);
       return;
