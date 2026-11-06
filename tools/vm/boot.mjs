@@ -5,7 +5,7 @@
  * the guest's /etc/profile hooks and the shell can be observed without a
  * browser. `npm run test:vm` compiles the 9p server for Node and boots it.
  *
- * It runs the *real* pieces — public/v86/libv86.js, the real kernel and
+ * It runs the *real* pieces — public/v64/libv86.js, the real kernel and
  * initramfs, and the real src/bridge/p9.ts server — against a filesystem that
  * is the host's own (instead of ZenFS), extracted from the initramfs the same
  * way guest-root.ts does it.
