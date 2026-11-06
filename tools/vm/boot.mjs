@@ -256,7 +256,10 @@ async function main() {
        harness moved, so the plugin needs its real path. */
     ...(ENGINE_DIR.includes("v64")
       ? {
-          vram_size: 2 * 1024 * 1024,
+          /* 16 MiB: the guest's bochs DRM driver refuses to bind below
+             4 MiB ("less than 4 MB video memory, ignoring device"), and X
+             on the framebuffer is the point of the guest packs. */
+          vram_size: 16 * 1024 * 1024,
           graphics_adapter_path: resolve(repo, `${ENGINE_DIR}/v86-bochs-vga.js`),
           /* v64 only: pick the emulated CPU. CPU_TYPE=x86_64 proves the
              64-bit machine boots the same 32-bit guest, the way real

@@ -593,6 +593,12 @@ class V86Backend implements TerminalBackend {
            (CPU_TYPE=x86_64 for the 64-bit one). */
         graphics_adapter: "bochs_vga",
         graphics_adapter_path: `${BASE}v86-bochs-vga.js`,
+        /* 16 MiB of VGA memory: the guest's bochs DRM driver refuses to
+           bind below 4 MiB ("less than 4 MB video memory, ignoring
+           device"), and X11 on that framebuffer (the guest packs) is what
+           makes the Engine Viewer a real desktop. Power of two, like v64
+           demands. */
+        vram_size: 16 * 1024 * 1024,
         ...(arch === "x86_64" ? { cpu_type: "x86_64" } : {}),
         /* Give fresh guests v86's ACPI tables. Without them, SeaBIOS
            leaves the Arch kernel to fall back to a bogus MP table,

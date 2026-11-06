@@ -32,11 +32,6 @@ fi
   echo "Settings -> Machine -> x86_64, install Arch Linux (x86-64) from the App Store, reboot, retry."
   exit 1
 }
-[ -x /usr/lib/Xorg ] || {
-  echo "X11 is not installed in this machine yet - NetSurf is a graphical app."
-  echo "Install install-wm64.sh from the App Store and run: sh /install-wm64.sh"
-  exit 1
-}
 set -- "$P"/netsurf64.tar.gz.part*
 [ -e "$1" ] || {
   echo "payload missing under $P - install install-netsurf.sh from the App Store first"
@@ -47,7 +42,21 @@ echo "unpacking NetSurf into / (over 9p - this takes a while) ..."
 cat "$P"/netsurf64.tar.gz.part* | tar -xzv -C / > "$LIST"
 sync
 echo
-echo "Installed. In the Engine Viewer run 'startwm' if the desktop is not up,"
-echo "then start NetSurf from the IceWM menu (bottom-left), or type 'netsurf &'"
-echo "in the desktop's xterm. Networking: run /networking.sh first if the"
-echo "machine is not online yet."
+FRONTEND=$(cat /usr/share/netsurf-d86-frontend 2>/dev/null || echo unknown)
+echo "Installed (NetSurf's $FRONTEND frontend, as Arch builds it)."
+case "$FRONTEND" in
+  framebuffer|sdl)
+    echo "This build draws on the machine's display directly - no X11 needed."
+    echo "Open the Engine Viewer, then run here:  netsurf https://example.com"
+    echo "(If the X11 desktop is running, quit it first - they share the screen.)"
+    ;;
+  *)
+    [ -x /usr/lib/Xorg ] || {
+      echo "NOTE: this build needs X11, which is not installed yet -"
+      echo "install install-wm64.sh from the App Store and run: sh /install-wm64.sh"
+    }
+    echo "Run 'startwm' in the Engine Viewer if the desktop is not up, then start"
+    echo "NetSurf from the IceWM menu (bottom-left) or type 'netsurf &' in xterm."
+    ;;
+esac
+echo "Networking: run /networking.sh first if the machine is not online yet."

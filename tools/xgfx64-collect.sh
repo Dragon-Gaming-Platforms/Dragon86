@@ -180,32 +180,52 @@ copymods "$X" bochs bochs_drm evdev psmouse
 du -sh "$X"
 
 # ============================================================ NetSurf pack ==
-# Arch's netsurf is the gtk3 build; find its binary from the package itself.
+# Which frontend Arch built NetSurf with is read off the binary itself, not
+# assumed (the first run of this script assumed gtk3 and was wrong — the
+# package links no gdk-pixbuf at all).
 NS_BIN=$(pacman -Ql netsurf | awk '$2 ~ /\/usr\/bin\/./ {print $2}' | head -1)
 [ -n "$NS_BIN" ]
-cp -L "$NS_BIN" "$N/usr/bin/netsurf"
+ldd "$NS_BIN"
+NS_LIBS=$(ldd "$NS_BIN" | awk '{print $1}')
+FRONTEND=unknown
+case "$NS_LIBS" in
+  *libgtk-3*) FRONTEND=gtk3 ;;
+  *libgtk-x11-2*) FRONTEND=gtk2 ;;
+  *libSDL*) FRONTEND=sdl ;;
+  *libnsfb*) FRONTEND=framebuffer ;;
+  *libX11*) FRONTEND=x11 ;;
+esac
+echo "netsurf frontend: $FRONTEND"
+[ "$FRONTEND" != unknown ] || { echo "cannot tell what Arch's netsurf draws with - look at the ldd above"; exit 1; }
 
-cp -a /usr/share/netsurf "$N/usr/share/netsurf" 2>/dev/null || true
-# gdk-pixbuf loaders (and their cache) — gtk cannot draw a PNG without them
-cp -a /usr/lib/gdk-pixbuf-2.0 "$N/usr/lib/gdk-pixbuf-2.0"
-# gtk's own module dir (input methods etc.) if present
+cp -L "$NS_BIN" "$N/usr/bin/netsurf"
+[ -d /usr/share/netsurf ] && cp -a /usr/share/netsurf "$N/usr/share/netsurf"
+# toolkit runtime data, only what this frontend actually has installed
+[ -d /usr/lib/gdk-pixbuf-2.0 ] && cp -a /usr/lib/gdk-pixbuf-2.0 "$N/usr/lib/gdk-pixbuf-2.0"
 [ -d /usr/lib/gtk-3.0 ] && cp -a /usr/lib/gtk-3.0 "$N/usr/lib/gtk-3.0"
+[ -d /usr/lib/gtk-2.0 ] && cp -a /usr/lib/gtk-2.0 "$N/usr/lib/gtk-2.0"
 
 closure "$N" "$N/usr/bin/netsurf" \
-  $(find "$N/usr/lib/gdk-pixbuf-2.0" "$N/usr/lib/gtk-3.0" -name '*.so' 2>/dev/null)
+  $(find "$N/usr/lib/gdk-pixbuf-2.0" "$N/usr/lib/gtk-3.0" "$N/usr/lib/gtk-2.0" -name '*.so' 2>/dev/null)
 
-# compiled GSettings schemas — gtk aborts the process on a missing schema
-glib-compile-schemas /usr/share/glib-2.0/schemas
-install -D /usr/share/glib-2.0/schemas/gschemas.compiled \
-  "$N/usr/share/glib-2.0/schemas/gschemas.compiled"
-# mime database (content sniffing)
-install -D /usr/share/mime/mime.cache "$N/usr/share/mime/mime.cache"
-# icon theme, trimmed to what a browser window actually shows
-mkdir -p "$N/usr/share/icons/Adwaita" "$N/usr/share/icons/hicolor"
-cp /usr/share/icons/hicolor/index.theme "$N/usr/share/icons/hicolor/"
-cp /usr/share/icons/Adwaita/index.theme "$N/usr/share/icons/Adwaita/"
-for d in cursors 16x16 24x24 32x32 48x48 scalable symbolic; do
-  [ -d "/usr/share/icons/Adwaita/$d" ] && cp -a "/usr/share/icons/Adwaita/$d" "$N/usr/share/icons/Adwaita/$d"
-done
+if [ -d /usr/share/glib-2.0/schemas ] && { [ "$FRONTEND" = gtk3 ] || [ "$FRONTEND" = gtk2 ]; }; then
+  # compiled GSettings schemas — gtk aborts the process on a missing schema
+  glib-compile-schemas /usr/share/glib-2.0/schemas
+  install -D /usr/share/glib-2.0/schemas/gschemas.compiled \
+    "$N/usr/share/glib-2.0/schemas/gschemas.compiled"
+fi
+[ -f /usr/share/mime/mime.cache ] && install -D /usr/share/mime/mime.cache "$N/usr/share/mime/mime.cache"
+if [ "$FRONTEND" = gtk3 ] || [ "$FRONTEND" = gtk2 ]; then
+  # icon theme, trimmed to what a browser window actually shows
+  mkdir -p "$N/usr/share/icons/Adwaita" "$N/usr/share/icons/hicolor"
+  cp /usr/share/icons/hicolor/index.theme "$N/usr/share/icons/hicolor/" 2>/dev/null || true
+  cp /usr/share/icons/Adwaita/index.theme "$N/usr/share/icons/Adwaita/" 2>/dev/null || true
+  for d in cursors 16x16 24x24 32x32 48x48 scalable symbolic; do
+    [ -d "/usr/share/icons/Adwaita/$d" ] && cp -a "/usr/share/icons/Adwaita/$d" "$N/usr/share/icons/Adwaita/$d"
+  done
+fi
+# the install script reads this to print the right launch instructions
+install -D /dev/null "$N/usr/share/netsurf-d86-frontend"
+echo "$FRONTEND" > "$N/usr/share/netsurf-d86-frontend"
 
 du -sh "$N"
