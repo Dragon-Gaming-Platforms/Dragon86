@@ -79,12 +79,31 @@ jobs:
           cp v64-src/build/v86*.wasm public/v64/
           for f in v64-src/build/v86-*.js; do [ -e "$f" ] && cp "$f" public/v64/; done
           if [ -d v64-src/build/glbridge ]; then cp -r v64-src/build/glbridge public/v64/glbridge; fi
+          # Dragon86 patch: load the initrd as high as RAM allows instead of
+          # at a fixed 64 MB. A 64-bit kernel's in-place extraction area
+          # (pref_address 16 MB + init_size, 68 MB for Arch's linux-lts)
+          # overlaps 64 MB and shreds the initrd mid-decompression
+          # ("Initramfs unpacking failed: uncompression error"). Real
+          # bootloaders place the initrd near the top of memory; so does this.
+          node -e '
+            const fs = require("fs");
+            const old = "e=h=0;c&&(h=67108864,e=c.byteLength,a.set(new Uint8Array(c),h));g[134]=h;g[135]=e;";
+            const neu = "e=h=0;c&&(e=c.byteLength,h=Math.max(67108864,Math.min(a.length-e-1048576,2147483647-e)&-2097152),a.set(new Uint8Array(c),h));g[134]=h;g[135]=e;";
+            let patched = 0;
+            for (const f of fs.readdirSync("public/v64").filter(f => f.endsWith(".js"))) {
+              const p = "public/v64/" + f, s = fs.readFileSync(p, "utf8");
+              if (s.includes(old)) { fs.writeFileSync(p, s.split(old).join(neu)); patched++; console.log("patched", p); }
+            }
+            if (!patched) { console.error("initrd-placement patch matched nothing — loader changed upstream?"); process.exit(1); }
+          '
           cp v64-src/bios/seabios.bin v64-src/bios/vgabios.bin v64-src/bios/COPYING.LESSER public/v64/bios/
           cp v64-src/LICENSE v64-src/LICENSE.MIT public/v64/
           {
             echo "Vendored build of v64 — not written by hand."
             echo "Source: https://github.com/${V64_REPO} @ ${V64_COMMIT}"
             echo "Built:  $(date -u +%Y-%m-%dT%H:%M:%SZ) by GitHub Actions run ${{ github.run_id }}"
+            echo "Patched: initrd loads near the top of RAM, not at 64 MB (see the"
+            echo "workflow's patch step — 64-bit kernels decompress over 64 MB)."
             echo "Rebuild: run the 'Build v64' workflow (it overwrites this directory)."
           } > public/v64/BUILD-INFO.txt
           ls -la public/v64
