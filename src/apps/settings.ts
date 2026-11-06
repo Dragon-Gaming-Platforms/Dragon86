@@ -9,7 +9,7 @@
 import { el, icon } from "../core/dom";
 import { showConfirm, showInput } from "../core/dialog";
 import { probeRelay, relayBackendName } from "../bridge/v86-relay";
-import { ensureGuestRoot, guestRootInfo, resetGuestRoot } from "../bridge/guest-root";
+import { ensureGuestRoot, guestRootInfo, installedDistro, resetGuestRoot } from "../bridge/guest-root";
 import {
   getSettings,
   setSettings,
@@ -600,15 +600,21 @@ export function openSettings(win: Win, startPage?: string): void {
          Terminal say "no OS installed". Drop it, then re-unpack over the
          existing tree immediately. */
       reseedBtn.disabled = true;
-      void resetGuestRoot(vfs.GUEST_ROOT)
-        .then(() =>
-          ensureGuestRoot(vfs.GUEST_ROOT, {
-            install: true,
-            force: true,
-            status: (text) => {
-              info.textContent = text;
-            },
-          }),
+      /* Remember WHICH distro is installed before dropping the marker —
+         the marker is where that answer lives, and re-unpacking must put
+         back the same OS, not silently swap in the 32-bit default. */
+      void installedDistro(vfs.GUEST_ROOT)
+        .then((distro) =>
+          resetGuestRoot(vfs.GUEST_ROOT).then(() =>
+            ensureGuestRoot(vfs.GUEST_ROOT, {
+              install: true,
+              force: true,
+              ...(distro ? { distro } : {}),
+              status: (text) => {
+                info.textContent = text;
+              },
+            }),
+          ),
         )
         .then(refreshRoot)
         .catch((err: Error) => {

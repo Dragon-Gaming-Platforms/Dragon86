@@ -1,0 +1,12 @@
+{
+  "id": "arch-linux-64",
+  "kind": "distro",
+  "distro": "arch64",
+  "dump": "/",
+  "image": "initrd.gz",
+  "kernel": "bzImage",
+  "arch": [
+    "x86_64"
+  ],
+  "note": "Where the App Store dumps this entry: the whole 64-bit Arch userland is unpacked from initrd.gz into the OS filesystem's own /, replacing the 32-bit userland if that was installed. Only the x86_64 machine can boot it."
+}

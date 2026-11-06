@@ -33,7 +33,7 @@ import {
   upsertAppEntry,
   normExt,
 } from "../core/fs-apps";
-import { distroInstalled, ensureGuestRoot } from "../bridge/guest-root";
+import { ensureGuestRoot, installedDistro, type DistroId } from "../bridge/guest-root";
 import type { Win } from "../core/wm";
 
 const BASE = import.meta.env.BASE_URL;
@@ -86,6 +86,9 @@ interface AppManifest {
   dump?: string;
   image?: string;
   kernel?: string;
+  /** For kind "distro": which OS this entry installs (see DISTROS in
+      bridge/guest-root). Absent on the original entry → arch32. */
+  distro?: string;
 }
 
 type Tab = "home" | "apps" | "games" | "installed";
@@ -218,9 +221,11 @@ export function openStore(win: Win): void {
     }
     for (const app of catalog?.apps ?? []) {
       if (isDistro(app)) {
-        /* The distro is "installed" when / actually holds a bootable root —
-           the same test the Terminal uses, so the two never disagree. */
-        if (await distroInstalled(vfs.GUEST_ROOT)) installedIds.add(app.id);
+        /* A distro is "installed" when / holds a bootable root unpacked
+           from *this* entry's initramfs — the same test the Terminal uses,
+           so the two never disagree. The two Arch entries share /, so at
+           most one of them is installed at a time. */
+        if ((await installedDistro(vfs.GUEST_ROOT)) === distroIdFor(app)) installedIds.add(app.id);
         continue;
       }
       if (await vfs.exists(`${dumpDirFor(app)}/${app.entry ?? "index.html"}`)) {
@@ -640,6 +645,12 @@ export function openStore(win: Win): void {
     return manifestFor(app)?.kind === "distro";
   }
 
+  /** Which OS a distro entry installs (its manifest's word; arch32 when
+      the manifest predates the 64-bit build). */
+  function distroIdFor(app: StoreApp): DistroId {
+    return (manifestFor(app)?.distro as DistroId) ?? "arch32";
+  }
+
   /** The folder an ordinary app's files are dumped into, per its manifest. */
   function dumpDirFor(app: StoreApp): string {
     const dump = manifestFor(app)?.dump;
@@ -735,6 +746,9 @@ export function openStore(win: Win): void {
     try {
       const res = await ensureGuestRoot(vfs.GUEST_ROOT, {
         install: true,
+        /* Which OS to unpack — the two Arch entries share / and replace
+           each other; installing (x86-64) over (x86) is the switch. */
+        distro: distroIdFor(app),
         status: (text) => {
           status.textContent = `${app.name}: ${text}`;
         },

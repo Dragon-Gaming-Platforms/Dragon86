@@ -16,7 +16,7 @@ import { getSettings, onSettingsChange, type MachineArch } from "../core/setting
 import type { Win } from "../core/wm";
 import type { TerminalBackend } from "../bridge/engine";
 import { getV86Backend } from "../bridge/v86";
-import { distroInstalled } from "../bridge/guest-root";
+import { distroInstalled, installedDistro, DISTROS } from "../bridge/guest-root";
 import * as vfs from "../core/vfs";
 import { isolationReport, logInfo, logWarn } from "../core/log";
 import { rememberEngine } from "./engine-viewer";
@@ -250,11 +250,36 @@ export function openTerminal(win: Win, options: TerminalOptions = {}): void {
     term.writeln("");
     term.writeln(`  The machine has nothing to boot: no OS is installed in /.`);
     term.writeln("");
-    term.writeln(`  Open the ${BOLD}App Store${RESET} and install ${BOLD}Arch Linux (x86)${RESET} — it unpacks`);
-    term.writeln(`  a real Arch userland into your filesystem's /, and this machine`);
+    term.writeln(`  Open the ${BOLD}App Store${RESET} and install ${BOLD}Arch Linux${RESET} — (x86) runs on both`);
+    term.writeln(`  x86 machines, (x86-64) only on the x86-64 machine. It unpacks a`);
+    term.writeln(`  real Arch userland into your filesystem's /, and this machine`);
     term.writeln(`  boots it. Then hit ${BOLD}Reconnect${RESET} here.`);
     term.writeln("");
     setChip("offline", "No operating system installed — see the App Store");
+  };
+
+  /** Honest refusal, the third kind: an OS is installed, but this CPU
+      cannot run it — Arch Linux (x86-64) on the 32-bit machine. The same
+      rule real hardware enforces (the other direction, the 32-bit OS on
+      the x86-64 machine, boots fine and is allowed). */
+  const wrongArchBanner = (arch: MachineArch, distroName: string) => {
+    term.clear();
+    term.writeln(`${BOLD}${RED}  ╔══════════════════════════════════════════╗${RESET}`);
+    term.writeln(`${BOLD}${RED}  ║        DRAGON86  ·  TERMINAL             ║${RESET}`);
+    term.writeln(`${BOLD}${RED}  ╚══════════════════════════════════════════╝${RESET}`);
+    term.writeln("");
+    term.writeln(`  ${GREEN}●${RESET} Terminal emulator : ready`);
+    term.writeln(`  ${GREEN}●${RESET} ${ARCH_LABEL[arch]} machine : ready`);
+    term.writeln(`  ${RED}●${RESET} Operating system  : ${distroName} — needs a 64-bit CPU`);
+    term.writeln("");
+    term.writeln(`  ${distroName} is installed in /, but this machine's CPU is`);
+    term.writeln(`  32-bit — a 64-bit kernel cannot run on it, here or on real`);
+    term.writeln(`  hardware.`);
+    term.writeln("");
+    term.writeln(`  Switch Settings → Machine to ${BOLD}x86-64${RESET}, or install`);
+    term.writeln(`  ${BOLD}${DISTROS.arch32.name}${RESET} from the App Store instead.`);
+    term.writeln("");
+    setChip("offline", `${distroName} needs the x86-64 machine`);
   };
 
   /* The window title says which machine is behind this terminal. The user
@@ -296,6 +321,14 @@ export function openTerminal(win: Win, options: TerminalOptions = {}): void {
       viewEngineBtn.style.display = "none";
       flushPrint();
       noOsBanner(arch);
+      return;
+    }
+    const distro = await installedDistro(vfs.GUEST_ROOT);
+    if (distro && !DISTROS[distro].runsOn.includes(arch)) {
+      saveStateBtn.style.display = "none";
+      viewEngineBtn.style.display = "none";
+      flushPrint();
+      wrongArchBanner(arch, DISTROS[distro].name);
       return;
     }
     saveStateBtn.style.display = "";

@@ -1,6 +1,7 @@
 {
   "id": "arch-linux",
   "kind": "distro",
+  "distro": "arch32",
   "dump": "/",
   "image": "initrd.gz",
   "kernel": "bzImage",

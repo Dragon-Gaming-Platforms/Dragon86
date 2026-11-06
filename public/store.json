@@ -17,6 +17,20 @@
       "description": "A real Arch Linux userland (bash, coreutils, git, kernel modules) for the x86 machines in the Terminal. Installing unpacks it into your filesystem's own / \u2014 every file of the distro becomes a normal file in Files, and the machine boots it from there over 9p. Nothing boots until this is installed: the Terminal will tell you to come here first. Uninstalling is not offered because the distro's files are woven into /; Settings \u2192 Machine can re-unpack it if it breaks."
     },
     {
+      "id": "arch-linux-64",
+      "name": "Arch Linux (x86-64)",
+      "sub": "Arch's own 64-bit build, for the x86-64 machine",
+      "category": "System",
+      "publisher": "Arch Linux x86_64 \u00b7 Dragon86 build",
+      "icon": "linux",
+      "base": "arch64/",
+      "files": [
+        "initrd.gz",
+        "bzImage"
+      ],
+      "description": "Arch Linux as Arch builds it for real 64-bit machines: the linux-lts kernel, 64-bit bash, coreutils and glibc straight from Arch's packages, and a static 64-bit git with networking and HTTPS git clone \u2014 the same tooling as the x86 build, compiled for x86_64. It needs the x86-64 machine (Settings \u2192 Machine); a 32-bit CPU cannot run it, here or anywhere. The two Arch entries share your filesystem's /, so installing this one replaces the installed (x86) userland in place \u2014 your own files stay."
+    },
+    {
       "id": "nes",
       "name": "NES",
       "sub": "Play NES games from your files",

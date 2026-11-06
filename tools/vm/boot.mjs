@@ -244,7 +244,13 @@ async function main() {
 
   const emu = new V86({
     wasm_path: resolve(repo, `${ENGINE_DIR}/v86.wasm`),
-    memory_size: (process.env.MEMORY_MB ? Number(process.env.MEMORY_MB) : 128) * 1024 * 1024,
+    /* Default mirrors src/bridge/v86.ts: 256 MB for the 64-bit machine
+       (Arch's x86_64 kernel needs a ~68 MB extraction area), 128 for the
+       32-bit one. MEMORY_MB overrides. */
+    memory_size:
+      (process.env.MEMORY_MB ? Number(process.env.MEMORY_MB) : process.env.CPU_TYPE === "x86_64" ? 256 : 128) *
+      1024 *
+      1024,
     /* v64 renamed vga_memory_size to vram_size and rejects the old name,
        and it loads its display as a plugin beside the bundle — which this
        harness moved, so the plugin needs its real path. */
