@@ -1,0 +1,12 @@
+{
+  "id": "alpine-linux-riscv64",
+  "kind": "distro",
+  "distro": "alpine-rv64",
+  "dump": "/",
+  "image": "initrd.gz",
+  "kernel": "Image",
+  "arch": [
+    "riscv64"
+  ],
+  "note": "Where the App Store dumps this entry: the whole Alpine riscv64 userland is unpacked from initrd.gz into the OS filesystem's own /, replacing whatever distro was installed. Only the RISC-V 64 machine can boot it."
+}

@@ -546,6 +546,12 @@ export function openSettings(win: Win, startPage?: string): void {
           "A 64-bit x86 machine. It boots the same installed 32-bit distro, the way real x86-64 hardware boots a 32-bit OS.",
       },
       {
+        id: "riscv64",
+        label: "RISC-V 64",
+        blurb:
+          "A RISC-V 64 machine (the rv64.js emulator). Boots Alpine Linux (RISC-V 64) from the App Store — serial console only; this machine has no display device.",
+      },
+      {
         id: "arm64",
         label: "ARM64",
         blurb:

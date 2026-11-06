@@ -31,6 +31,20 @@
       "description": "Arch Linux as Arch builds it for real 64-bit machines: the linux-lts kernel, 64-bit bash, coreutils and glibc straight from Arch's packages, and a static 64-bit git with networking and HTTPS git clone \u2014 the same tooling as the x86 build, compiled for x86_64. It needs the x86-64 machine (Settings \u2192 Machine); a 32-bit CPU cannot run it, here or anywhere. The two Arch entries share your filesystem's /, so installing this one replaces the installed (x86) userland in place \u2014 your own files stay."
     },
     {
+      "id": "alpine-linux-riscv64",
+      "name": "Alpine Linux (RISC-V 64)",
+      "sub": "Official Alpine riscv64, for the RISC-V 64 machine",
+      "category": "System",
+      "publisher": "Alpine Linux riscv64 \u00b7 Dragon86 build",
+      "icon": "linux",
+      "base": "rv64/",
+      "files": [
+        "initrd.gz",
+        "Image"
+      ],
+      "description": "Alpine Linux as Alpine builds it for real RISC-V 64 hardware: busybox, musl, bash and Alpine's own git \u2014 a full build with working HTTPS, so git clone https://\u2026 runs natively, no helper needed. Networking comes up by itself through the emulator's fetch backend. It needs the RISC-V 64 machine (Settings \u2192 Machine); an x86 CPU cannot run it, here or anywhere. The distros share your filesystem's /, so installing this one replaces the installed Arch userland in place \u2014 your own files stay. This machine has no display: the Terminal's serial console is its console."
+    },
+    {
       "id": "nes",
       "name": "NES",
       "sub": "Play NES games from your files",

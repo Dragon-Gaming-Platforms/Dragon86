@@ -593,7 +593,7 @@ class V86Backend implements TerminalBackend {
       if (installed && !DISTROS[installed].runsOn.includes(arch)) {
         throw new Error(
           `${DISTROS[installed].name} is installed, and a ${arch === "x86_32" ? "32-bit" : arch} CPU cannot run it — ` +
-            `switch Settings → Machine to x86_64, or install ${DISTROS.arch32.name} from the App Store`,
+            `switch Settings → Machine to ${DISTROS[installed].runsOn.join("/")}, or install an OS built for this machine from the App Store`,
         );
       }
 

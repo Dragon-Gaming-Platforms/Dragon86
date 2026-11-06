@@ -1,0 +1,198 @@
+#!/bin/sh
+# Dragon86 rv64 guest init (RISC-V 64, Alpine userland).
+#
+# Same shape as the x86 init (tools/guest-init/init), minus everything that
+# machine had and this one does not:
+#   - no kernel modules: the vendored rv64.js kernel builds 9p, virtio and
+#     the 8250 serial console in (MODULES=n), so there is nothing to modprobe
+#   - no VGA, no PS/2: the machine's only console is the serial line; the
+#     Engine Viewer story for riscv64 is the serial console, not a screen
+#   - virtio devices are MMIO, not PCI — the wait below watches the same
+#     /sys/bus/virtio tree, which is transport-agnostic
+#
+# The root filesystem is still not in this initramfs: it is Dragon86's ZenFS
+# `/`, served over virtio-9p by src/bridge/p9.ts (tag host9p). This script
+# brings up the console and the network, mounts that share at /newroot and
+# chroots a session into it. If the share is absent we fall back to a shell
+# in this initramfs — which is a complete Alpine userland, so the fallback
+# is usable, and says plainly what is missing.
+export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+mount -t proc -o noexec,nosuid,nodev proc /proc 2>/dev/null
+mount -t sysfs -o noexec,nosuid,nodev sysfs /sys 2>/dev/null
+mount -t devtmpfs devtmpfs /dev 2>/dev/null
+mkdir -p /dev/pts /newroot /run /run/rv64-proxy
+mount -t devpts devpts /dev/pts 2>/dev/null
+mount -t tmpfs tmpfs /run 2>/dev/null
+mkdir -p /run/rv64-proxy
+
+# serial line size arrives on the kernel cmdline (d86cols/d86rows) —
+# serial has no winsize channel, so the host tells us up front, in-band.
+COLS=80; ROWS=24
+for p in $(cat /proc/cmdline); do
+  case "$p" in
+    d86cols=*) COLS="${p#d86cols=}" ;;
+    d86rows=*) ROWS="${p#d86rows=}" ;;
+  esac
+done
+stty -F /dev/ttyS0 rows "$ROWS" cols "$COLS" 2>/dev/null
+
+# Talk to the serial line directly from here on. init's stdout is
+# /dev/console — the same tty — so without this every line prints twice.
+exec >/dev/ttyS0 2>&1
+
+ip link set lo up 2>/dev/null
+
+# Networking. rv64.js's fetch backend gives the guest a fixed link:
+# NIC at 10.0.2.15, HTTP(S) egress through the emulator's proxy at
+# 10.0.2.2:8080 (the guest sets http_proxy via /etc/profile.d/rv64-proxy.sh,
+# which checks the same cmdline flag). Other modes lease over DHCP.
+(
+  for i in $(seq 1 30); do
+    [ -e /sys/class/net/eth0 ] && break
+    sleep 0.5
+  done
+  [ -e /sys/class/net/eth0 ] || exit 0
+  ip link set eth0 up 2>/dev/null
+  if grep -qw 'rv64.network=fetch' /proc/cmdline; then
+    ip addr add 10.0.2.15/24 dev eth0 2>/dev/null
+    ip route replace default via 10.0.2.2 2>/dev/null
+  else
+    udhcpc -i eth0 -q -n -t 6 -T 3 >/dev/null 2>&1
+  fi
+) &
+
+# Virtio probes are quick here (builtin drivers, MMIO transport), but still
+# asynchronous: wait for the first device before burning a 9p mount attempt.
+for i in $(seq 1 100); do
+  [ -e /sys/bus/virtio/devices/virtio0 ] && break
+  sleep 0.1
+done
+
+MOUNT_ROOT_ERR=
+mount_root() {
+  mountpoint -q /newroot && return 0
+  for i in $(seq 1 40); do
+    # Keep mount's own message: when this fails it is the only description
+    # of why (no device, wrong tag, backend refused the client).
+    MOUNT_ROOT_ERR=$(mount -t 9p -o trans=virtio,version=9p2000.L,cache=loose,msize=1048576 host9p /newroot 2>&1)
+    [ $? -eq 0 ] && return 0
+    mountpoint -q /newroot && return 0
+    sleep 1
+  done
+  return 1
+}
+
+setup_mounts() {
+  mkdir -p /newroot/proc /newroot/sys /newroot/dev /newroot/tmp /newroot/run /newroot/root
+  mount --bind /proc /newroot/proc 2>/dev/null
+  mount --bind /sys /newroot/sys 2>/dev/null
+  mount --bind /dev /newroot/dev 2>/dev/null
+  mount -t tmpfs tmpfs /newroot/tmp 2>/dev/null
+  mount -t tmpfs tmpfs /newroot/run 2>/dev/null
+}
+
+teardown_mounts() {
+  umount /newroot/proc /newroot/sys /newroot/dev /newroot/tmp /newroot/run 2>/dev/null
+  umount /newroot 2>/dev/null
+}
+
+# The emulator's fetch proxy terminates the guest's TLS, so HTTPS only
+# verifies if the guest trusts the per-VM CA it exposes on the read-only
+# 9p tag `rv64-proxy`. Install it into the mounted root (that is where the
+# session lives); update-ca-certificates regenerates the bundle, so doing
+# this every boot is idempotent. If anything here is missing the shell still
+# arrives — HTTPS inside the guest just says so when it fails to verify.
+install_proxy_ca() {
+  grep -qw 'rv64.network=fetch' /proc/cmdline || return 0
+  mountpoint -q /run/rv64-proxy || \
+    mount -t 9p -o trans=virtio,version=9p2000.L,ro rv64-proxy /run/rv64-proxy 2>/dev/null || return 0
+  [ -f /run/rv64-proxy/ca.der ] || return 0
+  mkdir -p /newroot/usr/local/share/ca-certificates
+  openssl x509 -inform DER -in /run/rv64-proxy/ca.der \
+    -out /newroot/usr/local/share/ca-certificates/rv64-proxy.crt 2>/dev/null || return 0
+  chroot /newroot /usr/sbin/update-ca-certificates >/dev/null 2>&1 || true
+}
+
+run_session() {
+  HOME=/root
+  TERM=xterm-256color
+  export HOME TERM
+  # Alpine's bash lives at /bin/bash; setsid (busybox) makes it a session
+  # leader with ttyS0 as its controlling terminal (job control, Ctrl-C).
+  if [ -x /newroot/usr/bin/setsid ] || [ -x /newroot/bin/setsid ]; then
+    chroot /newroot /usr/bin/env setsid -c /bin/bash -l </dev/ttyS0 >/dev/ttyS0 2>&1
+  else
+    chroot /newroot /bin/bash -l </dev/ttyS0 >/dev/ttyS0 2>&1
+  fi
+}
+
+if mount_root; then
+  # A lost execute bit on bash locks the session out (a 9p write can land
+  # 0644). Repair it through the mount we just made, and say so.
+  if [ ! -x /newroot/bin/bash ] && [ -f /newroot/bin/bash ]; then
+    chmod 755 /newroot/bin/bash 2>/dev/null
+    echo "  note: /bin/bash was not executable; tried to fix its mode."
+  fi
+fi
+
+if mount_root && { [ -x /newroot/bin/bash ] || [ -L /newroot/bin/bash ]; }; then
+  setup_mounts
+  install_proxy_ca
+  clear 2>/dev/null
+  echo ""
+  echo "  Dragon86 Linux (rv64 engine - RISC-V 64, Alpine userland)"
+  echo "  ----------------------------------------------------------"
+  echo "  / here IS the / in Dragon86's Files - edit either side, both see it."
+  echo "  Your home is /home/user: Documents, Downloads and Desktop included."
+  echo "  This machine has no screen: the serial console is the console."
+  echo ""
+  try=1
+  while [ "$try" -le 4 ]; do
+    setup_mounts
+    started=$(cut -d' ' -f1 /proc/uptime)
+    run_session
+    status=$?
+    ended=$(cut -d' ' -f1 /proc/uptime)
+    echo ""
+    echo "  Session ended (status $status). Respawning in 2s — Ctrl-C to stay in the initramfs."
+    sleep 2
+    lived=$(awk -v a="$started" -v b="$ended" 'BEGIN{printf "%d", b-a}')
+    try=$((try + 1))
+    if [ "${lived:-0}" -lt 5 ]; then
+      teardown_mounts
+      mount_root || break
+    fi
+  done
+  echo "  The guest shell keeps exiting at once; dropping to the initramfs recovery shell."
+  echo ""
+fi
+
+# Fallback: no 9p root (first boot still unpacking, or the host has none).
+# This initramfs is a complete Alpine userland, so the shell is real.
+(
+  for i in $(seq 1 10); do
+    mountpoint -q /newroot 2>/dev/null && exit 0
+    mount -t 9p -o trans=virtio,version=9p2000.L,cache=loose,msize=1048576 host9p /newroot 2>/dev/null && exit 0
+    sleep 2
+  done
+) &
+
+export HOME=/root
+export TERM=xterm-256color
+clear 2>/dev/null
+echo ""
+echo "  Dragon86 Linux (rv64 · Alpine riscv64) — recovery shell"
+echo "  ------------------------------------------------------"
+echo "  The distro root is not serving, so this is the fallback shell."
+[ -n "$MOUNT_ROOT_ERR" ] && echo "  mount said: $MOUNT_ROOT_ERR"
+echo "  Reconnect from the Terminal to try again."
+echo ""
+cd /
+while true; do
+  if command -v setsid >/dev/null 2>&1; then
+    setsid -c /bin/bash -l </dev/ttyS0 >/dev/ttyS0 2>&1
+  else
+    /bin/bash -l </dev/ttyS0 >/dev/ttyS0 2>&1
+  fi
+  sleep 1
+done

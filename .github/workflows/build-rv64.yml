@@ -1,0 +1,79 @@
+name: Build rv64 guest
+
+# Builds public/rv64/ — the RISC-V 64 engine (justwasm/rv64.js, pinned
+# release, checksum-verified) plus its Alpine riscv64 guest — and commits
+# it to the branch the workflow ran on.
+#
+# Why a workflow: the release assets live on release-assets.githubusercontent.com
+# and the userland comes from Alpine's package CDN — hosts the development
+# sandbox cannot reach. See tools/build-rv64-guest.sh for the full story.
+#
+# Triggers: pushing the build scripts (or this file), or a manual dispatch.
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/build-rv64.yml"
+      - "tools/build-rv64-guest.sh"
+      - "tools/rv64-collect.sh"
+      - "tools/make-rv64-initrd.py"
+      - "tools/guest-init/init-rv64"
+
+permissions:
+  contents: write
+
+concurrency: build-rv64
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout Dragon86
+        uses: actions/checkout@v4
+
+      - name: Build engine + guest
+        run: |
+          chmod +x tools/build-rv64-guest.sh tools/rv64-collect.sh
+          sh tools/build-rv64-guest.sh
+
+      - name: Write VENDORED.md
+        run: |
+          TAG=$(cat public/rv64/ENGINE_TAG)
+          {
+            echo "# public/rv64 — vendored RISC-V 64 engine + Alpine guest"
+            echo
+            echo "Built by the 'Build rv64 guest' workflow — not written by hand."
+            echo
+            echo "- rv64.js / rv64.worker.js / rv64.d.ts / rv64_wasm.wasm: the"
+            echo "  justwasm/rv64.js emulator, release ${TAG}, taken as-is from"
+            echo "  that release and verified against its SHA256SUMS. MIT licensed"
+            echo "  (see LICENSE here)."
+            echo "- Image: the same release's riscv64 Linux kernel ('minimal'"
+            echo "  flavour). 9p, virtio-mmio and the 8250 serial console are"
+            echo "  built in; MODULES=n, so the guest ships no modules. GPL-2.0."
+            echo "- initrd.gz: official Alpine Linux riscv64 (minirootfs + apk"
+            echo "  packages bash, git, ca-certificates, openssl — Alpine's own"
+            echo "  riscv64 binaries, cross-extracted, nothing rebuilt) plus"
+            echo "  Dragon86's /init and /etc overlay. Also the App Store distro"
+            echo "  payload. Alpine packages: MIT/GPL and others, see each"
+            echo "  package; assembly: tools/rv64-collect.sh."
+            echo
+            echo "Built: $(date -u +%Y-%m-%dT%H:%M:%SZ) by GitHub Actions run ${{ github.run_id }}"
+            echo "Rebuild: run the 'Build rv64 guest' workflow (it overwrites these files)."
+          } > public/rv64/VENDORED.md
+          ls -la public/rv64
+          du -sh public/rv64
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A public/rv64
+          if git diff --cached --quiet; then
+            echo "build output unchanged — nothing to commit"
+          else
+            git commit -m "Vendor the RISC-V 64 engine + Alpine guest (public/rv64)"
+            git push origin "HEAD:${{ github.ref_name }}"
+          fi

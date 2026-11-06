@@ -5,10 +5,10 @@ export type ThemeId = "dragon" | "cyberpunk" | "purple" | "matrix" | "amoled" | 
 /**
  * The CPU architecture of the Terminal's machine. The user picks hardware,
  * not an emulator: the right engine is chosen behind the scenes
- * (bridge/v86.ts — the vendored v86 build for 32-bit x86, the vendored v64
- * build for x86-64 and ARM64).
+ * (bridge/v86.ts — the vendored v64 build for the x86 machines and ARM64;
+ * bridge/rv64.ts — the vendored rv64.js build for RISC-V 64).
  */
-export type MachineArch = "x86_32" | "x86_64" | "arm64";
+export type MachineArch = "x86_32" | "x86_64" | "arm64" | "riscv64";
 
 export interface Settings {
   theme: ThemeId;

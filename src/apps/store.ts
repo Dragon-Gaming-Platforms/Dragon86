@@ -618,7 +618,7 @@ export function openStore(win: Win): void {
     if (isDistro(app)) {
       /* The manifest dumps this one at /: the whole userland becomes your
          filesystem's root, not a folder under system/apps. */
-      files.append(el("code", undefined, `/ — the Arch userland, unpacked from ${manifestFor(app)?.image ?? "initrd.gz"}`));
+      files.append(el("code", undefined, `/ — the distro's userland, unpacked from ${manifestFor(app)?.image ?? "initrd.gz"}`));
       files.append(el("code", undefined, `/boot/vmlinuz + /boot/initrd.gz — what the machine boots`));
     } else {
       const dumpRel = dumpDirFor(app).replace(`${vfs.HOME}/`, "");
