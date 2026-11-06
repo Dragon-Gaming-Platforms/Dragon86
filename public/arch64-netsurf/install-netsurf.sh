@@ -51,6 +51,25 @@ echo "unpacking NetSurf into / (over 9p - this takes a while) ..."
 cat "$P"/netsurf64.tar.gz.part* | tar -xzv -C / > "$LIST"
 sync
 echo
+
+# gdk-pixbuf decodes images through glycin's loader processes, which default
+# to a bwrap sandbox this minimal guest can't provide (gtk aborts drawing its
+# first icon otherwise). Replace Arch's thin wrapper with one that runs the
+# loaders unsandboxed - proven necessary and sufficient in the harness.
+if [ -x /usr/bin/netsurf-gtk3 ]; then
+  cat > /usr/bin/netsurf <<'WRAP'
+#!/bin/sh
+# Dragon86 wrapper around netsurf-gtk3 (replaces Arch's LANG-only wrapper)
+export GLYCIN_DISABLE_SANDBOX=i-know-the-risks
+export GLYCIN_SANDBOX_MECHANISM=not-sandboxed
+export HOME="${HOME:-/root}"
+LANG_PREFIX=${LANG%%[._]*}; LANG_PREFIX=${LANG_PREFIX:-en}
+[ -d "/usr/share/netsurf/$LANG_PREFIX" ] || export LANG=en_US.UTF-8
+exec /usr/bin/netsurf-gtk3 "$@"
+WRAP
+  chmod 755 /usr/bin/netsurf
+fi
+
 FRONTEND=$(cat /usr/share/netsurf-d86-frontend 2>/dev/null || echo unknown)
 echo "Installed (NetSurf's $FRONTEND frontend, as Arch builds it)."
 case "$FRONTEND" in
