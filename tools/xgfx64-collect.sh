@@ -217,7 +217,11 @@ shippkg() { # pkg
   pacman -Ql "$1" | while read -r _ f; do
     case "$f" in
       */) mkdir -p "$N${f%/}" ;;
-      *) mkdir -p "$N$(dirname "$f")"; cp -a "$f" "$N$f" ;;
+      *)
+        # the build container strips man/doc pages, so pacman can list
+        # files that aren't on disk - skip those instead of dying
+        [ -e "$f" ] || { echo "shippkg: skipping missing $f"; continue; }
+        mkdir -p "$N$(dirname "$f")"; cp -a "$f" "$N$f" ;;
     esac
   done
 }
