@@ -27,7 +27,20 @@ pacman -S --noconfirm --needed \
   xorg-fonts-misc xkeyboard-config xterm icewm ttf-dejavu fontconfig \
   xorg-mkfontscale \
   netsurf gsettings-desktop-schemas shared-mime-info adwaita-icon-theme \
-  glycin-loaders bubblewrap >/dev/null
+  bubblewrap >/dev/null
+
+# gdk-pixbuf's image decoding lives in glycin's loader processes now; the
+# upstream error message says "glycin-loaders" but Arch's package name has
+# moved around — find it instead of assuming, and leave the search in the
+# log for the day it moves again.
+pacman -Ss glycin || true
+pacman -Si gdk-pixbuf2 | sed -n '/Depends On/,/^Conflicts/p' || true
+GLYCIN_PKG=""
+for cand in glycin-loaders glycin libglycin glycin2-loaders; do
+  pacman -Si "$cand" >/dev/null 2>&1 && { GLYCIN_PKG=$cand; break; }
+done
+[ -n "$GLYCIN_PKG" ] || { echo "no glycin package found in the repos - see the search above"; exit 1; }
+pacman -S --noconfirm --needed "$GLYCIN_PKG" >/dev/null
 
 # ---- shared-library closure: copy every library a binary (or module) pulls
 # ---- in, into <dest>/usr/lib. ldd covers dlopen'd X drivers too because we
@@ -209,7 +222,7 @@ shippkg() { # pkg
   done
 }
 shippkg netsurf
-shippkg glycin-loaders
+shippkg "$GLYCIN_PKG"
 shippkg bubblewrap
 
 is_elf() { [ -f "$1" ] && [ "$(head -c4 "$1" | od -An -tx1 | tr -d ' \n')" = "7f454c46" ]; }
