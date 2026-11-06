@@ -1,0 +1,90 @@
+name: Build arch64 guest
+
+# Builds public/arch64/ — the 64-bit Arch Linux guest for the App Store —
+# and commits it to the branch the workflow ran on.
+#
+#   bzImage            Arch's own x86_64 kernel (the `linux` package)
+#   initrd.gz          Arch x86_64 userland + static 64-bit git, assembled
+#                      in the proven layout of the 32-bit initrd
+#   git-remote-http.gz static x86_64-musl HTTPS transport (curl + mbedTLS),
+#                      same pinned recipe as tools/build-git-remote-http.sh
+#
+# Why a workflow: the kernel and userland come from Arch's package mirrors
+# via the official archlinux Docker image — hosts the development sandbox
+# cannot reach. The runner is x86_64, so the git binaries built here are
+# smoke-checked by actually running them before they ship.
+#
+# Triggers: pushing the build scripts (or this file), or a manual dispatch.
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/build-arch64.yml"
+      - "tools/build-arch64-guest.sh"
+      - "tools/arch64-collect.sh"
+      - "tools/make-arch64-initrd.py"
+
+permissions:
+  contents: write
+
+concurrency: build-arch64
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout Dragon86
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Build the guest
+        run: |
+          chmod +x tools/build-arch64-guest.sh tools/arch64-collect.sh
+          sh tools/build-arch64-guest.sh
+
+      - name: Write VENDORED.md
+        run: |
+          KVER=$(cat /tmp/d86-arch64-build/stage/kver)
+          {
+            echo "# public/arch64 — vendored 64-bit Arch Linux guest"
+            echo
+            echo "Built by the 'Build arch64 guest' workflow — not written by hand."
+            echo
+            echo "- bzImage: Arch Linux \`linux\` package kernel, version ${KVER},"
+            echo "  taken as-is from the official \`archlinux\` Docker image via pacman."
+            echo "- initrd.gz: Arch's x86_64 bash/coreutils/grep/sed/gawk/kmod/"
+            echo "  util-linux + glibc, busybox for the rest, the virtio/9p/serial/"
+            echo "  keyboard modules for ${KVER}, and a static 64-bit git"
+            echo "  (git/git v2.49.1, zig cc, x86_64-linux-musl, NO_CURL)."
+            echo "  The non-userland entries (/init, /networking.sh, /etc, device"
+            echo "  nodes) are reused verbatim from public/v86/initrd.gz — they are"
+            echo "  shell scripts and text, not binaries. See tools/make-arch64-initrd.py."
+            echo "- git-remote-http.gz: git v2.49.1 HTTPS transport, static"
+            echo "  x86_64-linux-musl, libcurl 8.11.1 + mbedTLS 3.6.2 + zlib 1.3.1 —"
+            echo "  the same pinned recipe as tools/build-git-remote-http.sh."
+            echo "  Licenses: see public/v86/LICENSE.git/.curl/.mbedtls (same sources)."
+            echo "- CA bundle: the guest reuses public/v86/ca-certificates.crt."
+            echo
+            echo "Built: $(date -u +%Y-%m-%dT%H:%M:%SZ) by GitHub Actions run ${{ github.run_id }}"
+            echo "Rebuild: run the 'Build arch64 guest' workflow (it overwrites these files)."
+          } > public/arch64/VENDORED.md
+          ls -la public/arch64
+          du -sh public/arch64
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A public/arch64
+          if git diff --cached --quiet; then
+            echo "build output unchanged — nothing to commit"
+          else
+            git commit -m "Vendor the 64-bit Arch Linux guest (public/arch64)"
+            git push origin "HEAD:${{ github.ref_name }}"
+          fi
