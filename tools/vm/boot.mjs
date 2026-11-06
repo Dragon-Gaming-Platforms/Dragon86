@@ -20,7 +20,7 @@
 import { createRequire } from "node:module";
 import { gunzipSync } from "node:zlib";
 import * as fsp from "node:fs/promises";
-import { existsSync, mkdirSync, writeFileSync, readFileSync, rmSync } from "node:fs";
+import { existsSync, mkdirSync, writeFileSync, readFileSync, readdirSync, rmSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -188,6 +188,15 @@ const ENGINE_DIR = process.env.ENGINE_DIR ?? "public/v86";
 const LIBV86 = resolve(here, "build/libv86.cjs");
 mkdirSync(dirname(LIBV86), { recursive: true });
 writeFileSync(LIBV86, readFileSync(resolve(repo, `${ENGINE_DIR}/libv86.js`)));
+/* Upstream v64 gives a default PC its cards (NE2000, SB16…) as plugin
+   files loaded from beside the bundle — exactly like the display plugin.
+   The bundle lives in build/ here, so the plugins must live there too, or
+   the start fails with "cannot load …/v86-ne2k.js". */
+for (const f of readdirSync(resolve(repo, ENGINE_DIR))) {
+  if (/^v86-.*\.js$/.test(f)) {
+    writeFileSync(resolve(here, "build", f), readFileSync(resolve(repo, `${ENGINE_DIR}/${f}`)));
+  }
+}
 const { V86 } = require(LIBV86);
 console.log(`[harness] engine: ${ENGINE_DIR}`);
 
@@ -263,6 +272,12 @@ async function main() {
     screen: { ansi: true },
   });
   emu.add_listener("serial0-output-byte", onByte);
+  /* The newer v64 reports a failed start here instead of throwing — without
+     this listener a missing plugin is an eternal silent stall. */
+  emu.add_listener("emulator-error", (err) => {
+    console.error("[harness] emulator-error:", (err && err.message) || err);
+    process.exit(1);
+  });
   globalThis.__emu = emu;
 
   const shell = await waitFor(/dragon86:.*[#$]|recovery shell/i, BOOT_TIMEOUT);

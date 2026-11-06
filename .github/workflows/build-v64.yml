@@ -1,8 +1,10 @@
 name: Build v64
 
 # Builds the v64 emulator (a v86 fork: x86 32/64-bit + ARM64, same JS API)
-# from a pinned upstream commit and commits the build output to public/v64/
-# on the branch the workflow ran on.
+# from a pinned commit of the upstream repo, speedyHKjournalist/v64, and
+# commits the build output to public/v64/ on the branch the workflow ran on.
+# (An earlier vendor came from Marukon/v64, a behind-upstream fork of the
+# same repo; this builds the real upstream.)
 #
 # Why a workflow: the build needs Rust (wasm32 target), clang and the Closure
 # Compiler — toolchains the development sandbox cannot install. Upstream's own
@@ -23,8 +25,8 @@ permissions:
 concurrency: build-v64
 
 env:
-  V64_REPO: Marukon/v64
-  V64_COMMIT: b54882e1ff47d5c24da2870d41274f82531b8b9c
+  V64_REPO: speedyHKjournalist/v64
+  V64_COMMIT: 87d26deb9a77c2e98b4b684f39cc72ba9065d76a
 
 jobs:
   build:
@@ -37,8 +39,8 @@ jobs:
       - name: Checkout v64 (pinned)
         uses: actions/checkout@v4
         with:
-          repository: Marukon/v64
-          ref: b54882e1ff47d5c24da2870d41274f82531b8b9c
+          repository: speedyHKjournalist/v64
+          ref: 87d26deb9a77c2e98b4b684f39cc72ba9065d76a
           path: v64-src
 
       - name: Setup Node.js
