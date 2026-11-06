@@ -86,5 +86,13 @@ jobs:
             echo "build output unchanged — nothing to commit"
           else
             git commit -m "Vendor the 64-bit Arch Linux guest (public/arch64)"
-            git push origin "HEAD:${{ github.ref_name }}"
+            # Two vendor workflows triggered by the same push race each other
+            # to this push (seen: run 42150688193, rejected non-fast-forward
+            # when build-arch64 landed first). Rebase onto whatever won and
+            # try again — the build outputs live in different directories, so
+            # the rebase is always clean.
+            for i in 1 2 3; do
+              git push origin "HEAD:${{ github.ref_name }}" && break
+              git pull --rebase origin "${{ github.ref_name }}"
+            done
           fi
