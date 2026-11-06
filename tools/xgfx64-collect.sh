@@ -180,13 +180,31 @@ copymods "$X" bochs bochs_drm evdev psmouse
 du -sh "$X"
 
 # ============================================================ NetSurf pack ==
-# Which frontend Arch built NetSurf with is read off the binary itself, not
-# assumed (the first run of this script assumed gtk3 and was wrong — the
-# package links no gdk-pixbuf at all).
-NS_BIN=$(pacman -Ql netsurf | awk '$2 ~ /\/usr\/bin\/./ {print $2}' | head -1)
-[ -n "$NS_BIN" ]
-ldd "$NS_BIN"
-NS_LIBS=$(ldd "$NS_BIN" | awk '{print $1}')
+# Ship Arch's netsurf package verbatim — every file pacman lists (the
+# /usr/bin entry turned out to be a wrapper script, so no guessing which
+# file is "the binary": copy them all, then find the ELFs by magic).
+pacman -Ql netsurf
+pacman -Ql netsurf | while read -r _ f; do
+  case "$f" in
+    */) mkdir -p "$N${f%/}" ;;
+    *) mkdir -p "$N$(dirname "$f")"; cp -a "$f" "$N$f" ;;
+  esac
+done
+
+is_elf() { [ -f "$1" ] && [ "$(head -c4 "$1" | od -An -tx1 | tr -d ' \n')" = "7f454c46" ]; }
+NS_ELFS=""
+set +x
+while IFS= read -r f; do
+  is_elf "$f" && NS_ELFS="$NS_ELFS $f"
+done <<EOF
+$(find "$N" -type f)
+EOF
+set -x
+[ -n "$NS_ELFS" ] || { echo "the netsurf package ships no ELF at all? see the listing above"; exit 1; }
+ldd $NS_ELFS || true
+
+# which frontend Arch built it with — read off the binaries, not assumed
+NS_LIBS=$(ldd $NS_ELFS 2>/dev/null | awk '{print $1}' | sort -u || true)
 FRONTEND=unknown
 case "$NS_LIBS" in
   *libgtk-3*) FRONTEND=gtk3 ;;
@@ -198,14 +216,12 @@ esac
 echo "netsurf frontend: $FRONTEND"
 [ "$FRONTEND" != unknown ] || { echo "cannot tell what Arch's netsurf draws with - look at the ldd above"; exit 1; }
 
-cp -L "$NS_BIN" "$N/usr/bin/netsurf"
-[ -d /usr/share/netsurf ] && cp -a /usr/share/netsurf "$N/usr/share/netsurf"
 # toolkit runtime data, only what this frontend actually has installed
 [ -d /usr/lib/gdk-pixbuf-2.0 ] && cp -a /usr/lib/gdk-pixbuf-2.0 "$N/usr/lib/gdk-pixbuf-2.0"
 [ -d /usr/lib/gtk-3.0 ] && cp -a /usr/lib/gtk-3.0 "$N/usr/lib/gtk-3.0"
 [ -d /usr/lib/gtk-2.0 ] && cp -a /usr/lib/gtk-2.0 "$N/usr/lib/gtk-2.0"
 
-closure "$N" "$N/usr/bin/netsurf" \
+closure "$N" $NS_ELFS \
   $(find "$N/usr/lib/gdk-pixbuf-2.0" "$N/usr/lib/gtk-3.0" "$N/usr/lib/gtk-2.0" -name '*.so' 2>/dev/null)
 
 if [ -d /usr/share/glib-2.0/schemas ] && { [ "$FRONTEND" = gtk3 ] || [ "$FRONTEND" = gtk2 ]; }; then
