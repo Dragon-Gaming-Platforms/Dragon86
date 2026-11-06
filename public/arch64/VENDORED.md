@@ -2,11 +2,11 @@
 
 Built by the 'Build arch64 guest' workflow — not written by hand.
 
-- bzImage: Arch Linux `linux` package kernel, version 7.2.14-arch1-1,
+- bzImage: Arch Linux `linux` package kernel, version 6.18.60-1-lts,
   taken as-is from the official `archlinux` Docker image via pacman.
 - initrd.gz: Arch's x86_64 bash/coreutils/grep/sed/gawk/kmod/
   util-linux + glibc, busybox for the rest, the virtio/9p/serial/
-  keyboard modules for 7.2.14-arch1-1, and a static 64-bit git
+  keyboard modules for 6.18.60-1-lts, and a static 64-bit git
   (git/git v2.49.1, zig cc, x86_64-linux-musl, NO_CURL).
   The non-userland entries (/init, /networking.sh, /etc, device
   nodes) are reused verbatim from public/v86/initrd.gz — they are
@@ -17,5 +17,5 @@ Built by the 'Build arch64 guest' workflow — not written by hand.
   Licenses: see public/v86/LICENSE.git/.curl/.mbedtls (same sources).
 - CA bundle: the guest reuses public/v86/ca-certificates.crt.
 
-Built: 2026-11-06T01:09:35Z by GitHub Actions run 42141695756
+Built: 2026-11-06T01:39:05Z by GitHub Actions run 42144900201
 Rebuild: run the 'Build arch64 guest' workflow (it overwrites these files).
