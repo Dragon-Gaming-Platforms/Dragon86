@@ -49,15 +49,29 @@ window.IDBObjectStore = IDBObjectStore;
 window.IDBCursor = IDBCursor;
 Object.defineProperty(window, "crypto", { configurable: true, value: globalThis.crypto });
 window.structuredClone ??= globalThis.structuredClone;
-window.fetch = async (input) => {
+window.fetch = async (input, init = {}) => {
   const url = String(input);
   const rel = url.replace(/^https:\/\/example\.test/, "").replace(/^\/(Dragon86\/)?/, "");
   const path = resolve(here, "../..", "public", rel);
+  /* A minimal Headers so code that asks for content-length or
+     content-encoding (the store's size probe) sees what a real static
+     host would say. */
+  const headersFor = (len) => ({
+    get(name) {
+      return String(name).toLowerCase() === "content-length" ? String(len) : null;
+    },
+  });
   try {
     const body = readFileSync(path);
+    if (init.method === "HEAD") {
+      return { ok: true, status: 200, headers: headersFor(body.byteLength) };
+    }
     return {
       ok: true,
       status: 200,
+      headers: headersFor(body.byteLength),
+      /* no `body` stream on purpose: download code must survive a fetch
+         without one (older WebKit) by falling back to arrayBuffer(). */
       async json() {
         return JSON.parse(body.toString("utf8"));
       },
@@ -69,7 +83,13 @@ window.fetch = async (input) => {
       },
     };
   } catch {
-    return { ok: false, status: 404, async text() { return "not found"; }, async json() { throw new Error("404"); } };
+    return {
+      ok: false,
+      status: 404,
+      headers: headersFor(0),
+      async text() { return "not found"; },
+      async json() { throw new Error("404"); },
+    };
   }
 };
 /* jsdom has no compression streams of its own; a real browser does, and so

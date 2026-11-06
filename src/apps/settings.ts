@@ -40,6 +40,7 @@ import {
   checkPassword,
 } from "../core/trash";
 import { logInfo } from "../core/log";
+import { downloadBlob, exportFsSnapshot, snapshotFilename } from "../core/fs-export";
 
 interface Page {
   id: string;
@@ -71,6 +72,7 @@ const SEARCH_INDEX: SearchHit[] = [
   { page: "v86", pageTitle: "Machine", label: "Guest filesystem", keywords: "linux root unpack reset distro" },
   { page: "v86", pageTitle: "Machine", label: "v86 network", keywords: "relay wisp network internet" },
   { page: "storage", pageTitle: "Storage", label: "Disk usage", keywords: "space quota bytes indexeddb" },
+  { page: "storage", pageTitle: "Storage", label: "Export filesystem", keywords: "backup snapshot download tar zenfs save" },
   { page: "storage", pageTitle: "Storage", label: "Factory reset", keywords: "erase wipe delete everything" },
   { page: "about", pageTitle: "About", label: "System information", keywords: "version build vendor engines" },
 ];
@@ -702,6 +704,37 @@ export function openSettings(win: Win, startPage?: string): void {
         usage.textContent = "This browser does not report disk usage.";
       }
     })();
+
+    host.append(section("Export", "Take the whole filesystem with you."));
+    const exportRow = el("div", "settings-row");
+    exportRow.dataset.setting = "Export filesystem";
+    const exportBtn = el("button", "btn", "Export filesystem");
+    const exportNote = el("div", "settings-note", "");
+    exportBtn.addEventListener("click", async () => {
+      exportBtn.disabled = true;
+      exportBtn.textContent = "Exporting…";
+      try {
+        const { blob, files, bytes } = await exportFsSnapshot((p) => {
+          exportNote.textContent = `Packing… ${p.files} entries, ${formatBytes(p.bytes)} so far (${p.path})`;
+        });
+        downloadBlob(blob, snapshotFilename());
+        exportNote.textContent = `Done: ${files} entries, ${formatBytes(bytes)} of file data → ${formatBytes(blob.size)} compressed. The download is in your browser's Downloads.`;
+        logInfo("os", `filesystem exported: ${files} entries, ${bytes} bytes (${blob.size} compressed)`);
+      } catch (err) {
+        exportNote.textContent = `Export failed: ${(err as Error).message}`;
+      } finally {
+        exportBtn.disabled = false;
+        exportBtn.textContent = "Export filesystem";
+      }
+    });
+    exportRow.append(exportBtn);
+    host.append(exportRow);
+    host.append(
+      note(
+        "Downloads a snapshot of the ZenFS state as a .tar.gz — every file in / and /home, symlinks and permission bits included, exactly as they are right now. /tmp is skipped (it is in-memory scratch that empties on reload). With a distro installed this is the whole OS tree, so expect a big file.",
+      ),
+    );
+    host.append(exportNote);
 
     host.append(section("Danger zone", "This cannot be undone."));
     const row = el("div", "settings-row");

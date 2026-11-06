@@ -23,6 +23,7 @@
 
 import { fs } from "@zenfs/core";
 import { logInfo, logWarn } from "../core/log";
+import { fetchBytes, humanMB, mapLimit } from "../core/download";
 
 /**
  * The operating systems the App Store can put at `/`. One of them is
@@ -241,7 +242,7 @@ function sameBytes(a: Uint8Array, b: Uint8Array): boolean {
  * fresh bytes when the image was rebuilt. When the network is down and a
  * copy exists, the copy boots — with a log line saying it was not checked.
  */
-async function ensureArtifact(root: string, name: string, url: string): Promise<Uint8Array> {
+async function ensureArtifact(root: string, name: string, url: string, say: (text: string) => void = () => {}): Promise<Uint8Array> {
   const path = at(root, `boot/${name}`);
   let local: Uint8Array | null = null;
   if (await exists(path)) {
@@ -249,9 +250,15 @@ async function ensureArtifact(root: string, name: string, url: string): Promise<
     if (data.byteLength > 1024) local = data;
   }
   try {
-    const res = await fetch(url, { cache: "no-cache" });
-    if (!res.ok) throw new Error(`${url}: HTTP ${res.status}`);
-    const fresh = new Uint8Array(await res.arrayBuffer());
+    /* With a local copy this is a conditional request (304 → bytes from the
+       HTTP cache, cheap on every boot). Without one it is a first download,
+       and fetchBytes pulls big files as parallel range requests. */
+    const fresh = await fetchBytes(url, {
+      revalidate: !!local,
+      onProgress: (done, total) => {
+        say(total ? `downloading ${name}… ${humanMB(done)} of ${humanMB(total)}` : `downloading ${name}… ${humanMB(done)}`);
+      },
+    });
     if (fresh.byteLength <= 1024) throw new Error(`${url}: implausibly small (${fresh.byteLength} bytes)`);
     if (local && sameBytes(local, fresh)) return local;
     await ensureDir(at(root, "boot"));
@@ -325,8 +332,8 @@ export async function ensureGuestRoot(
   const distro: DistroId = opts.distro ?? marker0?.distro ?? "arch32";
   const BASE = baseFor(distro);
 
-  const kernel = await ensureArtifact(root, "vmlinuz", `${BASE}${DISTROS[distro].kernel}`);
-  const initrd = await ensureArtifact(root, "initrd.gz", `${BASE}initrd.gz`);
+  const kernel = await ensureArtifact(root, "vmlinuz", `${BASE}${DISTROS[distro].kernel}`, say);
+  const initrd = await ensureArtifact(root, "initrd.gz", `${BASE}initrd.gz`, say);
 
   const marker = marker0;
   const initrdHash = fnv1a(initrd);
@@ -364,15 +371,33 @@ export async function ensureGuestRoot(
   let files = 0;
   let bytes = 0;
   let noMode = 0;
-  for (const e of rest) {
+  /* The writes are independent (every parent directory already exists), so
+     let a bunch of IndexedDB transactions run at once instead of waiting
+     for each file's round-trip before starting the next — this is where
+     most of an install's wall time used to go. A cpio may name the same
+     path twice ("last one wins" when written in order); keep only the last
+     so parallel writes cannot race on one target. */
+  const lastByName = new Map<string, (typeof rest)[number]>();
+  for (const e of rest) lastByName.set(e.name, e);
+  const unique = [...lastByName.values()];
+  /* Parents first, serially — a cpio can carry files whose directory has
+     no entry of its own, and racing concurrent mkdir -p on a shared parent
+     is asking ZenFS for trouble. After this loop the parallel phase only
+     ever writes leaves. */
+  const parents = new Set<string>();
+  for (const e of unique) {
+    const target = at(root, e.name);
+    const dir = target.slice(0, target.lastIndexOf("/"));
+    if (dir) parents.add(dir);
+  }
+  for (const dir of [...parents].sort()) await ensureDir(dir);
+  await mapLimit(unique, 16, async (e) => {
     const target = at(root, e.name);
     try {
       if (e.link !== undefined) {
-        await ensureDir(target.slice(0, target.lastIndexOf("/")));
         await fs.promises.unlink(target).catch(() => {});
         await fs.promises.symlink(e.link, target);
       } else {
-        await ensureDir(target.slice(0, target.lastIndexOf("/")));
         await fs.promises.writeFile(target, e.data);
         await fs.promises.chmod(target, e.mode & 0o7777).catch(() => { noMode++; });
         bytes += e.data.byteLength;
@@ -381,8 +406,8 @@ export async function ensureGuestRoot(
     } catch (err) {
       logWarn("guest", `could not unpack /${e.name}:`, err);
     }
-    if (files % 100 === 0) say(`unpacking the distro… ${files}/${rest.length}`);
-  }
+    if (files % 100 === 0) say(`unpacking the distro… ${files}/${unique.length}`);
+  });
 
   /* Things a 9p root needs that an initramfs never carried. */
   for (const dir of ["root", "tmp", "proc", "sys", "dev", "home", "mnt", "run"]) {

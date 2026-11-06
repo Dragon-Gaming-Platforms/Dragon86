@@ -34,6 +34,7 @@ import {
   normExt,
 } from "../core/fs-apps";
 import { ensureGuestRoot, installedDistro, type DistroId } from "../bridge/guest-root";
+import { fetchBytes, humanMB, mapLimit, remoteSize } from "../core/download";
 import type { Win } from "../core/wm";
 
 const BASE = import.meta.env.BASE_URL;
@@ -140,8 +141,45 @@ export function openStore(win: Win): void {
   let loadError = "";
   /** Apps found on disk that the catalog does not mention (installed by hand). */
   let localApps: StoreApp[] = [];
-  /** id → done/total while an install is running. */
-  const progress = new Map<string, { done: number; total: number }>();
+  /** id → done/total while an install is running. `label` carries byte
+      progress ("12.4 MB of 59.1 MB") when the download knows it. */
+  const progress = new Map<string, { done: number; total: number; label?: string }>();
+  /** Progress arrives per network chunk — repaint at most ~8×/s. */
+  let lastProgressRender = 0;
+  function renderProgress(force = false): void {
+    const now = Date.now();
+    if (!force && now - lastProgressRender < 120) return;
+    lastProgressRender = now;
+    render();
+  }
+
+  /**
+   * Byte-accurate install progress across parallel downloads: each file
+   * reports (done, total), the tracker sums them into one honest label —
+   * "12.4 MB of 59.1 MB" when every size is known, plain "12.4 MB" when not.
+   */
+  function byteTracker(appId: string, fileCount: number, writtenCount: () => number) {
+    const doneBytes = new Array<number>(fileCount).fill(0);
+    const totalBytes = new Array<number | null>(fileCount).fill(null);
+    const update = (force: boolean) => {
+      const done = doneBytes.reduce((a, b) => a + b, 0);
+      const total = totalBytes.every((t) => t !== null) ? (totalBytes as number[]).reduce((a, b) => a + b, 0) : null;
+      progress.set(appId, {
+        done: writtenCount(),
+        total: fileCount,
+        label: total ? `${humanMB(done)} of ${humanMB(total)}` : humanMB(done),
+      });
+      renderProgress(force);
+    };
+    return {
+      onFile: (i: number) => (done: number, total: number | null) => {
+        doneBytes[i] = done;
+        totalBytes[i] = total ?? totalBytes[i];
+        update(false);
+      },
+      bump: () => update(true),
+    };
+  }
   const installedIds = new Set<string>();
   /** id → its repo app-manifest.json (null = fetched, none there). */
   const manifests = new Map<string, AppManifest | null>();
@@ -493,22 +531,19 @@ export function openStore(win: Win): void {
   }
 
   /**
-   * The real size of the download, in bytes, measured from the files the
-   * catalog says it will fetch. Shown on the detail page because it costs one
-   * request per file, and a card grid should not fire off a dozen of them.
+   * The real size of the download, in bytes, as the server reports it for
+   * the exact files the catalog says it will fetch (HEAD / Content-Length —
+   * still measured, never invented). It used to download every byte just to
+   * count them, which meant opening a 59 MB pack's page downloaded the pack.
    */
   async function measureBytes(app: StoreApp): Promise<number | null> {
     const files = filesFor(app);
     if (!files.length) return null;
     const base = new URL(app.base ?? `${app.id}/`, catalogBase());
     try {
-      let total = 0;
-      for (const file of files) {
-        const res = await fetch(new URL(file, base).href, { cache: "no-cache" });
-        if (!res.ok) return null;
-        total += (await res.arrayBuffer()).byteLength;
-      }
-      return total;
+      const sizes = await mapLimit(files, 4, (file) => remoteSize(new URL(file, base).href));
+      if (sizes.some((s) => s === null)) return null;
+      return (sizes as number[]).reduce((a, b) => a + b, 0);
     } catch {
       return null;
     }
@@ -535,7 +570,7 @@ export function openStore(win: Win): void {
     const size = large ? "" : "sm";
 
     if (state) {
-      const busy = el("button", `btn ${size}`.trim(), `Installing… ${state.done}/${state.total}`);
+      const busy = el("button", `btn ${size}`.trim(), `Installing… ${state.label ?? `${state.done}/${state.total}`}`);
       busy.disabled = true;
       wrap.append(busy);
       return wrap;
@@ -738,17 +773,18 @@ export function openStore(win: Win): void {
     render();
 
     let written = 0;
+    const tracker = byteTracker(app.id, files.length, () => written);
     try {
       await vfs.ensureDir(dir);
-      for (const file of files) {
+      /* Files download in parallel (and big ones in parallel ranges inside
+         fetchBytes) — the progress label counts real bytes as they land. */
+      await mapLimit(files, 3, async (file, i) => {
         const url = new URL(file, baseUrl).href;
-        const res = await fetch(url, { cache: "no-cache" });
-        if (!res.ok) throw new Error(`${file}: HTTP ${res.status}`);
-        await vfs.writeBytes(`${dir}/${file}`, new Uint8Array(await res.arrayBuffer()));
+        const data = await fetchBytes(url, { onProgress: tracker.onFile(i) });
+        await vfs.writeBytes(`${dir}/${file}`, data);
         written++;
-        progress.set(app.id, { done: written, total: files.length });
-        render();
-      }
+        tracker.bump();
+      });
       await upsertAppEntry({
         id: app.id,
         name: app.name,
@@ -811,19 +847,18 @@ export function openStore(win: Win): void {
     progress.set(app.id, { done: 0, total: files.length });
     render();
     let written = 0;
+    const tracker = byteTracker(app.id, files.length, () => written);
     try {
-      for (const file of files) {
+      await mapLimit(files, 3, async (file, i) => {
         const url = new URL(file, baseUrl).href;
-        const res = await fetch(url, { cache: "no-cache" });
-        if (!res.ok) throw new Error(`${file}: HTTP ${res.status}`);
+        const data = await fetchBytes(url, { onProgress: tracker.onFile(i) });
         const target = `/${file}`;
         const dir = target.slice(0, target.lastIndexOf("/"));
         if (dir) await vfs.ensureDir(dir);
-        await vfs.writeBytes(target, new Uint8Array(await res.arrayBuffer()));
+        await vfs.writeBytes(target, data);
         written++;
-        progress.set(app.id, { done: written, total: files.length });
-        render();
-      }
+        tracker.bump();
+      });
       await refreshInstalled();
       const run = manifestFor(app)?.run;
       notify({
