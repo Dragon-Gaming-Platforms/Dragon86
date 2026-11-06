@@ -389,6 +389,29 @@ export async function ensureGuestRoot(
     await ensureDir(at(root, dir));
   }
 
+  /* Older initramfs builds shipped empty directories (/shared, /usr/local/…,
+     /etc/modprobe.d) and every seed left them in / as permanent clutter.
+     The archives no longer carry them (tools/clean-initrd.py), but an
+     unpack only ever writes — so sweep the known ones out of roots seeded
+     before. rmdir refuses a non-empty directory, so anything a user put
+     inside survives; and a distro whose archive still ships the path is
+     left alone. */
+  const shipped = new Set(entries.map((e) => e.name));
+  for (const legacy of [
+    "shared",
+    "usr/local/bin",
+    "usr/local/sbin",
+    "usr/local/lib",
+    "usr/local",
+    "etc/modprobe.d",
+  ]) {
+    if (shipped.has(legacy)) continue;
+    await fs.promises.rmdir(at(root, legacy)).then(
+      () => logInfo("guest", `swept the empty legacy directory /${legacy}`),
+      () => {} /* not there, or not empty — both are fine */,
+    );
+  }
+
   /* The initramfs keeps everything in /usr/bin and has bare /bin, /sbin and
      /lib directories. A normal Arch root has those as symlinks, and plenty of
      scripts (and kernel module loading) assume /bin/sh and /lib/modules

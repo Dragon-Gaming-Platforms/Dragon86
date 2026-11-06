@@ -27,5 +27,9 @@ chmod 755 "$stage/init"
 
 tmp="$stage/initrd.gz"
 python3 "$here/initrd-append.py" "$src" "$stage" "$tmp" --replace --drop init
+# The initrd doubles as the distro image: empty directories in it become
+# permanent clutter in the unpacked /. /init makes its own mount points, so
+# they carry nothing — drop them (tools/clean-initrd.py says which).
+python3 "$here/clean-initrd.py" "$tmp" "$tmp"
 mv "$tmp" "$out"
 echo "wrote $out ($(wc -c < "$out") bytes, /init from tools/guest-init/init)"

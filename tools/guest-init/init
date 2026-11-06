@@ -13,10 +13,15 @@
 # arrive (host still unpacking on a first boot), we fall back to a shell in
 # this initramfs so the user sees a prompt instead of a dead console.
 export PATH=/usr/bin:/usr/sbin
+# The initramfs ships no empty directories — unpacked into the OS
+# filesystem they were nothing but clutter (an empty /shared, /proc, /sys …
+# in the Files app). Every mount point is made here, just before it is
+# needed; the OS side ensures its own copies (guest-root.ts).
+mkdir -p /proc /sys /dev
 mount -t proc -o noexec,nosuid,nodev proc /proc 2>/dev/null
 mount -t sysfs -o noexec,nosuid,nodev sysfs /sys 2>/dev/null
 mount -t devtmpfs devtmpfs /dev 2>/dev/null
-mkdir -p /dev/pts /shared /mnt /newroot /run
+mkdir -p /dev/pts /mnt /newroot /run /tmp /root
 mount -t devpts devpts /dev/pts 2>/dev/null
 
 # serial line size arrives on the kernel cmdline (d86cols/d86rows) —
@@ -281,7 +286,7 @@ run_console_session() {
 fi
 
 # Fallback: no 9p root (first boot is still unpacking, or the host has none).
-# Run from this initramfs and mount /shared if it ever arrives.
+# Run from this initramfs and keep retrying the 9p root in the background.
 (
   for i in $(seq 1 10); do
     mountpoint -q /newroot 2>/dev/null && exit 0
