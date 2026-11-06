@@ -1,6 +1,6 @@
 Vendored build of v64 — not written by hand.
 Source: https://github.com/speedyHKjournalist/v64 @ 87d26deb9a77c2e98b4b684f39cc72ba9065d76a
-Built:  2026-11-06T00:40:35Z by GitHub Actions run 42138019965
-Rebuild: run the 'Build v64' workflow (it overwrites this directory).
+Built:  2026-11-06T02:22:51Z by GitHub Actions run 42149476162
 Patched: initrd loads near the top of RAM, not at 64 MB (see the
 workflow's patch step — 64-bit kernels decompress over 64 MB).
+Rebuild: run the 'Build v64' workflow (it overwrites this directory).
