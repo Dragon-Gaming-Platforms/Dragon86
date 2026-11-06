@@ -305,7 +305,14 @@ const { scancodesFor, scancodesForEvent, keyFor } = keysModule;
 {
   const read = (p) => readFileSync(new URL(p, import.meta.url), "utf8");
   const source = read("../src/bridge/guest-root.ts");
-  check("boot artifacts are revalidated against the app", /cache: "no-cache"/.test(source));
+  const download = read("../src/core/download.ts");
+  /* The conditional request moved into core/download.ts — guest-root asks
+     for revalidation whenever a local copy exists, and download.ts turns
+     that into a no-cache (conditional) fetch. Pin both halves. */
+  check(
+    "boot artifacts are revalidated against the app",
+    /revalidate: !!local/.test(source) && /opts\.revalidate \? "no-cache" : "default"/.test(download),
+  );
   check(
     "…even when ZenFS already has a copy",
     /if \(local && sameBytes\(local, fresh\)\) return local;/.test(source),
