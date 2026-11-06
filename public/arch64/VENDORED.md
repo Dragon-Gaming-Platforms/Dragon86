@@ -17,5 +17,5 @@ Built by the 'Build arch64 guest' workflow — not written by hand.
   Licenses: see public/v86/LICENSE.git/.curl/.mbedtls (same sources).
 - CA bundle: the guest reuses public/v86/ca-certificates.crt.
 
-Built: 2026-11-06T19:14:38Z by GitHub Actions run 42277330904
+Built: 2026-11-06T19:44:54Z by GitHub Actions run 42281815209
 Rebuild: run the 'Build arch64 guest' workflow (it overwrites these files).
