@@ -12,8 +12,14 @@
 # Everything here is Arch's binary as shipped — nothing is rebuilt.
 set -eux
 
+# Which Arch kernel to ship. The mainline `linux` package (7.2.14 at the
+# time of writing) dies in v64's 64-bit machine with a double-fault loop in
+# the exception-entry path right after /init starts; `linux-lts` is the same
+# Arch-built kernel line the proven 32-bit guest runs (6.12.x era).
+KERNEL_PKG=${KERNEL_PKG:-linux-lts}
+
 pacman -Sy --noconfirm archlinux-keyring >/dev/null || true
-pacman -Syu --noconfirm --needed linux bash coreutils grep sed gawk kmod util-linux busybox zstd findutils which >/dev/null
+pacman -Syu --noconfirm --needed "$KERNEL_PKG" bash coreutils grep sed gawk kmod util-linux busybox zstd findutils which >/dev/null
 
 KVER=$(basename "$(dirname "$(find /usr/lib/modules -maxdepth 2 -name vmlinuz | head -1)")")
 [ -n "$KVER" ]

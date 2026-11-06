@@ -51,7 +51,8 @@ STAGE="$WORK/stage"
 if [ ! -f "$STAGE/.done" ]; then
   say "Arch x86_64 userland + kernel via docker"
   rm -rf "$STAGE"; mkdir -p "$STAGE"
-  docker run --rm -v "$STAGE:/stage" -v "$REPO/tools:/tools:ro" archlinux:latest \
+  docker run --rm -e KERNEL_PKG="${KERNEL_PKG:-linux-lts}" \
+    -v "$STAGE:/stage" -v "$REPO/tools:/tools:ro" archlinux:latest \
     bash /tools/arch64-collect.sh
   # the container wrote as root; hand the tree back to the runner user
   sudo chown -R "$(id -u):$(id -g)" "$STAGE" 2>/dev/null || chown -R "$(id -u):$(id -g)" "$STAGE" || true
