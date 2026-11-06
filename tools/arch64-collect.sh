@@ -114,4 +114,11 @@ rm /stage/lib
 ldconfig -r /stage 2>/dev/null || true
 
 du -sh /stage
+
+# ---- the graphics guest packs (X11+IceWM, NetSurf) ride the same container
+# ---- run, so their kernel modules are for exactly this initrd's kernel ----
+if [ "${GFX_BUNDLES:-0}" = "1" ]; then
+  bash /tools/xgfx64-collect.sh
+fi
+
 touch /stage/.done

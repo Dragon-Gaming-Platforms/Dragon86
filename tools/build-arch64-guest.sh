@@ -51,7 +51,7 @@ STAGE="$WORK/stage"
 if [ ! -f "$STAGE/.done" ]; then
   say "Arch x86_64 userland + kernel via docker"
   rm -rf "$STAGE"; mkdir -p "$STAGE"
-  docker run --rm -e KERNEL_PKG="${KERNEL_PKG:-linux-lts}" \
+  docker run --rm -e KERNEL_PKG="${KERNEL_PKG:-linux-lts}" -e GFX_BUNDLES="${GFX_BUNDLES:-1}" \
     -v "$STAGE:/stage" -v "$REPO/tools:/tools:ro" archlinux:latest \
     bash /tools/arch64-collect.sh
   # the container wrote as root; hand the tree back to the runner user
@@ -278,3 +278,48 @@ gzip -9 -n -c "$WORK/bin/git-remote-http" > "$OUT/git-remote-http.gz"
 say "wrote $OUT/bzImage           ($(wc -c < "$OUT/bzImage") bytes, kernel $KVER)"
 say "wrote $OUT/initrd.gz         ($(wc -c < "$OUT/initrd.gz") bytes)"
 say "wrote $OUT/git-remote-http.gz ($(wc -c < "$OUT/git-remote-http.gz") bytes)"
+
+# ========================================================== guest packs ==
+# X11+IceWM and NetSurf, collected by tools/xgfx64-collect.sh in the same
+# container run (same kernel, same package snapshot). Each becomes an App
+# Store "guest-pack": the install script the user runs inside the machine,
+# the payload split under GitHub's 100 MB file limit, and a manifest whose
+# file list the store trusts verbatim.
+pack() { # stagename payloadname outdir script id run
+  local stagedir="$STAGE/$1" name=$2 outdir="$REPO/public/$3" script=$4 id=$5 run=$6
+  [ -d "$stagedir" ] || { say "no $stagedir - guest packs skipped (GFX_BUNDLES=0?)"; return 0; }
+  say "packing $name from $stagedir"
+  rm -rf "$outdir"
+  mkdir -p "$outdir/opt/dragon86"
+  tar -C "$stagedir" -czf "$WORK/$name.tar.gz" usr etc var 2>/dev/null \
+    || tar -C "$stagedir" -czf "$WORK/$name.tar.gz" usr
+  split -b 90m -d -a 1 "$WORK/$name.tar.gz" "$outdir/opt/dragon86/$name.tar.gz.part"
+  echo "$KVER" > "$outdir/opt/dragon86/$name.kver"
+  cp "$REPO/tools/guest-pack/$script" "$outdir/$script"
+  # the manifest: what the store dumps into /, in download order
+  {
+    printf '{\n  "id": "%s",\n  "kind": "guest-pack",\n  "dump": "/",\n  "run": "%s",\n  "kver": "%s",\n  "files": [\n' "$id" "$run" "$KVER"
+    printf '    "%s",\n' "$script" "opt/dragon86/$name.kver"
+    parts=$(cd "$outdir/opt/dragon86" && ls "$name.tar.gz.part"*)
+    first=1
+    for p in $parts; do
+      [ "$first" = 1 ] || printf ',\n'
+      printf '    "opt/dragon86/%s"' "$p"
+      first=0
+    done
+    printf '\n  ],\n  "note": "Dumped into the OS filesystem /; finish inside the machine: %s"\n}\n' "$run"
+  } > "$outdir/app-manifest.json"
+  python3 -c "import json,sys; json.load(open('$outdir/app-manifest.json'))"
+  {
+    echo "# public/$3 — vendored guest pack ($name)"
+    echo
+    echo "Built by the 'Build arch64 guest' workflow (tools/xgfx64-collect.sh) —"
+    echo "not written by hand. Arch Linux x86_64 binaries as shipped, collected"
+    echo "with their library closure; kernel modules are for $KVER (the same"
+    echo "kernel public/arch64 ships). Installed by the App Store into the OS"
+    echo "filesystem's /, then finished inside the machine: $run"
+  } > "$outdir/VENDORED.md"
+  say "wrote $outdir ($(du -sh "$outdir" | cut -f1))"
+}
+pack x11     xgfx64    arch64-x11     install-wm64.sh     x11-wm-64  "sh /install-wm64.sh"
+pack netsurf netsurf64 arch64-netsurf install-netsurf.sh  netsurf-64 "sh /install-netsurf.sh"

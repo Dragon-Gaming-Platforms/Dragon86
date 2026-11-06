@@ -65,6 +65,13 @@ interface V86Emulator {
    * cannot capture the whole page's keystrokes).
    */
   keyboard_send_scancodes?: (codes: number[]) => Promise<void> | void;
+  /**
+   * The emulator's message bus — the public add_listener is a thin wrapper
+   * over it. The PS/2 and vmware devices take their mouse input from here
+   * ("mouse-delta"/"mouse-click"/"mouse-wheel"/"mouse-absolute"), which is
+   * exactly how v86's own DOM mouse adapter feeds them.
+   */
+  bus?: { send(name: string, data?: unknown): void };
   /** Forwarded by some builds; not present in the vendored one. */
   get_text_screen?: () => string[];
   screen?: { get_text_screen?: () => string[] };
@@ -278,6 +285,44 @@ class V86Backend implements TerminalBackend {
       void this.emu.keyboard_send_scancodes?.(codes);
     } catch (err) {
       logWarn("v86", "could not send keys to the machine:", err);
+    }
+  }
+
+  /**
+   * Pointer input from the Engine Viewer, straight onto the emulator's bus —
+   * the same messages v86's own DOM mouse adapter would send. The machine is
+   * built with `disable_mouse: true`, which (like the keyboard flag) only
+   * turns off v86's page-wide event capture; the emulated PS/2 mouse and the
+   * vmware absolute-pointer device are always there. Relative deltas feed
+   * the PS/2 mouse (y inverted — PS/2 counts up as positive); the absolute
+   * position feeds the vmware device, which the guest's psmouse turns into
+   * an exactly-tracking cursor once X is running.
+   */
+  sendMouseMove(dx: number, dy: number, x: number, y: number, w: number, h: number): void {
+    if (!this.emu || this.disposed) return;
+    try {
+      this.emu.bus?.send("mouse-delta", [dx, -dy]);
+      if (w > 0 && h > 0) this.emu.bus?.send("mouse-absolute", [x, y, w, h]);
+    } catch (err) {
+      logWarn("v86", "could not send mouse movement to the machine:", err);
+    }
+  }
+
+  sendMouseButtons(left: boolean, middle: boolean, right: boolean): void {
+    if (!this.emu || this.disposed) return;
+    try {
+      this.emu.bus?.send("mouse-click", [left, middle, right]);
+    } catch (err) {
+      logWarn("v86", "could not send mouse buttons to the machine:", err);
+    }
+  }
+
+  sendMouseWheel(step: number): void {
+    if (!this.emu || this.disposed) return;
+    try {
+      this.emu.bus?.send("mouse-wheel", [step, 0]);
+    } catch (err) {
+      logWarn("v86", "could not send the mouse wheel to the machine:", err);
     }
   }
 
@@ -548,6 +593,12 @@ class V86Backend implements TerminalBackend {
            (CPU_TYPE=x86_64 for the 64-bit one). */
         graphics_adapter: "bochs_vga",
         graphics_adapter_path: `${BASE}v86-bochs-vga.js`,
+        /* 16 MiB of VGA memory: the guest's bochs DRM driver refuses to
+           bind below 4 MiB ("less than 4 MB video memory, ignoring
+           device"), and X11 on that framebuffer (the guest packs) is what
+           makes the Engine Viewer a real desktop. Power of two, like v64
+           demands. */
+        vram_size: 16 * 1024 * 1024,
         ...(arch === "x86_64" ? { cpu_type: "x86_64" } : {}),
         /* Give fresh guests v86's ACPI tables. Without them, SeaBIOS
            leaves the Arch kernel to fall back to a bogus MP table,

@@ -179,6 +179,19 @@ const { textScreenFrom, hasTextScreen, rowsWithText, stripEscapes } = screenModu
   check("the bridge reads the screen through v86-screen", /textScreenFrom\(this\.emu\)/.test(bridge));
   check("the bridge tells the truth about liveness", /isRunning\(\): boolean/.test(bridge));
 
+  /* The mouse: the viewer forwards pointer input to the machine the same
+     way v86's own DOM adapter would — deltas for the PS/2 mouse, a
+     container-relative absolute point for the vmware device (that is what
+     makes the guest cursor track exactly under X), buttons and wheel. */
+  check("the viewer forwards pointer movement", /sendMouseMove\?\.\(/.test(source));
+  check("…and buttons", /sendMouseButtons\?\.\(/.test(source));
+  check("…and the wheel", /sendMouseWheel\?\.\(/.test(source));
+  check("…keeping drags that leave the window", /setPointerCapture/.test(source));
+  check("…and the guest owns right-click", /contextmenu/.test(source));
+  check("the bridge sends PS/2 deltas with the PS/2 y-axis", /"mouse-delta", \[dx, -dy\]/.test(bridge));
+  check("…the absolute point for the vmware device", /"mouse-absolute", \[x, y, w, h\]/.test(bridge));
+  check("…buttons as one three-button state", /"mouse-click", \[left, middle, right\]/.test(bridge));
+
   /* v86 draws its own screen into a container we give it — that element is
      what the viewer mounts. Screen options must be under `opts.screen`: a
      top-level `container`/`ansi` is silently ignored by libv86. */

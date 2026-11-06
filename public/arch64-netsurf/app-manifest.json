@@ -1,0 +1,13 @@
+{
+  "id": "netsurf-64",
+  "kind": "guest-pack",
+  "dump": "/",
+  "run": "sh /install-netsurf.sh",
+  "kver": "6.18.60-1-lts",
+  "files": [
+    "install-netsurf.sh",
+    "opt/dragon86/netsurf64.kver",
+    "opt/dragon86/netsurf64.tar.gz.part0"
+  ],
+  "note": "Dumped into the OS filesystem /; finish inside the machine: sh /install-netsurf.sh"
+}
