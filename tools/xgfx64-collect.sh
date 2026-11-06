@@ -26,7 +26,8 @@ pacman -S --noconfirm --needed \
   xorg-server xorg-xinit xorg-xkbcomp xf86-video-fbdev xf86-input-evdev \
   xorg-fonts-misc xkeyboard-config xterm icewm ttf-dejavu fontconfig \
   xorg-mkfontscale \
-  netsurf gsettings-desktop-schemas shared-mime-info adwaita-icon-theme >/dev/null
+  netsurf gsettings-desktop-schemas shared-mime-info adwaita-icon-theme \
+  glycin-loaders bubblewrap >/dev/null
 
 # ---- shared-library closure: copy every library a binary (or module) pulls
 # ---- in, into <dest>/usr/lib. ldd covers dlopen'd X drivers too because we
@@ -193,16 +194,23 @@ copymods "$X" bochs bochs_drm evdev psmouse
 du -sh "$X"
 
 # ============================================================ NetSurf pack ==
-# Ship Arch's netsurf package verbatim — every file pacman lists (the
+# Ship whole Arch packages verbatim — every file pacman lists (netsurf's
 # /usr/bin entry turned out to be a wrapper script, so no guessing which
 # file is "the binary": copy them all, then find the ELFs by magic).
-pacman -Ql netsurf
-pacman -Ql netsurf | while read -r _ f; do
-  case "$f" in
-    */) mkdir -p "$N${f%/}" ;;
-    *) mkdir -p "$N$(dirname "$f")"; cp -a "$f" "$N$f" ;;
-  esac
-done
+# glycin-loaders + bubblewrap: current gdk-pixbuf delegates image decoding
+# to glycin's sandboxed loader processes — without them gtk aborts with
+# "No image loaders are configured" the moment it draws an icon.
+shippkg() { # pkg
+  pacman -Ql "$1" | while read -r _ f; do
+    case "$f" in
+      */) mkdir -p "$N${f%/}" ;;
+      *) mkdir -p "$N$(dirname "$f")"; cp -a "$f" "$N$f" ;;
+    esac
+  done
+}
+shippkg netsurf
+shippkg glycin-loaders
+shippkg bubblewrap
 
 is_elf() { [ -f "$1" ] && [ "$(head -c4 "$1" | od -An -tx1 | tr -d ' \n')" = "7f454c46" ]; }
 NS_ELFS=""
