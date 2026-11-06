@@ -36,6 +36,15 @@ fi
   echo "Settings -> Machine -> x86_64, install Arch Linux (x86-64) from the App Store, reboot, retry."
   exit 1
 }
+# the KERNEL being 64-bit is not enough - the 32-bit distro runs fine on the
+# x86-64 machine, and unpacking 64-bit libraries over a 32-bit /usr/lib
+# destroys it (found the hard way in the boot harness). Check the userland:
+# byte 5 of an ELF is its class, 2 = 64-bit.
+[ "$(head -c5 /usr/bin/bash | tail -c1 | od -An -tu1 | tr -d ' ')" = "2" ] || {
+  echo "the installed userland is 32-bit (Arch Linux x86) - these are 64-bit binaries."
+  echo "Install Arch Linux (x86-64) from the App Store first, reboot, then retry."
+  exit 1
+}
 set -- "$P"/xgfx64.tar.gz.part*
 [ -e "$1" ] || {
   echo "payload missing under $P - install install-wm64.sh from the App Store first"

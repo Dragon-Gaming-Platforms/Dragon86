@@ -25,6 +25,7 @@ mkdir -p "$X/usr/bin" "$X/usr/lib" "$N/usr/bin" "$N/usr/lib"
 pacman -S --noconfirm --needed \
   xorg-server xorg-xinit xorg-xkbcomp xf86-video-fbdev xf86-input-evdev \
   xorg-fonts-misc xkeyboard-config xterm icewm ttf-dejavu fontconfig \
+  xorg-mkfontscale \
   netsurf gsettings-desktop-schemas shared-mime-info adwaita-icon-theme >/dev/null
 
 # ---- shared-library closure: copy every library a binary (or module) pulls
@@ -58,8 +59,15 @@ closure "$X" "$X"/usr/bin/* "$X/usr/lib/Xorg" \
 
 # data the server and clients read at runtime
 mkdir -p "$X/usr/share/X11" "$X/usr/share/fonts" "$X/var/lib/xkb" "$X/etc/X11"
-cp -a /usr/share/X11/xkb "$X/usr/share/X11/xkb"
+# /usr/share/X11/xkb is a symlink into xkeyboard-config-2 on current Arch —
+# dereference it, or the guest gets a dangling link and X dies at keymap time
+cp -rL /usr/share/X11/xkb "$X/usr/share/X11/xkb"
 cp -a /usr/share/fonts/misc "$X/usr/share/fonts/misc"
+# the X server refuses to start without the core font index ("could not open
+# default font 'fixed'") — Arch generates it with a pacman hook, but it was
+# missing from the first build, so make it here, deterministically
+( cd "$X/usr/share/fonts/misc" && mkfontscale && mkfontdir )
+[ -f "$X/usr/share/fonts/misc/fonts.dir" ]
 mkdir -p "$X/usr/share/fonts/TTF"
 cp -L /usr/share/fonts/TTF/DejaVuSans.ttf /usr/share/fonts/TTF/DejaVuSans-Bold.ttf \
       /usr/share/fonts/TTF/DejaVuSansMono.ttf "$X/usr/share/fonts/TTF/"
@@ -143,8 +151,10 @@ set -e
 modprobe bochs 2>/dev/null || modprobe bochs_drm 2>/dev/null || true
 modprobe evdev 2>/dev/null || true
 modprobe psmouse 2>/dev/null || true
+# an emulated cold boot can take tens of seconds to bind the display —
+# wait up to a minute before calling it missing
 n=0
-while [ ! -e /dev/fb0 ] && [ "$n" -lt 25 ]; do sleep 0.2; n=$((n + 1)); done
+while [ ! -e /dev/fb0 ] && [ "$n" -lt 300 ]; do sleep 0.2; n=$((n + 1)); done
 [ -e /dev/fb0 ] || {
   echo "no /dev/fb0: the bochs DRM driver did not bind to the display."
   echo "Check 'dmesg | tail' - and that this is the x86-64 machine with the"
@@ -152,8 +162,11 @@ while [ ! -e /dev/fb0 ] && [ "$n" -lt 25 ]; do sleep 0.2; n=$((n + 1)); done
   exit 1
 }
 mkdir -p /tmp/.X11-unix && chmod 1777 /tmp/.X11-unix
+# the log lives in the OS filesystem (not tmpfs) so it survives a reboot —
+# it is readable from Dragon86's Files app at /var/log/Xorg.d86.log
+mkdir -p /var/log
 exec xinit /etc/X11/xinitrc-d86 -- /usr/lib/Xorg :0 vt2 \
-  -config /etc/X11/xorg-d86.conf -logfile /tmp/Xorg.d86.log "$@"
+  -config /etc/X11/xorg-d86.conf -logfile /var/log/Xorg.d86.log "$@"
 EOF
 chmod 755 "$X/usr/bin/startwm"
 
