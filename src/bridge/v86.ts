@@ -8,7 +8,9 @@
  *   x86_32 → v64's 32-bit x86 machine (its default cpu_type — the same
  *            machine v86 always was; proven against the real guest by
  *            tools/vm/boot.mjs)
- *   x86_64 → v64 with cpu_type "x86_64"; it boots the same 32-bit distro,
+ *   x86_64 → v64 with cpu_type "x86_64"; it boots whichever distro is
+ *            installed — Arch Linux (x86-64) runs only here, and the
+ *            32-bit distro also runs here,
  *            the way real x86-64 hardware boots a 32-bit OS
  *   arm64  → v64 has the machine, but no ARM64 distro is installed, so
  *            the Terminal refuses honestly (see apps/terminal.ts)
@@ -41,7 +43,7 @@ import * as vfs from "../core/vfs";
 import { ensureDir } from "../core/vfs";
 import { getSettings, type MachineArch } from "../core/settings";
 import { createP9Handler } from "./p9";
-import { ensureGuestRoot, at } from "./guest-root";
+import { ensureGuestRoot, installedDistro, DISTROS, at } from "./guest-root";
 import { createDirectFs, unionAsPromises } from "./union-fs";
 import { logInfo, logWarn } from "../core/log";
 import type { BackendHandlers, EngineScreen, TerminalBackend } from "./engine";
@@ -383,11 +385,11 @@ class V86Backend implements TerminalBackend {
    * the destination is already the right size: only a first boot (or a new
    * build of the binary) pays for it.
    */
-  private async installHostBinary(asset: string, dest: string, mode = 0o755): Promise<boolean> {
+  private async installHostBinary(asset: string, dest: string, mode = 0o755, base = ASSET_BASE): Promise<boolean> {
     try {
-      const res = await fetch(`${ASSET_BASE}${asset}`);
+      const res = await fetch(`${base}${asset}`);
       if (!res.ok) {
-        logWarn("v86", `${asset}: HTTP ${res.status} from ${ASSET_BASE}`);
+        logWarn("v86", `${asset}: HTTP ${res.status} from ${base}`);
         return false;
       }
       let bytes = new Uint8Array(await res.arrayBuffer());
@@ -483,8 +485,16 @@ class V86Backend implements TerminalBackend {
    * a clone verifies github.com against the same roots a browser would.
    */
   private async installGitTransport(root: string): Promise<void> {
+    /* The transport must match the installed userland: a 32-bit root gets
+       the x86-musl build from public/v86/, the 64-bit root gets the
+       x86_64-musl build from public/arch64/ (same pinned recipe, different
+       target — see tools/build-git-remote-http.sh and
+       tools/build-arch64-guest.sh). The CA bundle is architecture-free and
+       ships once, in public/v86/. */
+    const distro = (await installedDistro(root)) ?? "arch32";
+    const base = `${import.meta.env.BASE_URL}${DISTROS[distro].base}`;
     const dir = at(root, "usr/lib/git-core");
-    const ok = await this.installHostBinary("git-remote-http.gz", `${dir}/git-remote-http`, 0o755);
+    const ok = await this.installHostBinary("git-remote-http.gz", `${dir}/git-remote-http`, 0o755, base);
     if (!ok) return;
     const target = `${dir}/git-remote-https`;
     const existing = await fs.promises.readlink(target).catch(() => null);
@@ -495,7 +505,7 @@ class V86Backend implements TerminalBackend {
       await fs.promises.rmdir(target).catch(() => {});
       await fs.promises
         .symlink("git-remote-http", target)
-        .catch(() => this.installHostBinary("git-remote-http.gz", target, 0o755));
+        .catch(() => this.installHostBinary("git-remote-http.gz", target, 0o755, base));
     }
     await this.installHostBinary("ca-certificates.crt", at(root, "etc/ssl/certs/ca-certificates.crt"), 0o644);
   }
@@ -523,7 +533,12 @@ class V86Backend implements TerminalBackend {
 
       const opts: Record<string, unknown> = {
         wasm_path: `${BASE}v86.wasm`,
-        memory_size: 128 * 1024 * 1024,
+        /* 128 MB is plenty for the 32-bit machine. The 64-bit one gets 256:
+           Arch's x86_64 kernel alone needs a ~68 MB in-place extraction
+           area (init_size in its boot header) and panics in the page
+           allocator when 128 MB forces the pieces together — proven out in
+           tools/vm/boot.mjs (MEMORY_MB). */
+        memory_size: (arch === "x86_64" ? 256 : 128) * 1024 * 1024,
         bios: { url: `${BASE}bios/seabios.bin` },
         vga_bios: { url: `${BASE}bios/vgabios.bin` },
         /* v64's display is a plugin loaded beside the bundle (bochs_vga =
@@ -570,6 +585,17 @@ class V86Backend implements TerminalBackend {
 
       const root = vfs.GUEST_ROOT;
       await ensureDir(root);
+
+      /* A 64-bit OS cannot run on a 32-bit CPU — same rule as real
+         hardware (the other direction is fine: the 32-bit distro boots on
+         the x86_64 machine). Said here, before any unpacking happens. */
+      const installed = await installedDistro(root);
+      if (installed && !DISTROS[installed].runsOn.includes(arch)) {
+        throw new Error(
+          `${DISTROS[installed].name} is installed, and a ${arch === "x86_32" ? "32-bit" : arch} CPU cannot run it — ` +
+            `switch Settings → Machine to x86_64, or install ${DISTROS.arch32.name} from the App Store`,
+        );
+      }
 
       /* Guest / = ZenFS / (the persistent system root). The kernel and
          initramfs are read from /boot, so everything the machine runs is a

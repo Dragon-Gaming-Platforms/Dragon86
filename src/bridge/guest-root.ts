@@ -1,13 +1,15 @@
 /**
  * The v86 guest's root filesystem, living in the OS filesystem.
  *
- * The guest boots a vendored Arch 32 kernel plus a small initramfs, and its
+ * The guest boots a vendored Arch kernel plus a small initramfs, and its
  * `/` is not a disk image: it is the OS filesystem's own `/` in ZenFS, served to the
  * guest over 9p. So the whole distribution — `/bin/bash`, `/usr/bin/awk`,
  * `/etc/profile`, everything — is a normal file in Dragon86, visible in
  * Files, editable with the Text Editor, writable from inside the guest.
  *
- * Where the files come from: the initramfs (`public/v86/initrd.gz`) already
+ * Where the files come from: the installed distro's initramfs (see DISTROS —
+ * `public/v86/initrd.gz` for the 32-bit build, `public/arch64/initrd.gz` for
+ * Arch's own x86_64 build) already
  * contains the hand-built userland (busybox + Arch bash + coreutils + glibc +
  * kernel modules). Installing Arch Linux from the App Store unpacks it once
  * into ZenFS `/`, and every boot runs from that copy. The initramfs is still what the *kernel* is given — it has to be,
@@ -22,7 +24,49 @@
 import { fs } from "@zenfs/core";
 import { logInfo, logWarn } from "../core/log";
 
-const BASE = `${import.meta.env.BASE_URL}v86/`;
+/**
+ * The operating systems the App Store can put at `/`. One of them is
+ * installed at a time — they both dump their userland into the same root,
+ * so installing one over the other replaces the OS (the files the new
+ * initramfs carries win; files the guest created stay).
+ *
+ *  - arch32: Arch Linux 32 userland, boots on both x86 machines (a 32-bit
+ *    OS runs on a 64-bit CPU, exactly like real hardware).
+ *  - arch64: Arch's own x86_64 build (linux-lts kernel, 64-bit userland,
+ *    static 64-bit git) — needs the x86_64 machine; a 32-bit CPU cannot
+ *    run it, and the Terminal says so instead of pretending.
+ */
+export type DistroId = "arch32" | "arch64";
+
+export interface Distro {
+  id: DistroId;
+  /** public/ directory the boot artifacts are fetched from. */
+  base: string;
+  name: string;
+  /** Catalog id in public/store.json. */
+  storeId: string;
+  /** Machine architectures (Settings → Machine) whose CPU can run it. */
+  runsOn: readonly string[];
+}
+
+export const DISTROS: Record<DistroId, Distro> = {
+  arch32: {
+    id: "arch32",
+    base: "v86/",
+    name: "Arch Linux (x86)",
+    storeId: "arch-linux",
+    runsOn: ["x86_32", "x86_64"],
+  },
+  arch64: {
+    id: "arch64",
+    base: "arch64/",
+    name: "Arch Linux (x86-64)",
+    storeId: "arch-linux-64",
+    runsOn: ["x86_64"],
+  },
+};
+
+const baseFor = (distro: DistroId): string => `${import.meta.env.BASE_URL}${DISTROS[distro].base}`;
 
 /**
  * Bump when the seeding rules change (not when the initramfs changes — that
@@ -39,11 +83,16 @@ export interface GuestRoot {
   initrd: Uint8Array;
   /** True when the tree already existed and nothing was unpacked. */
   reused: boolean;
+  /** Which OS this root now holds. */
+  distro: DistroId;
 }
 
 interface Marker {
   v: number;
   at: number;
+  /** Which distro the root was unpacked from. Markers written before the
+      64-bit build existed carry no field — those roots are arch32. */
+  distro?: DistroId;
   initrdBytes: number;
   /** FNV-1a of the initramfs the root was unpacked from. Markers written
       before this field existed fail the check once and re-seed — which is
@@ -221,6 +270,17 @@ export async function distroInstalled(root: string): Promise<boolean> {
 }
 
 /**
+ * Which OS is installed at this root, or null when none is. Roots seeded
+ * before the 64-bit build existed have no distro field in their marker —
+ * they are arch32 roots.
+ */
+export async function installedDistro(root: string): Promise<DistroId | null> {
+  if (!(await distroInstalled(root))) return null;
+  const marker = await readMarker(root);
+  return marker?.distro ?? "arch32";
+}
+
+/**
  * Make sure the system root (`/` in ZenFS) is a bootable Arch root and hand back the kernel and
  * initramfs to boot it with. Cheap when it has already been done.
  *
@@ -233,34 +293,43 @@ export async function distroInstalled(root: string): Promise<boolean> {
  */
 export async function ensureGuestRoot(
   root: string,
-  opts: { status?: (text: string) => void; force?: boolean; install?: boolean } = {},
+  opts: { status?: (text: string) => void; force?: boolean; install?: boolean; distro?: DistroId } = {},
 ): Promise<GuestRoot> {
   const say = opts.status ?? (() => {});
   if (!opts.install && !opts.force && !(await distroInstalled(root))) {
     throw new Error(
-      "no operating system is installed — open the App Store and install Arch Linux (x86)",
+      "no operating system is installed — open the App Store and install Arch Linux",
     );
   }
   await ensureDir(root);
   await ensureDir(at(root, "boot"));
 
+  /* Which OS this root should hold: the caller's word (an install from the
+     store), else whatever is already installed, else the 32-bit default. */
+  const marker0 = await readMarker(root);
+  const distro: DistroId = opts.distro ?? marker0?.distro ?? "arch32";
+  const BASE = baseFor(distro);
+
   const kernel = await ensureArtifact(root, "vmlinuz", `${BASE}bzImage`);
   const initrd = await ensureArtifact(root, "initrd.gz", `${BASE}initrd.gz`);
 
-  const marker = await readMarker(root);
+  const marker = marker0;
   const initrdHash = fnv1a(initrd);
-  /* Same version, same size *and* same hash: a root unpacked from exactly
-     this initramfs. Markers from before the hash existed fail here once and
-     the tree is re-unpacked — those roots may carry an older init than the
-     app (the artifact check above used to trust the ZenFS copy unseen). */
+  /* Same version, same distro, same size *and* same hash: a root unpacked
+     from exactly this initramfs. Markers from before the hash existed fail
+     here once and the tree is re-unpacked — those roots may carry an older
+     init than the app (the artifact check above used to trust the ZenFS
+     copy unseen). Installing the other distro fails this too (different
+     bytes) and replaces the userland in place. */
   const seeded =
     marker?.v === SEED_VERSION &&
+    (marker.distro ?? "arch32") === distro &&
     marker.initrdBytes === initrd.byteLength &&
     marker.initrdHash === initrdHash;
   if (seeded && !opts.force && (await exists(at(root, "bin/bash")))) {
     logInfo("guest", `running the distro already in the OS filesystem (${marker?.files ?? "?"} files)`);
     await repairModes(root);
-    return { root, kernel, initrd, reused: true };
+    return { root, kernel, initrd, reused: true, distro };
   }
   if (marker && !seeded && !opts.force) {
     logInfo("guest", "the guest root was unpacked from a different initramfs — re-unpacking the distro");
@@ -339,14 +408,14 @@ export async function ensureGuestRoot(
 
   await fs.promises.writeFile(
     at(root, MARKER),
-    JSON.stringify({ v: SEED_VERSION, at: Date.now(), initrdBytes: initrd.byteLength, initrdHash, files } satisfies Marker),
+    JSON.stringify({ v: SEED_VERSION, at: Date.now(), distro, initrdBytes: initrd.byteLength, initrdHash, files } satisfies Marker),
   );
 
   say(
     `distro unpacked: ${files} files, ${(bytes / 1048576).toFixed(1)} MB in ${((Date.now() - started) / 1000).toFixed(1)}s`,
   );
   logInfo("guest", `guest root ready at ${root}: ${files} files, ${(bytes / 1048576).toFixed(1)} MB`);
-  return { root, kernel, initrd, reused: false };
+  return { root, kernel, initrd, reused: false, distro };
 }
 
 /**

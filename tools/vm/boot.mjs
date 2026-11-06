@@ -14,7 +14,9 @@
  *   node tools/vm/boot.mjs --keep     reuse an already-extracted root
  *   node tools/vm/boot.mjs --cmd "ls /" --cmd "d86-net"
  *
- * Env: INITRD=<path> to boot a rebuilt initramfs, CMDLINE=<kernel line> to
+ * Env: KERNEL=<path> to boot another kernel (default public/v86/bzImage),
+ * MEMORY_MB=<n> to size RAM (default 128),
+ * INITRD=<path> to boot a rebuilt initramfs, CMDLINE=<kernel line> to
  * change the command line, BOOT_TIMEOUT=<ms>, VERBOSE=1 to watch the console.
  */
 import { createRequire } from "node:module";
@@ -59,8 +61,8 @@ function cpioEntries(buf) {
   return out;
 }
 
-async function unpack() {
-  const gz = await fsp.readFile(resolve(repo, "public/v86/initrd.gz"));
+async function unpack(initrdPath) {
+  const gz = await fsp.readFile(initrdPath);
   const archive = gunzipSync(gz);
   rmSync(ROOT, { recursive: true, force: true });
   mkdirSync(ROOT, { recursive: true });
@@ -233,15 +235,22 @@ async function main() {
   if (reuse) {
     console.log(`[harness] reusing the extracted root at ${ROOT}`);
   } else {
-    const res = await unpack();
+    const res = await unpack(initrdPath);
     console.log(`[harness] extracted ${res.files} files into ${ROOT}`);
   }
 
-  const kernel = await fsp.readFile(resolve(repo, "public/v86/bzImage"));
+  const kernelPath = process.env.KERNEL ? resolve(process.env.KERNEL) : resolve(repo, "public/v86/bzImage");
+  const kernel = await fsp.readFile(kernelPath);
 
   const emu = new V86({
     wasm_path: resolve(repo, `${ENGINE_DIR}/v86.wasm`),
-    memory_size: 128 * 1024 * 1024,
+    /* Default mirrors src/bridge/v86.ts: 256 MB for the 64-bit machine
+       (Arch's x86_64 kernel needs a ~68 MB extraction area), 128 for the
+       32-bit one. MEMORY_MB overrides. */
+    memory_size:
+      (process.env.MEMORY_MB ? Number(process.env.MEMORY_MB) : process.env.CPU_TYPE === "x86_64" ? 256 : 128) *
+      1024 *
+      1024,
     /* v64 renamed vga_memory_size to vram_size and rejects the old name,
        and it loads its display as a plugin beside the bundle — which this
        harness moved, so the plugin needs its real path. */
