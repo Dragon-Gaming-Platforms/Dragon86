@@ -108,7 +108,10 @@ def main():
 
     w.trailer()
     with open(out_path, "wb") as f:
-        f.write(gzip.compress(bytes(w.out), 9))
+        # mtime=0: a rebuild from identical packages is byte-identical, so
+        # the workflow's "nothing to commit" check means what it says (and
+        # users' roots are not re-unpacked over a gzip timestamp).
+        f.write(gzip.compress(bytes(w.out), 9, mtime=0))
     print(f"{out_path}: {len(w.seen)} entries, "
           f"{os.path.getsize(out_path)} bytes gzipped")
 
