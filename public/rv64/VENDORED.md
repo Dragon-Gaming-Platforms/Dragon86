@@ -16,5 +16,5 @@ Built by the 'Build rv64 guest' workflow — not written by hand.
   payload. Alpine packages: MIT/GPL and others, see each
   package; assembly: tools/rv64-collect.sh.
 
-Built: 2026-11-06T03:52:15Z by GitHub Actions run 42159079914
+Built: 2026-11-06T04:08:15Z by GitHub Actions run 42160646037
 Rebuild: run the 'Build rv64 guest' workflow (it overwrites these files).
