@@ -40,11 +40,14 @@ cp -L /usr/bin/busybox /stage/usr/bin/busybox
 for want in ash sh udhcpc ip mount umount; do
   busybox --list | grep -qx "$want" || { echo "busybox is missing applet: $want" >&2; exit 1; }
 done
+set +x
 busybox --list | while read -r a; do
   [ -e "/stage/usr/bin/$a" ] || ln -sf busybox "/stage/usr/bin/$a"
 done
+set -x
 
 # ---- shared-library closure of every real ELF above ----
+set +x
 for f in /stage/usr/bin/*; do
   [ -f "$f" ] && [ ! -L "$f" ] || continue
   ldd "$f" 2>/dev/null | while read -r line; do
@@ -55,6 +58,8 @@ for f in /stage/usr/bin/*; do
     [ -e "/stage/usr/lib/$name" ] || cp -L "$lib" "/stage/usr/lib/$name"
   done
 done
+ls /stage/usr/lib
+set -x
 # NSS: getpwnam()/getgrnam() load these at runtime; ldd never lists them.
 for n in /usr/lib/libnss_files.so.2; do
   [ -e "$n" ] && cp -L "$n" "/stage/usr/lib/$(basename "$n")"
@@ -78,7 +83,8 @@ libps2 i8042 atkbd psmouse serio_raw crc32c_generic"
 for m in $MODS; do
   modprobe --show-depends --set-version "$KVER" "$m" 2>/dev/null | while read -r kind path rest; do
     [ "$kind" = insmod ] || continue
-    rel=${path#/usr/lib/modules/}
+    # modprobe prints /lib/modules/... (via the /lib symlink) on Arch
+    rel=${path#/usr/lib/modules/}; rel=${rel#/lib/modules/}
     dest="/stage/usr/lib/modules/${rel%.zst}"
     [ -e "$dest" ] && continue
     mkdir -p "$(dirname "$dest")"
@@ -88,9 +94,13 @@ for m in $MODS; do
     esac
   done || echo "note: module $m not found for $KVER (may be built-in)"
 done
+mkdir -p "/stage/usr/lib/modules/$KVER"
 cp "/usr/lib/modules/$KVER/modules.builtin" "/usr/lib/modules/$KVER/modules.builtin.modinfo" \
    "/usr/lib/modules/$KVER/modules.order" "/stage/usr/lib/modules/$KVER/" 2>/dev/null || true
+# depmod's -b expects <basedir>/lib/modules; point it at usr/lib for a moment
+ln -s usr/lib /stage/lib
 depmod -b /stage "$KVER"
+rm /stage/lib
 
 # ---- ld.so.cache for the staged tree (glibc also finds /usr/lib via the
 # ---- lib64 symlinks the initrd carries, this just makes it quick) ----
