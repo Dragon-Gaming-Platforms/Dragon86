@@ -3,6 +3,11 @@
   "kind": "guest-pack",
   "dump": "/",
   "run": "sh /install-netsurf.sh",
-  "files": [],
-  "note": "Placeholder — the 'Build arch64 guest' workflow overwrites this with the real payload list. An empty files list makes the store say so instead of installing nothing."
+  "kver": "6.18.60-1-lts",
+  "files": [
+    "install-netsurf.sh",
+    "opt/dragon86/netsurf64.kver",
+    "opt/dragon86/netsurf64.tar.gz.part0"
+  ],
+  "note": "Dumped into the OS filesystem /; finish inside the machine: sh /install-netsurf.sh"
 }
