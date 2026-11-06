@@ -12,6 +12,8 @@
     "test:guest": "node tools/test-guest-scripts.mjs",
     "test:preview": "node tools/test-preview.mjs",
     "test:archive": "node --experimental-strip-types tools/test-archive.mjs",
+    "test:download": "node --experimental-strip-types tools/test-download.mjs",
+    "test:fs-export": "node --experimental-strip-types tools/test-fs-export.mjs",
     "test:vm": "vite build --config tools/vm/vite.config.ts && node --experimental-strip-types tools/vm/boot.mjs",
     "test:vm:rv64": "vite build --config tools/vm/vite.config.ts && node tools/vm/boot-rv64.mjs"
   },
