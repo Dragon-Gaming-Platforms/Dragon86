@@ -7,42 +7,62 @@
       "name": "Arch Linux (x86)",
       "sub": "The operating system the Terminal's machines boot",
       "category": "System",
-      "publisher": "Arch Linux 32 userland \u00b7 Dragon86 build",
+      "publisher": "Arch Linux 32 userland · Dragon86 build",
       "icon": "linux",
       "base": "v86/",
       "files": [
         "initrd.gz",
         "bzImage"
       ],
-      "description": "A real Arch Linux userland (bash, coreutils, git, kernel modules) for the x86 machines in the Terminal. Installing unpacks it into your filesystem's own / \u2014 every file of the distro becomes a normal file in Files, and the machine boots it from there over 9p. Nothing boots until this is installed: the Terminal will tell you to come here first. Uninstalling is not offered because the distro's files are woven into /; Settings \u2192 Machine can re-unpack it if it breaks."
+      "description": "A real Arch Linux userland (bash, coreutils, git, kernel modules) for the x86 machines in the Terminal. Installing unpacks it into your filesystem's own / — every file of the distro becomes a normal file in Files, and the machine boots it from there over 9p. Nothing boots until this is installed: the Terminal will tell you to come here first. Uninstalling is not offered because the distro's files are woven into /; Settings → Machine can re-unpack it if it breaks."
     },
     {
       "id": "arch-linux-64",
       "name": "Arch Linux (x86-64)",
       "sub": "Arch's own 64-bit build, for the x86-64 machine",
       "category": "System",
-      "publisher": "Arch Linux x86_64 \u00b7 Dragon86 build",
+      "publisher": "Arch Linux x86_64 · Dragon86 build",
       "icon": "linux",
       "base": "arch64/",
       "files": [
         "initrd.gz",
         "bzImage"
       ],
-      "description": "Arch Linux as Arch builds it for real 64-bit machines: the linux-lts kernel, 64-bit bash, coreutils and glibc straight from Arch's packages, and a static 64-bit git with networking and HTTPS git clone \u2014 the same tooling as the x86 build, compiled for x86_64. It needs the x86-64 machine (Settings \u2192 Machine); a 32-bit CPU cannot run it, here or anywhere. The two Arch entries share your filesystem's /, so installing this one replaces the installed (x86) userland in place \u2014 your own files stay."
+      "description": "Arch Linux as Arch builds it for real 64-bit machines: the linux-lts kernel, 64-bit bash, coreutils and glibc straight from Arch's packages, and a static 64-bit git with networking and HTTPS git clone — the same tooling as the x86 build, compiled for x86_64. It needs the x86-64 machine (Settings → Machine); a 32-bit CPU cannot run it, here or anywhere. The two Arch entries share your filesystem's /, so installing this one replaces the installed (x86) userland in place — your own files stay."
     },
     {
       "id": "alpine-linux-riscv64",
       "name": "Alpine Linux (RISC-V 64)",
       "sub": "Official Alpine riscv64, for the RISC-V 64 machine",
       "category": "System",
-      "publisher": "Alpine Linux riscv64 \u00b7 Dragon86 build",
+      "publisher": "Alpine Linux riscv64 · Dragon86 build",
       "icon": "linux",
       "base": "rv64/",
       "files": [
         "initrd.gz",
         "Image"
       ],
-      "description": "Alpine Linux as Alpine builds it for real RISC-V 64 hardware: busybox, musl, bash and Alpine's own git \u2014 a full build with working HTTPS, so git clone https://\u2026 runs natively, no helper needed. Networking comes up by itself through the emulator's fetch backend. It needs the RISC-V 64 machine (Settings \u2192 Machine); an x86 CPU cannot run it, here or anywhere. The distros share your filesystem's /, so installing this one replaces the installed Arch userland in place \u2014 your own files stay. This machine has no display: the Terminal's serial console is its console."
+      "description": "Alpine Linux as Alpine builds it for real RISC-V 64 hardware: busybox, musl, bash and Alpine's own git — a full build with working HTTPS, so git clone https://… runs natively, no helper needed. Networking comes up by itself through the emulator's fetch backend. It needs the RISC-V 64 machine (Settings → Machine); an x86 CPU cannot run it, here or anywhere. The distros share your filesystem's /, so installing this one replaces the installed Arch userland in place — your own files stay. This machine has no display: the Terminal's serial console is its console."
+    },
+    {
+      "id": "x11-wm-64",
+      "name": "install-wm64.sh",
+      "sub": "X11 + IceWM — a window manager on the machine's display",
+      "category": "System",
+      "publisher": "Arch Linux x86_64 packages · Dragon86 pack",
+      "icon": "desktop",
+      "base": "arch64-x11/",
+      "description": "A real X11 desktop for the x86-64 machine: Xorg on the machine's own display (open the Engine Viewer to see it), the IceWM window manager, and xterm — Arch's own packages, with the bochs display and evdev input kernel modules to match the installed kernel. Installing dumps /install-wm64.sh and its payload into your filesystem; the second half runs inside the machine: sh /install-wm64.sh, then startwm. Mouse and keyboard work on the Engine Viewer screen. Needs Arch Linux (x86-64) installed and the x86_64 machine selected."
+    },
+    {
+      "id": "netsurf-64",
+      "name": "install-netsurf.sh",
+      "sub": "NetSurf — a real graphical web browser, in the window manager",
+      "category": "System",
+      "publisher": "Arch Linux x86_64 packages · Dragon86 pack",
+      "icon": "browser",
+      "base": "arch64-netsurf/",
+      "description": "NetSurf is a real browser engine — its own layout, CSS and image rendering — built to be light enough for exactly this kind of machine. (Chromium itself cannot run here: it needs a gigabyte of RAM and a GPU, and this is a software-emulated x86-64 with 256 MB — an install script would only pretend.) Installing dumps /install-netsurf.sh and its payload into your filesystem; inside the machine run sh /install-netsurf.sh, then start NetSurf from the IceWM menu on the Engine Viewer screen. Needs install-wm64.sh set up first, and /networking.sh for the network."
     },
     {
       "id": "nes",
@@ -106,7 +126,7 @@
       ],
       "width": 340,
       "height": 470,
-      "description": "A pocket calculator: add, subtract, multiply and divide, plus percent, sign flip and clear. Tap the buttons or use the number keys, Enter for equals and Escape to clear. It keeps twelve digits on screen, then switches to precision notation. Deliberately dull \u2014 a calculator that wants to be clever is a calculator that lies.",
+      "description": "A pocket calculator: add, subtract, multiply and divide, plus percent, sign flip and clear. Tap the buttons or use the number keys, Enter for equals and Escape to clear. It keeps twelve digits on screen, then switches to precision notation. Deliberately dull — a calculator that wants to be clever is a calculator that lies.",
       "icon-path": "icon.svg"
     },
     {
@@ -233,7 +253,7 @@
     {
       "id": "cheerpj",
       "name": "CheerpJ",
-      "sub": "Run .jar files \u2014 Java in the browser",
+      "sub": "Run .jar files — Java in the browser",
       "category": "Utilities",
       "publisher": "Dragon Gaming Platforms (runtime by Leaning Technologies)",
       "icon": "img:icons/apps/cheerpj.svg",
@@ -246,7 +266,7 @@
       ],
       "width": 920,
       "height": 640,
-      "description": "CheerpJ is a full Java runtime in WebAssembly: pick a .jar from your files and it runs, unmodified. Programs with a Swing or AWT interface get their own display inside the window; console programs print underneath it. Once installed it offers to open .jar files, so double-clicking one in Files runs it here. The Java runtime itself is downloaded from Leaning Technologies' CDN on first use \u2014 it is far too large to vendor \u2014 so the first run needs a network connection.",
+      "description": "CheerpJ is a full Java runtime in WebAssembly: pick a .jar from your files and it runs, unmodified. Programs with a Swing or AWT interface get their own display inside the window; console programs print underneath it. Once installed it offers to open .jar files, so double-clicking one in Files runs it here. The Java runtime itself is downloaded from Leaning Technologies' CDN on first use — it is far too large to vendor — so the first run needs a network connection.",
       "icon-path": "icon.svg",
       "opens": [
         "jar"

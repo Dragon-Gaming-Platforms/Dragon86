@@ -78,7 +78,10 @@ interface Catalog {
  * the store dumps the app's source when installing it. Ordinary apps dump
  * into `~/system/apps/<id>/` (also the default when the file is missing);
  * a `"kind": "distro"` entry dumps an operating system — the Arch userland
- * unpacked at `/` for the Terminal's machines to boot.
+ * unpacked at `/` for the Terminal's machines to boot; a `"kind":
+ * "guest-pack"` entry dumps files for the *guest* into the OS filesystem's
+ * `/` (an install script plus its payload) and makes no desktop app at all —
+ * the install finishes inside the machine, by running the script.
  */
 interface AppManifest {
   id?: string;
@@ -89,6 +92,12 @@ interface AppManifest {
   /** For kind "distro": which OS this entry installs (see DISTROS in
       bridge/guest-root). Absent on the original entry → arch32. */
   distro?: string;
+  /** For kind "guest-pack": the files to dump, as paths relative to `/`.
+      Written by the build workflow, which knows how the payload was split —
+      the catalog never has to guess. */
+  files?: string[];
+  /** For kind "guest-pack": the command to run inside the machine. */
+  run?: string;
 }
 
 type Tab = "home" | "apps" | "games" | "installed";
@@ -226,6 +235,14 @@ export function openStore(win: Win): void {
            so the two never disagree. The two Arch entries share /, so at
            most one of them is installed at a time. */
         if ((await installedDistro(vfs.GUEST_ROOT)) === distroIdFor(app)) installedIds.add(app.id);
+        continue;
+      }
+      if (isGuestPack(app)) {
+        /* A guest pack is "installed" when everything it dumps is in /. */
+        const files = filesFor(app);
+        let all = files.length > 0;
+        for (const file of files) if (!(await vfs.exists(`/${file}`))) all = false;
+        if (all) installedIds.add(app.id);
         continue;
       }
       if (await vfs.exists(`${dumpDirFor(app)}/${app.entry ?? "index.html"}`)) {
@@ -454,7 +471,7 @@ export function openStore(win: Win): void {
     meta.append(el("span", undefined, app.category ?? "App"));
     if (app.local) meta.append(el("span", "store-dot", "·"), el("span", undefined, "Installed here"));
     else {
-      const count = app.files?.length ?? 0;
+      const count = filesFor(app).length;
       if (count) {
         meta.append(
           el("span", "store-dot", "·"),
@@ -481,7 +498,7 @@ export function openStore(win: Win): void {
    * request per file, and a card grid should not fire off a dozen of them.
    */
   async function measureBytes(app: StoreApp): Promise<number | null> {
-    const files = app.files ?? [];
+    const files = filesFor(app);
     if (!files.length) return null;
     const base = new URL(app.base ?? `${app.id}/`, catalogBase());
     try {
@@ -538,6 +555,24 @@ export function openStore(win: Win): void {
         wrap.append(openBtn);
         return wrap;
       }
+      if (isGuestPack(app)) {
+        /* The pack's second half runs inside the machine: "Open" goes to
+           the Terminal, where its install script is waiting in /. */
+        const run = manifestFor(app)?.run;
+        openBtn.title = run ? `Open the Terminal and run: ${run}` : "Open the Terminal";
+        openBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          window.dispatchEvent(new CustomEvent("d86-launch-app", { detail: "terminal" }));
+        });
+        const removeBtn = el("button", `btn ${size} danger`.trim(), "Uninstall");
+        removeBtn.title = "Delete the files the store dumped into /";
+        removeBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          void uninstall(app);
+        });
+        wrap.append(openBtn, removeBtn);
+        return wrap;
+      }
       openBtn.title = `Open ${app.name}`;
       openBtn.addEventListener("click", (e) => {
         e.stopPropagation();
@@ -580,7 +615,7 @@ export function openStore(win: Win): void {
     info.append(el("h1", undefined, app.name), el("div", "store-publisher", app.publisher ?? "Unknown publisher"));
     const meta = el("div", "store-card-meta");
     meta.append(el("span", undefined, app.category ?? "App"));
-    const fileCount = app.files?.length ?? 0;
+    const fileCount = filesFor(app).length;
     if (fileCount) {
       meta.append(
         el("span", "store-dot", "·"),
@@ -594,7 +629,12 @@ export function openStore(win: Win): void {
     const facts = el("div", "store-facts");
     facts.append(fact("Category", app.category ?? "App"));
     facts.append(fact("Publisher", app.publisher ?? "Unknown"));
-    facts.append(fact("Installs to", `~/system/apps/${app.id}/`));
+    facts.append(
+      fact(
+        "Installs to",
+        isDistro(app) ? "/" : isGuestPack(app) ? "/ — then run its script in the Terminal" : `~/system/apps/${app.id}/`,
+      ),
+    );
     if (app.opens?.length) {
       facts.append(fact("Opens", app.opens.map((o) => `.${normExt(o)}`).join(", ")));
     }
@@ -620,6 +660,10 @@ export function openStore(win: Win): void {
          filesystem's root, not a folder under system/apps. */
       files.append(el("code", undefined, `/ — the distro's userland, unpacked from ${manifestFor(app)?.image ?? "initrd.gz"}`));
       files.append(el("code", undefined, `/boot/vmlinuz + /boot/initrd.gz — what the machine boots`));
+    } else if (isGuestPack(app)) {
+      for (const file of filesFor(app)) files.append(el("code", undefined, `/${file}`));
+      const run = manifestFor(app)?.run;
+      if (run) files.append(el("code", undefined, `then, in the Terminal: ${run}`));
     } else {
       const dumpRel = dumpDirFor(app).replace(`${vfs.HOME}/`, "");
       for (const file of app.files ?? []) files.append(el("code", undefined, `${dumpRel}/${file}`));
@@ -645,6 +689,16 @@ export function openStore(win: Win): void {
     return manifestFor(app)?.kind === "distro";
   }
 
+  function isGuestPack(app: StoreApp): boolean {
+    return manifestFor(app)?.kind === "guest-pack";
+  }
+
+  /** The files an entry downloads: the manifest's word for a guest pack
+      (its build workflow writes the real list), the catalog's otherwise. */
+  function filesFor(app: StoreApp): string[] {
+    return (isGuestPack(app) ? manifestFor(app)?.files : undefined) ?? app.files ?? [];
+  }
+
   /** Which OS a distro entry installs (its manifest's word; arch32 when
       the manifest predates the 64-bit build). */
   function distroIdFor(app: StoreApp): DistroId {
@@ -667,6 +721,10 @@ export function openStore(win: Win): void {
   async function install(app: StoreApp): Promise<void> {
     if (isDistro(app)) {
       await installDistro(app);
+      return;
+    }
+    if (isGuestPack(app)) {
+      await installGuestPack(app);
       return;
     }
     const files = app.files ?? [];
@@ -732,6 +790,110 @@ export function openStore(win: Win): void {
   }
 
   /**
+   * Install a guest pack: dump its files into the OS filesystem's `/`, where
+   * the machine sees them over 9p. Nothing is unpacked here and no desktop
+   * app is made — the second half of the install happens *inside* the guest,
+   * by running the pack's install script in the Terminal. That is the honest
+   * split: this side can only deliver files; only the machine itself can
+   * depmod its modules and lay the payload into its own /usr.
+   */
+  async function installGuestPack(app: StoreApp): Promise<void> {
+    const files = filesFor(app);
+    if (!files.length) {
+      notify({
+        title: `${app.name} has nothing to install`,
+        body: "Its manifest lists no files — the build workflow has not produced this pack yet.",
+        icon: "info",
+      });
+      return;
+    }
+    const baseUrl = new URL(app.base ?? `${app.id}/`, catalogBase());
+    progress.set(app.id, { done: 0, total: files.length });
+    render();
+    let written = 0;
+    try {
+      for (const file of files) {
+        const url = new URL(file, baseUrl).href;
+        const res = await fetch(url, { cache: "no-cache" });
+        if (!res.ok) throw new Error(`${file}: HTTP ${res.status}`);
+        const target = `/${file}`;
+        const dir = target.slice(0, target.lastIndexOf("/"));
+        if (dir) await vfs.ensureDir(dir);
+        await vfs.writeBytes(target, new Uint8Array(await res.arrayBuffer()));
+        written++;
+        progress.set(app.id, { done: written, total: files.length });
+        render();
+      }
+      await refreshInstalled();
+      const run = manifestFor(app)?.run;
+      notify({
+        title: `${app.name} is in /`,
+        body: run
+          ? `${written} file${written === 1 ? "" : "s"} dumped. Open the Terminal and run: ${run}`
+          : `${written} file${written === 1 ? "" : "s"} dumped. Finish the install inside the machine.`,
+        icon: app.icon ?? "grid",
+        timeout: 10000,
+      });
+      logInfo("store", `dumped guest pack ${app.id}: ${written} files into /`);
+    } catch (err) {
+      logWarn("store", `install of ${app.id} failed`, err);
+      notify({
+        title: `${app.name} did not install`,
+        body: (err as Error).message,
+        icon: "info",
+        timeout: 0,
+      });
+    } finally {
+      progress.delete(app.id);
+      render();
+    }
+  }
+
+  /**
+   * Uninstall a guest pack: delete exactly what the store dumped. What the
+   * pack's script unpacked *inside* the machine stays — the script owns
+   * that, and says so (`--remove` undoes it from the guest's side).
+   */
+  async function uninstallGuestPack(app: StoreApp): Promise<void> {
+    const files = filesFor(app);
+    const ok = await showConfirm(
+      "Uninstall app",
+      `Remove ${app.name}'s files from /? This deletes what the App Store dumped (${files.join(", ")}). ` +
+        `Anything its install script already unpacked inside the machine stays until you run its --remove inside the guest.`,
+      true,
+      "Uninstall",
+    );
+    if (!ok) return;
+    for (const file of files) {
+      try {
+        await vfs.removePath(`/${file}`);
+      } catch {
+        /* already gone — that is the goal */
+      }
+      /* Sweep now-empty parents, but never below /. */
+      let dir = `/${file}`.slice(0, `/${file}`.lastIndexOf("/"));
+      while (dir && dir !== "/") {
+        try {
+          if ((await vfs.listDir(dir)).length) break;
+          await vfs.removePath(dir);
+        } catch {
+          break;
+        }
+        dir = dir.slice(0, dir.lastIndexOf("/"));
+      }
+    }
+    await refreshInstalled();
+    logInfo("store", `uninstalled guest pack ${app.id}`);
+    notify({
+      title: `${app.name} uninstalled`,
+      body: "The dumped files are gone from /.",
+      icon: "trash",
+      timeout: 6000,
+    });
+    render();
+  }
+
+  /**
    * Install an operating system: the dump location in its manifest is `/`.
    *
    * This is ensureGuestRoot's unpack — fetch the kernel and initramfs into
@@ -786,6 +948,10 @@ export function openStore(win: Win): void {
    * file type afterwards falls back to something that exists.
    */
   async function uninstall(app: StoreApp): Promise<void> {
+    if (isGuestPack(app)) {
+      await uninstallGuestPack(app);
+      return;
+    }
     const dir = dumpDirFor(app);
     const ok = await showConfirm(
       "Uninstall app",

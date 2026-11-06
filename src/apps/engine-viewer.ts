@@ -216,6 +216,74 @@ export function openEngineViewer(win: Win, backend?: TerminalBackend | null): vo
   root.addEventListener("pointerdown", takeFocus);
   root.tabIndex = -1;
 
+  /* ---------- the mouse ---------- */
+
+  /** The machine that should receive pointer input right now, if any. */
+  const mouseTarget = (): TerminalBackend | null => {
+    const live = current();
+    if (!live || !running(live) || !live.sendMouseMove) return null;
+    return live;
+  };
+
+  /**
+   * Pointer events over the machine's display go to its emulated mouse: the
+   * movement as PS/2 deltas, the position as an absolute point in the
+   * display (which the vmware device hands to a guest whose mouse driver
+   * speaks vmmouse — then the guest's cursor sits exactly under the user's,
+   * no pointer lock needed). Buttons and the wheel ride along. On a plain
+   * text console nothing visible happens, because the guest only reads the
+   * mouse once something (an X server, gpm) asks for it — the messages are
+   * cheap and honest either way.
+   *
+   * The display element is scaled to fit the window; deltas are divided
+   * back to display pixels, and the absolute point is container-relative so
+   * the ratio survives the scaling untouched (vmware maps it to 0–65535).
+   */
+  const onPointer = (event: PointerEvent): void => {
+    const live = mouseTarget();
+    if (!live || !mounted) return;
+    const rect = mounted.getBoundingClientRect();
+    if (event.type === "pointermove") {
+      const k = mounted.offsetWidth && rect.width ? rect.width / mounted.offsetWidth : 1;
+      live.sendMouseMove?.(
+        event.movementX / k,
+        event.movementY / k,
+        event.clientX - rect.left,
+        event.clientY - rect.top,
+        rect.width,
+        rect.height,
+      );
+      return;
+    }
+    /* pointerdown / pointerup: the full button state in one message. */
+    const b = event.buttons;
+    live.sendMouseButtons?.(Boolean(b & 1), Boolean(b & 4), Boolean(b & 2));
+    if (event.type === "pointerdown") {
+      /* Keep the drag even when it leaves the window mid-move. */
+      try {
+        stage.setPointerCapture(event.pointerId);
+      } catch {
+        /* a capture that cannot be taken is not worth a crash */
+      }
+      event.preventDefault();
+    }
+  };
+  stage.addEventListener("pointermove", onPointer);
+  stage.addEventListener("pointerdown", onPointer);
+  stage.addEventListener("pointerup", onPointer);
+  const onWheel = (event: WheelEvent): void => {
+    const live = mouseTarget();
+    if (!live) return;
+    event.preventDefault();
+    if (event.deltaY) live.sendMouseWheel?.(event.deltaY < 0 ? 1 : -1);
+  };
+  stage.addEventListener("wheel", onWheel, { passive: false });
+  /* The guest owns the right button (a WM's window menu, a browser's context
+     menu) — the desktop's own menu would land on top of it. */
+  stage.addEventListener("contextmenu", (event) => {
+    if (mouseTarget()) event.preventDefault();
+  });
+
   /**
    * Mount the machine's own display element. v86 created it before the machine
    * started and has been drawing into it ever since; it is only now put on

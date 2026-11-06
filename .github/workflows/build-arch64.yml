@@ -24,6 +24,9 @@ on:
       - "tools/build-arch64-guest.sh"
       - "tools/arch64-collect.sh"
       - "tools/make-arch64-initrd.py"
+      - "tools/xgfx64-collect.sh"
+      - "tools/guest-pack/install-wm64.sh"
+      - "tools/guest-pack/install-netsurf.sh"
 
 permissions:
   contents: write
@@ -45,7 +48,7 @@ jobs:
 
       - name: Build the guest
         run: |
-          chmod +x tools/build-arch64-guest.sh tools/arch64-collect.sh
+          chmod +x tools/build-arch64-guest.sh tools/arch64-collect.sh tools/xgfx64-collect.sh
           sh tools/build-arch64-guest.sh
 
       - name: Write VENDORED.md
@@ -74,18 +77,18 @@ jobs:
             echo "Built: $(date -u +%Y-%m-%dT%H:%M:%SZ) by GitHub Actions run ${{ github.run_id }}"
             echo "Rebuild: run the 'Build arch64 guest' workflow (it overwrites these files)."
           } > public/arch64/VENDORED.md
-          ls -la public/arch64
-          du -sh public/arch64
+          ls -la public/arch64 public/arch64-x11 public/arch64-netsurf
+          du -sh public/arch64 public/arch64-x11 public/arch64-netsurf
 
       - name: Commit and push
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add -A public/arch64
+          git add -A public/arch64 public/arch64-x11 public/arch64-netsurf
           if git diff --cached --quiet; then
             echo "build output unchanged — nothing to commit"
           else
-            git commit -m "Vendor the 64-bit Arch Linux guest (public/arch64)"
+            git commit -m "Vendor the 64-bit Arch Linux guest + X11/NetSurf guest packs"
             # Two vendor workflows triggered by the same push race each other
             # to this push (seen: run 42150688193, rejected non-fast-forward
             # when build-arch64 landed first). Rebase onto whatever won and

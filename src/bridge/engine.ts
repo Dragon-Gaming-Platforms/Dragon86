@@ -54,6 +54,20 @@ export interface TerminalBackend {
    */
   sendScancodes?: (codes: number[]) => void;
   /**
+   * Pointer movement from the Engine Viewer, in the machine's display
+   * coordinates: a relative step for the PS/2 mouse plus the absolute
+   * position inside the display (x, y, width, height). The absolute half is
+   * what makes the guest's cursor sit exactly under the user's — v86's
+   * vmware device feeds it to the guest once its mouse driver speaks
+   * vmmouse, which Arch's psmouse does. Present only on a backend with an
+   * emulated mouse.
+   */
+  sendMouseMove?: (dx: number, dy: number, x: number, y: number, w: number, h: number) => void;
+  /** Pointer buttons, current state of all three at once. */
+  sendMouseButtons?: (left: boolean, middle: boolean, right: boolean) => void;
+  /** Wheel: +1 a notch up, -1 a notch down. */
+  sendMouseWheel?: (step: number) => void;
+  /**
    * True while this backend still owns a live machine. The Engine Viewer
    * needs to tell "there is no machine" from "the machine is up but its
    * display is not readable yet" — the two used to be the same message, and

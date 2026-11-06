@@ -1,0 +1,8 @@
+{
+  "id": "x11-wm-64",
+  "kind": "guest-pack",
+  "dump": "/",
+  "run": "sh /install-wm64.sh",
+  "files": [],
+  "note": "Placeholder — the 'Build arch64 guest' workflow overwrites this with the real payload list. An empty files list makes the store say so instead of installing nothing."
+}
