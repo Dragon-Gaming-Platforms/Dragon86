@@ -334,6 +334,18 @@ check(
   [...cards].map((n) => n.textContent.slice(0, 24)).join(" | ").slice(0, 200),
 );
 
+/* The distro is a store entry now: Arch Linux is listed, not installed
+   (this jsdom device has no OS at /), and Install is the only button —
+   the Terminal refuses to boot until it is used. */
+const archCard = [...cards].find((n) => n.textContent.includes("Arch Linux"));
+check("catalog offers Arch Linux (the distro moved to the store)", Boolean(archCard));
+const archButtons = [...(archCard?.querySelectorAll("button") ?? [])].map((b) => b.textContent.trim());
+check(
+  "Arch Linux offers Install, not Open or Uninstall",
+  archButtons.includes("Install") && !archButtons.includes("Open") && !archButtons.includes("Uninstall"),
+  archButtons.join(", "),
+);
+
 /* NES is in the catalog but not on the device: Install is what puts it there. */
 const nesCardCatalog = [...cards].find((n) => n.textContent.includes("NES"));
 check("catalog has NES", Boolean(nesCardCatalog));
@@ -919,20 +931,21 @@ check(
   [...document.querySelectorAll(".desktop-icon")].map((n) => n.textContent.trim()).join(" | ").slice(0, 200),
 );
 
-/* ---- .d86 shortcuts: the fixed apps are visible where apps live ----
-   Preview, Scramjet and the Engine Viewer are pages, not folders, so each one
-   gets a shortcut file in ~/system/apps. The file holds the iframe markup and
-   opening it launches the app. */
+/* ---- .d86 pointers: every app entry gets a file in ~/applications ----
+   Fixed apps (Preview, Scramjet, DrakeForge, the Engine Viewer) and the
+   filesystem apps from ~/system/apps/*.json each get an auto-generated
+   pointer file. The file holds the iframe markup and opening it launches
+   the app. */
 {
   const filesW = [...document.querySelectorAll(".d86-window")].find((w) => w.querySelector(".fm-root"));
   const pathInput = filesW.querySelector(".fm-path-input");
-  pathInput.value = "/home/user/system/apps";
+  pathInput.value = "/home/user/applications";
   pathInput.dispatchEvent(new window.KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
   await wait(500);
   const names = [...filesW.querySelectorAll(".fm-row")].map((r) => r.textContent);
-  for (const id of ["preview", "scramjet", "drakeforge", "engine-viewer"]) {
+  for (const id of ["preview", "scramjet", "drakeforge", "engine-viewer", "hello"]) {
     check(
-      `${id}.d86 is in system/apps`,
+      `${id}.d86 is in ~/applications`,
       names.some((t) => t.includes(`${id}.d86`)),
       names.join(" | ").slice(0, 200),
     );

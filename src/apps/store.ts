@@ -8,9 +8,12 @@
  * bundled apps, so an installed app is an ordinary folder you can open,
  * edit, back up in Files, or delete from the Files app.
  *
- * The store is deliberately a normal app, not a privileged one: it has no
- * way to write outside `~/system/apps`, and everything it does is visible in
- * that folder afterwards.
+ * Where an app lands is declared by the app itself: each entry in the repo
+ * carries an `app-manifest.json` saying where the store dumps its source
+ * (`"dump"`). Ordinary apps dump into `~/system/apps/<id>/`; the Arch Linux
+ * distro is a store entry too, and its manifest dumps the whole userland at
+ * `/` — the root the Terminal's machines then boot. Everything the store
+ * does is visible in the filesystem afterwards.
  */
 
 import { el, icon } from "../core/dom";
@@ -30,6 +33,7 @@ import {
   upsertAppEntry,
   normExt,
 } from "../core/fs-apps";
+import { distroInstalled, ensureGuestRoot } from "../bridge/guest-root";
 import type { Win } from "../core/wm";
 
 const BASE = import.meta.env.BASE_URL;
@@ -67,6 +71,21 @@ interface StoreApp {
 interface Catalog {
   name?: string;
   apps: StoreApp[];
+}
+
+/**
+ * `app-manifest.json`, shipped in the repo beside each app's files: where
+ * the store dumps the app's source when installing it. Ordinary apps dump
+ * into `~/system/apps/<id>/` (also the default when the file is missing);
+ * a `"kind": "distro"` entry dumps an operating system — the Arch userland
+ * unpacked at `/` for the Terminal's machines to boot.
+ */
+interface AppManifest {
+  id?: string;
+  kind?: string;
+  dump?: string;
+  image?: string;
+  kernel?: string;
 }
 
 type Tab = "home" | "apps" | "games" | "installed";
@@ -112,6 +131,8 @@ export function openStore(win: Win): void {
   /** id → done/total while an install is running. */
   const progress = new Map<string, { done: number; total: number }>();
   const installedIds = new Set<string>();
+  /** id → its repo app-manifest.json (null = fetched, none there). */
+  const manifests = new Map<string, AppManifest | null>();
   /** Guards the registry clean-up against re-entering itself. */
   let healing = false;
   let scanQueued = false;
@@ -135,6 +156,19 @@ export function openStore(win: Win): void {
       catalog = parsed;
       loadError = "";
       logInfo("store", `catalog loaded: ${parsed.apps.length} apps from ${url}`);
+      /* Each app's own manifest says where its source gets dumped. */
+      await Promise.all(
+        parsed.apps.map(async (app) => {
+          try {
+            const res2 = await fetch(new URL("app-manifest.json", new URL(app.base ?? `${app.id}/`, url)).href, {
+              cache: "no-cache",
+            });
+            manifests.set(app.id, res2.ok ? ((await res2.json()) as AppManifest) : null);
+          } catch {
+            manifests.set(app.id, null);
+          }
+        }),
+      );
     } catch (err) {
       catalog = null;
       loadError =
@@ -183,7 +217,13 @@ export function openStore(win: Win): void {
       }
     }
     for (const app of catalog?.apps ?? []) {
-      if (await vfs.exists(`${APPS_DIRS[0]}/${app.id}/${app.entry ?? "index.html"}`)) {
+      if (isDistro(app)) {
+        /* The distro is "installed" when / actually holds a bootable root —
+           the same test the Terminal uses, so the two never disagree. */
+        if (await distroInstalled(vfs.GUEST_ROOT)) installedIds.add(app.id);
+        continue;
+      }
+      if (await vfs.exists(`${dumpDirFor(app)}/${app.entry ?? "index.html"}`)) {
         installedIds.add(app.id);
       }
     }
@@ -481,6 +521,18 @@ export function openStore(win: Win): void {
 
     if (installed) {
       const openBtn = el("button", `btn ${size} ghost`.trim(), "Open");
+      if (isDistro(app)) {
+        /* An installed OS opens in the Terminal; it has no Uninstall button
+           because its files are woven into / — removing them would mean
+           deleting /usr, /etc and whatever you have put there since. */
+        openBtn.title = "Open the Terminal — the machine boots this system";
+        openBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          window.dispatchEvent(new CustomEvent("d86-launch-app", { detail: "terminal" }));
+        });
+        wrap.append(openBtn);
+        return wrap;
+      }
       openBtn.title = `Open ${app.name}`;
       openBtn.addEventListener("click", (e) => {
         e.stopPropagation();
@@ -558,7 +610,15 @@ export function openStore(win: Win): void {
 
     const files = el("div", "store-files");
     files.append(el("h3", undefined, "What gets installed"));
-    for (const file of app.files ?? []) files.append(el("code", undefined, `system/apps/${app.id}/${file}`));
+    if (isDistro(app)) {
+      /* The manifest dumps this one at /: the whole userland becomes your
+         filesystem's root, not a folder under system/apps. */
+      files.append(el("code", undefined, `/ — the Arch userland, unpacked from ${manifestFor(app)?.image ?? "initrd.gz"}`));
+      files.append(el("code", undefined, `/boot/vmlinuz + /boot/initrd.gz — what the machine boots`));
+    } else {
+      const dumpRel = dumpDirFor(app).replace(`${vfs.HOME}/`, "");
+      for (const file of app.files ?? []) files.append(el("code", undefined, `${dumpRel}/${file}`));
+    }
     content.append(files);
 
     status.textContent = `${app.name} · from ${catalog?.name ?? "store.json"}`;
@@ -572,19 +632,39 @@ export function openStore(win: Win): void {
 
   /* ---------- install / remove ---------- */
 
+  function manifestFor(app: StoreApp): AppManifest | null {
+    return manifests.get(app.id) ?? null;
+  }
+
+  function isDistro(app: StoreApp): boolean {
+    return manifestFor(app)?.kind === "distro";
+  }
+
+  /** The folder an ordinary app's files are dumped into, per its manifest. */
+  function dumpDirFor(app: StoreApp): string {
+    const dump = manifestFor(app)?.dump;
+    if (!dump || dump === "/") return `${APPS_DIRS[0]}/${app.id}`;
+    const expanded = dump.replace(/^~(?=\/|$)/, vfs.HOME);
+    return expanded.replace(/\/+$/, "");
+  }
+
   function catalogBase(): string {
     const custom = getSettings().storeUrl.trim();
     return new URL(custom || `${BASE}store.json`, window.location.href).href;
   }
 
   async function install(app: StoreApp): Promise<void> {
+    if (isDistro(app)) {
+      await installDistro(app);
+      return;
+    }
     const files = app.files ?? [];
     if (!files.length) {
       notify({ title: `${app.name} has nothing to install`, body: "Its store listing lists no files.", icon: "info" });
       return;
     }
     const baseUrl = new URL(app.base ?? `${app.id}/`, catalogBase());
-    const dir = `${APPS_DIRS[0]}/${app.id}`;
+    const dir = dumpDirFor(app);
     progress.set(app.id, { done: 0, total: files.length });
     render();
 
@@ -641,6 +721,49 @@ export function openStore(win: Win): void {
   }
 
   /**
+   * Install an operating system: the dump location in its manifest is `/`.
+   *
+   * This is ensureGuestRoot's unpack — fetch the kernel and initramfs into
+   * /boot, then unpack the whole userland into the OS filesystem's root.
+   * The same code path updates an installed distro on later boots; this is
+   * the only place that performs the FIRST install, which is exactly what
+   * "the distro lives in the App Store" means.
+   */
+  async function installDistro(app: StoreApp): Promise<void> {
+    progress.set(app.id, { done: 0, total: 1 });
+    render();
+    try {
+      const res = await ensureGuestRoot(vfs.GUEST_ROOT, {
+        install: true,
+        status: (text) => {
+          status.textContent = `${app.name}: ${text}`;
+        },
+      });
+      await refreshInstalled();
+      notify({
+        title: `${app.name} installed`,
+        body: res.reused
+          ? "A bootable system was already in / — nothing needed unpacking. Open the Terminal to boot it."
+          : "The userland is unpacked into /. Open the Terminal and the machine boots it.",
+        icon: "linux",
+        timeout: 8000,
+      });
+      logInfo("store", `installed ${app.id} at /${res.reused ? " (already present)" : ""}`);
+    } catch (err) {
+      logWarn("store", `install of ${app.id} failed`, err);
+      notify({
+        title: `${app.name} did not install`,
+        body: (err as Error).message,
+        icon: "info",
+        timeout: 0,
+      });
+    } finally {
+      progress.delete(app.id);
+      render();
+    }
+  }
+
+  /**
    * Uninstall: a real delete, not a trip to the trash.
    *
    * Both halves have to go — the folder under ~/system/apps and the entry in
@@ -649,7 +772,7 @@ export function openStore(win: Win): void {
    * file type afterwards falls back to something that exists.
    */
   async function uninstall(app: StoreApp): Promise<void> {
-    const dir = `${APPS_DIRS[0]}/${app.id}`;
+    const dir = dumpDirFor(app);
     const ok = await showConfirm(
       "Uninstall app",
       `Uninstall ${app.name}? This deletes ${dir.replace(vfs.HOME, "~")}/ and removes its entry from user-apps.json. It is not moved to the trash, so it cannot be undone.`,

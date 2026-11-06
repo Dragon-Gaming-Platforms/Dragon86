@@ -575,8 +575,10 @@ class V86Backend implements TerminalBackend {
 
       /* Guest / = ZenFS / (the persistent system root). The kernel and
          initramfs are read from /boot, so everything the machine runs is a
-         file in the OS filesystem; they are unpacked/copied in on first
-         boot. */
+         file in the OS filesystem. Installing the distro is the App Store's
+         job (Arch Linux listing); this throws honestly when no OS is
+         installed, and updates an installed one when the app ships a newer
+         initramfs. */
       const guestRoot = await ensureGuestRoot(root, { status: (t) => this.status(t) });
       /* Scripts and the profile hook go in *after* the distro tree exists —
          a first boot that unpacked over the top of them would lose them —

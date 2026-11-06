@@ -3,6 +3,20 @@
   "name": "Dragon86 App Store",
   "apps": [
     {
+      "id": "arch-linux",
+      "name": "Arch Linux (x86)",
+      "sub": "The operating system the Terminal's machines boot",
+      "category": "System",
+      "publisher": "Arch Linux 32 userland \u00b7 Dragon86 build",
+      "icon": "linux",
+      "base": "v86/",
+      "files": [
+        "initrd.gz",
+        "bzImage"
+      ],
+      "description": "A real Arch Linux userland (bash, coreutils, git, kernel modules) for the x86 machines in the Terminal. Installing unpacks it into your filesystem's own / \u2014 every file of the distro becomes a normal file in Files, and the machine boots it from there over 9p. Nothing boots until this is installed: the Terminal will tell you to come here first. Uninstalling is not offered because the distro's files are woven into /; Settings \u2192 Machine can re-unpack it if it breaks."
+    },
+    {
       "id": "nes",
       "name": "NES",
       "sub": "Play NES games from your files",

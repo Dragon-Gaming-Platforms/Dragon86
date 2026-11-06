@@ -1,0 +1,12 @@
+{
+  "id": "arch-linux",
+  "kind": "distro",
+  "dump": "/",
+  "image": "initrd.gz",
+  "kernel": "bzImage",
+  "arch": [
+    "x86_32",
+    "x86_64"
+  ],
+  "note": "Where the App Store dumps this entry: the whole Arch userland is unpacked from initrd.gz into the OS filesystem's own /, which the x86 machines then boot as their root over 9p."
+}
