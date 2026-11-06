@@ -16,6 +16,8 @@ import { getSettings, onSettingsChange, type MachineArch } from "../core/setting
 import type { Win } from "../core/wm";
 import type { TerminalBackend } from "../bridge/engine";
 import { getV86Backend } from "../bridge/v86";
+import { distroInstalled } from "../bridge/guest-root";
+import * as vfs from "../core/vfs";
 import { isolationReport, logInfo, logWarn } from "../core/log";
 import { rememberEngine } from "./engine-viewer";
 
@@ -234,6 +236,27 @@ export function openTerminal(win: Win, options: TerminalOptions = {}): void {
     setChip("offline", `No ${ARCH_LABEL[arch]} operating system installed`);
   };
 
+  /** Honest refusal, the other kind: the machine is fine, but no operating
+      system has been installed yet. The distro lives in the App Store. */
+  const noOsBanner = (arch: MachineArch) => {
+    term.clear();
+    term.writeln(`${BOLD}${RED}  ╔══════════════════════════════════════════╗${RESET}`);
+    term.writeln(`${BOLD}${RED}  ║        DRAGON86  ·  TERMINAL             ║${RESET}`);
+    term.writeln(`${BOLD}${RED}  ╚══════════════════════════════════════════╝${RESET}`);
+    term.writeln("");
+    term.writeln(`  ${GREEN}●${RESET} Terminal emulator : ready`);
+    term.writeln(`  ${GREEN}●${RESET} ${ARCH_LABEL[arch]} machine : ready`);
+    term.writeln(`  ${RED}●${RESET} Operating system  : not installed`);
+    term.writeln("");
+    term.writeln(`  The machine has nothing to boot: no OS is installed in /.`);
+    term.writeln("");
+    term.writeln(`  Open the ${BOLD}App Store${RESET} and install ${BOLD}Arch Linux (x86)${RESET} — it unpacks`);
+    term.writeln(`  a real Arch userland into your filesystem's /, and this machine`);
+    term.writeln(`  boots it. Then hit ${BOLD}Reconnect${RESET} here.`);
+    term.writeln("");
+    setChip("offline", "No operating system installed — see the App Store");
+  };
+
   /* The window title says which machine is behind this terminal. The user
      picks an architecture; the emulator behind it is an implementation
      detail (bridge/v86.ts). */
@@ -268,6 +291,13 @@ export function openTerminal(win: Win, options: TerminalOptions = {}): void {
       noDistroBanner(arch);
       return;
     }
+    if (!(await distroInstalled(vfs.GUEST_ROOT))) {
+      saveStateBtn.style.display = "none";
+      viewEngineBtn.style.display = "none";
+      flushPrint();
+      noOsBanner(arch);
+      return;
+    }
     saveStateBtn.style.display = "";
     viewEngineBtn.style.display = "";
     logInfo(
@@ -279,7 +309,7 @@ export function openTerminal(win: Win, options: TerminalOptions = {}): void {
     flushPrint();
     term.writeln(`${DIM}Starting the ${ARCH_LABEL[arch]} machine (Arch userland, in-page).${RESET}`);
     term.writeln(`${DIM}Its root filesystem is YOUR filesystem: the guest's / is the / that Files shows.${RESET}`);
-    term.writeln(`${DIM}First boot unpacks the distro into / once; after that it just boots.${RESET}`);
+    term.writeln(`${DIM}It boots the Arch userland installed in / (App Store → Arch Linux).${RESET}`);
     term.writeln(`${DIM}/home/user in the guest is your home — Documents, Downloads and Desktop included.${RESET}`);
     if (arch === "x86_64") {
       term.writeln(`${DIM}x86-64 machine: the installed distro is 32-bit and boots the way it would on real 64-bit hardware.${RESET}`);

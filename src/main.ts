@@ -14,7 +14,7 @@ import { isolationReport, logInfo } from "./core/log";
 import { loadFsApps, onFsAppsChange, startFsAppBridge } from "./core/fs-apps";
 import { loadDefaults, requestDefaults } from "./core/filetypes";
 import { initTrash } from "./core/trash";
-import { ensureAppShortcuts } from "./core/app-shortcuts";
+import { ensureAppShortcuts, watchAppPointers } from "./core/app-shortcuts";
 import { installDevApi } from "./core/dev-api";
 
 async function boot(): Promise<void> {
@@ -85,10 +85,13 @@ async function boot(): Promise<void> {
   /* Installed apps get to ask to become the default opener for their file
      types — once each, in a corner card, after the desktop is visible. */
   setTimeout(() => void requestDefaults(), 1200);
-  /* ~/system/apps gets a .d86 file per fixed app (Preview, Scramjet, the
-     Engine Viewer), so the apps that are not folders are still visible where
-     apps live. Version-gated: deleting one is not undone next boot. */
-  setTimeout(() => void ensureAppShortcuts(), 1600);
+  /* ~/applications gets a .d86 pointer per app entry in the app JSONs
+     (iframe-apps.json + ~/system/apps/*.json), regenerated whenever those
+     JSONs change and never duplicated. */
+  setTimeout(() => {
+    void ensureAppShortcuts();
+    watchAppPointers();
+  }, 1600);
 }
 
 void boot();

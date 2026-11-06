@@ -14,7 +14,7 @@
  *      installed app: it runs the page as an app for as long as it is open;
  *   4. the Terminal, offered for shell scripts: it prints the file into the
  *      console and runs nothing (apps/terminal.ts);
- *   5. "App shortcut" for `.d86` files — `~/system/apps/scramjet.d86` and
+ *   5. "App shortcut" for `.d86` files — `~/applications/scramjet.d86` and
  *      friends launch the fixed app they name (core/app-shortcuts.ts).
  *
  * The user's choices live in the filesystem, next to the apps themselves:

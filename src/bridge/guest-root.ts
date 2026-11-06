@@ -2,15 +2,15 @@
  * The v86 guest's root filesystem, living in the OS filesystem.
  *
  * The guest boots a vendored Arch 32 kernel plus a small initramfs, and its
- * `/` is not a disk image: it is `/home/user/v86` in ZenFS, served to the
+ * `/` is not a disk image: it is the OS filesystem's own `/` in ZenFS, served to the
  * guest over 9p. So the whole distribution — `/bin/bash`, `/usr/bin/awk`,
  * `/etc/profile`, everything — is a normal file in Dragon86, visible in
  * Files, editable with the Text Editor, writable from inside the guest.
  *
  * Where the files come from: the initramfs (`public/v86/initrd.gz`) already
  * contains the hand-built userland (busybox + Arch bash + coreutils + glibc +
- * kernel modules). On first boot we unpack it once into ZenFS and boot from
- * that copy. The initramfs is still what the *kernel* is given — it has to be,
+ * kernel modules). Installing Arch Linux from the App Store unpacks it once
+ * into ZenFS `/`, and every boot runs from that copy. The initramfs is still what the *kernel* is given — it has to be,
  * since it is what mounts the 9p root — but inside it the only thing that
  * matters is `/init`, which mounts our ZenFS root and switches to it.
  *
@@ -209,14 +209,38 @@ async function ensureArtifact(root: string, name: string, url: string): Promise<
 }
 
 /**
+ * Is there an operating system at this root? True once the distro has been
+ * installed (App Store → Arch Linux) — a valid seed marker plus a shell.
+ * A marker from an older initramfs still counts: that is an installed OS
+ * that will be updated on the next boot, not a missing one.
+ */
+export async function distroInstalled(root: string): Promise<boolean> {
+  const marker = await readMarker(root);
+  if (!marker) return false;
+  return (await exists(at(root, "bin/bash"))) || (await exists(at(root, "usr/bin/bash")));
+}
+
+/**
  * Make sure the system root (`/` in ZenFS) is a bootable Arch root and hand back the kernel and
  * initramfs to boot it with. Cheap when it has already been done.
+ *
+ * First-time installation is the App Store's job (the Arch Linux listing,
+ * whose app-manifest.json dumps the distro at `/`): a boot with no OS
+ * installed throws instead of quietly installing one. `install: true` is
+ * how the store (and Settings' re-unpack) actually performs the dump.
+ * An installed root whose initramfs is older than the app's still updates
+ * itself on boot — that is an update, not an install.
  */
 export async function ensureGuestRoot(
   root: string,
-  opts: { status?: (text: string) => void; force?: boolean } = {},
+  opts: { status?: (text: string) => void; force?: boolean; install?: boolean } = {},
 ): Promise<GuestRoot> {
   const say = opts.status ?? (() => {});
+  if (!opts.install && !opts.force && !(await distroInstalled(root))) {
+    throw new Error(
+      "no operating system is installed — open the App Store and install Arch Linux (x86)",
+    );
+  }
   await ensureDir(root);
   await ensureDir(at(root, "boot"));
 
@@ -354,7 +378,11 @@ export async function guestRootInfo(root: string): Promise<Marker | null> {
   return readMarker(root);
 }
 
-/** Drop the marker so the next boot re-unpacks over the existing tree. */
+/**
+ * Drop the marker. With install-from-the-store semantics this alone would
+ * leave the machine "not installed", so the only caller (Settings'
+ * re-unpack) follows it with ensureGuestRoot(root, { force: true }).
+ */
 export async function resetGuestRoot(root: string): Promise<void> {
   await fs.promises.unlink(at(root, MARKER)).catch(() => {});
 }

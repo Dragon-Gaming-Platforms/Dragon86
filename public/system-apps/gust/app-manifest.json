@@ -1,0 +1,6 @@
+{
+  "id": "gust",
+  "kind": "iframe-app",
+  "dump": "~/system/apps/gust/",
+  "note": "Where the App Store writes this app's files when it installs it. The OS then serves them from that folder (9pf/<id>/) and registers the entry in ~/system/apps/user-apps.json."
+}

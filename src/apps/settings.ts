@@ -9,7 +9,7 @@
 import { el, icon } from "../core/dom";
 import { showConfirm, showInput } from "../core/dialog";
 import { probeRelay, relayBackendName } from "../bridge/v86-relay";
-import { guestRootInfo, resetGuestRoot } from "../bridge/guest-root";
+import { ensureGuestRoot, guestRootInfo, resetGuestRoot } from "../bridge/guest-root";
 import {
   getSettings,
   setSettings,
@@ -584,8 +584,8 @@ export function openSettings(win: Win, startPage?: string): void {
     const refreshRoot = async (): Promise<void> => {
       const data = await guestRootInfo(vfs.GUEST_ROOT);
       info.textContent = data
-        ? `${data.files.toLocaleString()} files, unpacked ${new Date(data.at).toLocaleString()}. /Documents, /Downloads and /Desktop inside the guest are your own folders.`
-        : "Not unpacked yet — it happens the first time the Terminal connects.";
+        ? `${data.files.toLocaleString()} files, unpacked ${new Date(data.at).toLocaleString()}. Your home (/home/user) is inside it — Documents, Downloads and Desktop included.`
+        : "No operating system installed — get Arch Linux (x86) from the App Store.";
     };
     void refreshRoot();
     host.append(info);
@@ -593,12 +593,30 @@ export function openSettings(win: Win, startPage?: string): void {
     const row = el("div", "settings-row");
     row.dataset.setting = "Guest filesystem";
     const reseedBtn = el("button", "btn", "Re-unpack the distro");
-    reseedBtn.title = "Extract the distro into / again on the next boot";
+    reseedBtn.title = "Extract the installed distro into / again, right now (repairs a broken root)";
     reseedBtn.addEventListener("click", () => {
-      void resetGuestRoot(vfs.GUEST_ROOT).then(async () => {
-        await refreshRoot();
-        info.textContent = "It will be unpacked again the next time the Terminal connects.";
-      });
+      /* Done here and now, not "on the next boot": first-time installs live
+         in the App Store, so a dropped marker alone would just make the
+         Terminal say "no OS installed". Drop it, then re-unpack over the
+         existing tree immediately. */
+      reseedBtn.disabled = true;
+      void resetGuestRoot(vfs.GUEST_ROOT)
+        .then(() =>
+          ensureGuestRoot(vfs.GUEST_ROOT, {
+            install: true,
+            force: true,
+            status: (text) => {
+              info.textContent = text;
+            },
+          }),
+        )
+        .then(refreshRoot)
+        .catch((err: Error) => {
+          info.textContent = `Re-unpack failed: ${err.message}`;
+        })
+        .finally(() => {
+          reseedBtn.disabled = false;
+        });
     });
     row.append(reseedBtn);
     host.append(row);
