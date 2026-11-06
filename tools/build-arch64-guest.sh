@@ -212,6 +212,7 @@ if [ ! -f "$WORK/prefix/lib/libcurl.a" ]; then
 #define CURL_OS "x86_64-linux-musl"
 CONFIG
   ( cd "$WORK/src/curl-curl-$CURL_VERSION"
+    mkdir -p lib/x86_64-unknown-linux-musl
     make -C lib -f Makefile.mk CFG=-mbedtls-zlib-ipv6 \
       CC="$ZIG cc -target $ZIG_TARGET" AR="$ZIG ar" \
       MBEDTLS_PATH="$WORK/prefix" ZLIB_PATH="$WORK/prefix" \
