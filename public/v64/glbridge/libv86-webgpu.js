@@ -1,4 +1,4 @@
-globalThis.V86GL_BUILD_REVISION = "6a5936bfd189a5d6221e";
+globalThis.V86GL_BUILD_REVISION = "f77b8908d07b0f3e0acd";
 (function(module, require) {
 globalThis.V86SVGADXFormats = [["","","",1,1,0],["bgra8unorm","srbmx","",1,1,4],["bgra8unorm","srbm","unorm8x4-bgra",1,1,4],["rgba8unorm","srbme","",1,1,2],["rgba8unorm","srbmxe","",1,1,2],["rgba8unorm","srbme","",1,1,2],["rgba8unorm","srbme","",1,1,2],["depth32float","dum","",1,1,4],["depth16unorm","dum","",1,1,2],["depth24plus-stencil8","dum","",1,1,4],["","","",1,1,2],["rgba8unorm","se","",1,1,1],["","","",1,1,1],["","","",1,1,2],["rgba8unorm","se","",1,1,2],["bc1-rgba-unorm","s","",4,4,8],["bc2-rgba-unorm","s","",4,4,16],["bc2-rgba-unorm","s","",4,4,16],["bc3-rgba-unorm","s","",4,4,16],["bc3-rgba-unorm","s","",4,4,16],["","","",1,1,2],["","","",1,1,2],["","","",1,1,4],["","","",1,1,3],["rgba16float","srbm","float16x4",1,1,8],["rgba32float","srb","float32x4",1,1,16],["rgb10a2unorm","srbme","",1,1,4],["","","",1,1,2],["","","",1,1,4],["","","",1,1,2],["","","",1,1,4],["","","",1,1,4],["rgba8unorm","srbe","",1,1,1],["r16float","srbm","float16",1,1,2],["r32float","srb","float32",1,1,4],["rg16float","srbm","float16x2",1,1,4],["rg32float","srb","float32x2",1,1,8],["","","",1,1,1],["depth24plus","dum","",1,1,4],["","","",1,1,4],["rg16uint","ue","",1,1,4],["rgba16uint","ue","",1,1,8],["","","",2,1,4],["","","",2,1,4],["","","",2,2,6],["","","",1,1,4],["rgba32float","srb","float32x4",1,1,16],["rgba32uint","ur","uint32x4",1,1,16],["rgba32sint","ur","sint32x4",1,1,16],["rgba32float","se","float32x3",1,1,12],["rgba32float","se","float32x3",1,1,12],["rgba32uint","ue","uint32x3",1,1,12],["rgba32sint","ue","sint32x3",1,1,12],["rgba16float","srbm","float16x4",1,1,8],["rgba16uint","urm","uint16x4",1,1,8],["rgba32float","srbe","snorm16x4",1,1,8],["rgba16sint","urm","sint16x4",1,1,8],["rg32float","srb","float32x2",1,1,8],["rg32uint","ur","uint32x2",1,1,8],["rg32sint","ur","sint32x2",1,1,8],["depth32float-stencil8","du","",1,1,8],["depth32float-stencil8","du","",1,1,8],["depth32float-stencil8","u","",1,1,8],["depth32float-stencil8","u","",1,1,8],["rgb10a2unorm","srbm","unorm10-10-10-2",1,1,4],["rgb10a2uint","urm","pull:uint10-10-10-2",1,1,4],["rg11b10ufloat","srb","pull:ufloat11-11-10",1,1,4],["rgba8unorm","srbm","unorm8x4",1,1,4],["rgba8unorm","srbm","unorm8x4",1,1,4],["rgba8unorm-srgb","srbm","",1,1,4],["rgba8uint","urm","uint8x4",1,1,4],["rgba8sint","urm","sint8x4",1,1,4],["rg16float","srbm","float16x2",1,1,4],["rg16uint","urm","uint16x2",1,1,4],["rg16sint","urm","sint16x2",1,1,4],["r32float","srb","float32",1,1,4],["depth32float","dum","",1,1,4],["r32uint","urm","uint32",1,1,4],["r32sint","urm","sint32",1,1,4],["depth24plus-stencil8","dum","",1,1,4],["depth24plus-stencil8","dum","",1,1,4],["depth24plus-stencil8","u","",1,1,4],["depth24plus-stencil8","u","",1,1,4],["rg8unorm","srbm","unorm8x2",1,1,2],["rg8unorm","srbm","unorm8x2",1,1,2],["rg8uint","urm","uint8x2",1,1,2],["rg8sint","urm","sint8x2",1,1,2],["r16float","srbm","float16",1,1,2],["r32float","srbe","unorm16",1,1,2],["r16uint","urm","uint16",1,1,2],["r32float","srbe","snorm16",1,1,2],["r16sint","urm","sint16",1,1,2],["r8unorm","srbm","unorm8",1,1,1],["r8unorm","srbm","unorm8",1,1,1],["r8uint","urm","uint8",1,1,1],["r16float","srbe","snorm8",1,1,1],["r8sint","urm","sint8",1,1,1],["","","",1,1,1],["rgb9e5ufloat","s","",1,1,4],["rgba8unorm","se","",2,1,4],["rgba8unorm","se","",2,1,4],["bc1-rgba-unorm","s","",4,4,8],["bc1-rgba-unorm-srgb","s","",4,4,8],["bc2-rgba-unorm","s","",4,4,16],["bc2-rgba-unorm-srgb","s","",4,4,16],["bc3-rgba-unorm","s","",4,4,16],["bc3-rgba-unorm-srgb","s","",4,4,16],["bc4-r-unorm","s","",4,4,8],["bc4-r-unorm","s","",4,4,8],["bc4-r-snorm","s","",4,4,8],["bc5-rg-unorm","s","",4,4,16],["bc5-rg-unorm","s","",4,4,16],["bc5-rg-snorm","s","",4,4,16],["rgb10a2unorm","","",1,1,4],["bgra8unorm","srbm","unorm8x4-bgra",1,1,4],["bgra8unorm-srgb","srbm","",1,1,4],["bgra8unorm","srbmx","",1,1,4],["bgra8unorm-srgb","srbmx","",1,1,4],["depth16unorm","dum","",1,1,2],["depth24plus","dum","",1,1,4],["depth24plus-stencil8","dum","",1,1,4],["","","",2,2,6],["rgba32float","srb","float32x4",1,1,16],["rgba16float","srbm","float16x4",1,1,8],["rgba32float","srbe","unorm16x4",1,1,8],["rg32float","srb","float32x2",1,1,8],["rgb10a2unorm","srbm","unorm10-10-10-2",1,1,4],["rgba16float","srbe","snorm8x4",1,1,4],["rg16float","srbm","float16x2",1,1,4],["rg32float","srbe","unorm16x2",1,1,4],["rg32float","srbe","snorm16x2",1,1,4],["r32float","srbm","float32",1,1,4],["rg16float","srbe","snorm8x2",1,1,2],["r16float","srbm","float16",1,1,2],["depth16unorm","dum","",1,1,2],["rgba8unorm","srbe","",1,1,1],["bc1-rgba-unorm","s","",4,4,8],["bc2-rgba-unorm","s","",4,4,16],["bc3-rgba-unorm","s","",4,4,16],["rgba8unorm","srbme","",1,1,2],["rgba8unorm","srbme","",1,1,2],["bgra8unorm","srbm","unorm8x4-bgra",1,1,4],["bgra8unorm","srbmx","pull:unorm8x4-bgrx",1,1,4],["bc4-r-unorm","s","",4,4,8],["bc5-rg-unorm","s","",4,4,16],["rgba8unorm","srbme","",1,1,2],["bc6h-rgb-ufloat","s","",4,4,16],["bc6h-rgb-ufloat","s","",4,4,16],["bc6h-rgb-float","s","",4,4,16],["bc7-rgba-unorm","s","",4,4,16],["bc7-rgba-unorm","s","",4,4,16],["bc7-rgba-unorm-srgb","s","",4,4,16],["","","",1,1,4],["rg11b10ufloat","srb","",1,1,4]];
 globalThis.V86VenusFormats = {"4":["rgba8unorm","frbmcp",null,2],"6":["rgba8unorm","frbmcp",null,2],"8":["rgba8unorm","frbmcp",null,2],"9":["r8unorm","frbmc","unorm8",1],"10":["r8snorm","fc","snorm8",1],"13":["r8uint","irmc","uint8",1],"14":["r8sint","irmc","sint8",1],"16":["rg8unorm","frbmc","unorm8x2",2],"17":["rg8snorm","fc","snorm8x2",2],"20":["rg8uint","irmc","uint8x2",2],"21":["rg8sint","irmc","sint8x2",2],"37":["rgba8unorm","frbmsc","unorm8x4",4],"38":["rgba8snorm","fsc","snorm8x4",4],"41":["rgba8uint","irmsc","uint8x4",4],"42":["rgba8sint","irmsc","sint8x4",4],"43":["rgba8unorm-srgb","frbmc",null,4],"44":["bgra8unorm","frbmc","unorm8x4-bgra",4],"50":["bgra8unorm-srgb","frbmc",null,4],"51":["rgba8unorm","frbmsc","unorm8x4",4],"52":["rgba8snorm","fsc","snorm8x4",4],"55":["rgba8uint","irmsc","uint8x4",4],"56":["rgba8sint","irmsc","sint8x4",4],"57":["rgba8unorm-srgb","frbmc",null,4],"64":["rgb10a2unorm","frbmc","unorm10-10-10-2",4],"68":["rgb10a2uint","irmc",null,4],"70":[null,"","unorm16",2],"71":[null,"","snorm16",2],"74":["r16uint","irmc","uint16",2],"75":["r16sint","irmc","sint16",2],"76":["r16float","frbmc","float16",2],"77":[null,"","unorm16x2",4],"78":[null,"","snorm16x2",4],"81":["rg16uint","irmc","uint16x2",4],"82":["rg16sint","irmc","sint16x2",4],"83":["rg16float","frbmc","float16x2",4],"91":[null,"","unorm16x4",8],"92":[null,"","snorm16x4",8],"95":["rgba16uint","irmsc","uint16x4",8],"96":["rgba16sint","irmsc","sint16x4",8],"97":["rgba16float","frbmsc","float16x4",8],"98":["r32uint","irmsc","uint32",4],"99":["r32sint","irmsc","sint32",4],"100":["r32float","xrmsc","float32",4],"101":["rg32uint","irsc","uint32x2",8],"102":["rg32sint","irsc","sint32x2",8],"103":["rg32float","xrsc","float32x2",8],"104":[null,"","uint32x3",12],"105":[null,"","sint32x3",12],"106":[null,"","float32x3",12],"107":["rgba32uint","irsc","uint32x4",16],"108":["rgba32sint","irsc","sint32x4",16],"109":["rgba32float","xrsc","float32x4",16],"122":["rg11b10ufloat","fc",null,4],"123":["rgb9e5ufloat","fc",null,4],"124":["depth16unorm","dmc",null,2],"125":["depth24plus","dmc",null,4],"126":["depth32float","dmc",null,4],"127":["stencil8","dmc",null,1],"129":["depth24plus-stencil8","dmc",null,4],"130":["depth32float-stencil8","dmc",null,8]};
@@ -69,6 +69,11 @@ globalThis.V86VenusFormats = {"4":["rgba8unorm","frbmcp",null,2],"6":["rgba8unor
         "texture-compression-bc-sliced-3d",
         // D3D11's typed UAVs of B8G8R8A8
         "bgra8unorm-storage",
+        // GLES 3.0's ETC2 and EAC, GLES 3.2's ASTC (the GLES executor, src/gles/page/gles3_executor.js)
+        "texture-compression-etc2",
+        "texture-compression-astc",
+        // GLES 3.0's TEXTURE_SWIZZLE_*
+        "texture-component-swizzle",
     ];
 
     // Limits raised to what the adapter allows: D3D10 has 8 render targets
@@ -5266,6 +5271,13 @@ struct VertexOutput {
             // compile option for the same reason the LOD bias does: it changes
             // the WGSL, so it belongs in the shader variant key.
             this.samplerMirrorOnce = this.options.samplerMirrorOnce || null;
+            // D3DRS_SHADEMODE's D3DSHADE_FLAT: the two colour varyings take
+            // the provoking vertex's value, with shaders as without them (as
+            // wined3d's flatshading). A vertex output and the fragment input
+            // at one location must agree, so the caller passes the same flag
+            // to both stages, as the fixed-function ones get it, and keys the
+            // variant on it.
+            this.flatShading = !!this.options.flatShading;
             this.writtenVaryings = new Set();
             this.usesAddress = false;
             this.usesLoopCounter = false;
@@ -5300,6 +5312,17 @@ struct VertexOutput {
 
         emit(text) {
             this.lines.push(" ".repeat(this.indent) + text);
+        }
+
+        // One varying of the inter-stage struct, the same in both stages:
+        // with flat shading the colour slots are flat (texture coordinates
+        // and fog keep interpolating, as in D3D9)
+        varyingDeclaration(slot) {
+            const flat = this.flatShading &&
+                (slot === VARYING_COLOR0 || slot === VARYING_COLOR1);
+            return "    @location(" + slot + ")" +
+                (flat ? " @interpolate(flat)" : "") +
+                " varying" + slot + ": vec4<f32>,";
         }
 
         fresh(prefix) {
@@ -6782,7 +6805,7 @@ struct VertexOutput {
             out.push("struct D9VertexOutput {");
             out.push("    @builtin(position) position: vec4<f32>,");
             for (let slot = 0; slot < VARYING_COUNT; ++slot)
-                out.push("    @location(" + slot + ") varying" + slot + ": vec4<f32>,");
+                out.push(this.varyingDeclaration(slot));
             const clipPlaneCount = this.options.clipPlaneCount || 0;
             for (let group = 0; group < Math.ceil(clipPlaneCount / 4); ++group)
                 out.push("    @location(" + (VARYING_COUNT + group) +
@@ -6909,7 +6932,7 @@ struct VertexOutput {
             out.push("struct D9PixelInput {");
             out.push("    @builtin(position) position: vec4<f32>,");
             for (let slot = 0; slot < VARYING_COUNT; ++slot)
-                out.push("    @location(" + slot + ") varying" + slot + ": vec4<f32>,");
+                out.push(this.varyingDeclaration(slot));
             const clipPlaneCount = this.options.clipPlaneCount || 0;
             for (let group = 0; group < Math.ceil(clipPlaneCount / 4); ++group)
                 out.push("    @location(" + (VARYING_COUNT + group) +
@@ -17158,10 +17181,12 @@ fn fs_main(in: VSOut) -> @location(0) vec4<f32> {
             const clipPlaneCount = clipMask
                 ? 32 - Math.clz32(clipMask) : 0;
             const clipKey = "_cl" + clipPlaneCount;
-            // D3DRS_SHADEMODE, applied to the two colour varyings of the
-            // fixed-function pipeline. A translated pixel shader is left alone:
-            // its varyings are the vertex shader's declared outputs, and D3D9
-            // does not reinterpolate a shader's outputs by shade mode.
+            // D3DRS_SHADEMODE, applied to the two colour varyings in both
+            // stages, fixed-function or translated (D3D9 flat-shades COLOR0/1
+            // with shaders too, as wined3d's flatshading does). The two
+            // stages have to agree: a vertex output and the fragment input at
+            // one location with different interpolation make the pipeline,
+            // and the frame's command buffer, invalid.
             const flatShading =
                 (rs.get(D3DRS_SHADEMODE) || D3DSHADE_GOURAUD) === D3DSHADE_FLAT;
             // Pre-transformed vertices (a POSITIONT element) skip vertex
@@ -17305,9 +17330,11 @@ fn fs_main(in: VSOut) -> @location(0) vec4<f32> {
                     }
                 }
                 const pixelVariantKey = alphaTestKey + clipKey + depthKey +
-                    lodBiasKey + mirrorOnceKey + legacySamplerKey;
+                    lodBiasKey + mirrorOnceKey + legacySamplerKey +
+                    (flatShading ? "_flat" : "");
                 if (alphaTest.enabled || clipPlaneCount || depthSamplers.length
-                        || lodBiasKey || mirrorOnceKey || legacySamplerKey) {
+                        || lodBiasKey || mirrorOnceKey || legacySamplerKey ||
+                        flatShading) {
                     variant = psResource.variants.get(pixelVariantKey);
                     if (!variant) {
                         variant = shaderPipeline.compileShader(psResource.tokens, {
@@ -17319,6 +17346,7 @@ fn fs_main(in: VSOut) -> @location(0) vec4<f32> {
                             samplerLodBias,
                             samplerMirrorOnce,
                             legacySamplerTypes,
+                            flatShading,
                         });
                         psResource.variants.set(pixelVariantKey, variant);
                         if (variant.ok) ++this.stats.shaderVariantsTranslated;
@@ -17492,9 +17520,11 @@ fn fs_main(in: VSOut) -> @location(0) vec4<f32> {
                 const pointKey = drawOptions.pointExpansion
                     ? "|p:" + (drawOptions.pointSprite ? "s" : "q") : "";
                 const variantKey = "b:" + bgra.join(",") + "|c:" +
-                    conversionKey + pointKey + clipKey;
+                    conversionKey + pointKey + clipKey +
+                    (flatShading ? "|flat" : "");
                 const needsVariant = bgra.length || conversionKey.length ||
-                    !!drawOptions.pointExpansion || !!clipPlaneCount;
+                    !!drawOptions.pointExpansion || !!clipPlaneCount ||
+                    flatShading;
                 let variant = vsResource.variants.get(variantKey);
                 if (!variant) {
                     variant = needsVariant
@@ -17502,7 +17532,7 @@ fn fs_main(in: VSOut) -> @location(0) vec4<f32> {
                             { bgraInputLocations: bgra, inputConversions,
                               pointExpansion: !!drawOptions.pointExpansion,
                               pointSprite: !!drawOptions.pointSprite,
-                              clipPlaneCount })
+                              clipPlaneCount, flatShading })
                         : vsResource.translated;
                     vsResource.variants.set(variantKey, variant);
                     if (needsVariant && variant.ok)
@@ -22780,7 +22810,7 @@ ${body.join("\n")}
     const stateLayout = (typeof require === "function" && typeof module !== "undefined") ?
         require("./gl_state_layout.js") : global.GLStateLayout;
 
-    const TRANSLATOR_REVISION = 1;
+    const TRANSLATOR_REVISION = 2;
 
     /* ================================================================== */
     /* Types                                                              */
@@ -22852,6 +22882,9 @@ ${body.join("\n")}
         sampler3D: sampler("3D"), samplerCube: sampler("Cube"),
         sampler1DShadow: sampler("1D", true), sampler2DShadow: sampler("2D", true),
         sampler2DRect: sampler("2DRect"), sampler2DRectShadow: sampler("2DRect", true),
+        // GL_OES_EGL_image_external (GLSL ES): a 2D sampler of an EGL image,
+        // which the executor holds as an ordinary 2D texture
+        samplerExternalOES: { kind: "sampler", dim: "2D", shadow: false, name: "samplerExternalOES", external: true },
     };
 
     function sameType(a, b) {
@@ -22915,6 +22948,32 @@ ${body.join("\n")}
             return t.name;
         default:
             throw new Error("no WGSL type for " + t.kind);
+        }
+    }
+
+    /* GLSL's == of two values of type t (already named, as each is read more
+     * than once) as one WGSL bool */
+    function equalityWGSL(a, b, t) {
+        switch (t.kind) {
+        case "vector":
+            return "all(" + a + " == " + b + ")";
+        case "matrix": {
+            const columns = [];
+            for (let c = 0; c < t.cols; ++c)
+                columns.push("all(" + a + "[" + c + "] == " + b + "[" + c + "])");
+            return "(" + columns.join(" && ") + ")";
+        }
+        case "array": {
+            const elements = [];
+            for (let i = 0; i < t.size; ++i)
+                elements.push(equalityWGSL(a + "[" + i + "]", b + "[" + i + "]", t.elem));
+            return "(" + elements.join(" && ") + ")";
+        }
+        case "struct":
+            return "(" + t.fields.map(f => equalityWGSL(a + "." + safeName(f.name),
+                b + "." + safeName(f.name), f.type)).join(" && ") + ")";
+        default:
+            return "(" + a + " == " + b + ")";
         }
     }
 
@@ -23035,6 +23094,12 @@ ${body.join("\n")}
         "GL_EXT_gpu_shader4",
     ]);
 
+    /* GLSL ES 1.00's (options.es: OpenGL ES 2.0's shaders, src/gles/glsl_es.js) */
+    const ES_EXTENSIONS = new Set([
+        "GL_OES_standard_derivatives",
+        "GL_OES_EGL_image_external",
+    ]);
+
     class Preprocessor {
         constructor(stage, options) {
             this.stage = stage;
@@ -23049,6 +23114,17 @@ ${body.join("\n")}
         defineBuiltins() {
             const objectMacro = (name, value) =>
                 this.macros.set(name, { params: null, body: ppTokenize(value) });
+            if (this.options.es) {
+                // GLSL ES 1.00, 3.4: GL_ES, and the fragment stage's highp
+                this.version = 100;
+                objectMacro("__VERSION__", "100");
+                objectMacro("GL_ES", "1");
+                if (this.stage === "fragment") objectMacro("GL_FRAGMENT_PRECISION_HIGH", "1");
+                for (const ext of ES_EXTENSIONS) objectMacro(ext, "1");
+                for (const [name, value] of Object.entries(this.options.defines || {}))
+                    objectMacro(name, String(value));
+                return;
+            }
             objectMacro("__VERSION__", "110");
             objectMacro("GL_ARB_texture_rectangle", "1");
             for (const [name, value] of Object.entries(this.options.defines || {}))
@@ -23166,6 +23242,8 @@ ${body.join("\n")}
                 const v = /\s*(\d+)/.exec(rest);
                 if (!v) fail(this.line, "malformed #version");
                 this.version = parseInt(v[1], 10);
+                if (this.options.es && this.version !== 100)
+                    fail(this.line, "#version " + this.version + " is not supported: GLSL ES 1.00 is #version 100");
                 if (this.version > 120) {
                     // Refusing outright turns a shader we might still translate
                     // into a hard failure; the analyzer rejects what it really
@@ -23181,11 +23259,12 @@ ${body.join("\n")}
                 const e = /\s*([A-Za-z_][A-Za-z0-9_]*)\s*:\s*([A-Za-z_]+)/.exec(rest);
                 if (!e) fail(this.line, "malformed #extension");
                 const [, ext, behavior] = e;
+                const supported = this.options.es ? ES_EXTENSIONS : SUPPORTED_EXTENSIONS;
                 if (behavior === "require" && ext !== "all" &&
-                        !SUPPORTED_EXTENSIONS.has(ext))
+                        !supported.has(ext))
                     fail(this.line, "extension not supported: " + ext);
                 if (behavior === "enable" && ext !== "all" &&
-                        !SUPPORTED_EXTENSIONS.has(ext))
+                        !supported.has(ext))
                     this.warnings.push("extension not supported: " + ext);
                 this.extensions.set(ext, behavior);
                 return;
@@ -23488,7 +23567,7 @@ ${body.join("\n")}
         "mat4x2", "mat4x3", "mat4x4",
         "sampler1D", "sampler2D", "sampler3D", "samplerCube",
         "sampler1DShadow", "sampler2DShadow",
-        "sampler2DRect", "sampler2DRectShadow",
+        "sampler2DRect", "sampler2DRectShadow", "samplerExternalOES",
         "lowp", "mediump", "highp", "precision",
     ]);
 
@@ -24692,6 +24771,25 @@ ${body.join("\n")}
         gl_FragDepth: { type: F.float },
     };
 
+    /* GLSL ES 1.00 (7.4): its constants are OpenGL ES 2.0's limits, which the
+     * GLES host reports (src/gles/gles_caps.js); one draw buffer; no
+     * gl_FragDepth, no compatibility state but gl_DepthRange, no fixed-function
+     * attributes or varyings */
+    const ES_BUILTIN_CONSTANTS = {
+        gl_MaxVertexAttribs: { type: F.int, value: 16 },
+        gl_MaxVertexUniformVectors: { type: F.int, value: 256 },
+        gl_MaxVaryingVectors: { type: F.int, value: 15 },
+        gl_MaxVertexTextureImageUnits: { type: F.int, value: 16 },
+        gl_MaxCombinedTextureImageUnits: { type: F.int, value: 32 },
+        gl_MaxTextureImageUnits: { type: F.int, value: 16 },
+        gl_MaxFragmentUniformVectors: { type: F.int, value: 224 },
+        gl_MaxDrawBuffers: { type: F.int, value: 1 },
+    };
+    const ES_FRAGMENT_BUILTIN_OUTPUTS = {
+        gl_FragColor: { type: F.vec4 },
+        gl_FragData: { type: arrayOf(F.vec4, 1) },
+    };
+
     /* ================================================================== */
     /* Semantic analysis                                                  */
     /* ================================================================== */
@@ -24811,6 +24909,25 @@ ${body.join("\n")}
 
         declareBuiltins() {
             const g = this.globalScope;
+            if (this.options.es) {
+                for (const [name, info] of Object.entries(ES_BUILTIN_CONSTANTS))
+                    g.names.set(name, { kind: "builtinConst", name, type: info.type,
+                                        value: info.value });
+                g.names.set("gl_DepthRange", { kind: "stateUniform", name: "gl_DepthRange",
+                                               type: STATE_UNIFORMS.gl_DepthRange.type,
+                                               info: STATE_UNIFORMS.gl_DepthRange });
+                const outputs = this.stage === "vertex" ? VERTEX_BUILTIN_OUTPUTS : ES_FRAGMENT_BUILTIN_OUTPUTS;
+                for (const [name, info] of Object.entries(outputs)) {
+                    if (name === "gl_ClipVertex") continue;
+                    g.names.set(name, { kind: "builtinOut", name, type: info.type, info });
+                }
+                if (this.stage === "fragment") {
+                    for (const [name, info] of Object.entries(FRAGMENT_BUILTIN_INPUTS))
+                        g.names.set(name, { kind: "builtinIn", name, type: info.type,
+                                            info });
+                }
+                return;
+            }
             for (const [name, info] of Object.entries(BUILTIN_CONSTANTS))
                 g.names.set(name, { kind: "builtinConst", name, type: info.type,
                                     value: info.value });
@@ -24936,7 +25053,9 @@ ${body.join("\n")}
             const leafSamplers = [];
             collectSamplerLeaves(name, type, leafSamplers);
             if (leafSamplers.length) {
-                if (leafSamplers.length !== countLeaves(type))
+                // (an array of samplers is one leaf of arraySize elements)
+                const elements = leafSamplers.reduce((n, leaf) => n + Math.max(1, leaf.arraySize), 0);
+                if (elements !== countLeaves(type))
                     fail(line, "a struct mixing samplers with other members is " +
                         "not supported: " + name);
                 for (const leaf of leafSamplers) {
@@ -25289,8 +25408,10 @@ ${body.join("\n")}
                         symbol.name + "' in a fragment shader");
                 break;
             case "param":
-                if (symbol.isConst || symbol.direction === "in")
-                    fail(node.line, "cannot assign to the input parameter '" +
+                // (an `in` parameter is the function's own copy: only a
+                // `const in` one is read-only)
+                if (symbol.isConst)
+                    fail(node.line, "cannot assign to the const parameter '" +
                         symbol.name + "'");
                 break;
             }
@@ -25356,10 +25477,14 @@ ${body.join("\n")}
                 }
                 return T.bool;
             case "<<": case ">>": case "&": case "|": case "^":
+                if (this.options.es)
+                    fail(line, "'" + op + "' is reserved in GLSL ES 1.00");
                 if (baseOf(left) !== "int" || baseOf(right) !== "int")
                     fail(line, "'" + op + "' requires integer operands");
                 return componentCount(left) >= componentCount(right) ? left : right;
             case "%":
+                if (this.options.es)
+                    fail(line, "'%' is reserved in GLSL ES 1.00");
                 if (baseOf(left) !== "int" || baseOf(right) !== "int")
                     fail(line, "'%' requires integer operands in GLSL 1.20");
                 return componentCount(left) >= componentCount(right) ? left : right;
@@ -25438,6 +25563,8 @@ ${body.join("\n")}
                     fail(node.line, "'!' requires a bool operand");
                 return T.bool;
             case "~":
+                if (this.options.es)
+                    fail(node.line, "'~' is reserved in GLSL ES 1.00");
                 if (baseOf(t) !== "int")
                     fail(node.line, "'~' requires an integer operand");
                 return t;
@@ -25934,6 +26061,14 @@ ${body.join("\n")}
                     cursor = fieldOffset + this.structSizeBytes(field.type);
                     continue;
                 }
+                if (field.type.kind === "array" && field.type.elem.kind === "struct") {
+                    const elemSize = this.structSizeBytes(field.type.elem);
+                    for (let i = 0; i < field.type.size; ++i)
+                        this.placeStructLeaves(path + "[" + i + "]", expr + "[" + i + "]",
+                            field.type.elem, fieldOffset + i * elemSize);
+                    cursor = fieldOffset + elemSize * field.type.size;
+                    continue;
+                }
                 if (field.type.kind === "array") {
                     const storage = uniformArrayElementFor(field.type.elem);
                     if (!storage)
@@ -25971,6 +26106,8 @@ ${body.join("\n")}
                 cursor = roundUp(cursor, 16);
                 if (field.type.kind === "struct")
                     cursor += this.structSizeBytes(field.type);
+                else if (field.type.kind === "array" && field.type.elem.kind === "struct")
+                    cursor += this.structSizeBytes(field.type.elem) * field.type.size;
                 else if (field.type.kind === "array") {
                     const storage = uniformArrayElementFor(field.type.elem);
                     cursor += storage.strideBytes * field.type.size;
@@ -26002,6 +26139,10 @@ ${body.join("\n")}
                 if (field.type.kind === "struct") {
                     wgslType = this.declareStruct(field.type);
                     size = this.structSizeBytes(field.type);
+                } else if (field.type.kind === "array" && field.type.elem.kind === "struct") {
+                    wgslType = "array<" + this.declareStruct(field.type.elem) + ", " +
+                        field.type.size + ">";
+                    size = this.structSizeBytes(field.type.elem) * field.type.size;
                 } else if (field.type.kind === "array") {
                     const storage = uniformArrayElementFor(field.type.elem);
                     wgslType = "array<" + storage.wgsl + ", " + field.type.size + ">";
@@ -26051,7 +26192,11 @@ ${body.join("\n")}
      * aliasing that made this layout famous is only safe when the two never
      * both appear, and here they can.
      */
-    function assignAttributeLocations(usage, bindings) {
+    /* Desktop GL's generic attributes fill from the top, below the
+     * compatibility ones' fixed slots; GLSL ES has none of those, so with
+     * `ascending` (options.es) they take the lowest free locations in
+     * declaration order, as ES drivers commonly do. */
+    function assignAttributeLocations(usage, bindings, ascending) {
         const used = new Set();
         const result = new Map();
         for (const [name, info] of usage.attributes) {
@@ -26074,6 +26219,20 @@ ${body.join("\n")}
                     " is claimed twice (" + name + ")", 0);
             result.set(name, bound);
             used.add(bound);
+        }
+        if (ascending) {
+            for (const [name, info] of usage.attributes) {
+                if (info.isCompat || result.has(name)) continue;
+                const slots = attributeSlotCount(info.type);
+                let base = 0;
+                while (base + slots <= MAX_VERTEX_ATTRIBUTES && !slotsFree(used, base, slots)) ++base;
+                if (base + slots > MAX_VERTEX_ATTRIBUTES)
+                    throw new GLSLError("out of vertex attribute slots for '" +
+                        name + "'", 0);
+                for (let i = 0; i < slots; ++i) used.add(base + i);
+                result.set(name, base);
+            }
+            return result;
         }
         let next = MAX_VERTEX_ATTRIBUTES - 1;
         for (const [name, info] of usage.attributes) {
@@ -26303,6 +26462,10 @@ ${body.join("\n")}
         generate() {
             this.emit("// generated by gl_shader_translator.js r" +
                 TRANSLATOR_REVISION + " (" + this.stage + ")");
+            // GL leaves derivatives in non-uniform control flow undefined and
+            // drivers compute them anyway; WGSL refuses the shader (Tint
+            // checks it, naga does not), as VX's and GX's shaders say too
+            this.emit("diagnostic(off, derivative_uniformity);");
             this.emit("");
             this.emitBindings();
             this.emitUserStructs();
@@ -26928,7 +27091,55 @@ ${body.join("\n")}
             const right = this.genExpr(node.right, pre, node.right.convertTo);
             if (node.op === "^^")
                 return "((" + left + ") != (" + right + "))";
-            return "(" + left + " " + node.op + " " + right + ")";
+            return this.binaryText(node.op, left, node.left.convertTo || node.left.type,
+                right, node.right.convertTo || node.right.type, pre);
+        }
+
+        /*
+         * A binary operator where GLSL and WGSL differ:
+         *  - == and != of a vector, matrix, struct or array give one bool in
+         *    GLSL; WGSL compares vectors componentwise and the rest not at all
+         *  - &, | and ^ take a scalar beside a vector in GLSL, not in WGSL
+         *  - a shift's amount is unsigned in WGSL (a vector's, a vector)
+         */
+        binaryText(op, left, lt, right, rt, pre) {
+            if ((op === "==" || op === "!=") && lt.kind !== "scalar") {
+                let a = left, b = right;
+                if (lt.kind !== "vector") {
+                    // the operands are read more than once
+                    a = this.temp();
+                    b = this.temp();
+                    pre.push("let " + a + " = " + left + ";");
+                    pre.push("let " + b + " = " + right + ";");
+                }
+                const equal = equalityWGSL(a, b, lt);
+                return op === "==" ? equal : "(!" + equal + ")";
+            }
+            if (op === "<<" || op === ">>") {
+                const amount = lt.kind !== "vector" ? "u32(" + right + ")" :
+                    "vec" + lt.size + "<u32>(" + (rt.kind === "vector" ? right : "u32(" + right + ")") + ")";
+                return "(" + left + " " + op + " " + amount + ")";
+            }
+            if ((op === "&" || op === "|" || op === "^") && lt.kind !== rt.kind) {
+                if (lt.kind === "scalar") left = typeToWGSL(rt) + "(" + left + ")";
+                else right = typeToWGSL(lt) + "(" + right + ")";
+            }
+            // WGSL has a matrix beside a scalar for * only, and matrices
+            // divide by nothing: the rest is done column by column
+            const matrix = lt.kind === "matrix" ? lt : rt.kind === "matrix" ? rt : null;
+            if (matrix && (op === "+" || op === "-" || op === "/") &&
+                    (lt.kind === "scalar" || rt.kind === "scalar" || op === "/")) {
+                const a = this.temp(), b = this.temp();
+                pre.push("let " + a + " = " + left + ";");
+                pre.push("let " + b + " = " + right + ";");
+                const columns = [];
+                for (let c = 0; c < matrix.cols; ++c) {
+                    columns.push("(" + (lt.kind === "matrix" ? a + "[" + c + "]" : a) + " " + op + " " +
+                        (rt.kind === "matrix" ? b + "[" + c + "]" : b) + ")");
+                }
+                return typeToWGSL(matrix) + "(" + columns.join(", ") + ")";
+            }
+            return "(" + left + " " + op + " " + right + ")";
         }
 
         genUnary(node, pre, asStatement) {
@@ -26937,7 +27148,9 @@ ${body.join("\n")}
                 const one = baseOf(node.type) === "int" ? "1" : "1.0";
                 const delta = node.op === "++" ? " + " : " - ";
                 const isVector = node.type.kind !== "scalar";
-                const rhs = isVector ?
+                const rhs = node.type.kind === "matrix" ?
+                    this.binaryText(delta.trim(), target.read, node.type, one, T.float, pre) :
+                    isVector ?
                     target.read + delta + typeToWGSL(node.type) + "(" + one + ")" :
                     target.read + delta + one;
                 if (node.prefix) {
@@ -26951,6 +27164,8 @@ ${body.join("\n")}
             }
             const operand = this.genExpr(node.operand, pre);
             if (node.op === "+") return "(" + operand + ")";
+            // (WGSL negates no matrix)
+            if (node.op === "-" && node.type.kind === "matrix") return "(" + operand + " * -1.0)";
             return "(" + node.op + "(" + operand + "))";
         }
 
@@ -27021,7 +27236,8 @@ ${body.join("\n")}
             } else {
                 const op = node.op.slice(0, -1);
                 const rhs = this.genExpr(node.value, pre, node.value.convertTo);
-                valueText = "(" + target.read + " " + op + " " + rhs + ")";
+                valueText = this.binaryText(op, target.read, node.target.type, rhs,
+                    node.value.convertTo || node.value.type, pre);
             }
             if (!target.components && asStatement)
                 return target.write + " = " + valueText;
@@ -27227,8 +27443,10 @@ ${body.join("\n")}
          *  - the vertex stage has no implicit derivatives at all, so every
          *    lookup there is an explicit-level one
          *  - in non-uniform control flow textureSample's derivatives are
-         *    undefined, so the gradient is computed from the coordinate and
-         *    passed explicitly (plan section 4.10, strategy 2)
+         *    undefined, as in GL: with derivative_uniformity off (generate())
+         *    the lookup is the same as in uniform flow ("implicit", the
+         *    default); "grad" passes the coordinate's own derivatives (plan
+         *    section 4.10, strategy 2), "level0" samples level 0
          *
          * Both cases are counted, because an approximation nobody measures is
          * an approximation nobody can trust.
@@ -27240,16 +27458,17 @@ ${body.join("\n")}
                     ", " + coord + ", 0.0)";
             }
             const uniform = this.inUniformControlFlow;
-            if (uniform) {
-                ++this.stats.uniformSamples;
+            if (uniform) ++this.stats.uniformSamples;
+            else ++this.stats.nonUniformSamples;
+            const strategy = this.options.nonUniformSampleStrategy || "implicit";
+            if (uniform || strategy === "implicit") {
                 return bias ?
                     "textureSampleBias(" + pair.texture + ", " + pair.sampler +
                         ", " + coord + ", " + bias + ")" :
                     "textureSample(" + pair.texture + ", " + pair.sampler +
                         ", " + coord + ")";
             }
-            ++this.stats.nonUniformSamples;
-            if (this.options.nonUniformSampleStrategy === "level0") {
+            if (strategy === "level0") {
                 ++this.stats.levelSamples;
                 return "textureSampleLevel(" + pair.texture + ", " + pair.sampler +
                     ", " + coord + ", 0.0)";
@@ -27263,12 +27482,14 @@ ${body.join("\n")}
         emitCompareSample(pair, coord, ref, node) {
             const uniform = this.stage === "fragment" && this.inUniformControlFlow;
             void node;
-            if (uniform) {
-                ++this.stats.uniformSamples;
+            if (uniform) ++this.stats.uniformSamples;
+            else ++this.stats.nonUniformSamples;
+            // (implicit derivatives exist in the fragment stage only; see emitSample)
+            if (this.stage === "fragment" &&
+                    (uniform || (this.options.nonUniformSampleStrategy || "implicit") !== "level0")) {
                 return "textureSampleCompare(" + pair.texture + ", " +
                     pair.sampler + ", " + coord + ", " + ref + ")";
             }
-            ++this.stats.nonUniformSamples;
             return "textureSampleCompareLevel(" + pair.texture + ", " +
                 pair.sampler + ", " + coord + ", " + ref + ")";
         }
@@ -27760,7 +27981,7 @@ ${body.join("\n")}
 
             /* ---- attributes ---- */
             const bindings = normalizeBindings(opts.bindAttribLocations);
-            const attributes = assignAttributeLocations(vs.usage, bindings);
+            const attributes = assignAttributeLocations(vs.usage, bindings, !!opts.es);
             if (variant.pointSprite) {
                 for (const [name, loc] of attributes) {
                     const info = vs.usage.attributes.get(name);
@@ -27820,7 +28041,7 @@ ${body.join("\n")}
                 logicOp: variant.logicOp ? (variant.logicOp >>> 0) : 0,
                 pointCornerLocation: POINT_CORNER_LOCATION,
                 alphaTest: variant.alphaTest || null,
-                nonUniformSampleStrategy: opts.nonUniformSampleStrategy || "grad",
+                nonUniformSampleStrategy: opts.nonUniformSampleStrategy || "implicit",
             };
 
             const vsGen = new Generator("vertex", vs.ast, vs.usage, iface, genOptions);
@@ -27875,7 +28096,7 @@ ${body.join("\n")}
             "o" + (variant.logicOp || 0).toString(16),
             variant.twoSided ? "2" : "-",
             variant.flatShading ? "f" : "-",
-            opts.nonUniformSampleStrategy || "grad",
+            opts.nonUniformSampleStrategy || "implicit",
         ].join("|");
     }
 
@@ -27930,6 +28151,7 @@ ${body.join("\n")}
                 binding: s.binding,
                 dim: s.type.dim,
                 shadow: s.type.shadow,
+                external: !!s.type.external,
                 arraySize: s.arraySize,
                 bindingCount: 2 * Math.max(1, s.arraySize),
             });
@@ -27969,7 +28191,7 @@ ${body.join("\n")}
         UniformBlockLayout, GLSLError,
         BASIC_TYPES, T, vec, mat, arrayOf, structType, typeToWGSL, sameType,
         COMPAT_ATTRIBUTE_LOCATIONS, COMPAT_ATTRIBUTE_TYPES,
-        STATE_UNIFORMS, BUILTIN_CONSTANTS,
+        STATE_UNIFORMS, BUILTIN_CONSTANTS, ES_BUILTIN_CONSTANTS,
         MAX_INTER_STAGE_SLOTS, MAX_VERTEX_ATTRIBUTES, POINT_CORNER_LOCATION,
         assignAttributeLocations, assignVaryings, hashString, safeName,
     };
@@ -46395,6 +46617,7 @@ fn tessellate(pi: u32) {
         SURFACE_DEFINE: 1, SURFACE_DESTROY: 2, SURFACE_UPLOAD: 3, SURFACE_READBACK: 4,
         CONTEXT_DEFINE: 5, CONTEXT_DESTROY: 6, SHADER_CODE: 7, DX: 8, SURFACE_COPY: 9, QUERY_END: 10,
         COTABLE_RESET: 11, SURFACE_STRETCH: 12, SURFACE_IMPORT: 13, SURFACE_EXPORT: 14, CLEAR_RTV_INTEGER: 15,
+        SURFACE_PRESENT: 16,
     };
 
     // SVGA_3D_CMD_DX_* (svga3d_cmd.h)
@@ -46637,6 +46860,7 @@ fn tessellate(pi: u32) {
                 }
                 case GX.SURFACE_UPLOAD: return this.upload(b);
                 case GX.SURFACE_READBACK: return this.readback(b);
+                case GX.SURFACE_PRESENT: return this.present(b);
                 case GX.CONTEXT_DEFINE: this.contexts.set(b[0], new GXContext(b[0])); return;
                 case GX.CONTEXT_DESTROY: this.contexts.delete(b[0]); return;
                 case GX.SHADER_CODE: return this.shaderCode(b);
@@ -47016,6 +47240,29 @@ struct Box { x: u32, y: u32, w: u32, pad: u32 }
                     for (let c = 0; c < columns; c++) bytes[row * pitch + c * 4 + 3] = 255;
                 }
             }
+        }
+
+        /**
+         * A surface's rectangle to the page's screen (SURFACE_PRESENT): the
+         * peer's presenter copies it on the GPU, in this encoder's order;
+         * sid 0 takes it away
+         */
+        present(b) {
+            const [sid, x, y, w, h, dx, dy, width, height] = b;
+            if (!this.peer || !this.peer.present) return;
+            if (!sid) return this.peer.present(null);
+            const s = this.surfaces.get(sid);
+            if (!s) return;
+            this.primary(s, false);
+            if (!s.texture || s.samples > 1 || isDepthFormat(s.f.gpu)) {
+                this.warn("present" + s.format, "presenting format " + s.format + " is not supported");
+                return;
+            }
+            this.endPass();
+            this.stats.presents = (this.stats.presents || 0) + 1;
+            this.peer.present({ texture: s.texture, format: s.f.gpu, x, y, w, h, dx, dy, width, height, encoder: this.encoder() });
+            // (submitted now: the compositor composes in a microtask after this)
+            this.flushEncoder();
         }
 
         readback(b) {
@@ -52414,6 +52661,16211 @@ struct Out { @builtin(position) position: vec4<f32>, @location(0) uv: vec2<f32> 
 })(typeof globalThis !== "undefined" ? globalThis : this);
 
 ;
+(() => {
+  // src/gles/gles_formats.js
+  var GL = {
+    NO_ERROR: 0,
+    INVALID_ENUM: 1280,
+    INVALID_VALUE: 1281,
+    INVALID_OPERATION: 1282,
+    OUT_OF_MEMORY: 1285,
+    INVALID_FRAMEBUFFER_OPERATION: 1286,
+    FALSE: 0,
+    TRUE: 1,
+    NONE: 0,
+    // primitives
+    POINTS: 0,
+    LINES: 1,
+    LINE_LOOP: 2,
+    LINE_STRIP: 3,
+    TRIANGLES: 4,
+    TRIANGLE_STRIP: 5,
+    TRIANGLE_FAN: 6,
+    // types
+    BYTE: 5120,
+    UNSIGNED_BYTE: 5121,
+    SHORT: 5122,
+    UNSIGNED_SHORT: 5123,
+    INT: 5124,
+    UNSIGNED_INT: 5125,
+    FLOAT: 5126,
+    FIXED: 5132,
+    HALF_FLOAT_OES: 36193,
+    UNSIGNED_SHORT_4_4_4_4: 32819,
+    UNSIGNED_SHORT_5_5_5_1: 32820,
+    UNSIGNED_SHORT_5_6_5: 33635,
+    // formats
+    DEPTH_COMPONENT: 6402,
+    ALPHA: 6406,
+    RGB: 6407,
+    RGBA: 6408,
+    LUMINANCE: 6409,
+    LUMINANCE_ALPHA: 6410,
+    BGRA_EXT: 32993,
+    ETC1_RGB8_OES: 36196,
+    RGBA4: 32854,
+    RGB5_A1: 32855,
+    RGB565: 36194,
+    RGB8_OES: 32849,
+    RGBA8_OES: 32856,
+    DEPTH_COMPONENT16: 33189,
+    DEPTH_COMPONENT24_OES: 33190,
+    STENCIL_INDEX8: 36168,
+    DEPTH24_STENCIL8_OES: 35056,
+    // objects and targets
+    TEXTURE_2D: 3553,
+    TEXTURE_CUBE_MAP: 34067,
+    TEXTURE_CUBE_MAP_POSITIVE_X: 34069,
+    TEXTURE_EXTERNAL_OES: 36197,
+    TEXTURE0: 33984,
+    ARRAY_BUFFER: 34962,
+    ELEMENT_ARRAY_BUFFER: 34963,
+    FRAMEBUFFER: 36160,
+    RENDERBUFFER: 36161,
+    TEXTURE: 5890,
+    COLOR_ATTACHMENT0: 36064,
+    DEPTH_ATTACHMENT: 36096,
+    STENCIL_ATTACHMENT: 36128,
+    STREAM_DRAW: 35040,
+    STATIC_DRAW: 35044,
+    DYNAMIC_DRAW: 35048,
+    VERTEX_SHADER: 35633,
+    FRAGMENT_SHADER: 35632,
+    // framebuffer status
+    FRAMEBUFFER_COMPLETE: 36053,
+    FRAMEBUFFER_INCOMPLETE_ATTACHMENT: 36054,
+    FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT: 36055,
+    FRAMEBUFFER_INCOMPLETE_DIMENSIONS: 36057,
+    FRAMEBUFFER_UNSUPPORTED: 36061,
+    // texture parameters
+    TEXTURE_MAG_FILTER: 10240,
+    TEXTURE_MIN_FILTER: 10241,
+    TEXTURE_WRAP_S: 10242,
+    TEXTURE_WRAP_T: 10243,
+    GENERATE_MIPMAP: 33169,
+    TEXTURE_CROP_RECT_OES: 35741,
+    NEAREST: 9728,
+    LINEAR: 9729,
+    NEAREST_MIPMAP_NEAREST: 9984,
+    LINEAR_MIPMAP_NEAREST: 9985,
+    NEAREST_MIPMAP_LINEAR: 9986,
+    LINEAR_MIPMAP_LINEAR: 9987,
+    REPEAT: 10497,
+    CLAMP_TO_EDGE: 33071,
+    MIRRORED_REPEAT: 33648,
+    // pixel store
+    UNPACK_ALIGNMENT: 3317,
+    PACK_ALIGNMENT: 3333
+  };
+  var CAPS_2 = /* @__PURE__ */ new Set([2884, 3042, 3024, 2960, 2929, 3089, 32823, 32926, 32928]);
+  var CAPS_1 = /* @__PURE__ */ new Set([
+    2884,
+    3042,
+    3024,
+    2960,
+    2929,
+    3089,
+    32823,
+    32926,
+    32928,
+    3008,
+    2896,
+    2903,
+    2977,
+    2912,
+    3058,
+    2848,
+    2832,
+    32925,
+    32826,
+    32927,
+    34913,
+    34067,
+    16384,
+    16385,
+    16386,
+    16387,
+    16388,
+    16389,
+    16390,
+    16391,
+    12288,
+    12289,
+    12290,
+    12291,
+    12292,
+    12293,
+    32884,
+    32885,
+    32886,
+    32888,
+    35740,
+    34882,
+    34477,
+    36197
+  ]);
+  var TEXTURE_TYPES = /* @__PURE__ */ new Map([
+    [GL.RGBA, /* @__PURE__ */ new Map([[GL.UNSIGNED_BYTE, 4], [GL.UNSIGNED_SHORT_4_4_4_4, 2], [GL.UNSIGNED_SHORT_5_5_5_1, 2]])],
+    [GL.RGB, /* @__PURE__ */ new Map([[GL.UNSIGNED_BYTE, 3], [GL.UNSIGNED_SHORT_5_6_5, 2]])],
+    [GL.LUMINANCE_ALPHA, /* @__PURE__ */ new Map([[GL.UNSIGNED_BYTE, 2]])],
+    [GL.LUMINANCE, /* @__PURE__ */ new Map([[GL.UNSIGNED_BYTE, 1]])],
+    [GL.ALPHA, /* @__PURE__ */ new Map([[GL.UNSIGNED_BYTE, 1]])],
+    [GL.BGRA_EXT, /* @__PURE__ */ new Map([[GL.UNSIGNED_BYTE, 4]])]
+  ]);
+  var TYPE_ENUMS = /* @__PURE__ */ new Set([
+    GL.BYTE,
+    GL.UNSIGNED_BYTE,
+    GL.SHORT,
+    GL.UNSIGNED_SHORT,
+    GL.INT,
+    GL.UNSIGNED_INT,
+    GL.FLOAT,
+    GL.HALF_FLOAT_OES,
+    GL.UNSIGNED_SHORT_4_4_4_4,
+    GL.UNSIGNED_SHORT_5_5_5_1,
+    GL.UNSIGNED_SHORT_5_6_5
+  ]);
+  var FORMAT_ENUMS = /* @__PURE__ */ new Set([GL.DEPTH_COMPONENT, GL.ALPHA, GL.RGB, GL.RGBA, GL.LUMINANCE, GL.LUMINANCE_ALPHA, GL.BGRA_EXT]);
+  function texture_format_error(format, type) {
+    if (!FORMAT_ENUMS.has(format) || !TYPE_ENUMS.has(type)) return GL.INVALID_ENUM;
+    const types = TEXTURE_TYPES.get(format);
+    return types && types.has(type) ? GL.NO_ERROR : GL.INVALID_OPERATION;
+  }
+  function texel_bytes(format, type) {
+    const types = TEXTURE_TYPES.get(format);
+    return types && types.get(type) || 0;
+  }
+  function image_bytes(width, height, bytes_per_texel, alignment) {
+    if (width <= 0 || height <= 0) return 0;
+    const row = width * bytes_per_texel;
+    const stride = Math.ceil(row / alignment) * alignment;
+    return stride * (height - 1) + row;
+  }
+  function etc1_bytes(width, height) {
+    return Math.ceil(width / 4) * Math.ceil(height / 4) * 8;
+  }
+  var RENDERBUFFER_FORMATS = /* @__PURE__ */ new Map([
+    [GL.RGBA4, { bits: [4, 4, 4, 4, 0, 0], color: true, depth: false, stencil: false }],
+    [GL.RGB5_A1, { bits: [5, 5, 5, 1, 0, 0], color: true, depth: false, stencil: false }],
+    [GL.RGB565, { bits: [5, 6, 5, 0, 0, 0], color: true, depth: false, stencil: false }],
+    [GL.RGB8_OES, { bits: [8, 8, 8, 0, 0, 0], color: true, depth: false, stencil: false }],
+    [GL.RGBA8_OES, { bits: [8, 8, 8, 8, 0, 0], color: true, depth: false, stencil: false }],
+    [GL.DEPTH_COMPONENT16, { bits: [0, 0, 0, 0, 16, 0], color: false, depth: true, stencil: false }],
+    [GL.DEPTH_COMPONENT24_OES, { bits: [0, 0, 0, 0, 24, 0], color: false, depth: true, stencil: false }],
+    [GL.STENCIL_INDEX8, { bits: [0, 0, 0, 0, 0, 8], color: false, depth: false, stencil: true }],
+    [GL.DEPTH24_STENCIL8_OES, { bits: [0, 0, 0, 0, 24, 8], color: false, depth: true, stencil: true }]
+  ]);
+  function texture_kind(format, type) {
+    const color = !(format === GL.LUMINANCE || format === GL.LUMINANCE_ALPHA || format === GL.ALPHA || format === GL.ETC1_RGB8_OES);
+    let bits;
+    switch (format) {
+      case GL.RGBA:
+      case GL.BGRA_EXT:
+        bits = type === GL.UNSIGNED_SHORT_4_4_4_4 ? [4, 4, 4, 4] : type === GL.UNSIGNED_SHORT_5_5_5_1 ? [5, 5, 5, 1] : [8, 8, 8, 8];
+        break;
+      case GL.RGB:
+      case GL.ETC1_RGB8_OES:
+        bits = type === GL.UNSIGNED_SHORT_5_6_5 ? [5, 6, 5, 0] : [8, 8, 8, 0];
+        break;
+      case GL.ALPHA:
+        bits = [0, 0, 0, 8];
+        break;
+      case GL.LUMINANCE:
+        bits = [8, 8, 8, 0];
+        break;
+      case GL.LUMINANCE_ALPHA:
+        bits = [8, 8, 8, 8];
+        break;
+      default:
+        bits = [8, 8, 8, 8];
+    }
+    return { bits: [...bits, 0, 0], color, depth: false, stencil: false };
+  }
+  var GLSL_TYPES = {
+    "float": 5126,
+    "vec2": 35664,
+    "vec3": 35665,
+    "vec4": 35666,
+    "int": 5124,
+    "ivec2": 35667,
+    "ivec3": 35668,
+    "ivec4": 35669,
+    "bool": 35670,
+    "bvec2": 35671,
+    "bvec3": 35672,
+    "bvec4": 35673,
+    "mat2": 35674,
+    "mat3": 35675,
+    "mat4": 35676,
+    "sampler2D": 35678,
+    "samplerCube": 35680,
+    "samplerExternalOES": 36198
+  };
+  function sampler_type(dim, external) {
+    return external ? GLSL_TYPES["samplerExternalOES"] : dim === "Cube" ? GLSL_TYPES["samplerCube"] : GLSL_TYPES["sampler2D"];
+  }
+
+  // src/gles/gles_caps.js
+  var EGL = {
+    NONE: 12344,
+    DONT_CARE: -1,
+    TRUE: 1,
+    FALSE: 0,
+    BUFFER_SIZE: 12320,
+    ALPHA_SIZE: 12321,
+    BLUE_SIZE: 12322,
+    GREEN_SIZE: 12323,
+    RED_SIZE: 12324,
+    DEPTH_SIZE: 12325,
+    STENCIL_SIZE: 12326,
+    CONFIG_CAVEAT: 12327,
+    CONFIG_ID: 12328,
+    LEVEL: 12329,
+    MAX_PBUFFER_HEIGHT: 12330,
+    MAX_PBUFFER_PIXELS: 12331,
+    MAX_PBUFFER_WIDTH: 12332,
+    NATIVE_RENDERABLE: 12333,
+    NATIVE_VISUAL_ID: 12334,
+    NATIVE_VISUAL_TYPE: 12335,
+    PRESERVED_RESOURCES: 12336,
+    SAMPLES: 12337,
+    SAMPLE_BUFFERS: 12338,
+    SURFACE_TYPE: 12339,
+    TRANSPARENT_TYPE: 12340,
+    TRANSPARENT_BLUE_VALUE: 12341,
+    TRANSPARENT_GREEN_VALUE: 12342,
+    TRANSPARENT_RED_VALUE: 12343,
+    BIND_TO_TEXTURE_RGB: 12345,
+    BIND_TO_TEXTURE_RGBA: 12346,
+    MIN_SWAP_INTERVAL: 12347,
+    MAX_SWAP_INTERVAL: 12348,
+    LUMINANCE_SIZE: 12349,
+    ALPHA_MASK_SIZE: 12350,
+    COLOR_BUFFER_TYPE: 12351,
+    RENDERABLE_TYPE: 12352,
+    MATCH_NATIVE_PIXMAP: 12353,
+    CONFORMANT: 12354,
+    RECORDABLE_ANDROID: 12610,
+    FRAMEBUFFER_TARGET_ANDROID: 12615,
+    SLOW_CONFIG: 12368,
+    NON_CONFORMANT_CONFIG: 12369,
+    RGB_BUFFER: 12430,
+    LUMINANCE_BUFFER: 12431,
+    PBUFFER_BIT: 1,
+    WINDOW_BIT: 4,
+    OPENGL_ES_BIT: 1,
+    OPENGL_ES2_BIT: 4,
+    OPENGL_ES3_BIT: 64,
+    VENDOR: 12371,
+    VERSION: 12372,
+    EXTENSIONS: 12373,
+    CLIENT_APIS: 12429,
+    CONDITION_SATISFIED_KHR: 12534
+  };
+  var CONFIG_ATTRIBUTES = [
+    EGL.DEPTH_SIZE,
+    EGL.STENCIL_SIZE,
+    EGL.RENDERABLE_TYPE,
+    EGL.SURFACE_TYPE,
+    EGL.CONFIG_ID,
+    EGL.BUFFER_SIZE,
+    EGL.ALPHA_SIZE,
+    EGL.BLUE_SIZE,
+    EGL.GREEN_SIZE,
+    EGL.RED_SIZE,
+    EGL.CONFIG_CAVEAT,
+    EGL.LEVEL,
+    EGL.MAX_PBUFFER_HEIGHT,
+    EGL.MAX_PBUFFER_PIXELS,
+    EGL.MAX_PBUFFER_WIDTH,
+    EGL.NATIVE_RENDERABLE,
+    EGL.NATIVE_VISUAL_ID,
+    EGL.NATIVE_VISUAL_TYPE,
+    EGL.PRESERVED_RESOURCES,
+    EGL.SAMPLES,
+    EGL.SAMPLE_BUFFERS,
+    EGL.TRANSPARENT_TYPE,
+    EGL.TRANSPARENT_BLUE_VALUE,
+    EGL.TRANSPARENT_GREEN_VALUE,
+    EGL.TRANSPARENT_RED_VALUE,
+    EGL.BIND_TO_TEXTURE_RGB,
+    EGL.BIND_TO_TEXTURE_RGBA,
+    EGL.MIN_SWAP_INTERVAL,
+    EGL.MAX_SWAP_INTERVAL,
+    EGL.LUMINANCE_SIZE,
+    EGL.ALPHA_MASK_SIZE,
+    EGL.COLOR_BUFFER_TYPE,
+    EGL.RECORDABLE_ANDROID,
+    EGL.CONFORMANT
+  ];
+  var MAX_SIZE = 4096;
+  var HAL_PIXEL_FORMAT = { RGBA_8888: 1, RGBX_8888: 2, RGB_565: 4 };
+  var CONFIGS = [];
+  for (const [r, g, b, a, visual] of [
+    [8, 8, 8, 8, HAL_PIXEL_FORMAT.RGBA_8888],
+    [8, 8, 8, 0, HAL_PIXEL_FORMAT.RGBX_8888],
+    [5, 6, 5, 0, HAL_PIXEL_FORMAT.RGB_565]
+  ]) {
+    for (const [depth, stencil] of [[0, 0], [16, 0], [24, 0], [24, 8]]) {
+      const values = /* @__PURE__ */ new Map([
+        [EGL.DEPTH_SIZE, depth],
+        [EGL.STENCIL_SIZE, stencil],
+        [EGL.RENDERABLE_TYPE, EGL.OPENGL_ES_BIT | EGL.OPENGL_ES2_BIT],
+        [EGL.SURFACE_TYPE, EGL.WINDOW_BIT | EGL.PBUFFER_BIT],
+        [EGL.CONFIG_ID, CONFIGS.length + 1],
+        [EGL.BUFFER_SIZE, r + g + b + a],
+        [EGL.ALPHA_SIZE, a],
+        [EGL.BLUE_SIZE, b],
+        [EGL.GREEN_SIZE, g],
+        [EGL.RED_SIZE, r],
+        [EGL.CONFIG_CAVEAT, EGL.NONE],
+        [EGL.LEVEL, 0],
+        [EGL.MAX_PBUFFER_HEIGHT, MAX_SIZE],
+        [EGL.MAX_PBUFFER_PIXELS, MAX_SIZE * MAX_SIZE],
+        [EGL.MAX_PBUFFER_WIDTH, MAX_SIZE],
+        [EGL.NATIVE_RENDERABLE, EGL.FALSE],
+        [EGL.NATIVE_VISUAL_ID, visual],
+        [EGL.NATIVE_VISUAL_TYPE, EGL.NONE],
+        [EGL.PRESERVED_RESOURCES, 0],
+        [EGL.SAMPLES, 0],
+        [EGL.SAMPLE_BUFFERS, 0],
+        [EGL.TRANSPARENT_TYPE, EGL.NONE],
+        [EGL.TRANSPARENT_BLUE_VALUE, 0],
+        [EGL.TRANSPARENT_GREEN_VALUE, 0],
+        [EGL.TRANSPARENT_RED_VALUE, 0],
+        [EGL.BIND_TO_TEXTURE_RGB, a ? EGL.FALSE : EGL.TRUE],
+        [EGL.BIND_TO_TEXTURE_RGBA, a ? EGL.TRUE : EGL.FALSE],
+        [EGL.MIN_SWAP_INTERVAL, 0],
+        [EGL.MAX_SWAP_INTERVAL, 1],
+        [EGL.LUMINANCE_SIZE, 0],
+        [EGL.ALPHA_MASK_SIZE, 0],
+        [EGL.COLOR_BUFFER_TYPE, EGL.RGB_BUFFER],
+        [EGL.RECORDABLE_ANDROID, EGL.TRUE],
+        [EGL.CONFORMANT, EGL.OPENGL_ES_BIT | EGL.OPENGL_ES2_BIT]
+      ]);
+      CONFIGS.push(CONFIG_ATTRIBUTES.map((attribute) => values.get(attribute)));
+    }
+  }
+  var MATCH = /* @__PURE__ */ new Map([
+    [EGL.BUFFER_SIZE, [0, "atleast"]],
+    [EGL.RED_SIZE, [0, "atleast"]],
+    [EGL.GREEN_SIZE, [0, "atleast"]],
+    [EGL.BLUE_SIZE, [0, "atleast"]],
+    [EGL.LUMINANCE_SIZE, [0, "atleast"]],
+    [EGL.ALPHA_SIZE, [0, "atleast"]],
+    [EGL.ALPHA_MASK_SIZE, [0, "atleast"]],
+    [EGL.BIND_TO_TEXTURE_RGB, [EGL.DONT_CARE, "exact"]],
+    [EGL.BIND_TO_TEXTURE_RGBA, [EGL.DONT_CARE, "exact"]],
+    [EGL.COLOR_BUFFER_TYPE, [EGL.RGB_BUFFER, "exact"]],
+    [EGL.CONFIG_CAVEAT, [EGL.DONT_CARE, "exact"]],
+    [EGL.CONFIG_ID, [EGL.DONT_CARE, "exact"]],
+    [EGL.CONFORMANT, [0, "mask"]],
+    [EGL.DEPTH_SIZE, [0, "atleast"]],
+    [EGL.LEVEL, [0, "exact"]],
+    [EGL.MAX_SWAP_INTERVAL, [EGL.DONT_CARE, "exact"]],
+    [EGL.MIN_SWAP_INTERVAL, [EGL.DONT_CARE, "exact"]],
+    [EGL.NATIVE_RENDERABLE, [EGL.DONT_CARE, "exact"]],
+    [EGL.NATIVE_VISUAL_TYPE, [EGL.DONT_CARE, "exact"]],
+    [EGL.RENDERABLE_TYPE, [EGL.OPENGL_ES_BIT, "mask"]],
+    [EGL.SAMPLE_BUFFERS, [0, "atleast"]],
+    [EGL.SAMPLES, [0, "atleast"]],
+    [EGL.STENCIL_SIZE, [0, "atleast"]],
+    [EGL.SURFACE_TYPE, [EGL.WINDOW_BIT, "mask"]],
+    [EGL.TRANSPARENT_TYPE, [EGL.NONE, "exact"]],
+    [EGL.TRANSPARENT_RED_VALUE, [EGL.DONT_CARE, "exact"]],
+    [EGL.TRANSPARENT_GREEN_VALUE, [EGL.DONT_CARE, "exact"]],
+    [EGL.TRANSPARENT_BLUE_VALUE, [EGL.DONT_CARE, "exact"]],
+    [EGL.RECORDABLE_ANDROID, [EGL.DONT_CARE, "exact"]],
+    // (every configuration is one: the guest's EGL answers EGL_TRUE for it)
+    [EGL.FRAMEBUFFER_TARGET_ANDROID, [EGL.DONT_CARE, "true"]]
+  ]);
+  var EGL_STRINGS = /* @__PURE__ */ new Map([
+    [EGL.VENDOR, "v86"],
+    [EGL.VERSION, "1.4 v86"],
+    [EGL.EXTENSIONS, "EGL_KHR_image_base EGL_KHR_gl_texture_2D_image EGL_ANDROID_recordable "],
+    [EGL.CLIENT_APIS, "OpenGL_ES"]
+  ]);
+  var EXTENSIONS = {
+    1: [
+      "GL_OES_EGL_image",
+      "GL_OES_EGL_image_external",
+      "GL_OES_compressed_ETC1_RGB8_texture",
+      "GL_OES_element_index_uint",
+      "GL_OES_framebuffer_object",
+      "GL_OES_depth24",
+      "GL_OES_packed_depth_stencil",
+      "GL_OES_rgb8_rgba8",
+      "GL_OES_texture_npot",
+      "GL_OES_blend_func_separate",
+      "GL_OES_blend_equation_separate",
+      "GL_OES_blend_subtract",
+      "GL_OES_draw_texture",
+      "GL_OES_point_sprite",
+      "GL_OES_point_size_array",
+      "GL_EXT_texture_format_BGRA8888"
+    ],
+    2: [
+      "GL_OES_EGL_image",
+      "GL_OES_EGL_image_external",
+      "GL_OES_compressed_ETC1_RGB8_texture",
+      "GL_OES_element_index_uint",
+      "GL_OES_depth24",
+      "GL_OES_packed_depth_stencil",
+      "GL_OES_rgb8_rgba8",
+      "GL_OES_texture_npot",
+      "GL_OES_standard_derivatives",
+      "GL_EXT_texture_format_BGRA8888"
+    ],
+    // (GLES 3.x: GLES 2.0's, those 3.0 has in its core too: the guest's EGL makes a GLES 2.0 context one of the
+    // highest version announced, and GLES 2.0 programs, dEQP-GLES2 among them, look for them; docs/gles3-plan.md)
+    3: [
+      "GL_OES_EGL_image",
+      "GL_OES_EGL_image_external",
+      "GL_OES_EGL_image_external_essl3",
+      "GL_OES_compressed_ETC1_RGB8_texture",
+      "GL_OES_element_index_uint",
+      "GL_OES_depth24",
+      "GL_OES_packed_depth_stencil",
+      "GL_OES_rgb8_rgba8",
+      "GL_OES_texture_npot",
+      "GL_OES_standard_derivatives",
+      "GL_EXT_texture_format_BGRA8888"
+    ]
+  };
+  var EXTENSIONS_3 = EXTENSIONS[3];
+  var COMPRESSED_TEXTURE_FORMATS = [36196];
+  var GL_STATE = /* @__PURE__ */ new Map([
+    // limits (GLES 2.0 table 6.18-6.20; WebGPU's defaults bound them)
+    [3379, [MAX_SIZE]],
+    // GL_MAX_TEXTURE_SIZE
+    [34076, [MAX_SIZE]],
+    // GL_MAX_CUBE_MAP_TEXTURE_SIZE
+    [34024, [MAX_SIZE]],
+    // GL_MAX_RENDERBUFFER_SIZE
+    [3386, [MAX_SIZE, MAX_SIZE]],
+    // GL_MAX_VIEWPORT_DIMS
+    [34921, [16]],
+    // GL_MAX_VERTEX_ATTRIBS
+    [36347, [256]],
+    // GL_MAX_VERTEX_UNIFORM_VECTORS
+    [36348, [15]],
+    // GL_MAX_VARYING_VECTORS
+    [36349, [224]],
+    // GL_MAX_FRAGMENT_UNIFORM_VECTORS
+    [35661, [32]],
+    // GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS
+    [35660, [16]],
+    // GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS
+    [34930, [16]],
+    // GL_MAX_TEXTURE_IMAGE_UNITS
+    [33901, [1, 256]],
+    // GL_ALIASED_POINT_SIZE_RANGE
+    [33902, [1, 1]],
+    // GL_ALIASED_LINE_WIDTH_RANGE
+    [3408, [4]],
+    // GL_SUBPIXEL_BITS
+    [32936, [0]],
+    // GL_SAMPLE_BUFFERS
+    [32937, [0]],
+    // GL_SAMPLES
+    [34466, [COMPRESSED_TEXTURE_FORMATS.length]],
+    // GL_NUM_COMPRESSED_TEXTURE_FORMATS
+    [34467, COMPRESSED_TEXTURE_FORMATS],
+    // GL_COMPRESSED_TEXTURE_FORMATS
+    [36345, [0]],
+    // GL_NUM_SHADER_BINARY_FORMATS
+    [36346, [1]],
+    // GL_SHADER_COMPILER
+    [35738, [5121]],
+    // GL_IMPLEMENTATION_COLOR_READ_TYPE: GL_UNSIGNED_BYTE
+    [35739, [6408]],
+    // GL_IMPLEMENTATION_COLOR_READ_FORMAT: GL_RGBA
+    // GLES 1.1's (table 6.25-6.26)
+    [3377, [8]],
+    // GL_MAX_LIGHTS
+    [3378, [6]],
+    // GL_MAX_CLIP_PLANES
+    [3382, [16]],
+    // GL_MAX_MODELVIEW_STACK_DEPTH
+    [3384, [2]],
+    // GL_MAX_PROJECTION_STACK_DEPTH
+    [3385, [2]],
+    // GL_MAX_TEXTURE_STACK_DEPTH
+    [34018, [4]],
+    // GL_MAX_TEXTURE_UNITS
+    [2834, [1, 1]],
+    // GL_SMOOTH_POINT_SIZE_RANGE
+    [2850, [1, 1]],
+    // GL_SMOOTH_LINE_WIDTH_RANGE
+    // initial values (GLES 2.0 tables 6.2-6.17, GLES 1.1's)
+    [2928, [0, 1]],
+    // GL_DEPTH_RANGE
+    [2849, [1]],
+    // GL_LINE_WIDTH
+    [2885, [1029]],
+    // GL_CULL_FACE_MODE: GL_BACK
+    [2886, [2305]],
+    // GL_FRONT_FACE: GL_CCW
+    [32938, [1]],
+    // GL_SAMPLE_COVERAGE_VALUE
+    [34016, [33984]],
+    // GL_ACTIVE_TEXTURE: GL_TEXTURE0
+    [34017, [33984]],
+    // GL_CLIENT_ACTIVE_TEXTURE: GL_TEXTURE0
+    [3107, [1, 1, 1, 1]],
+    // GL_COLOR_WRITEMASK
+    [2930, [1]],
+    // GL_DEPTH_WRITEMASK
+    [2968, [-1]],
+    // GL_STENCIL_WRITEMASK
+    [36005, [-1]],
+    // GL_STENCIL_BACK_WRITEMASK
+    [2931, [1]],
+    // GL_DEPTH_CLEAR_VALUE
+    [2932, [513]],
+    // GL_DEPTH_FUNC: GL_LESS
+    [32969, [1]],
+    // GL_BLEND_SRC_RGB: GL_ONE
+    [32971, [1]],
+    // GL_BLEND_SRC_ALPHA: GL_ONE
+    [3041, [1]],
+    // GL_BLEND_SRC: GL_ONE
+    [32777, [32774]],
+    // GL_BLEND_EQUATION_RGB: GL_FUNC_ADD
+    [34877, [32774]],
+    // GL_BLEND_EQUATION_ALPHA: GL_FUNC_ADD
+    [2962, [519]],
+    // GL_STENCIL_FUNC: GL_ALWAYS
+    [34816, [519]],
+    // GL_STENCIL_BACK_FUNC: GL_ALWAYS
+    [2963, [-1]],
+    // GL_STENCIL_VALUE_MASK
+    [36004, [-1]],
+    // GL_STENCIL_BACK_VALUE_MASK
+    [2964, [7680]],
+    [2965, [7680]],
+    [2966, [7680]],
+    // GL_STENCIL_FAIL, _PASS_DEPTH_FAIL, _PASS_DEPTH_PASS: GL_KEEP
+    [34817, [7680]],
+    [34818, [7680]],
+    [34819, [7680]],
+    // the back face's
+    [3317, [4]],
+    // GL_UNPACK_ALIGNMENT
+    [3333, [4]],
+    // GL_PACK_ALIGNMENT
+    [33170, [4352]],
+    // GL_GENERATE_MIPMAP_HINT: GL_DONT_CARE
+    [3152, [4352]],
+    [3153, [4352]],
+    [3154, [4352]],
+    [3156, [4352]],
+    // GLES 1.1's hints
+    [2976, [5888]],
+    // GL_MATRIX_MODE: GL_MODELVIEW
+    [2900, [7425]],
+    // GL_SHADE_MODEL: GL_SMOOTH
+    [2816, [1, 1, 1, 1]],
+    // GL_CURRENT_COLOR
+    [2818, [0, 0, 1]],
+    // GL_CURRENT_NORMAL
+    [2819, [0, 0, 0, 1]],
+    // GL_CURRENT_TEXTURE_COORDS
+    [2833, [1]],
+    // GL_POINT_SIZE
+    [33063, [256]],
+    // GL_POINT_SIZE_MAX
+    [33064, [1]],
+    // GL_POINT_FADE_THRESHOLD_SIZE
+    [33065, [1, 0, 0]],
+    // GL_POINT_DISTANCE_ATTENUATION
+    [3009, [519]],
+    // GL_ALPHA_TEST_FUNC: GL_ALWAYS
+    [2917, [2048]],
+    // GL_FOG_MODE: GL_EXP
+    [2914, [1]],
+    // GL_FOG_DENSITY
+    [2916, [1]],
+    // GL_FOG_END
+    [2899, [0.2, 0.2, 0.2, 1]],
+    // GL_LIGHT_MODEL_AMBIENT
+    [3056, [5379]],
+    // GL_LOGIC_OP_MODE: GL_COPY
+    [2979, [1]],
+    [2980, [1]],
+    [2981, [1]],
+    // the matrix stacks' depths
+    [2982, [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]],
+    // GL_MODELVIEW_MATRIX
+    [2983, [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]],
+    // GL_PROJECTION_MATRIX
+    [2984, [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]]
+    // GL_TEXTURE_MATRIX
+  ]);
+
+  // src/gles/glsl_es.js
+  function translator() {
+    return globalThis["GLShaderTranslator"];
+  }
+  function compile_shader(source, stage) {
+    let result;
+    try {
+      result = translator().compileShader(source, stage, { es: true });
+    } catch (e) {
+      return { ok: false, log: "ERROR: internal compiler error: " + (e && e.message || e), result: null };
+    }
+    return { ok: result.ok, log: result.log, result };
+  }
+  function link_program(vs, fs, bindings) {
+    const empty = (log) => ({ ok: false, log, attributes: [], uniforms: [], locations: /* @__PURE__ */ new Map(), by_location: [], reflection: null });
+    if (!vs || !fs) return empty("ERROR: a program needs a vertex and a fragment shader");
+    if (!vs.ok || !fs.ok) return empty("ERROR: " + (!vs.ok ? "the vertex" : "the fragment") + " shader is not compiled");
+    let linked;
+    try {
+      linked = translator().linkProgram(vs.result, fs.result, { es: true, bindAttribLocations: bindings });
+    } catch (e) {
+      return empty("ERROR: internal linker error: " + (e && e.message || e));
+    }
+    if (!linked.ok) return empty(linked.log);
+    const reflection = linked.reflection;
+    const attributes = reflection.attributes.map((a) => ({ name: a.name, size: 1, type: GLSL_TYPES[a.glslType], location: a.location }));
+    const uniforms = [];
+    for (const u of reflection.uniforms) {
+      const size = Math.max(1, u.arraySize);
+      uniforms.push({
+        name: u.arraySize ? u.name + "[0]" : u.name,
+        base: u.name,
+        size,
+        type: GLSL_TYPES[u.glslType],
+        location: u.location,
+        components: u.components,
+        sampler: false,
+        int: u.baseType === "int",
+        bool: u.baseType === "bool",
+        columns: u.columns
+      });
+    }
+    for (const s of reflection.samplers) {
+      const size = Math.max(1, s.arraySize);
+      uniforms.push({
+        name: s.arraySize ? s.name + "[0]" : s.name,
+        base: s.name,
+        size,
+        type: sampler_type(s.dim, s.external),
+        location: s.location,
+        components: 1,
+        sampler: true,
+        int: true,
+        bool: false,
+        columns: 0
+      });
+    }
+    const locations = /* @__PURE__ */ new Map();
+    const by_location = [];
+    for (const u of uniforms) {
+      locations.set(u.base, u.location);
+      for (let i = 0; i < u.size; i++) {
+        if (u.size > 1 || u.name !== u.base) locations.set(u.base + "[" + i + "]", u.location + i);
+        by_location[u.location + i] = { uniform: u, element: i };
+      }
+    }
+    return {
+      ok: true,
+      log: linked.log,
+      attributes,
+      uniforms,
+      locations,
+      by_location,
+      reflection,
+      wgsl: { vertex: linked.wgslVertex, fragment: linked.wgslFragment }
+    };
+  }
+
+  // src/gles/glslang.js
+  var STAGE = { vertex: 0, tess_control: 1, tess_evaluation: 2, geometry: 3, fragment: 4, compute: 5 };
+  var STAGE_OF_GL_TYPE = /* @__PURE__ */ new Map([[35633, 0], [36488, 1], [36487, 2], [36313, 3], [35632, 4], [37305, 5]]);
+  var ERRNO_NOSYS = 52;
+  function Glslang() {
+    this.exports = {};
+    this.printed = "";
+    this.limits = null;
+  }
+  Glslang.prototype.memory = function() {
+    return new Uint8Array(this.exports["memory"].buffer);
+  };
+  Glslang.prototype.imports = function() {
+    const view = () => new DataView(this.exports["memory"].buffer);
+    return {
+      "env": {
+        "emscripten_notify_memory_growth": () => {
+        },
+        "__syscall_getcwd": () => -ERRNO_NOSYS
+      },
+      "wasi_snapshot_preview1": {
+        "fd_write": (fd, iovs, count, written) => {
+          let total = 0;
+          for (let i = 0; i < count; i++) {
+            const pointer2 = view().getUint32(iovs + 8 * i, true), length = view().getUint32(iovs + 8 * i + 4, true);
+            this.printed += new TextDecoder().decode(this.memory().subarray(pointer2, pointer2 + length));
+            total += length;
+          }
+          view().setUint32(written, total, true);
+          return 0;
+        },
+        "fd_close": () => 0,
+        "fd_seek": () => ERRNO_NOSYS,
+        "environ_sizes_get": (count, size) => {
+          view().setUint32(count, 0, true);
+          view().setUint32(size, 0, true);
+          return 0;
+        },
+        "environ_get": () => 0
+      }
+    };
+  };
+  Glslang.prototype.with_bytes = function(bytes, call) {
+    const pointer2 = this.exports["v86_glslang_alloc"](Math.max(1, bytes.length));
+    this.memory().set(bytes, pointer2);
+    try {
+      return call(pointer2);
+    } finally {
+      this.exports["v86_glslang_free"](pointer2);
+    }
+  };
+  Glslang.prototype.output = function() {
+    const pointer2 = this.exports["v86_glslang_output"](), size = this.exports["v86_glslang_output_size"]();
+    return this.memory().slice(pointer2, pointer2 + size);
+  };
+  Glslang.prototype.set_limits = function(limits) {
+    if (limits === this.limits) return;
+    this.limits = limits;
+    const text = Object.entries(limits).map(([name, value]) => name + " " + value).join("\n") + "\n";
+    this.with_bytes(new TextEncoder().encode(text + "\0"), (pointer2) => this.exports["v86_glslang_limits"](pointer2));
+  };
+  function pack(shaders) {
+    const encoded = shaders.map((s) => new TextEncoder().encode(s.source));
+    const bytes = new Uint8Array(encoded.reduce((n, e) => n + 8 + (e.length + 3 & ~3), 0));
+    const view = new DataView(bytes.buffer);
+    let at = 0;
+    shaders.forEach((s, i) => {
+      view.setUint32(at, s.stage, true);
+      view.setUint32(at + 4, encoded[i].length, true);
+      bytes.set(encoded[i], at + 8);
+      at += 8 + (encoded[i].length + 3 & ~3);
+    });
+    return bytes;
+  }
+  Glslang.prototype.check_shader = function(stage, source) {
+    const packed = pack([{ stage, source }]);
+    const ok = this.with_bytes(packed, (pointer2) => this.exports["v86_glslang_compile"](pointer2, packed.length));
+    return { ok: !!ok, log: new TextDecoder().decode(this.output()) };
+  };
+  Glslang.prototype.check_program = function(shaders, flags) {
+    const packed = pack(shaders);
+    this.with_bytes(packed, (pointer2) => this.exports["v86_glslang_link"](pointer2, packed.length, flags || 0));
+    return JSON.parse(new TextDecoder().decode(this.output()));
+  };
+  Glslang.prototype.program_spirv = function(shaders, flags) {
+    const packed = pack(shaders);
+    this.with_bytes(packed, (pointer2) => this.exports["v86_glslang_spirv"](pointer2, packed.length, flags || 0));
+    const out = this.output();
+    const view = new DataView(out.buffer, out.byteOffset, out.byteLength);
+    const json_length = view.getUint32(0, true);
+    const result = JSON.parse(new TextDecoder().decode(out.subarray(4, 4 + json_length)));
+    result.modules = [];
+    for (let at = 4 + json_length + 3 & ~3; at + 8 <= out.length; ) {
+      const stage = view.getUint32(at, true), count = view.getUint32(at + 4, true);
+      result.modules.push({ stage, words: new Uint32Array(out.slice(at + 8, at + 8 + 4 * count).buffer) });
+      at += 8 + 4 * count;
+    }
+    return result;
+  };
+
+  // src/gles/glsl_es_rewrite.js
+  var TEXTURE_FUNCTIONS = /* @__PURE__ */ new Map([
+    ["texture2D", "texture"],
+    ["texture2DProj", "textureProj"],
+    ["texture2DLod", "textureLod"],
+    ["texture2DProjLod", "textureProjLod"],
+    ["textureCube", "texture"],
+    ["textureCubeLod", "textureLod"],
+    ["texture2DLodEXT", "textureLod"],
+    ["texture2DProjLodEXT", "textureProjLod"],
+    ["textureCubeLodEXT", "textureLod"],
+    ["texture2DGradEXT", "textureGrad"],
+    ["texture2DProjGradEXT", "textureProjGrad"],
+    ["textureCubeGradEXT", "textureGrad"],
+    ["shadow2DEXT", "texture"],
+    ["shadow2DProjEXT", "textureProj"],
+    ["texture3D", "texture"],
+    ["texture3DProj", "textureProj"],
+    ["texture3DLod", "textureLod"],
+    ["texture3DProjLod", "textureProjLod"]
+  ]);
+  var ES300_NAMES = new Set("flat smooth centroid layout uint uvec2 uvec3 uvec4 switch case default mat2x2 mat2x3 mat2x4 mat3x2 mat3x3 mat3x4 mat4x2 mat4x3 mat4x4 sampler3D samplerCubeShadow sampler2DArray sampler2DArrayShadow isampler2D isampler3D isamplerCube isampler2DArray usampler2D usampler3D usamplerCube usampler2DArray sinh cosh tanh asinh acosh atanh trunc round roundEven isnan isinf floatBitsToInt floatBitsToUint intBitsToFloat uintBitsToFloat packSnorm2x16 unpackSnorm2x16 packUnorm2x16 unpackUnorm2x16 packHalf2x16 unpackHalf2x16 outerProduct transpose determinant inverse texture textureProj textureLod textureOffset texelFetch texelFetchOffset textureProjOffset textureLodOffset textureProjLod textureProjLodOffset textureGrad textureGradOffset textureProjGrad textureProjGradOffset textureSize".split(" "));
+  var VULKAN_NAMES = new Set("texture1D texture2D texture3D textureCube texture2DRect texture1DArray texture2DArray textureBuffer texture2DMS texture2DMSArray textureCubeArray itexture1D itexture2D itexture3D itextureCube itexture2DRect itexture1DArray itexture2DArray itextureBuffer itexture2DMS itexture2DMSArray itextureCubeArray utexture1D utexture2D utexture3D utextureCube utexture2DRect utexture1DArray utexture2DArray utextureBuffer utexture2DMS utexture2DMSArray utextureCubeArray sampler samplerShadow subpassInput subpassInputMS isubpassInput isubpassInputMS usubpassInput usubpassInputMS attachmentEXT iattachmentEXT uattachmentEXT".split(" "));
+  var SUFFIX = "_v86";
+  var SAMPLES_CONSTANT = 71;
+  var BLEND_CONSTANT = 72;
+  var BLEND_DESTINATION = "_v86_dst";
+  var ADVANCED_BLEND = [
+    [37524, "multiply"],
+    [37525, "screen"],
+    [37526, "overlay"],
+    [37527, "darken"],
+    [37528, "lighten"],
+    [37529, "colordodge"],
+    [37530, "colorburn"],
+    [37531, "hardlight"],
+    [37532, "softlight"],
+    [37534, "difference"],
+    [37536, "exclusion"],
+    [37549, "hsl_hue"],
+    [37550, "hsl_saturation"],
+    [37551, "hsl_color"],
+    [37552, "hsl_luminosity"]
+  ];
+  function blend_support(source) {
+    const equations = /* @__PURE__ */ new Set();
+    for (const m of source.matchAll(/\blayout\s*\(([^)]*)\)\s*out\s*;/g)) {
+      for (const name of m[1].matchAll(/\bblend_support_(\w+)/g)) {
+        for (const [e, n] of ADVANCED_BLEND) if (name[1] === n || name[1] === "all_equations") equations.add(e);
+      }
+    }
+    return [...equations];
+  }
+  var BLEND_FUNCTIONS = `
+uniform highp sampler2D ${BLEND_DESTINATION};
+layout(constant_id = ${BLEND_CONSTANT}) const int _v86_equation = 0;
+highp float _v86_lum(highp vec3 c) { return dot(c, vec3(0.30, 0.59, 0.11)); }
+highp vec3 _v86_clip(highp vec3 c) {
+    highp float l = _v86_lum(c), n = min(min(c.r, c.g), c.b), x = max(max(c.r, c.g), c.b);
+    if (n < 0.0) c = l + ((c - l) * l) / (l - n);
+    if (x > 1.0) c = l + ((c - l) * (1.0 - l)) / (x - l);
+    return c;
+}
+highp vec3 _v86_setlum(highp vec3 base, highp vec3 lum) { return _v86_clip(base + (_v86_lum(lum) - _v86_lum(base))); }
+highp float _v86_sat(highp vec3 c) { return max(max(c.r, c.g), c.b) - min(min(c.r, c.g), c.b); }
+highp vec3 _v86_setsatlum(highp vec3 base, highp vec3 sat, highp vec3 lum) {
+    highp float s = _v86_sat(base);
+    highp vec3 c = s > 0.0 ? (base - min(min(base.r, base.g), base.b)) * _v86_sat(sat) / s : vec3(0.0);
+    return _v86_setlum(c, lum);
+}
+highp float _v86_f(int e, highp float s, highp float d) {
+    if (e == 0) return s * d;
+    if (e == 1) return s + d - s * d;
+    if (e == 2) return d <= 0.5 ? 2.0 * s * d : 1.0 - 2.0 * (1.0 - s) * (1.0 - d);
+    if (e == 3) return min(s, d);
+    if (e == 4) return max(s, d);
+    if (e == 5) return d <= 0.0 ? 0.0 : s >= 1.0 ? 1.0 : min(1.0, d / (1.0 - s));
+    if (e == 6) return d >= 1.0 ? 1.0 : s <= 0.0 ? 0.0 : 1.0 - min(1.0, (1.0 - d) / s);
+    if (e == 7) return s <= 0.5 ? 2.0 * s * d : 1.0 - 2.0 * (1.0 - s) * (1.0 - d);
+    if (e == 8) return s <= 0.5 ? d - (1.0 - 2.0 * s) * d * (1.0 - d) :
+        d <= 0.25 ? d + (2.0 * s - 1.0) * d * ((16.0 * d - 12.0) * d + 3.0) : d + (2.0 * s - 1.0) * (sqrt(d) - d);
+    if (e == 9) return abs(d - s);
+    return s + d - 2.0 * s * d;
+}
+highp vec4 _v86_blend(highp vec4 src, highp vec4 dst) {
+    int e = _v86_equation;
+    src = clamp(src, 0.0, 1.0);
+    highp vec3 cs = src.a == 0.0 ? vec3(0.0) : src.rgb / src.a, cd = dst.a == 0.0 ? vec3(0.0) : dst.rgb / dst.a;
+    highp vec3 f;
+    if (e <= 10) f = vec3(_v86_f(e, cs.r, cd.r), _v86_f(e, cs.g, cd.g), _v86_f(e, cs.b, cd.b));
+    else if (e == 11) f = _v86_setsatlum(cs, cd, cd);
+    else if (e == 12) f = _v86_setsatlum(cd, cs, cd);
+    else if (e == 13) f = _v86_setlum(cs, cd);
+    else f = _v86_setlum(cd, cs);
+    highp float p0 = src.a * dst.a, p1 = src.a * (1.0 - dst.a), p2 = dst.a * (1.0 - src.a);
+    return vec4(f * p0 + cs * p1 + cd * p2, p0 + p1 + p2);
+}
+`;
+  function rewrite_blend(tokens) {
+    const significant = tokens.map((t, i) => i).filter((i) => !["space", "comment", "newline"].includes(tokens[i].kind));
+    let brace = 0, paren = 0, start = 0, output = null;
+    for (let k = 0; k < significant.length; k++) {
+      const t = tokens[significant[k]];
+      if (t.text === "{") brace++;
+      else if (t.text === "}") {
+        if (--brace === 0) start = k + 1;
+        continue;
+      } else if (t.text === "(") paren++;
+      else if (t.text === ")") paren--;
+      if (brace === 0 && paren === 0 && t.kind === "name" && t.text === "main" && tokens[significant[k + 1]] && tokens[significant[k + 1]].text === "(") {
+        t.text = "_v86_main";
+      }
+      if (brace !== 0 || paren !== 0 || t.text !== ";") continue;
+      const statement = significant.slice(start, k + 1).map((i) => tokens[i]);
+      start = k + 1;
+      const words = statement.map((x) => x.text);
+      if (!words.includes("out")) continue;
+      if (words.some((w) => /^blend_support_/.test(w))) {
+        for (const x of statement) x.text = "";
+        continue;
+      }
+      if (output) continue;
+      const end = words.indexOf("[") >= 0 ? words.indexOf("[") : words.length - 1;
+      output = words[end - 1];
+      const layout = words.indexOf("layout");
+      if (layout >= 0) {
+        let depth = 0;
+        for (let j = layout; j < statement.length; j++) {
+          const x = statement[j].text;
+          statement[j].text = "";
+          if (x === "(") depth++;
+          else if (x === ")" && --depth === 0) break;
+        }
+      }
+      statement[words.indexOf("out")].text = "";
+    }
+    if (!output) return null;
+    return BLEND_FUNCTIONS + `layout(location = 0) out highp vec4 _v86_color;
+void main() { _v86_main(); _v86_color = _v86_blend(${output}, texelFetch(${BLEND_DESTINATION}, ivec2(gl_FragCoord.xy), 0)); }
+`;
+  }
+  var SAMPLE_FUNCTIONS = /* @__PURE__ */ new Set(["gl_SamplePosition", "interpolateAtCentroid", "interpolateAtSample", "interpolateAtOffset"]);
+  var EXTENDED_FUNCTIONS = /* @__PURE__ */ new Set(["uaddCarry", "usubBorrow", "umulExtended", "imulExtended"]);
+  function extended_helpers(uses) {
+    let text = "";
+    for (const n of ["", "2", "3", "4"]) {
+      const u = n ? "uvec" + n : "uint", i = n ? "ivec" + n : "int";
+      const below = (a, b) => n ? `${u}(lessThan(${a}, ${b}))` : `(${a} < ${b} ? 1u : 0u)`;
+      if (uses.has("uaddCarry")) text += `highp ${u} _v86_uaddCarry(highp ${u} a, highp ${u} b, out highp ${u} carry) { highp ${u} s = a + b; carry = ${below("s", "a")}; return s; }
+`;
+      if (uses.has("usubBorrow")) text += `highp ${u} _v86_usubBorrow(highp ${u} a, highp ${u} b, out highp ${u} borrow) { borrow = ${below("a", "b")}; return a - b; }
+`;
+      if (uses.has("umulExtended") || uses.has("imulExtended")) {
+        text += `void _v86_umulExtended(highp ${u} x, highp ${u} y, out highp ${u} msb, out highp ${u} lsb) { highp ${u} xl = x & 0xFFFFu, xh = x >> 16u, yl = y & 0xFFFFu, yh = y >> 16u; highp ${u} ll = xl * yl, lh = xl * yh, hl = xh * yl; highp ${u} mid = (ll >> 16u) + (lh & 0xFFFFu) + (hl & 0xFFFFu); msb = xh * yh + (lh >> 16u) + (hl >> 16u) + (mid >> 16u); lsb = x * y; }
+`;
+      }
+      if (uses.has("imulExtended")) {
+        const negative = (a, b) => n ? `${u}(lessThan(${a}, ${i}(0))) * ${u}(${b})` : `(${a} < 0 ? ${u}(${b}) : 0u)`;
+        text += `void _v86_imulExtended(highp ${i} x, highp ${i} y, out highp ${i} msb, out highp ${i} lsb) { highp ${u} m, l; _v86_umulExtended(${u}(x), ${u}(y), m, l); m -= ${negative("x", "y")} + ${negative("y", "x")}; msb = ${i}(m); lsb = ${i}(l); }
+`;
+      }
+    }
+    return text;
+  }
+  function sample_helpers(uses) {
+    let text = "";
+    if (uses.has("gl_SamplePosition") || uses.has("interpolateAtSample")) {
+      text += `layout(constant_id = ${SAMPLES_CONSTANT}) const int _v86_samples = 4;
+highp vec2 _v86_sample_offset(int i) { int n = _v86_samples; return n == 1 ? vec2(0.0) : (i == 0 ? vec2(0.375, 0.125) : i == 1 ? vec2(0.875, 0.375) : i == 2 ? vec2(0.125, 0.625) : vec2(0.625, 0.875)) - 0.5; }
+`;
+    }
+    if (uses.has("gl_SamplePosition")) text += "highp vec2 _v86_SamplePosition() { return _v86_sample_offset(gl_SampleID) + 0.5; }\n";
+    for (const type of ["float", "vec2", "vec3", "vec4"]) {
+      if (uses.has("interpolateAtCentroid")) text += `highp ${type} _v86_interpolateAtCentroid(highp ${type} x) { return x; }
+`;
+      if (uses.has("interpolateAtOffset") || uses.has("interpolateAtSample")) {
+        text += `highp ${type} _v86_interpolateAtOffset(highp ${type} x, highp vec2 o) { return x + dFdx(x) * o.x + dFdy(x) * o.y; }
+`;
+      }
+      if (uses.has("interpolateAtSample")) text += `highp ${type} _v86_interpolateAtSample(highp ${type} x, int i) { return _v86_interpolateAtOffset(x, _v86_sample_offset(i)); }
+`;
+    }
+    return text;
+  }
+  var BUILTINS_100 = new Map(Object.entries({
+    radians: [1],
+    degrees: [1],
+    sin: [1],
+    cos: [1],
+    tan: [1],
+    asin: [1],
+    acos: [1],
+    atan: [1, 2],
+    pow: [2],
+    exp: [1],
+    log: [1],
+    exp2: [1],
+    log2: [1],
+    sqrt: [1],
+    inversesqrt: [1],
+    abs: [1],
+    sign: [1],
+    floor: [1],
+    ceil: [1],
+    fract: [1],
+    mod: [2],
+    min: [2],
+    max: [2],
+    clamp: [3],
+    mix: [3],
+    step: [2],
+    smoothstep: [3],
+    length: [1],
+    distance: [2],
+    dot: [2],
+    cross: [2],
+    normalize: [1],
+    faceforward: [3],
+    reflect: [2],
+    refract: [3],
+    matrixCompMult: [2],
+    lessThan: [2],
+    lessThanEqual: [2],
+    greaterThan: [2],
+    greaterThanEqual: [2],
+    equal: [2],
+    notEqual: [2],
+    any: [1],
+    all: [1],
+    not: [1],
+    dFdx: [1],
+    dFdy: [1],
+    fwidth: [1]
+  }));
+  function mark_overloads(tokens) {
+    const significant = tokens.map((t, i) => i).filter((i) => !["space", "comment", "newline"].includes(tokens[i].kind));
+    const uses = [];
+    let depth = 0;
+    for (let k = 0; k < significant.length; k++) {
+      const t = tokens[significant[k]];
+      if (t.text === "{") depth++;
+      else if (t.text === "}") depth--;
+      if (t.kind !== "name" || !BUILTINS_100.has(t.text) || !tokens[significant[k + 1]] || tokens[significant[k + 1]].text !== "(") continue;
+      let level = 0, count = 0, empty = true;
+      for (let j = k + 1; j < significant.length; j++) {
+        const x = tokens[significant[j]].text;
+        if (level >= 1 && x !== ")" && !(level === 1 && x === "void")) empty = false;
+        if (x === "(" || x === "[") level++;
+        else if (x === ")" || x === "]") {
+          if (--level === 0) break;
+        } else if (level === 1 && x === ",") count++;
+      }
+      const before = k > 0 ? tokens[significant[k - 1]] : null;
+      uses.push({ token: t, arity: empty ? 0 : count + 1, declaration: depth === 0 && !!before && before.kind === "name" });
+    }
+    const own = /* @__PURE__ */ new Map();
+    for (const u of uses) if (u.declaration) own.set(u.token.text, (own.get(u.token.text) || /* @__PURE__ */ new Set()).add(u.arity));
+    for (const u of uses) {
+      const arities = own.get(u.token.text);
+      if (arities && arities.has(u.arity) && !BUILTINS_100.get(u.token.text).includes(u.arity)) u.token.overload = true;
+    }
+  }
+  function tokenize(source) {
+    const tokens = [];
+    let line = 1;
+    const pattern = /(\/\/[^\n]*)|(\/\*[\s\S]*?\*\/)|([A-Za-z_][A-Za-z0-9_]*)|(\d+\.?\d*(?:[eE][+-]?\d+)?[uUfF]?|\.\d+(?:[eE][+-]?\d+)?[fF]?)|(\n)|([ \t\r\f\v]+)|([\s\S])/g;
+    for (let m; m = pattern.exec(source); ) {
+      const kind = m[1] || m[2] ? "comment" : m[3] ? "name" : m[4] ? "number" : m[5] ? "newline" : m[6] ? "space" : "punct";
+      tokens.push({ kind, text: m[0], line });
+      line += (m[0].match(/\n/g) || []).length;
+    }
+    return tokens;
+  }
+  function std_blocks(source, buffers = true) {
+    const version = glsl_version(source);
+    if (version < 300) return source;
+    const tokens = tokenize(source);
+    const significant = tokens.map((t, i) => i).filter((i) => !["space", "comment", "newline"].includes(tokens[i].kind));
+    const at_k = (k) => tokens[significant[k]] || { text: "", kind: "" };
+    const QUALIFIERS = /* @__PURE__ */ new Set(["readonly", "writeonly", "coherent", "volatile", "restrict", "highp", "mediump", "lowp"]);
+    const PACKINGS = /* @__PURE__ */ new Set(["shared", "packed", "std140", "std430"]);
+    const packing_of = (storage, packing) => storage === "uniform" ? packing === "std430" ? packing : "std140" : buffers && (packing === "shared" || packing === "packed") ? "std430" : packing;
+    const defaults = { uniform: "shared", buffer: "shared" };
+    for (let k = 0; k < significant.length; k++) {
+      let open = -1, close = -1, storage_at = k;
+      if (at_k(k).text === "layout" && at_k(k + 1).text === "(") {
+        open = k + 1;
+        close = open;
+        while (close < significant.length && at_k(close).text !== ")") close++;
+        storage_at = close + 1;
+      } else if (at_k(k).text !== "uniform" && at_k(k).text !== "buffer") continue;
+      while (storage_at < significant.length && QUALIFIERS.has(at_k(storage_at).text)) storage_at++;
+      const storage = at_k(storage_at).text;
+      if (storage !== "uniform" && storage !== "buffer") continue;
+      let given = null;
+      for (let j = open + 1; open >= 0 && j < close; j++) if (at_k(j).kind === "name" && PACKINGS.has(at_k(j).text)) given = at_k(j);
+      const block = at_k(storage_at + 1).kind === "name" && at_k(storage_at + 2).text === "{";
+      if (at_k(storage_at + 1).text === ";" && given) defaults[storage] = given.text;
+      if (given) given.text = packing_of(storage, given.text);
+      else if (block && open >= 0) at_k(open).text = "(" + packing_of(storage, defaults[storage]) + ", ";
+      else if (block) at_k(storage_at).text = "layout(" + packing_of(storage, defaults[storage]) + ") " + storage;
+      k = storage_at;
+    }
+    let end = 0, at_line_start = true;
+    for (let i = 0; i < tokens.length; i++) {
+      const t = tokens[i];
+      if (t.kind === "newline") {
+        at_line_start = true;
+        continue;
+      }
+      if (t.kind === "space" || t.kind === "comment") continue;
+      if (at_line_start && t.text === "#") {
+        const name = tokens.slice(i + 1).find((x) => x.kind !== "space");
+        let j = i;
+        while (j < tokens.length && tokens[j].kind !== "newline") j++;
+        if (name && (name.text === "version" || name.text === "extension")) end = j + 1;
+        i = j - 1;
+        continue;
+      }
+      at_line_start = false;
+    }
+    const before = tokens.slice(0, end).map((t) => t.text).join(""), rest = tokens.slice(end).map((t) => t.text).join("");
+    const statements = "layout(std140) uniform;\n" + (version >= 310 && buffers ? "layout(std430) buffer;\n" : "");
+    return before + (before && !before.endsWith("\n") ? "\n" : "") + statements + rest;
+  }
+  function block_packings(source) {
+    const packings = /* @__PURE__ */ new Map();
+    if (glsl_version(source) < 300) return packings;
+    const tokens = tokenize(source).filter((t) => !["space", "comment", "newline"].includes(t.kind));
+    const PACKINGS = /* @__PURE__ */ new Set(["shared", "packed", "std140", "std430"]);
+    const QUALIFIERS = /* @__PURE__ */ new Set(["readonly", "writeonly", "coherent", "volatile", "restrict", "highp", "mediump", "lowp"]);
+    const defaults = { uniform: "shared", buffer: "shared" };
+    for (let k = 0; k < tokens.length; k++) {
+      let packing = null, at = k;
+      if (tokens[k].text === "layout" && tokens[k + 1] && tokens[k + 1].text === "(") {
+        at = k + 2;
+        while (at < tokens.length && tokens[at].text !== ")") {
+          if (PACKINGS.has(tokens[at].text)) packing = tokens[at].text;
+          at++;
+        }
+        at++;
+      } else if (tokens[k].text !== "uniform" && tokens[k].text !== "buffer") continue;
+      while (at < tokens.length && QUALIFIERS.has(tokens[at].text)) at++;
+      const storage = tokens[at] && tokens[at].text;
+      if (storage !== "uniform" && storage !== "buffer") {
+        k = at - 1;
+        continue;
+      }
+      const next = tokens[at + 1];
+      if (next && next.text === ";") {
+        if (packing) defaults[storage] = packing;
+      } else if (next && next.kind === "name" && tokens[at + 2] && tokens[at + 2].text === "{") packings.set(storage + ":" + next.text, packing || defaults[storage]);
+      k = at;
+    }
+    return packings;
+  }
+  var RESERVED_300 = /* @__PURE__ */ new Set(["image1DShadow", "image2DShadow", "image1DArrayShadow", "image2DArrayShadow"]);
+  function reserved_word(source) {
+    const t = tokenize(source).find((t2) => t2.kind === "name" && RESERVED_300.has(t2.text));
+    return t ? t.text : null;
+  }
+  function extension_after_code(source) {
+    let code = false, line_start = true;
+    const tokens = tokenize(source);
+    for (let i = 0; i < tokens.length; i++) {
+      const t = tokens[i];
+      if (t.kind === "newline") {
+        line_start = true;
+        continue;
+      }
+      if (t.kind === "space" || t.kind === "comment") continue;
+      if (line_start && t.text === "#") {
+        let j = i + 1;
+        while (j < tokens.length && tokens[j].kind === "space") j++;
+        if (code && tokens[j] && tokens[j].text === "extension") return true;
+        while (i < tokens.length && tokens[i].kind !== "newline") i++;
+        i--;
+        line_start = false;
+        continue;
+      }
+      line_start = false;
+      code = true;
+    }
+    return false;
+  }
+  function es3_rules(source) {
+    if (glsl_version(source) < 300) return null;
+    if (extension_after_code(source)) return "ERROR: '#extension' : must occur before any non-preprocessor tokens\n";
+    const reserved = reserved_word(source);
+    return reserved ? "ERROR: '" + reserved + "' : Reserved word.\n" : null;
+  }
+  function glsl_version(source) {
+    const m = /^\s*(?:(?:\/\/[^\n]*|\/\*[\s\S]*?\*\/)\s*)*#\s*version\s+(\d+)/.exec(source);
+    return m ? +m[1] : 100;
+  }
+  function rewrite_for_spirv(source, stage, limits) {
+    const version = glsl_version(source);
+    const es100 = version === 100;
+    const tokens = tokenize(source);
+    const renames = /* @__PURE__ */ new Map();
+    const rename = (name) => {
+      const renamed2 = name + SUFFIX;
+      renames.set(name, renamed2);
+      return renamed2;
+    };
+    let frag_color = false, frag_data = false, at_line_start = true;
+    let version_line_end = -1;
+    let directives_end = -1;
+    const sample_uses = /* @__PURE__ */ new Set();
+    const extended_uses = /* @__PURE__ */ new Set();
+    if (es100) mark_overloads(tokens);
+    for (let i = 0; i < tokens.length; i++) {
+      const t = tokens[i];
+      if (t.kind === "newline") {
+        at_line_start = true;
+        continue;
+      }
+      if (t.kind === "space" || t.kind === "comment") continue;
+      if (at_line_start && t.text === "#") {
+        let j = i + 1;
+        while (j < tokens.length && tokens[j].kind === "space") j++;
+        const directive = tokens[j] && tokens[j].text;
+        let end = j;
+        while (end < tokens.length && tokens[end].kind !== "newline") end++;
+        if (directive === "version" || directive === "extension") directives_end = end;
+        if (directive === "version") {
+          if (es100) for (let k = i; k < end; k++) tokens[k].text = k === i ? "#version 300 es" : "";
+          version_line_end = end;
+        } else if (directive === "extension" && (es100 || tokens.slice(j, end).some((t2) => /^GL_OES_EGL_image_external/.test(t2.text)))) {
+          for (let k = i; k < end; k++) tokens[k].text = "";
+        } else {
+          for (let k = j + 1; k < end; k++) if (tokens[k].kind === "name") rename_token(tokens[k]);
+        }
+        i = end - 1;
+        at_line_start = false;
+        continue;
+      }
+      at_line_start = false;
+      if (t.kind === "name" && t.text === "invariant" && es100 && stage === "fragment") {
+        const next = tokens.slice(i + 1).find((n) => n.kind !== "space" && n.kind !== "comment" && n.kind !== "newline");
+        if (next && next.text === "varying") {
+          t.text = "";
+          continue;
+        }
+        if (next && next.kind === "name" && !/^gl_Frag/.test(next.text)) {
+          let j = i;
+          while (j < tokens.length && tokens[j].text !== ";") tokens[j++].text = "";
+          if (j < tokens.length) tokens[j].text = "";
+          i = j;
+          continue;
+        }
+      }
+      if (t.kind === "name") rename_token(t);
+    }
+    function rename_token(t) {
+      const name = t.text;
+      if (VULKAN_NAMES.has(name) && !(es100 && TEXTURE_FUNCTIONS.has(name))) {
+        t.text = rename(name);
+        return;
+      }
+      if (name === "samplerExternalOES") t.text = "sampler2D";
+      if (!es100 && EXTENDED_FUNCTIONS.has(name)) {
+        extended_uses.add(name);
+        t.text = "_v86_" + name;
+        return;
+      }
+      if (stage === "fragment" && name === "gl_HelperInvocation") {
+        t.text = "false";
+        return;
+      }
+      if (stage === "fragment" && !es100 && SAMPLE_FUNCTIONS.has(name)) {
+        sample_uses.add(name);
+        t.text = name === "gl_SamplePosition" ? "_v86_SamplePosition()" : "_v86_" + name;
+        return;
+      }
+      if (!es100) return;
+      if (t.overload) t.text = rename(name);
+      else if (TEXTURE_FUNCTIONS.has(name)) t.text = TEXTURE_FUNCTIONS.get(name);
+      else if (ES300_NAMES.has(name)) t.text = rename(name);
+      else if (name === "attribute") t.text = "in";
+      else if (name === "varying") t.text = stage === "vertex" ? "out" : "in";
+      else if (name === "gl_FragColor") {
+        t.text = "_v86_FragColor";
+        frag_color = true;
+      } else if (name === "gl_FragData") {
+        t.text = "_v86_FragData";
+        frag_data = true;
+      } else if (name === "gl_FragDepthEXT") t.text = "gl_FragDepth";
+      else if (name === "gl_MaxVaryingVectors") t.text = String(limits.maxVaryingVectors);
+    }
+    const blend = stage === "fragment" && !es100 && tokens.some((t) => t.kind === "name" && /^blend_support_/.test(t.text)) ? rewrite_blend(tokens) : null;
+    let text = tokens.map((t) => t.text).join("");
+    if (blend) text += "\n" + blend;
+    const conversions = version >= 310 && tokens.some((t) => t.kind === "name" && t.text === "atomicCounterDecrement") ? "#extension GL_EXT_shader_implicit_conversions : enable\n" : "";
+    if ((sample_uses.size || extended_uses.size || conversions) && directives_end >= 0) {
+      const at = tokens.slice(0, directives_end).reduce((n, t) => n + t.text.length, 0);
+      text = text.slice(0, at) + "\n" + conversions + sample_helpers(sample_uses) + extended_helpers(extended_uses) + text.slice(at);
+    }
+    if (es100) {
+      const outputs = (frag_color ? "layout(location = 0) out mediump vec4 _v86_FragColor; " : "") + (frag_data ? "layout(location = 0) out mediump vec4 _v86_FragData[" + limits.maxDrawBuffers + "]; " : "");
+      if (version_line_end < 0) {
+        text = "#version 300 es\n" + (outputs ? outputs + "\n" : "") + text;
+      } else if (outputs) {
+        const end = tokens.slice(0, version_line_end).reduce((n, t) => n + t.text.length, 0);
+        text = text.slice(0, end) + "\n" + outputs + text.slice(end);
+      }
+    }
+    return { source: text, renames, version };
+  }
+
+  // src/gles/spirv_patch.js
+  var OP = {
+    Name: 5,
+    MemberName: 6,
+    EntryPoint: 15,
+    ExecutionMode: 16,
+    TypeBool: 20,
+    TypeInt: 21,
+    TypeFloat: 22,
+    TypeVector: 23,
+    TypeMatrix: 24,
+    TypeImage: 25,
+    TypeSampler: 26,
+    TypeSampledImage: 27,
+    TypeArray: 28,
+    TypeRuntimeArray: 29,
+    TypeStruct: 30,
+    TypePointer: 32,
+    Constant: 43,
+    Variable: 59,
+    Decorate: 71,
+    MemberDecorate: 72
+  };
+  var DECORATION = {
+    Block: 2,
+    BufferBlock: 3,
+    RowMajor: 4,
+    ColMajor: 5,
+    ArrayStride: 6,
+    MatrixStride: 7,
+    BuiltIn: 11,
+    Flat: 14,
+    Location: 30,
+    Component: 31,
+    Index: 32,
+    Binding: 33,
+    DescriptorSet: 34,
+    Offset: 35,
+    XfbBuffer: 36,
+    XfbStride: 37
+  };
+  var STORAGE = {
+    UniformConstant: 0,
+    Input: 1,
+    Uniform: 2,
+    Output: 3,
+    Workgroup: 4,
+    Private: 6,
+    Function: 7,
+    PushConstant: 9,
+    Image: 11,
+    StorageBuffer: 12
+  };
+  var EXECUTION_MODEL = { Vertex: 0, TessellationControl: 1, TessellationEvaluation: 2, Geometry: 3, Fragment: 4, GLCompute: 5 };
+  function string_at(words, at) {
+    const bytes = [];
+    for (let i = at; i < words.length; i++) {
+      for (let b = 0; b < 4; b++) {
+        const c = words[i] >>> 8 * b & 255;
+        if (!c) return new TextDecoder().decode(new Uint8Array(bytes));
+        bytes.push(c);
+      }
+    }
+    return new TextDecoder().decode(new Uint8Array(bytes));
+  }
+  function parse_spirv(words) {
+    const m = {
+      /** @type {!Map<number, string>} */
+      names: /* @__PURE__ */ new Map(),
+      /** @type {!Map<number, !Array<string>>} */
+      member_names: /* @__PURE__ */ new Map(),
+      /** @type {!Map<number, !Object>} */
+      types: /* @__PURE__ */ new Map(),
+      /** @type {!Map<number, number>} */
+      constants: /* @__PURE__ */ new Map(),
+      /** @type {!Array<{id: number, type: number, storage: number}>} */
+      variables: [],
+      /** id -> decoration -> the word index of its first operand (-1: none) */
+      /** @type {!Map<number, !Map<number, number>>} */
+      decorations: /* @__PURE__ */ new Map(),
+      /** @type {!Map<number, !Map<number, !Map<number, number>>>} */
+      member_decorations: /* @__PURE__ */ new Map(),
+      entry: null
+    };
+    for (let at = 5; at < words.length; ) {
+      const count = words[at] >>> 16, op = words[at] & 65535;
+      if (!count) break;
+      const w = (i) => words[at + i];
+      switch (op) {
+        case OP.Name:
+          m.names.set(w(1), string_at(words, at + 2));
+          break;
+        case OP.MemberName: {
+          if (!m.member_names.has(w(1))) m.member_names.set(w(1), []);
+          m.member_names.get(w(1))[w(2)] = string_at(words, at + 3);
+          break;
+        }
+        case OP.EntryPoint:
+          m.entry = { model: w(1), id: w(2) };
+          break;
+        case OP.TypeBool:
+          m.types.set(w(1), { kind: "bool" });
+          break;
+        case OP.TypeInt:
+          m.types.set(w(1), { kind: "int", width: w(2), signed: !!w(3) });
+          break;
+        case OP.TypeFloat:
+          m.types.set(w(1), { kind: "float", width: w(2) });
+          break;
+        case OP.TypeVector:
+          m.types.set(w(1), { kind: "vector", component: w(2), size: w(3) });
+          break;
+        case OP.TypeMatrix:
+          m.types.set(w(1), { kind: "matrix", column: w(2), columns: w(3) });
+          break;
+        case OP.TypeImage:
+          m.types.set(w(1), { kind: "image", sampled_type: w(2), dim: w(3), depth: w(4), arrayed: w(5), ms: w(6), sampled: w(7), format: w(8) });
+          break;
+        case OP.TypeSampler:
+          m.types.set(w(1), { kind: "sampler" });
+          break;
+        case OP.TypeSampledImage:
+          m.types.set(w(1), { kind: "sampled_image", image: w(2) });
+          break;
+        case OP.TypeArray:
+          m.types.set(w(1), { kind: "array", element: w(2), length_id: w(3) });
+          break;
+        case OP.TypeRuntimeArray:
+          m.types.set(w(1), { kind: "runtime_array", element: w(2) });
+          break;
+        case OP.TypeStruct:
+          m.types.set(w(1), { kind: "struct", members: Array.from(words.subarray(at + 2, at + count)) });
+          break;
+        case OP.TypePointer:
+          m.types.set(w(1), { kind: "pointer", storage: w(2), pointee: w(3) });
+          break;
+        case OP.Constant:
+          m.constants.set(w(2), w(3));
+          break;
+        case OP.Variable:
+          if (w(3) !== STORAGE.Function) m.variables.push({ id: w(2), type: w(1), storage: w(3) });
+          break;
+        case OP.Decorate: {
+          if (!m.decorations.has(w(1))) m.decorations.set(w(1), /* @__PURE__ */ new Map());
+          m.decorations.get(w(1)).set(w(2), count > 3 ? at + 3 : -1);
+          break;
+        }
+        case OP.MemberDecorate: {
+          if (!m.member_decorations.has(w(1))) m.member_decorations.set(w(1), /* @__PURE__ */ new Map());
+          const members = m.member_decorations.get(w(1));
+          if (!members.has(w(2))) members.set(w(2), /* @__PURE__ */ new Map());
+          members.get(w(2)).set(w(3), count > 4 ? at + 4 : -1);
+          break;
+        }
+      }
+      at += count;
+    }
+    return m;
+  }
+  function array_length(m, type) {
+    return m.constants.get(type.length_id) || 1;
+  }
+  function location_count(m, id) {
+    const t = m.types.get(id);
+    switch (t && t.kind) {
+      case "matrix":
+        return t.columns;
+      case "array":
+        return array_length(m, t) * location_count(m, t.element);
+      case "struct":
+        return t.members.reduce((n, member) => n + location_count(m, member), 0);
+      default:
+        return 1;
+    }
+  }
+  function is_builtin(m, v) {
+    const d = m.decorations.get(v.id);
+    if (d && d.has(DECORATION.BuiltIn)) return true;
+    const members = m.member_decorations.get(innermost(m, m.types.get(v.type).pointee));
+    return !!members && [...members.values()].some((member) => member.has(DECORATION.BuiltIn));
+  }
+  function innermost(m, id) {
+    let t = m.types.get(id);
+    while (t && t.kind === "array") {
+      id = t.element;
+      t = m.types.get(id);
+    }
+    return id;
+  }
+  function set_decoration(words, m, id, decoration, value) {
+    const d = m.decorations.get(id);
+    const at = d && d.get(decoration);
+    if (at === void 0 || at < 0) return false;
+    words[at] = value >>> 0;
+    return true;
+  }
+  function get_decoration(words, m, id, decoration) {
+    const d = m.decorations.get(id);
+    const at = d && d.get(decoration);
+    return at === void 0 || at < 0 ? void 0 : words[at];
+  }
+  function variable_name(m, v) {
+    const own = m.names.get(v.id);
+    if (own) return own;
+    return m.names.get(innermost(m, m.types.get(v.type).pointee)) || "";
+  }
+  function block_layout(words, m, block_name) {
+    const leaves = /* @__PURE__ */ new Map();
+    const block = [...m.names].find(([id, name]) => name === block_name && m.types.has(id) && m.types.get(id).kind === "struct");
+    if (!block) return leaves;
+    const member_word = (id, index, decoration) => {
+      const members = m.member_decorations.get(id);
+      const d = members && members.get(index);
+      const at = d && d.get(decoration);
+      return at === void 0 || at < 0 ? void 0 : words[at];
+    };
+    const has_member = (id, index, decoration) => {
+      const members = m.member_decorations.get(id);
+      const d = members && members.get(index);
+      return !!d && d.has(decoration);
+    };
+    const walk = (type_id, name, offset, matrix_stride, row_major) => {
+      const t = m.types.get(type_id);
+      if (t.kind === "struct") {
+        const names = m.member_names.get(type_id) || [];
+        t.members.forEach((member, i) => {
+          walk(
+            member,
+            (name ? name + "." : "") + names[i],
+            offset + (member_word(type_id, i, DECORATION.Offset) || 0),
+            member_word(type_id, i, DECORATION.MatrixStride) || 0,
+            has_member(type_id, i, DECORATION.RowMajor)
+          );
+        });
+        return;
+      }
+      if (t.kind === "array") {
+        const stride = get_decoration(words, m, type_id, DECORATION.ArrayStride) || 0;
+        const element = m.types.get(t.element);
+        if (element.kind === "struct" || element.kind === "array") {
+          for (let i = 0; i < array_length(m, t); i++) walk(t.element, name + "[" + i + "]", offset + i * stride, matrix_stride, row_major);
+          return;
+        }
+        leaves.set(name + "[0]", { offset, array_stride: stride, matrix_stride, row_major });
+        return;
+      }
+      leaves.set(name, { offset, array_stride: 0, matrix_stride, row_major });
+    };
+    walk(block[0], "", 0, 0, false);
+    return leaves;
+  }
+  function add_xfb(words, captures) {
+    const m = parse_spirv(words);
+    const decorations = [];
+    const instruction = (op, ...operands) => [operands.length + 1 << 16 | op, ...operands];
+    for (const c of captures) {
+      const builtin = { gl_Position: 0, gl_PointSize: 1 }[c.name];
+      if (builtin !== void 0) {
+        for (const v2 of m.variables.filter((x) => x.storage === STORAGE.Output)) {
+          const type = m.types.get(v2.type).pointee;
+          const members = m.member_decorations.get(type);
+          const member = members && [...members].find(([, d]) => d.has(DECORATION.BuiltIn) && words[d.get(DECORATION.BuiltIn)] === builtin);
+          if (member) {
+            decorations.push(
+              instruction(OP.MemberDecorate, type, member[0], DECORATION.Offset, c.offset),
+              instruction(OP.MemberDecorate, type, member[0], DECORATION.XfbBuffer, c.buffer),
+              instruction(OP.MemberDecorate, type, member[0], DECORATION.XfbStride, c.stride)
+            );
+          } else if (get_decoration(words, m, v2.id, DECORATION.BuiltIn) === builtin) {
+            decorations.push(
+              instruction(OP.Decorate, v2.id, DECORATION.Offset, c.offset),
+              instruction(OP.Decorate, v2.id, DECORATION.XfbBuffer, c.buffer),
+              instruction(OP.Decorate, v2.id, DECORATION.XfbStride, c.stride)
+            );
+          }
+        }
+        continue;
+      }
+      const v = m.variables.find((x) => x.storage === STORAGE.Output && variable_name(m, x) === c.name && !is_builtin(m, x));
+      if (!v) continue;
+      decorations.push(
+        instruction(OP.Decorate, v.id, DECORATION.XfbBuffer, c.buffer),
+        instruction(OP.Decorate, v.id, DECORATION.XfbStride, c.stride),
+        instruction(OP.Decorate, v.id, DECORATION.Offset, c.offset)
+      );
+    }
+    let modes = 5, debug = 5, annotations = 5;
+    for (let at = 5; at < words.length; ) {
+      const count = words[at] >>> 16, op = words[at] & 65535;
+      if (!count) break;
+      if (op === OP.EntryPoint || op === OP.ExecutionMode || op === 17 || op === 10 || op === 11 || op === 14) modes = at + count;
+      if (op >= 3 && op <= 7 || op === 330) debug = at + count;
+      if (op === OP.Decorate || op === OP.MemberDecorate || op === 332 || op === 333) annotations = at + count;
+      at += count;
+    }
+    annotations = Math.max(annotations, debug, modes);
+    const head = Array.from(words.subarray(0, modes));
+    const mode = m.entry ? instruction(OP.ExecutionMode, m.entry.id, 11) : [];
+    const out = [
+      ...head.slice(0, 5),
+      ...instruction(17, 53),
+      ...head.slice(5),
+      ...mode,
+      ...words.subarray(modes, annotations),
+      ...decorations.flat(),
+      ...words.subarray(annotations)
+    ];
+    return new Uint32Array(out);
+  }
+
+  // src/gles/glsl_program.js
+  var MAX_VERTEX_ATTRIBS = GL_STATE.get(34921)[0];
+  var BINDING = { DEFAULT_BLOCK: 0, SAMPLERS: 1, UNIFORM_BLOCKS: 17, STORAGE_BLOCKS: 42, ATOMIC_COUNTERS: 60, IMAGES: 70 };
+  var TYPES = /* @__PURE__ */ new Map();
+  for (const [base, enums] of [
+    ["float", [5126, 35664, 35665, 35666]],
+    ["int", [5124, 35667, 35668, 35669]],
+    ["uint", [5125, 36294, 36295, 36296]],
+    ["bool", [35670, 35671, 35672, 35673]]
+  ]) {
+    enums.forEach((e, i) => TYPES.set(e, { base, components: i + 1, columns: 0, rows: i + 1 }));
+  }
+  for (const [e, columns, rows] of [
+    [35674, 2, 2],
+    [35675, 3, 3],
+    [35676, 4, 4],
+    [35685, 2, 3],
+    [35686, 2, 4],
+    [35687, 3, 2],
+    [35688, 3, 4],
+    [35689, 4, 2],
+    [35690, 4, 3]
+  ]) {
+    TYPES.set(e, { base: "float", components: columns * rows, columns, rows });
+  }
+  var SAMPLERS = [
+    35678,
+    35679,
+    35680,
+    35682,
+    36289,
+    36292,
+    36293,
+    36298,
+    36299,
+    36300,
+    36303,
+    36306,
+    36307,
+    36308,
+    36311,
+    36198,
+    37128,
+    37129,
+    37130,
+    36876,
+    36877,
+    36878,
+    36879,
+    36290,
+    36304,
+    36312,
+    37131,
+    37132,
+    37133
+  ];
+  var IMAGES = [
+    36941,
+    36942,
+    36944,
+    36947,
+    36952,
+    36953,
+    36955,
+    36958,
+    36963,
+    36964,
+    36966,
+    36969,
+    36945,
+    36956,
+    36967,
+    36948,
+    36959,
+    36970
+  ];
+  for (const e of SAMPLERS) TYPES.set(e, { base: "int", components: 1, columns: 0, rows: 1, opaque: "sampler" });
+  for (const e of IMAGES) TYPES.set(e, { base: "int", components: 1, columns: 0, rows: 1, opaque: "image" });
+  TYPES.set(37595, { base: "uint", components: 1, columns: 0, rows: 1, opaque: "atomic" });
+  function gl_type(type) {
+    return TYPES.get(type) || { base: "float", components: 1, columns: 0, rows: 1 };
+  }
+  var STAGE_NAME = ["vertex", "tess_control", "tess_evaluation", "geometry", "fragment", "compute"];
+  var MODEL_OF_STAGE = [
+    EXECUTION_MODEL.Vertex,
+    EXECUTION_MODEL.TessellationControl,
+    EXECUTION_MODEL.TessellationEvaluation,
+    EXECUTION_MODEL.Geometry,
+    EXECUTION_MODEL.Fragment,
+    EXECUTION_MODEL.GLCompute
+  ];
+  function instance_array_name(name) {
+    return name.replace(/(?:\[\d+\])+$/, "");
+  }
+  function renamed(name, renames) {
+    return name.replace(/[A-Za-z_][A-Za-z0-9_]*/g, (id) => renames.get(id) || id);
+  }
+  function base_name(name) {
+    return name.endsWith("[0]") ? name.slice(0, -3) : name;
+  }
+  function link_glslang_program(glslang, shaders, options) {
+    const empty = (log) => ({
+      ok: false,
+      log,
+      attributes: [],
+      uniforms: [],
+      locations: /* @__PURE__ */ new Map(),
+      by_location: [],
+      reflection: null,
+      blocks: [],
+      bindings: [],
+      spirv: []
+    });
+    const flags = options.separable ? 1 : 0;
+    const packings = /* @__PURE__ */ new Map();
+    for (const s of shaders) {
+      for (const [block, packing] of block_packings(s.source)) {
+        if (packings.has(block) && packings.get(block) !== packing) return empty("ERROR: Linking: the layouts of block " + block.split(":")[1] + " differ");
+        packings.set(block, packing);
+      }
+    }
+    const check_sources = shaders.map((s) => std_blocks(s.source, false));
+    shaders = shaders.map((s) => Object.assign({}, s, { source: std_blocks(s.source) }));
+    let check;
+    try {
+      check = glslang.check_program(shaders.map((s, i) => ({ stage: STAGE[s.stage], source: check_sources[i] })), flags);
+    } catch (e) {
+      return empty("ERROR: internal linker error: " + (e && e.message || e));
+    }
+    if (!check.ok) return empty(check.log || "ERROR: link failed");
+    const attributes = [];
+    const used = /* @__PURE__ */ new Set();
+    const vertex_inputs = check.inputs.filter((i) => !i.builtIn && i.stages & 1 << STAGE.vertex);
+    const span = (i) => Math.max(1, gl_type(i.type).columns) * Math.max(1, i.size);
+    const take = (location, n) => {
+      for (let k = 0; k < n; k++) used.add(location + k);
+    };
+    for (const i of vertex_inputs) {
+      const bound2 = options.bindings && options.bindings.get(i.name);
+      const location = i.location >= 0 ? i.location : bound2 !== void 0 ? bound2 : -1;
+      attributes.push({ name: i.name, size: Math.max(1, i.size), type: i.type, location });
+      if (location >= 0) take(location, span(i));
+    }
+    for (const a of attributes) {
+      if (a.location >= 0) continue;
+      const n = span(vertex_inputs.find((i) => i.name === a.name));
+      let location = 0;
+      while ([...Array(n).keys()].some((k) => used.has(location + k))) location++;
+      a.location = location;
+      take(location, n);
+    }
+    if ([...used].some((location) => location >= MAX_VERTEX_ATTRIBS)) return empty("ERROR: the vertex shader's inputs need more than " + MAX_VERTEX_ATTRIBS + " locations");
+    const blocks = check.uniformBlocks.map((b, index) => ({
+      name: b.name,
+      index,
+      size: b.size,
+      binding: element_binding(check.uniformBlocks, b),
+      stages: b.stages,
+      members: []
+    }));
+    const uniforms = [];
+    for (const u of check.uniforms) {
+      const t = gl_type(u.type);
+      const size = Math.max(1, u.size);
+      const row_major = !!u.rowMajor && !!t.columns;
+      const matrix_stride = !t.columns ? 0 : u.packing === "std430" ? (row_major ? t.columns : t.rows) === 2 ? 8 : 16 : 16;
+      uniforms.push({
+        name: u.name,
+        base: base_name(u.name),
+        size,
+        type: u.type,
+        location: -1,
+        explicit_location: u.location,
+        components: t.components,
+        columns: t.columns,
+        rows: t.rows,
+        sampler: t.opaque === "sampler",
+        opaque: t.opaque || null,
+        int: t.base !== "float",
+        bool: t.base === "bool",
+        uint: t.base === "uint",
+        block_index: u.index,
+        offset: u.offset,
+        array_stride: u.arrayStride,
+        matrix_stride,
+        row_major,
+        binding: u.binding,
+        stages: u.stages
+      });
+      if (u.index >= 0 && blocks[u.index]) blocks[u.index].members.push(uniforms.length - 1);
+    }
+    for (const b of blocks) {
+      const first = blocks.find((x) => instance_array_name(x.name) === instance_array_name(b.name));
+      if (first !== b && !b.members.length) b.members = first.members.slice();
+    }
+    const declared = /* @__PURE__ */ new Map(), located = /* @__PURE__ */ new Map();
+    const structs = struct_declarations(shaders);
+    for (const s of shaders) {
+      const pattern = /(?:layout\s*\(([^)]*)\)\s*uniform|uniform\s+layout\s*\(([^)]*)\))\s+(?:(?:lowp|mediump|highp)\s+)?(\w+)\s+(\w+)\s*((?:\[\s*\d+\s*\])*)/g;
+      for (let m; m = pattern.exec(s.source); ) {
+        const at = /\blocation\s*=\s*(\d+)/.exec(m[1] || m[2]);
+        if (!at) continue;
+        const dims = (m[5].match(/\d+/g) || []).map(Number);
+        const location = +at[1], size = dims.reduce((n, d) => n * d, 1) * uniform_locations(m[3], structs);
+        located.set(m[4], { location, type: m[3], dims });
+        for (let i = 0; i < size; i++) {
+          const owner = declared.get(location + i);
+          if (owner !== void 0 && owner !== m[4] + "[" + i + "]") {
+            return empty("ERROR: uniform location " + (location + i) + " is used by two uniforms");
+          }
+          declared.set(location + i, m[4] + "[" + i + "]");
+        }
+      }
+    }
+    const taken = /* @__PURE__ */ new Set();
+    const default_uniforms = uniforms.filter((u) => u.block_index < 0 && u.opaque !== "atomic");
+    for (const u of default_uniforms) {
+      const declaration = located.get(u.name.replace(/[[.].*$/, ""));
+      const offset = declaration ? location_offset(declaration, u.name, structs) : -1;
+      if (offset >= 0) u.explicit_location = declaration.location + offset;
+      if (u.explicit_location < 0) continue;
+      u.location = u.explicit_location;
+      for (let i = 0; i < u.size; i++) {
+        if (taken.has(u.location + i)) return empty("ERROR: uniform location " + (u.location + i) + " is used by two uniforms");
+        taken.add(u.location + i);
+      }
+    }
+    let next = 0;
+    for (const u of default_uniforms) {
+      if (u.location >= 0) continue;
+      while ([...Array(u.size).keys()].some((k) => taken.has(next + k))) next++;
+      u.location = next;
+      for (let i = 0; i < u.size; i++) taken.add(next + i);
+      next += u.size;
+    }
+    const locations = /* @__PURE__ */ new Map();
+    const by_location = [];
+    for (const u of default_uniforms) {
+      locations.set(u.base, u.location);
+      for (let i = 0; i < u.size; i++) {
+        if (u.size > 1 || u.name !== u.base) locations.set(u.base + "[" + i + "]", u.location + i);
+        by_location[u.location + i] = { uniform: u, element: i };
+      }
+    }
+    const rewritten = shaders.map((s) => rewrite_for_spirv(s.source, s.stage, options.limits));
+    const renames = /* @__PURE__ */ new Map();
+    for (const r of rewritten) for (const [from, to] of r.renames) renames.set(from, to);
+    let code;
+    try {
+      code = glslang.program_spirv(shaders.map((s, i) => ({ stage: STAGE[s.stage], source: rewritten[i].source })), flags);
+    } catch (e) {
+      return empty("ERROR: internal compiler error: " + (e && e.message || e));
+    }
+    if (!code.ok) return empty("ERROR: internal compiler error (SPIR-V): " + code.log);
+    const parts = options.tf ? options.tf.names.filter((n) => /[[.]/.test(n) && !n.startsWith("gl_")) : [];
+    if (parts.length) {
+      let index = shaders.length - 1;
+      while (index >= 0 && (shaders[index].stage === "fragment" || shaders[index].stage === "compute")) index--;
+      const module = index >= 0 && code.modules.find((x) => x.stage === STAGE[shaders[index].stage]);
+      const m = module && parse_spirv(new Uint32Array(module.words));
+      const explicit = /\blayout\s*\([^)]*\blocation\b[^)]*\)\s*(?:(?:flat|smooth|centroid|highp|mediump|lowp|invariant)\s+)*out\b/.test(shaders[index].source);
+      let source = rewritten[index].source.replace(/\bmain\b(?=\s*\()/g, "_v86_main");
+      let copies = "";
+      for (const [i, name] of parts.entries()) {
+        const type = m && element_type(m, renamed(name, renames));
+        if (!type) return empty("ERROR: transform feedback varying " + name + " is not an output of the vertex shader");
+        source += `
+${explicit ? `layout(location = ${15 - i}) ` : ""}${type.integer ? "flat " : ""}out highp ${type.glsl} _v86_xfb${i};`;
+        copies += ` _v86_xfb${i} = ${renamed(name, renames)};`;
+      }
+      rewritten[index] = Object.assign({}, rewritten[index], { source: source + "\nvoid main() { _v86_main();" + copies + " }\n" });
+      try {
+        code = glslang.program_spirv(shaders.map((s, i) => ({ stage: STAGE[s.stage], source: rewritten[i].source })), flags);
+      } catch (e) {
+        return empty("ERROR: internal compiler error: " + (e && e.message || e));
+      }
+      if (!code.ok) return empty("ERROR: transform feedback varyings " + parts.join(", ") + ": " + code.log);
+    }
+    const refused = link_rules(code.modules, shaders, !!options.separable);
+    if (refused) return empty(refused);
+    const default_block = code.uniformBlocks.findIndex((b) => b.name === "gl_DefaultUniformBlock");
+    const layout = /* @__PURE__ */ new Map();
+    for (const module of code.modules) {
+      const words = new Uint32Array(module.words);
+      for (const [name, leaf] of block_layout(words, parse_spirv(words), "gl_DefaultUniformBlock")) layout.set(name, leaf);
+    }
+    for (const u of default_uniforms) {
+      if (u.opaque) continue;
+      const leaf = layout.get(renamed(u.name, renames));
+      if (!leaf) continue;
+      u.offset = leaf.offset;
+      u.array_stride = leaf.array_stride;
+      u.matrix_stride = leaf.matrix_stride;
+    }
+    const counters = /* @__PURE__ */ new Map();
+    const counter_buffers = /* @__PURE__ */ new Map();
+    for (const module of code.modules) {
+      const words = new Uint32Array(module.words);
+      const m = parse_spirv(words);
+      for (const [id, name] of m.names) {
+        const t = m.types.get(id);
+        const binding = /^gl_AtomicCounterBlock_(\d+)$/.exec(name);
+        if (!binding || !t || t.kind !== "struct") continue;
+        const names = m.member_names.get(id) || [];
+        t.members.forEach((member, i) => {
+          const d = m.member_decorations.get(id);
+          const at = d && d.get(i) && d.get(i).get(DECORATION.Offset);
+          const offset = at === void 0 || at < 0 ? 0 : words[at];
+          const strides = [];
+          let count = 1;
+          for (let e = member; m.types.get(e) && m.types.get(e).kind === "array"; e = m.types.get(e).element) {
+            strides.push(get_decoration(words, m, e, DECORATION.ArrayStride) || 4);
+            count *= array_length(m, m.types.get(e));
+          }
+          counters.set(binding[1] + ":" + names[i], { offset, strides });
+          counter_buffers.set(+binding[1], Math.max(counter_buffers.get(+binding[1]) || 0, offset + 4 * count));
+        });
+      }
+    }
+    for (const u of uniforms) {
+      if (u.opaque !== "atomic") continue;
+      const parts2 = /^(\w+)((?:\[\d+\])*)$/.exec(u.name);
+      const counter = parts2 && counters.get(u.binding + ":" + renamed(parts2[1], renames));
+      if (!counter) continue;
+      const indices = (parts2[2].match(/\d+/g) || []).map(Number);
+      u.offset = indices.reduce((offset, index, k) => offset + index * (counter.strides[k] || 4), counter.offset);
+      u.array_stride = counter.strides.length ? counter.strides[counter.strides.length - 1] : 0;
+    }
+    const bindings = [{ binding: BINDING.DEFAULT_BLOCK, kind: "default", size: default_block >= 0 ? code.uniformBlocks[default_block].size : 0 }];
+    const gl_names = new Map([...renames].map(([from, to]) => [to, from]));
+    const gl_name = (name) => name.replace(/[A-Za-z_][A-Za-z0-9_]*/g, (id) => gl_names.get(id) || id);
+    const opaque = /* @__PURE__ */ new Map();
+    let next_sampler = BINDING.SAMPLERS, next_image = BINDING.IMAGES;
+    const opaque_binding = (name, image) => {
+      if (opaque.has(name)) return opaque.get(name);
+      const gl = gl_name(name);
+      const location = locations.has(gl) ? locations.get(gl) : -1;
+      const at = by_location[location];
+      const binding = image ? next_image++ : next_sampler++;
+      opaque.set(name, binding);
+      bindings.push({
+        binding,
+        kind: image ? "image" : "sampler",
+        location,
+        size: at && gl === at.uniform.base ? at.uniform.size : 1,
+        type: at ? at.uniform.type : 0,
+        unit: at && image ? at.uniform.binding : void 0,
+        // (the draw's destination, an advanced blend's: glsl_es_rewrite.js's)
+        ...gl === BLEND_DESTINATION ? { blend_destination: true } : {}
+      });
+      return binding;
+    };
+    blocks.forEach((b, i) => bindings.push({ binding: BINDING.UNIFORM_BLOCKS + i, kind: "uniform_block", block: i, size: b.size }));
+    const storage_blocks = check.bufferBlocks.map((b, index) => ({ name: b.name, index, size: b.size, binding: element_binding(check.bufferBlocks, b) }));
+    storage_blocks.forEach((b, i) => bindings.push({ binding: BINDING.STORAGE_BLOCKS + i, kind: "storage_block", block: i, size: b.size }));
+    const spirv = [];
+    const unused_inputs = [];
+    const stages = code.modules.map((m) => m.stage).sort((a, b) => a - b);
+    let previous = null;
+    const explicit_io = shaders.some((s) => /\blayout\s*\([^)]*\blocation\b[^)]*\)\s*(?:(?:flat|smooth|centroid|highp|mediump|lowp|invariant|patch)\s+)*(?:in|out)\b/.test(s.source));
+    for (const stage of stages) {
+      const module = code.modules.find((m2) => m2.stage === stage);
+      const words = new Uint32Array(module.words);
+      const m = parse_spirv(words);
+      const arrayed_inputs = stage === STAGE.tess_control || stage === STAGE.tess_evaluation || stage === STAGE.geometry;
+      const arrayed_outputs = stage === STAGE.tess_control;
+      const count = (v, arrayed) => {
+        let t = m.types.get(m.types.get(v.type).pointee);
+        const id = arrayed && t.kind === "array" ? t.element : m.types.get(v.type).pointee;
+        return location_count(m, id);
+      };
+      const outputs = /* @__PURE__ */ new Map();
+      let next_output = 0;
+      for (const v of m.variables) {
+        const name = variable_name(m, v);
+        if (v.storage === STORAGE.Input && !is_builtin(m, v)) {
+          if (stage === STAGE.vertex) {
+            const gl = [...renames].find(([, to]) => to === name);
+            const a = attributes.find((x) => x.name === (gl ? gl[0] : name));
+            if (a) set_decoration(words, m, v.id, DECORATION.Location, a.location);
+            else {
+              const pointee = m.types.get(v.type).pointee;
+              const n = location_count(m, pointee);
+              let location = 0;
+              while ([...Array(n).keys()].some((k) => used.has(location + k))) location++;
+              take(location, n);
+              set_decoration(words, m, v.id, DECORATION.Location, location);
+              let t = m.types.get(pointee);
+              while (t && t.kind === "array") t = m.types.get(t.element);
+              if (t && t.kind === "matrix") t = m.types.get(t.column);
+              const scalar = t && t.kind === "vector" ? m.types.get(t.component) : t;
+              const kind = scalar && scalar.kind === "int" ? scalar.signed ? "i" : "u" : "f";
+              for (let k = 0; k < n; k++) unused_inputs.push({ location: location + k, kind, components: t && t.kind === "vector" ? t.size : 1 });
+            }
+          } else if (!explicit_io && previous && previous.has(name)) {
+            set_decoration(words, m, v.id, DECORATION.Location, previous.get(name));
+          }
+        } else if (v.storage === STORAGE.Output && !is_builtin(m, v) && stage !== STAGE.fragment) {
+          if (!explicit_io) {
+            set_decoration(words, m, v.id, DECORATION.Location, next_output);
+            outputs.set(name, next_output);
+            next_output += count(v, arrayed_outputs);
+          } else outputs.set(name, get_decoration(words, m, v.id, DECORATION.Location));
+        } else if (v.storage === STORAGE.Uniform || v.storage === STORAGE.UniformConstant || v.storage === STORAGE.StorageBuffer) {
+          let binding;
+          let inner = m.types.get(m.types.get(v.type).pointee);
+          while (inner && (inner.kind === "array" || inner.kind === "runtime_array")) inner = m.types.get(inner.element);
+          if (name === "gl_DefaultUniformBlock") binding = BINDING.DEFAULT_BLOCK;
+          else if (inner && (inner.kind === "sampled_image" || inner.kind === "sampler")) binding = opaque_binding(name, false);
+          else if (inner && inner.kind === "image") binding = opaque_binding(name, inner.sampled === 2);
+          else if (/^gl_AtomicCounterBlock/.test(name)) {
+            binding = BINDING.ATOMIC_COUNTERS + +(/_(\d+)$/.exec(name) || [0, 0])[1];
+            if (!bindings.some((b) => b.binding === binding)) bindings.push({ binding, kind: "atomic_counters", unit: binding - BINDING.ATOMIC_COUNTERS });
+          } else {
+            const type_name = m.names.get(innermost(m, m.types.get(v.type).pointee)) || "";
+            const of = (b) => [name, type_name].some((n) => n && [b.name, renamed(b.name, renames)].some((x) => x === n || x === n + "[0]"));
+            const block = blocks.findIndex(of);
+            const storage = storage_blocks.findIndex(of);
+            if (block >= 0) binding = BINDING.UNIFORM_BLOCKS + block;
+            else if (storage >= 0) binding = BINDING.STORAGE_BLOCKS + storage;
+          }
+          if (binding !== void 0) {
+            set_decoration(words, m, v.id, DECORATION.DescriptorSet, options.separable && stage === STAGE.fragment ? 1 : 0);
+            set_decoration(words, m, v.id, DECORATION.Binding, binding);
+          }
+        }
+      }
+      void arrayed_inputs;
+      previous = outputs;
+      naga_decorations(words, m);
+      spirv.push({ stage: STAGE_NAME[stage], words: consecutive_elements(words), model: MODEL_OF_STAGE[stage] });
+    }
+    let tf_varyings = [];
+    if (options.tf && options.tf.names.length) {
+      const last = spirv.filter((m2) => m2.stage !== "fragment" && m2.stage !== "compute").pop();
+      const m = last && parse_spirv(last.words);
+      let components = 0;
+      for (const name of options.tf.names) {
+        const variable = parts.includes(name) ? "_v86_xfb" + parts.indexOf(name) : renamed(name, renames);
+        const v = m && varying_of(m, variable, name);
+        if (v) v.variable = variable;
+        if (!v) return empty("ERROR: transform feedback varying " + name + " is not an output of the vertex shader");
+        if (tf_varyings.some((x) => x.name === name)) return empty("ERROR: transform feedback varying " + name + " is named twice");
+        components += v.components * v.size;
+        if (options.tf.mode === 35981 && v.components * v.size > 4) return empty("ERROR: " + name + " has too many components to capture alone");
+        tf_varyings.push(v);
+      }
+      if (options.tf.mode === 35980 && components > 64) return empty("ERROR: too many components to capture interleaved");
+      const interleaved = options.tf.mode === 35980;
+      const stride = tf_varyings.reduce((n, v) => n + v.bytes, 0);
+      let offset = 0;
+      last.words = add_xfb(last.words, tf_varyings.map((v, i) => {
+        const capture = {
+          name: v.name.startsWith("gl_") ? v.name : v.variable,
+          buffer: interleaved ? 0 : i,
+          offset: interleaved ? offset : 0,
+          stride: interleaved ? stride : v.bytes
+        };
+        offset += v.bytes;
+        return capture;
+      }));
+    }
+    const geometry_module = spirv.find((m) => m.stage === "geometry");
+    const tessellation_modules = spirv.filter((m) => m.stage === "tess_control" || m.stage === "tess_evaluation");
+    return {
+      ok: true,
+      log: check.log,
+      attributes,
+      uniforms,
+      locations,
+      by_location,
+      reflection: check,
+      blocks,
+      storage_blocks,
+      bindings,
+      spirv,
+      renames,
+      local_size: check.localSize,
+      default_block_size: bindings[0].size,
+      tf_varyings,
+      counter_buffers: Object.fromEntries(counter_buffers),
+      tf_mode: options.tf ? options.tf.mode : 35980,
+      outputs: check.outputs,
+      geometry: geometry_module ? geometry_layout(geometry_module.words) : null,
+      unused_inputs,
+      blend_support: shaders.filter((s) => s.stage === "fragment").flatMap((s) => blend_support(s.source)),
+      tessellation: tessellation_modules.length ? tessellation_layout(tessellation_modules) : null
+    };
+  }
+  function tessellation_layout(modules) {
+    const layout = { control: false, evaluation: false, vertices: 0, mode: 0, spacing: 514, order: 2305, point_mode: 0 };
+    const MODES3 = {
+      22: ["mode", 4],
+      24: ["mode", 7],
+      25: ["mode", 36474],
+      1: ["spacing", 514],
+      2: ["spacing", 36476],
+      3: ["spacing", 36475],
+      4: ["order", 2304],
+      5: ["order", 2305],
+      10: ["point_mode", 1]
+    };
+    for (const m of modules) {
+      layout[m.stage === "tess_control" ? "control" : "evaluation"] = true;
+      const words = m.words;
+      for (let at = 5; at < words.length; ) {
+        const count = words[at] >>> 16;
+        if (!count) break;
+        if ((words[at] & 65535) === 16 && count >= 3) {
+          const mode = words[at + 2];
+          if (mode === 26) layout.vertices = words[at + 3];
+          else if (m.stage === "tess_evaluation" && mode in MODES3) layout[MODES3[mode][0]] = MODES3[mode][1];
+        }
+        at += count;
+      }
+    }
+    return layout;
+  }
+  function geometry_layout(words) {
+    const layout = { input: 4, output: 5, vertices: 0, invocations: 1 };
+    const INPUT = { 19: 0, 20: 1, 21: 10, 22: 4, 23: 12 };
+    const OUTPUT = { 27: 0, 28: 3, 29: 5 };
+    for (let at = 5; at < words.length; ) {
+      const count = words[at] >>> 16;
+      if (!count) break;
+      if ((words[at] & 65535) === 16 && count >= 3) {
+        const mode = words[at + 2];
+        if (mode in INPUT) layout.input = INPUT[mode];
+        else if (mode in OUTPUT) layout.output = OUTPUT[mode];
+        else if (mode === 26) layout.vertices = words[at + 3];
+        else if (mode === 0) layout.invocations = words[at + 3];
+      }
+      at += count;
+    }
+    return layout;
+  }
+  var DEFAULT_PRECISIONS = {
+    vertex: { float: "highp", int: "highp", sampler2D: "lowp", samplerCube: "lowp" },
+    fragment: { int: "mediump", sampler2D: "lowp", samplerCube: "lowp" }
+  };
+  function uniform_precisions(source, stage) {
+    const text = source.replace(/\/\*[^]*?\*\//g, " ").replace(/\/\/[^\n]*/g, "").replace(/^\s*#[^\n]*/gm, "");
+    const tokens = text.match(/[A-Za-z_][A-Za-z0-9_]*|\d+|[^\s\w]/g) || [];
+    const defaults = Object.assign({}, DEFAULT_PRECISIONS[stage] || {});
+    const QUALIFIERS = /* @__PURE__ */ new Set(["lowp", "mediump", "highp"]);
+    const category = (type) => /^(float|vec\d|mat\d(x\d)?)$/.test(type) ? "float" : /^(int|uint|[iu]vec\d)$/.test(type) ? "int" : type;
+    const structs = /* @__PURE__ */ new Map();
+    const out = /* @__PURE__ */ new Map();
+    let i = 0;
+    const struct_body = () => {
+      const members = [];
+      i++;
+      while (i < tokens.length && tokens[i] !== "}") {
+        let precision = null;
+        if (QUALIFIERS.has(tokens[i])) precision = tokens[i++];
+        let type = tokens[i++];
+        if (type === "struct") {
+          const name = tokens[i] !== "{" ? tokens[i++] : null;
+          const nested = struct_body();
+          if (name) structs.set(name, nested);
+          type = { members: nested };
+        }
+        while (i < tokens.length && tokens[i] !== ";") {
+          const name = tokens[i++];
+          while (tokens[i] === "[") {
+            while (tokens[i] !== "]") i++;
+            i++;
+          }
+          members.push({ name, type, precision: precision || (typeof type === "string" ? defaults[category(type)] || null : null) });
+          if (tokens[i] === ",") i++;
+        }
+        i++;
+      }
+      i++;
+      return members;
+    };
+    const leaves = (path, type, precision) => {
+      const members = typeof type === "object" ? type.members : structs.get(type);
+      if (members) for (const m of members) leaves(path + "." + m.name, m.type, m.precision);
+      else if (type !== "bool" && !/^bvec/.test(type) && precision) out.set(path, precision);
+    };
+    let depth = 0;
+    while (i < tokens.length) {
+      const t = tokens[i];
+      if (t === "{") {
+        depth++;
+        i++;
+        continue;
+      }
+      if (t === "}") {
+        depth--;
+        i++;
+        continue;
+      }
+      if (depth > 0) {
+        i++;
+        continue;
+      }
+      if (t === "precision" && QUALIFIERS.has(tokens[i + 1])) {
+        defaults[category(tokens[i + 2])] = tokens[i + 1];
+        i += 3;
+        continue;
+      }
+      if (t === "struct" && tokens[i + 2] === "{") {
+        const name = tokens[i + 1];
+        i += 2;
+        structs.set(name, struct_body());
+        continue;
+      }
+      if (t !== "uniform") {
+        i++;
+        continue;
+      }
+      i++;
+      if (tokens[i] === ";") {
+        i++;
+        continue;
+      }
+      if (tokens[i] === "layout") {
+        while (tokens[i] !== ")") i++;
+        i++;
+      }
+      let precision = null;
+      if (QUALIFIERS.has(tokens[i])) precision = tokens[i++];
+      let type = tokens[i++];
+      if (type === "struct") {
+        const name = tokens[i] !== "{" ? tokens[i++] : null;
+        const members = struct_body();
+        if (name) structs.set(name, members);
+        type = { members };
+      } else if (tokens[i] === "{") {
+        depth++;
+        i++;
+        continue;
+      }
+      while (i < tokens.length && tokens[i] !== ";") {
+        const name = tokens[i++];
+        while (tokens[i] === "[") {
+          while (tokens[i] !== "]") i++;
+          i++;
+        }
+        leaves(name, type, precision || (typeof type === "string" ? defaults[category(type)] || null : null));
+        if (tokens[i] === ",") i++;
+        else if (tokens[i] !== ";") i++;
+      }
+      i++;
+    }
+    return out;
+  }
+  function link_rules(modules, shaders, separable) {
+    const precisions = /* @__PURE__ */ new Map();
+    for (const shader of shaders) {
+      for (const [path, precision] of uniform_precisions(shader.source, shader.stage)) {
+        if (precisions.has(path) && precisions.get(path) !== precision) return "ERROR: Linking: precision of uniform " + path + " differs between shaders";
+        precisions.set(path, precision);
+      }
+    }
+    if (separable) return null;
+    const parsed = modules.map((module) => {
+      const words = new Uint32Array(module.words);
+      return { stage: module.stage, words, m: parse_spirv(words) };
+    }).sort((a, b) => a.stage - b.stage);
+    const FLAT = 14, NO_PERSPECTIVE = 13;
+    const decorated = (m, id, d) => !!(m.decorations.get(id) && m.decorations.get(id).has(d));
+    const interface_name = (m, v) => {
+      let id = m.types.get(v.type).pointee;
+      while (m.types.get(id) && m.types.get(id).kind === "array") id = m.types.get(id).element;
+      return m.types.get(id) && m.types.get(id).kind === "struct" && decorated(m, id, DECORATION.Block) ? "block " + m.names.get(id) : variable_name(m, v);
+    };
+    for (let k = 1; k < parsed.length; k++) {
+      const before = parsed[k - 1], after = parsed[k];
+      if (after.stage === STAGE.compute) continue;
+      const outputs = new Map(before.m.variables.filter((v) => v.storage === STORAGE.Output && !is_builtin(before.m, v)).map((v) => [interface_name(before.m, v), v]));
+      const used = /* @__PURE__ */ new Set();
+      const words = after.words;
+      let in_functions = false;
+      for (let at = 5; at < words.length; ) {
+        const count = words[at] >>> 16, op = words[at] & 65535;
+        if (!count) break;
+        if (op === 54) in_functions = true;
+        if (in_functions && (op === 61 || op === 65 || op === 66) && count >= 4) used.add(words[at + 3]);
+        if (in_functions && op === 12 && count >= 6) used.add(words[at + 5]);
+        at += count;
+      }
+      const es300 = [before, after].every((x) => shaders.some((s) => STAGE[s.stage] === x.stage && glsl_version(s.source) === 300));
+      for (const v of after.m.variables) {
+        if (v.storage !== STORAGE.Input || is_builtin(after.m, v)) continue;
+        const name = interface_name(after.m, v);
+        const output = outputs.get(name);
+        if (!output) {
+          if (used.has(v.id)) return "ERROR: Linking " + STAGE_NAME[after.stage] + " stage: input " + name + " is not written by the " + STAGE_NAME[before.stage] + " stage";
+          continue;
+        }
+        if (es300 && (decorated(before.m, output.id, FLAT) !== decorated(after.m, v.id, FLAT) || decorated(before.m, output.id, NO_PERSPECTIVE) !== decorated(after.m, v.id, NO_PERSPECTIVE))) {
+          return "ERROR: Linking " + STAGE_NAME[after.stage] + " stage: interpolation of " + name + " differs from the " + STAGE_NAME[before.stage] + " stage's";
+        }
+      }
+    }
+    return null;
+  }
+  var GL_OF = {
+    float: [5126, 35664, 35665, 35666],
+    int: [5124, 35667, 35668, 35669],
+    uint: [5125, 36294, 36295, 36296],
+    bool: [35670, 35671, 35672, 35673]
+  };
+  var GL_MATRICES = { 2: { 2: 35674, 3: 35685, 4: 35686 }, 3: { 2: 35687, 3: 35675, 4: 35688 }, 4: { 2: 35689, 3: 35690, 4: 35676 } };
+  function element_type(m, path) {
+    const steps = path.match(/^\w+|\[\d+\]|\.\w+/g);
+    if (!steps || steps.join("") !== path) return null;
+    const v = m.variables.find((x) => x.storage === STORAGE.Output && variable_name(m, x) === steps[0] && !is_builtin(m, x));
+    if (!v) return null;
+    let id = m.types.get(v.type).pointee;
+    for (const step of steps.slice(1)) {
+      const t2 = m.types.get(id);
+      if (step[0] === "[") {
+        if (!t2 || t2.kind !== "array" || +step.slice(1, -1) >= array_length(m, t2)) return null;
+        id = t2.element;
+      } else {
+        const member = t2 && t2.kind === "struct" ? (m.member_names.get(id) || []).indexOf(step.slice(1)) : -1;
+        if (member < 0) return null;
+        id = t2.members[member];
+      }
+    }
+    const t = m.types.get(id);
+    const scalar = (s) => s.kind === "float" ? "" : s.signed ? "i" : "u";
+    if (t.kind === "matrix") {
+      const column = m.types.get(t.column);
+      return { glsl: t.columns === column.size ? `mat${t.columns}` : `mat${t.columns}x${column.size}`, integer: false };
+    }
+    if (t.kind === "vector") {
+      const s = m.types.get(t.component);
+      return s.kind === "bool" ? null : { glsl: `${scalar(s)}vec${t.size}`, integer: s.kind === "int" };
+    }
+    if (t.kind === "float") return { glsl: "float", integer: false };
+    if (t.kind === "int") return { glsl: t.signed ? "int" : "uint", integer: true };
+    return null;
+  }
+  function varying_of(m, name, gl_name) {
+    const builtin = { gl_Position: [35666, 4], gl_PointSize: [5126, 1] }[gl_name];
+    if (builtin) return { name: gl_name, type: builtin[0], size: 1, components: builtin[1], bytes: 4 * builtin[1] };
+    const v = m.variables.find((x) => x.storage === STORAGE.Output && variable_name(m, x) === name && !is_builtin(m, x));
+    if (!v) return null;
+    let t = m.types.get(m.types.get(v.type).pointee), size = 1;
+    if (t.kind === "array") {
+      size = m.constants.get(t.length_id) || 1;
+      t = m.types.get(t.element);
+    }
+    const scalar = (id) => {
+      const s = m.types.get(id);
+      return s.kind === "float" ? "float" : s.kind === "bool" ? "bool" : s.signed ? "int" : "uint";
+    };
+    let type, components;
+    if (t.kind === "matrix") {
+      const column = m.types.get(t.column);
+      type = GL_MATRICES[t.columns][column.size];
+      components = t.columns * column.size;
+    } else if (t.kind === "vector") {
+      type = GL_OF[scalar(t.component)][t.size - 1];
+      components = t.size;
+    } else if (t.kind === "struct") return null;
+    else {
+      type = GL_OF[t.kind === "float" ? "float" : t.kind === "bool" ? "bool" : t.signed ? "int" : "uint"][0];
+      components = 1;
+    }
+    return { name: gl_name, type, size, components, bytes: 4 * components * size };
+  }
+  function consecutive_elements(words) {
+    const text = new TextEncoder().encode("vx consecutive block elements");
+    const marker = new Uint32Array(1 + (text.length >> 2) + 1);
+    new Uint8Array(marker.buffer).set(text, 4);
+    marker[0] = marker.length << 16 | 330;
+    let at = 5;
+    while (at < words.length) {
+      const op = words[at] & 65535;
+      if (op >= 71 && op <= 75 || op === 332 || op >= 19 && op <= 59) break;
+      at += words[at] >>> 16 || 1;
+    }
+    const out = new Uint32Array(words.length + marker.length);
+    out.set(words.subarray(0, at));
+    out.set(marker, at);
+    out.set(words.subarray(at), at + marker.length);
+    return out;
+  }
+  function struct_declarations(shaders) {
+    const structs = /* @__PURE__ */ new Map();
+    for (const s of shaders) {
+      const source = s.source.replace(/\/\/[^\n]*|\/\*[\s\S]*?\*\//g, "");
+      for (const m of source.matchAll(/\bstruct\s+(\w+)\s*\{([^}]*)\}/g)) {
+        const members = [];
+        for (const declaration of m[2].split(";")) {
+          const words = declaration.replace(/\b(?:lowp|mediump|highp)\b/g, "").trim().match(/^(\w+)\s+([\s\S]+)$/);
+          if (!words) continue;
+          for (const d of words[2].split(",")) {
+            const one = /^\s*(\w+)\s*((?:\[\s*\d+\s*\])*)\s*$/.exec(d);
+            if (one) members.push({ type: words[1], name: one[1], dims: (one[2].match(/\d+/g) || []).map(Number) });
+          }
+        }
+        structs.set(m[1], members);
+      }
+    }
+    return structs;
+  }
+  function uniform_locations(type, structs) {
+    const members = structs.get(type);
+    if (!members) return 1;
+    return members.reduce((n, m) => n + m.dims.reduce((k, d) => k * d, 1) * uniform_locations(m.type, structs), 0);
+  }
+  function location_offset(declaration, name, structs) {
+    const steps = name.match(/^\w+|\[\d+\]|\.\w+/g);
+    if (!steps || steps.join("") !== name) return -1;
+    let type = declaration.type, dims = declaration.dims, offset = 0;
+    for (const step of steps.slice(1)) {
+      if (step[0] === "[") {
+        if (!dims.length) return -1;
+        offset += +step.slice(1, -1) * dims.slice(1).reduce((n, d) => n * d, 1) * uniform_locations(type, structs);
+        dims = dims.slice(1);
+        continue;
+      }
+      const members = structs.get(type);
+      const at = members ? members.findIndex((m) => m.name === step.slice(1)) : -1;
+      if (at < 0 || dims.length) return -1;
+      for (const m of members.slice(0, at)) offset += m.dims.reduce((n, d) => n * d, 1) * uniform_locations(m.type, structs);
+      type = members[at].type;
+      dims = members[at].dims;
+    }
+    return offset;
+  }
+  function element_binding(list, b) {
+    if (b.binding < 0) return 0;
+    const parts = /^([^[]+)((?:\[\d+\])+)$/.exec(b.name);
+    if (!parts) return b.binding;
+    const indices = parts[2].match(/\d+/g);
+    if (indices.length === 1) return b.binding + +indices[0];
+    return b.binding + list.filter((x) => x.name.startsWith(parts[1] + "[")).indexOf(b);
+  }
+  function naga_decorations(words, m) {
+    const NON_READABLE = 25, COHERENT = 23, VOLATILE = 21, RELAXED_PRECISION = 0;
+    const blocks = /* @__PURE__ */ new Set(), buffers = /* @__PURE__ */ new Set(), variables = new Set(m.variables.map((v) => v.id));
+    for (const v of m.variables) {
+      if (v.storage !== STORAGE.StorageBuffer && v.storage !== STORAGE.Uniform) continue;
+      buffers.add(v.id);
+      blocks.add(innermost(m, m.types.get(v.type).pointee));
+    }
+    for (let at = 5; at < words.length; ) {
+      const count = words[at] >>> 16, op = words[at] & 65535;
+      if (!count) break;
+      if (op === OP.Decorate && count === 3 && (words[at + 2] === NON_READABLE && buffers.has(words[at + 1]) || (words[at + 2] === COHERENT || words[at + 2] === VOLATILE) && variables.has(words[at + 1]))) {
+        words[at + 2] = RELAXED_PRECISION;
+      }
+      if (op === OP.MemberDecorate && count === 4 && words[at + 3] === NON_READABLE && blocks.has(words[at + 1])) words[at + 3] = RELAXED_PRECISION;
+      at += count;
+    }
+  }
+  function unpack_program(bytes) {
+    const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+    const length = view.getUint32(0, true);
+    const info = JSON.parse(new TextDecoder().decode(bytes.subarray(4, 4 + length)));
+    let at = 4 + (length + 3 & ~3);
+    info.spirv = info.stages.map(([stage, model]) => {
+      const count = view.getUint32(at, true);
+      const words = new Uint32Array(bytes.slice(at + 4, at + 4 + 4 * count).buffer);
+      at += 4 + 4 * count;
+      return { stage, model, words };
+    });
+    delete info.stages;
+    info.locations = /* @__PURE__ */ new Map();
+    info.by_location = [];
+    for (const u of info.uniforms) {
+      if (u.location < 0) continue;
+      info.locations.set(u.base, u.location);
+      for (let i = 0; i < u.size; i++) {
+        if (u.size > 1 || u.name !== u.base) info.locations.set(u.base + "[" + i + "]", u.location + i);
+        info.by_location[u.location + i] = { uniform: u, element: i };
+      }
+    }
+    return info;
+  }
+
+  // src/gles/gles_formats3.js
+  var F = {
+    // formats
+    RED: 6403,
+    RG: 33319,
+    RGB: 6407,
+    RGBA: 6408,
+    RED_INTEGER: 36244,
+    RG_INTEGER: 33320,
+    RGB_INTEGER: 36248,
+    RGBA_INTEGER: 36249,
+    DEPTH_COMPONENT: 6402,
+    DEPTH_STENCIL: 34041,
+    LUMINANCE: 6409,
+    LUMINANCE_ALPHA: 6410,
+    ALPHA: 6406,
+    BGRA_EXT: 32993,
+    STENCIL_INDEX: 6401,
+    // types
+    BYTE: 5120,
+    UNSIGNED_BYTE: 5121,
+    SHORT: 5122,
+    UNSIGNED_SHORT: 5123,
+    INT: 5124,
+    UNSIGNED_INT: 5125,
+    FLOAT: 5126,
+    HALF_FLOAT: 5131,
+    HALF_FLOAT_OES: 36193,
+    UNSIGNED_SHORT_4_4_4_4: 32819,
+    UNSIGNED_SHORT_5_5_5_1: 32820,
+    UNSIGNED_SHORT_5_6_5: 33635,
+    UNSIGNED_INT_2_10_10_10_REV: 33640,
+    UNSIGNED_INT_10F_11F_11F_REV: 35899,
+    UNSIGNED_INT_5_9_9_9_REV: 35902,
+    UNSIGNED_INT_24_8: 34042,
+    FLOAT_32_UNSIGNED_INT_24_8_REV: 36269,
+    // component types (GL_FRAMEBUFFER_ATTACHMENT_COMPONENT_TYPE)
+    UNSIGNED_NORMALIZED: 35863,
+    SIGNED_NORMALIZED: 36764,
+    LINEAR: 9729,
+    SRGB: 35904
+  };
+  var SIZED = [
+    ["R8", 33321, F.RED, [F.UNSIGNED_BYTE], true, true, [8, 0, 0, 0, 0, 0], "unorm", "r8unorm"],
+    ["R8_SNORM", 36756, F.RED, [F.BYTE], false, true, [8, 0, 0, 0, 0, 0], "snorm", "r8snorm"],
+    ["R16F", 33325, F.RED, [F.HALF_FLOAT, F.FLOAT], false, true, [16, 0, 0, 0, 0, 0], "float", "r16float"],
+    ["R32F", 33326, F.RED, [F.FLOAT], false, false, [32, 0, 0, 0, 0, 0], "float", "r32float"],
+    ["R8UI", 33330, F.RED_INTEGER, [F.UNSIGNED_BYTE], true, false, [8, 0, 0, 0, 0, 0], "uint", "r8uint"],
+    ["R8I", 33329, F.RED_INTEGER, [F.BYTE], true, false, [8, 0, 0, 0, 0, 0], "int", "r8sint"],
+    ["R16UI", 33332, F.RED_INTEGER, [F.UNSIGNED_SHORT], true, false, [16, 0, 0, 0, 0, 0], "uint", "r16uint"],
+    ["R16I", 33331, F.RED_INTEGER, [F.SHORT], true, false, [16, 0, 0, 0, 0, 0], "int", "r16sint"],
+    ["R32UI", 33334, F.RED_INTEGER, [F.UNSIGNED_INT], true, false, [32, 0, 0, 0, 0, 0], "uint", "r32uint"],
+    ["R32I", 33333, F.RED_INTEGER, [F.INT], true, false, [32, 0, 0, 0, 0, 0], "int", "r32sint"],
+    ["RG8", 33323, F.RG, [F.UNSIGNED_BYTE], true, true, [8, 8, 0, 0, 0, 0], "unorm", "rg8unorm"],
+    ["RG8_SNORM", 36757, F.RG, [F.BYTE], false, true, [8, 8, 0, 0, 0, 0], "snorm", "rg8snorm"],
+    ["RG16F", 33327, F.RG, [F.HALF_FLOAT, F.FLOAT], false, true, [16, 16, 0, 0, 0, 0], "float", "rg16float"],
+    ["RG32F", 33328, F.RG, [F.FLOAT], false, false, [32, 32, 0, 0, 0, 0], "float", "rg32float"],
+    ["RG8UI", 33336, F.RG_INTEGER, [F.UNSIGNED_BYTE], true, false, [8, 8, 0, 0, 0, 0], "uint", "rg8uint"],
+    ["RG8I", 33335, F.RG_INTEGER, [F.BYTE], true, false, [8, 8, 0, 0, 0, 0], "int", "rg8sint"],
+    ["RG16UI", 33338, F.RG_INTEGER, [F.UNSIGNED_SHORT], true, false, [16, 16, 0, 0, 0, 0], "uint", "rg16uint"],
+    ["RG16I", 33337, F.RG_INTEGER, [F.SHORT], true, false, [16, 16, 0, 0, 0, 0], "int", "rg16sint"],
+    ["RG32UI", 33340, F.RG_INTEGER, [F.UNSIGNED_INT], true, false, [32, 32, 0, 0, 0, 0], "uint", "rg32uint"],
+    ["RG32I", 33339, F.RG_INTEGER, [F.INT], true, false, [32, 32, 0, 0, 0, 0], "int", "rg32sint"],
+    ["RGB8", 32849, F.RGB, [F.UNSIGNED_BYTE], true, true, [8, 8, 8, 0, 0, 0], "unorm", "rgba8unorm"],
+    ["SRGB8", 35905, F.RGB, [F.UNSIGNED_BYTE], false, true, [8, 8, 8, 0, 0, 0], "unorm", "rgba8unorm-srgb"],
+    ["RGB565", 36194, F.RGB, [F.UNSIGNED_BYTE, F.UNSIGNED_SHORT_5_6_5], true, true, [5, 6, 5, 0, 0, 0], "unorm", "rgba8unorm"],
+    ["RGB8_SNORM", 36758, F.RGB, [F.BYTE], false, true, [8, 8, 8, 0, 0, 0], "snorm", "rgba8snorm"],
+    [
+      "R11F_G11F_B10F",
+      35898,
+      F.RGB,
+      [F.UNSIGNED_INT_10F_11F_11F_REV, F.HALF_FLOAT, F.FLOAT],
+      false,
+      true,
+      [11, 11, 10, 0, 0, 0],
+      "float",
+      "rg11b10ufloat"
+    ],
+    ["RGB9_E5", 35901, F.RGB, [F.UNSIGNED_INT_5_9_9_9_REV, F.HALF_FLOAT, F.FLOAT], false, true, [9, 9, 9, 0, 0, 0], "float", "rgb9e5ufloat"],
+    ["RGB16F", 34843, F.RGB, [F.HALF_FLOAT, F.FLOAT], false, true, [16, 16, 16, 0, 0, 0], "float", "rgba16float"],
+    ["RGB32F", 34837, F.RGB, [F.FLOAT], false, false, [32, 32, 32, 0, 0, 0], "float", "rgba32float"],
+    ["RGB8UI", 36221, F.RGB_INTEGER, [F.UNSIGNED_BYTE], false, false, [8, 8, 8, 0, 0, 0], "uint", "rgba8uint"],
+    ["RGB8I", 36239, F.RGB_INTEGER, [F.BYTE], false, false, [8, 8, 8, 0, 0, 0], "int", "rgba8sint"],
+    ["RGB16UI", 36215, F.RGB_INTEGER, [F.UNSIGNED_SHORT], false, false, [16, 16, 16, 0, 0, 0], "uint", "rgba16uint"],
+    ["RGB16I", 36233, F.RGB_INTEGER, [F.SHORT], false, false, [16, 16, 16, 0, 0, 0], "int", "rgba16sint"],
+    ["RGB32UI", 36209, F.RGB_INTEGER, [F.UNSIGNED_INT], false, false, [32, 32, 32, 0, 0, 0], "uint", "rgba32uint"],
+    ["RGB32I", 36227, F.RGB_INTEGER, [F.INT], false, false, [32, 32, 32, 0, 0, 0], "int", "rgba32sint"],
+    ["RGBA8", 32856, F.RGBA, [F.UNSIGNED_BYTE], true, true, [8, 8, 8, 8, 0, 0], "unorm", "rgba8unorm"],
+    ["SRGB8_ALPHA8", 35907, F.RGBA, [F.UNSIGNED_BYTE], true, true, [8, 8, 8, 8, 0, 0], "unorm", "rgba8unorm-srgb"],
+    ["RGBA8_SNORM", 36759, F.RGBA, [F.BYTE], false, true, [8, 8, 8, 8, 0, 0], "snorm", "rgba8snorm"],
+    [
+      "RGB5_A1",
+      32855,
+      F.RGBA,
+      [F.UNSIGNED_BYTE, F.UNSIGNED_SHORT_5_5_5_1, F.UNSIGNED_INT_2_10_10_10_REV],
+      true,
+      true,
+      [5, 5, 5, 1, 0, 0],
+      "unorm",
+      "rgba8unorm"
+    ],
+    ["RGBA4", 32854, F.RGBA, [F.UNSIGNED_BYTE, F.UNSIGNED_SHORT_4_4_4_4], true, true, [4, 4, 4, 4, 0, 0], "unorm", "rgba8unorm"],
+    ["RGB10_A2", 32857, F.RGBA, [F.UNSIGNED_INT_2_10_10_10_REV], true, true, [10, 10, 10, 2, 0, 0], "unorm", "rgb10a2unorm"],
+    ["RGBA16F", 34842, F.RGBA, [F.HALF_FLOAT, F.FLOAT], false, true, [16, 16, 16, 16, 0, 0], "float", "rgba16float"],
+    ["RGBA32F", 34836, F.RGBA, [F.FLOAT], false, false, [32, 32, 32, 32, 0, 0], "float", "rgba32float"],
+    ["RGBA8UI", 36220, F.RGBA_INTEGER, [F.UNSIGNED_BYTE], true, false, [8, 8, 8, 8, 0, 0], "uint", "rgba8uint"],
+    ["RGBA8I", 36238, F.RGBA_INTEGER, [F.BYTE], true, false, [8, 8, 8, 8, 0, 0], "int", "rgba8sint"],
+    ["RGB10_A2UI", 36975, F.RGBA_INTEGER, [F.UNSIGNED_INT_2_10_10_10_REV], true, false, [10, 10, 10, 2, 0, 0], "uint", "rgb10a2uint"],
+    ["RGBA16UI", 36214, F.RGBA_INTEGER, [F.UNSIGNED_SHORT], true, false, [16, 16, 16, 16, 0, 0], "uint", "rgba16uint"],
+    ["RGBA16I", 36232, F.RGBA_INTEGER, [F.SHORT], true, false, [16, 16, 16, 16, 0, 0], "int", "rgba16sint"],
+    ["RGBA32I", 36226, F.RGBA_INTEGER, [F.INT], true, false, [32, 32, 32, 32, 0, 0], "int", "rgba32sint"],
+    ["RGBA32UI", 36208, F.RGBA_INTEGER, [F.UNSIGNED_INT], true, false, [32, 32, 32, 32, 0, 0], "uint", "rgba32uint"],
+    [
+      "DEPTH_COMPONENT16",
+      33189,
+      F.DEPTH_COMPONENT,
+      [F.UNSIGNED_SHORT, F.UNSIGNED_INT],
+      false,
+      false,
+      [0, 0, 0, 0, 16, 0],
+      "depth",
+      "depth16unorm"
+    ],
+    ["DEPTH_COMPONENT24", 33190, F.DEPTH_COMPONENT, [F.UNSIGNED_INT], false, false, [0, 0, 0, 0, 24, 0], "depth", "depth24plus"],
+    ["DEPTH_COMPONENT32F", 36012, F.DEPTH_COMPONENT, [F.FLOAT], false, false, [0, 0, 0, 0, 32, 0], "depth", "depth32float"],
+    [
+      "DEPTH24_STENCIL8",
+      35056,
+      F.DEPTH_STENCIL,
+      [F.UNSIGNED_INT_24_8],
+      false,
+      false,
+      [0, 0, 0, 0, 24, 8],
+      "depth_stencil",
+      "depth24plus-stencil8"
+    ],
+    [
+      "DEPTH32F_STENCIL8",
+      36013,
+      F.DEPTH_STENCIL,
+      [F.FLOAT_32_UNSIGNED_INT_24_8_REV],
+      false,
+      false,
+      [0, 0, 0, 0, 32, 8],
+      "depth_stencil",
+      "depth32float-stencil8"
+    ]
+  ];
+  var SIZED_FORMATS = new Map(SIZED.map(([name, value, format, types, renderable2, filterable, bits, kind, webgpu]) => [value, {
+    name,
+    value,
+    format,
+    types,
+    renderable: renderable2,
+    filterable,
+    bits,
+    kind,
+    webgpu,
+    sized: true,
+    compressed: false,
+    srgb: name.startsWith("SRGB")
+  }]));
+  var UNSIZED = /* @__PURE__ */ new Map([
+    [F.RGBA, /* @__PURE__ */ new Map([[F.UNSIGNED_BYTE, 32856], [F.UNSIGNED_SHORT_4_4_4_4, 32854], [F.UNSIGNED_SHORT_5_5_5_1, 32855]])],
+    [F.RGB, /* @__PURE__ */ new Map([[F.UNSIGNED_BYTE, 32849], [F.UNSIGNED_SHORT_5_6_5, 36194]])],
+    [F.LUMINANCE_ALPHA, /* @__PURE__ */ new Map([[F.UNSIGNED_BYTE, F.LUMINANCE_ALPHA]])],
+    [F.LUMINANCE, /* @__PURE__ */ new Map([[F.UNSIGNED_BYTE, F.LUMINANCE]])],
+    [F.ALPHA, /* @__PURE__ */ new Map([[F.UNSIGNED_BYTE, F.ALPHA]])],
+    [F.BGRA_EXT, /* @__PURE__ */ new Map([[F.UNSIGNED_BYTE, F.BGRA_EXT]])]
+  ]);
+  var LEGACY = /* @__PURE__ */ new Map([
+    [F.LUMINANCE, {
+      name: "LUMINANCE",
+      value: F.LUMINANCE,
+      format: F.LUMINANCE,
+      types: [F.UNSIGNED_BYTE],
+      renderable: false,
+      filterable: true,
+      bits: [8, 0, 0, 0, 0, 0],
+      kind: "unorm",
+      webgpu: "rgba8unorm",
+      sized: false,
+      compressed: false,
+      srgb: false
+    }],
+    [F.ALPHA, {
+      name: "ALPHA",
+      value: F.ALPHA,
+      format: F.ALPHA,
+      types: [F.UNSIGNED_BYTE],
+      renderable: false,
+      filterable: true,
+      bits: [0, 0, 0, 8, 0, 0],
+      kind: "unorm",
+      webgpu: "rgba8unorm",
+      sized: false,
+      compressed: false,
+      srgb: false
+    }],
+    [F.LUMINANCE_ALPHA, {
+      name: "LUMINANCE_ALPHA",
+      value: F.LUMINANCE_ALPHA,
+      format: F.LUMINANCE_ALPHA,
+      types: [F.UNSIGNED_BYTE],
+      renderable: false,
+      filterable: true,
+      bits: [8, 0, 0, 8, 0, 0],
+      kind: "unorm",
+      webgpu: "rgba8unorm",
+      sized: false,
+      compressed: false,
+      srgb: false
+    }],
+    [F.BGRA_EXT, {
+      name: "BGRA8_EXT",
+      value: F.BGRA_EXT,
+      format: F.BGRA_EXT,
+      types: [F.UNSIGNED_BYTE],
+      renderable: true,
+      filterable: true,
+      bits: [8, 8, 8, 8, 0, 0],
+      kind: "unorm",
+      webgpu: "rgba8unorm",
+      sized: false,
+      compressed: false,
+      srgb: false
+    }]
+  ]);
+  var COMPRESSED = [
+    [37488, "COMPRESSED_R11_EAC", 8, 1, "eac-r11unorm"],
+    [37489, "COMPRESSED_SIGNED_R11_EAC", 8, 1, "eac-r11snorm"],
+    [37490, "COMPRESSED_RG11_EAC", 16, 2, "eac-rg11unorm"],
+    [37491, "COMPRESSED_SIGNED_RG11_EAC", 16, 2, "eac-rg11snorm"],
+    [37492, "COMPRESSED_RGB8_ETC2", 8, 3, "etc2-rgb8unorm"],
+    [37493, "COMPRESSED_SRGB8_ETC2", 8, 3, "etc2-rgb8unorm-srgb"],
+    [37494, "COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2", 8, 4, "etc2-rgb8a1unorm"],
+    [37495, "COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2", 8, 4, "etc2-rgb8a1unorm-srgb"],
+    [37496, "COMPRESSED_RGBA8_ETC2_EAC", 16, 4, "etc2-rgba8unorm"],
+    [37497, "COMPRESSED_SRGB8_ALPHA8_ETC2_EAC", 16, 4, "etc2-rgba8unorm-srgb"],
+    [36196, "ETC1_RGB8_OES", 8, 3, "etc2-rgb8unorm"]
+  ];
+  var ASTC = [
+    [37808, 4, 4],
+    [37809, 5, 4],
+    [37810, 5, 5],
+    [37811, 6, 5],
+    [37812, 6, 6],
+    [37813, 8, 5],
+    [37814, 8, 6],
+    [37815, 8, 8],
+    [37816, 10, 5],
+    [37817, 10, 6],
+    [37818, 10, 8],
+    [37819, 10, 10],
+    [37820, 12, 10],
+    [37821, 12, 12]
+  ];
+  var COMPRESSED_FORMATS = new Map([
+    ...COMPRESSED.map(([value, name, block_bytes, channels, webgpu]) => [value, { name, block_bytes, channels, webgpu, block_width: 4, block_height: 4 }]),
+    ...ASTC.flatMap(([value, w, h]) => [false, true].map((srgb) => [value + (srgb ? 32 : 0), {
+      name: (srgb ? "COMPRESSED_SRGB8_ALPHA8_ASTC_" : "COMPRESSED_RGBA_ASTC_") + w + "x" + h,
+      block_bytes: 16,
+      channels: 4,
+      webgpu: "astc-" + w + "x" + h + "-unorm" + (srgb ? "-srgb" : ""),
+      block_width: w,
+      block_height: h,
+      astc: true
+    }]))
+  ]);
+  var COMPRESSED_TEXTURE_FORMATS_3 = COMPRESSED.map((c) => c[0]);
+  var COMPRESSED_TEXTURE_FORMATS_32 = [...COMPRESSED_FORMATS.keys()];
+  function format_info(internalformat) {
+    return SIZED_FORMATS.get(internalformat) || LEGACY.get(internalformat) || null;
+  }
+  var FORMATS = /* @__PURE__ */ new Set([
+    F.RED,
+    F.RG,
+    F.RGB,
+    F.RGBA,
+    F.RED_INTEGER,
+    F.RG_INTEGER,
+    F.RGB_INTEGER,
+    F.RGBA_INTEGER,
+    F.DEPTH_COMPONENT,
+    F.DEPTH_STENCIL,
+    F.LUMINANCE,
+    F.LUMINANCE_ALPHA,
+    F.ALPHA,
+    F.BGRA_EXT
+  ]);
+  var TYPES2 = /* @__PURE__ */ new Set([
+    F.BYTE,
+    F.UNSIGNED_BYTE,
+    F.SHORT,
+    F.UNSIGNED_SHORT,
+    F.INT,
+    F.UNSIGNED_INT,
+    F.FLOAT,
+    F.HALF_FLOAT,
+    F.HALF_FLOAT_OES,
+    F.UNSIGNED_SHORT_4_4_4_4,
+    F.UNSIGNED_SHORT_5_5_5_1,
+    F.UNSIGNED_SHORT_5_6_5,
+    F.UNSIGNED_INT_2_10_10_10_REV,
+    F.UNSIGNED_INT_10F_11F_11F_REV,
+    F.UNSIGNED_INT_5_9_9_9_REV,
+    F.UNSIGNED_INT_24_8,
+    F.FLOAT_32_UNSIGNED_INT_24_8_REV
+  ]);
+  function tex_image_format(internalformat, format, type) {
+    if (!FORMATS.has(format) || !TYPES2.has(type)) return { error: 1280, internal: 0 };
+    const unsized = UNSIZED.get(internalformat);
+    if (unsized) {
+      if (format !== internalformat) return { error: 1282, internal: 0 };
+      if (!unsized.has(type)) return { error: 1282, internal: 0 };
+      return { error: 0, internal: unsized.get(type) };
+    }
+    const sized = SIZED_FORMATS.get(internalformat);
+    if (!sized) return { error: 1281, internal: 0 };
+    if (sized.format !== format || !sized.types.includes(type)) return { error: 1282, internal: 0 };
+    return { error: 0, internal: internalformat };
+  }
+  function pixel_bytes(format, type) {
+    switch (type) {
+      case F.UNSIGNED_SHORT_4_4_4_4:
+      case F.UNSIGNED_SHORT_5_5_5_1:
+      case F.UNSIGNED_SHORT_5_6_5:
+        return 2;
+      case F.UNSIGNED_INT_2_10_10_10_REV:
+      case F.UNSIGNED_INT_10F_11F_11F_REV:
+      case F.UNSIGNED_INT_5_9_9_9_REV:
+      case F.UNSIGNED_INT_24_8:
+        return 4;
+      case F.FLOAT_32_UNSIGNED_INT_24_8_REV:
+        return 8;
+    }
+    const channels = {
+      [F.RED]: 1,
+      [F.RED_INTEGER]: 1,
+      [F.DEPTH_COMPONENT]: 1,
+      [F.LUMINANCE]: 1,
+      [F.ALPHA]: 1,
+      [F.STENCIL_INDEX]: 1,
+      [F.RG]: 2,
+      [F.RG_INTEGER]: 2,
+      [F.LUMINANCE_ALPHA]: 2,
+      [F.RGB]: 3,
+      [F.RGB_INTEGER]: 3,
+      [F.RGBA]: 4,
+      [F.RGBA_INTEGER]: 4,
+      [F.BGRA_EXT]: 4
+    }[format] || 0;
+    const size = {
+      [F.BYTE]: 1,
+      [F.UNSIGNED_BYTE]: 1,
+      [F.SHORT]: 2,
+      [F.UNSIGNED_SHORT]: 2,
+      [F.HALF_FLOAT]: 2,
+      [F.HALF_FLOAT_OES]: 2,
+      [F.INT]: 4,
+      [F.UNSIGNED_INT]: 4,
+      [F.FLOAT]: 4
+    }[type] || 0;
+    return channels * size;
+  }
+  function image_bytes3(width, height, depth, format, type, store) {
+    if (!width || !height || !depth) return 0;
+    const pixel = pixel_bytes(format, type);
+    const row_pixels = store.row_length > 0 ? store.row_length : width;
+    const row = Math.ceil(row_pixels * pixel / store.alignment) * store.alignment;
+    const image_rows = store.image_height > 0 ? store.image_height : height;
+    const skip = store.skip_images * image_rows * row + store.skip_rows * row + store.skip_pixels * pixel;
+    return skip + (depth - 1) * image_rows * row + (height - 1) * row + width * pixel;
+  }
+  function compressed_bytes(internalformat, width, height, depth) {
+    const c = COMPRESSED_FORMATS.get(internalformat);
+    if (!c) return -1;
+    return Math.ceil(width / c.block_width) * Math.ceil(height / c.block_height) * c.block_bytes * depth;
+  }
+  function component_type(info) {
+    switch (info.kind) {
+      case "snorm":
+        return F.SIGNED_NORMALIZED;
+      case "float":
+        return F.FLOAT;
+      case "int":
+        return F.INT;
+      case "uint":
+        return F.UNSIGNED_INT;
+      case "depth":
+      case "depth_stencil":
+        return info.value === 36012 || info.value === 36013 ? F.FLOAT : F.UNSIGNED_NORMALIZED;
+      default:
+        return F.UNSIGNED_NORMALIZED;
+    }
+  }
+  function renderable(info, color_buffer_float) {
+    if (!info) return false;
+    if (info.kind === "depth" || info.kind === "depth_stencil" || info.value === 36168) return true;
+    if (info.renderable) return true;
+    return !!color_buffer_float && info.kind === "float" && info.value !== 35901 && info.format !== F.RGB || !!color_buffer_float && info.value === 35898;
+  }
+
+  // src/gles/gles3_state.js
+  var GL3 = {
+    TEXTURE_3D: 32879,
+    TEXTURE_2D_ARRAY: 35866,
+    TEXTURE_2D: 3553,
+    TEXTURE_CUBE_MAP: 34067,
+    TEXTURE_EXTERNAL_OES: 36197,
+    TEXTURE_CUBE_MAP_POSITIVE_X: 34069,
+    ARRAY_BUFFER: 34962,
+    ELEMENT_ARRAY_BUFFER: 34963,
+    COPY_READ_BUFFER: 36662,
+    COPY_WRITE_BUFFER: 36663,
+    PIXEL_PACK_BUFFER: 35051,
+    PIXEL_UNPACK_BUFFER: 35052,
+    TRANSFORM_FEEDBACK_BUFFER: 35982,
+    UNIFORM_BUFFER: 35345,
+    FRAMEBUFFER: 36160,
+    DRAW_FRAMEBUFFER: 36009,
+    READ_FRAMEBUFFER: 36008,
+    RENDERBUFFER: 36161,
+    COLOR_ATTACHMENT0: 36064,
+    DEPTH_ATTACHMENT: 36096,
+    STENCIL_ATTACHMENT: 36128,
+    DEPTH_STENCIL_ATTACHMENT: 33306,
+    BACK: 1029,
+    NONE: 0,
+    COLOR: 6144,
+    DEPTH: 6145,
+    STENCIL: 6146,
+    DEPTH_STENCIL: 34041,
+    TEXTURE: 5890,
+    FRAMEBUFFER_DEFAULT: 33304,
+    FRAMEBUFFER_COMPLETE: 36053,
+    INCOMPLETE_ATTACHMENT: 36054,
+    INCOMPLETE_MISSING_ATTACHMENT: 36055,
+    FRAMEBUFFER_UNSUPPORTED: 36061,
+    INCOMPLETE_MULTISAMPLE: 36182,
+    TRANSFORM_FEEDBACK: 36386,
+    INTERLEAVED_ATTRIBS: 35980,
+    SEPARATE_ATTRIBS: 35981,
+    ANY_SAMPLES_PASSED: 35887,
+    ANY_SAMPLES_PASSED_CONSERVATIVE: 36202,
+    TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN: 35976,
+    POINTS: 0,
+    LINES: 1,
+    LINE_LOOP: 2,
+    LINE_STRIP: 3,
+    TRIANGLES: 4,
+    TRIANGLE_STRIP: 5,
+    TRIANGLE_FAN: 6,
+    NO_ERROR: 0,
+    INVALID_ENUM: 1280,
+    INVALID_VALUE: 1281,
+    INVALID_OPERATION: 1282,
+    INVALID_FRAMEBUFFER_OPERATION: 1286,
+    NEAREST: 9728,
+    LINEAR: 9729,
+    NEAREST_MIPMAP_NEAREST: 9984,
+    LINEAR_MIPMAP_NEAREST: 9985,
+    NEAREST_MIPMAP_LINEAR: 9986,
+    LINEAR_MIPMAP_LINEAR: 9987,
+    REPEAT: 10497,
+    CLAMP_TO_EDGE: 33071,
+    MIRRORED_REPEAT: 33648,
+    RASTERIZER_DISCARD: 35977,
+    PRIMITIVE_RESTART_FIXED_INDEX: 36201,
+    MAP_READ_BIT: 1,
+    MAP_WRITE_BIT: 2,
+    MAP_INVALIDATE_RANGE_BIT: 4,
+    MAP_INVALIDATE_BUFFER_BIT: 8,
+    MAP_FLUSH_EXPLICIT_BIT: 16,
+    MAP_UNSYNCHRONIZED_BIT: 32
+  };
+  var LIMITS3 = {
+    MAX_3D_TEXTURE_SIZE: 2048,
+    MAX_ARRAY_TEXTURE_LAYERS: 256,
+    MAX_COLOR_ATTACHMENTS: 4,
+    MAX_DRAW_BUFFERS: 4,
+    MAX_SAMPLES: 4,
+    MAX_UNIFORM_BUFFER_BINDINGS: 36,
+    MAX_UNIFORM_BLOCK_SIZE: 16384,
+    MAX_VERTEX_UNIFORM_BLOCKS: 12,
+    MAX_FRAGMENT_UNIFORM_BLOCKS: 12,
+    MAX_COMBINED_UNIFORM_BLOCKS: 24,
+    MAX_TRANSFORM_FEEDBACK_SEPARATE_ATTRIBS: 4,
+    MAX_TRANSFORM_FEEDBACK_INTERLEAVED_COMPONENTS: 64,
+    MAX_TRANSFORM_FEEDBACK_SEPARATE_COMPONENTS: 4,
+    MAX_VERTEX_OUTPUT_COMPONENTS: 64,
+    MAX_FRAGMENT_INPUT_COMPONENTS: 60,
+    MAX_VERTEX_UNIFORM_COMPONENTS: 1024,
+    MAX_FRAGMENT_UNIFORM_COMPONENTS: 1024,
+    MAX_VARYING_COMPONENTS: 60,
+    UNIFORM_BUFFER_OFFSET_ALIGNMENT: 256,
+    MAX_ELEMENT_INDEX: 4294967295,
+    MAX_PROGRAM_TEXEL_OFFSET: 7,
+    MIN_PROGRAM_TEXEL_OFFSET: -8,
+    MAX_TEXTURE_LOD_BIAS: 2,
+    MAX_TEXTURE_SIZE: 4096
+  };
+  var MAX_UNITS = 48;
+  var SAMPLER_STATES = /* @__PURE__ */ new Set([10241, 10240, 10242, 10243, 32882, 33082, 33083, 34892, 34893, 4100]);
+  var MAX_ATTRIBS = 16;
+  var MAX_LEVELS_2D = Math.log2(LIMITS3.MAX_TEXTURE_SIZE) + 1;
+  var MAX_LEVELS_3D = Math.log2(LIMITS3.MAX_3D_TEXTURE_SIZE) + 1;
+  var SLOT = {
+    TEXTURE_2D: 0,
+    TEXTURE_CUBE_MAP: 1,
+    TEXTURE_EXTERNAL_OES: 2,
+    TEXTURE_3D: 3,
+    TEXTURE_2D_ARRAY: 4,
+    TEXTURE_2D_MULTISAMPLE: 5,
+    TEXTURE_CUBE_MAP_ARRAY: 6
+  };
+  var TEXTURE_CUBE_MAP_ARRAY = 36873;
+  var layered = (c, target) => target === GL3.TEXTURE_2D_ARRAY || target === TEXTURE_CUBE_MAP_ARRAY && c.version >= 32;
+  var BUFFER_TARGETS = /* @__PURE__ */ new Map([
+    [GL3.ARRAY_BUFFER, "array"],
+    [GL3.ELEMENT_ARRAY_BUFFER, "element"],
+    [GL3.COPY_READ_BUFFER, "copy_read"],
+    [GL3.COPY_WRITE_BUFFER, "copy_write"],
+    [GL3.PIXEL_PACK_BUFFER, "pixel_pack"],
+    [GL3.PIXEL_UNPACK_BUFFER, "pixel_unpack"],
+    [GL3.TRANSFORM_FEEDBACK_BUFFER, "transform_feedback"],
+    [GL3.UNIFORM_BUFFER, "uniform"],
+    // (GLES 3.1's: gles31_state.js)
+    [37074, "shader_storage"],
+    [37568, "atomic_counter"],
+    [37102, "dispatch_indirect"],
+    [36671, "draw_indirect"]
+  ]);
+  var TARGETS31 = /* @__PURE__ */ new Set([37074, 37568, 37102, 36671]);
+  var target_ok = (c, target) => BUFFER_TARGETS.has(target) && (c.version >= 31 || !TARGETS31.has(target));
+  var USAGES3 = /* @__PURE__ */ new Set([35040, 35041, 35042, 35044, 35045, 35046, 35048, 35049, 35050]);
+  var COMPARE_FUNCS = /* @__PURE__ */ new Set([512, 513, 514, 515, 516, 517, 518, 519]);
+  var WRAPS = /* @__PURE__ */ new Set([GL3.REPEAT, GL3.CLAMP_TO_EDGE, GL3.MIRRORED_REPEAT]);
+  var DATUM_BYTES = {
+    5120: 1,
+    5121: 1,
+    5122: 2,
+    5123: 2,
+    5124: 4,
+    5125: 4,
+    5126: 4,
+    5131: 2,
+    36193: 2,
+    32819: 2,
+    32820: 2,
+    33635: 2,
+    33640: 4,
+    35899: 4,
+    35902: 4,
+    34042: 4,
+    36269: 8
+  };
+  var CLAMP_TO_BORDER = 33069;
+  var TEXTURE_BORDER_COLOR = 4100;
+  var DEPTH_STENCIL_TEXTURE_MODE = 37098;
+  var wrap_ok = (c, wrap) => WRAPS.has(wrap) || c.version >= 32 && wrap === CLAMP_TO_BORDER;
+  var border_color = (params, float) => [0, 1, 2, 3].map((k) => k >= params.length ? 0 : float ? Math.fround(params[k]) : Math.fround((2 * params[k] + 1) / 4294967295));
+  var border_int = (v) => Math.max(-2147483648, Math.min(2147483647, Math.round((v * 4294967295 - 1) / 2)));
+  var MIN_FILTERS = /* @__PURE__ */ new Set([
+    GL3.NEAREST,
+    GL3.LINEAR,
+    GL3.NEAREST_MIPMAP_NEAREST,
+    GL3.LINEAR_MIPMAP_NEAREST,
+    GL3.NEAREST_MIPMAP_LINEAR,
+    GL3.LINEAR_MIPMAP_LINEAR
+  ]);
+  var SWIZZLES = /* @__PURE__ */ new Set([6403, 6404, 6405, 6406, 0, 1]);
+  var MODES = /* @__PURE__ */ new Set([0, 1, 2, 3, 4, 5, 6]);
+  var ADVANCED_EQUATIONS = [
+    37524,
+    37525,
+    37526,
+    37527,
+    37528,
+    37529,
+    37530,
+    37531,
+    37532,
+    37534,
+    37536,
+    37549,
+    37550,
+    37551,
+    37552
+  ];
+  var ADJACENCY_MODES = /* @__PURE__ */ new Set([10, 11, 12, 13]);
+  var mode_ok = (c, mode) => MODES.has(mode) || c.version >= 32 && (ADJACENCY_MODES.has(mode) || mode === PATCHES);
+  var PATCHES = 14;
+  var GEOMETRY_MODES = /* @__PURE__ */ new Map([[0, [0]], [1, [1, 2, 3]], [4, [4, 5, 6]], [10, [10, 11]], [12, [12, 13]]]);
+  var INDEX_TYPES = /* @__PURE__ */ new Set([5121, 5123, 5125]);
+  var QUERY_TARGETS = /* @__PURE__ */ new Set([GL3.ANY_SAMPLES_PASSED, GL3.ANY_SAMPLES_PASSED_CONSERVATIVE, GL3.TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN]);
+  function new_attrib3() {
+    return {
+      enabled: false,
+      size: 4,
+      type: 5126,
+      normalized: false,
+      stride: 0,
+      buffer: 0,
+      offset: 0,
+      current: [0, 0, 0, 1],
+      integer: false,
+      divisor: 0,
+      current_type: "f"
+    };
+  }
+  function new_vao() {
+    return { attribs: Array.from({ length: MAX_ATTRIBS }, new_attrib3), element_array_buffer: 0, bound_once: false };
+  }
+  function new_tf() {
+    return {
+      active: false,
+      paused: false,
+      mode: 0,
+      program: 0,
+      bindings: Array.from({ length: 4 }, () => ({ buffer: 0, offset: 0, size: 0 })),
+      vertices: [0, 0, 0, 0],
+      bound_once: false
+    };
+  }
+  function new_framebuffer3() {
+    return { attachments: /* @__PURE__ */ new Map(), draw_buffers: [GL3.COLOR_ATTACHMENT0, GL3.NONE, GL3.NONE, GL3.NONE], read_buffer: GL3.COLOR_ATTACHMENT0 };
+  }
+  function new_sampler() {
+    return {
+      min_filter: GL3.NEAREST_MIPMAP_LINEAR,
+      mag_filter: GL3.LINEAR,
+      wrap_s: GL3.REPEAT,
+      wrap_t: GL3.REPEAT,
+      wrap_r: GL3.REPEAT,
+      min_lod: -1e3,
+      max_lod: 1e3,
+      compare_mode: 0,
+      compare_func: 515
+    };
+  }
+  function pad_context3(c) {
+    while (c.textures.length < MAX_UNITS) c.textures.push([0, 0, 0, 0, 0, 0, 0]);
+    while (c.samplers.length < MAX_UNITS) c.samplers.push(0);
+    while (c.uniform_bindings.length < LIMITS3.MAX_UNIFORM_BUFFER_BINDINGS) c.uniform_bindings.push({ buffer: 0, offset: 0, size: 0 });
+  }
+  function extend_context3(c) {
+    c.textures = Array.from({ length: MAX_UNITS }, () => [0, 0, 0, 0, 0, 0, 0]);
+    c.samplers = new Array(MAX_UNITS).fill(0);
+    c.buffers = {
+      copy_read: 0,
+      copy_write: 0,
+      pixel_pack: 0,
+      pixel_unpack: 0,
+      transform_feedback: 0,
+      uniform: 0,
+      shader_storage: 0,
+      atomic_counter: 0,
+      dispatch_indirect: 0,
+      draw_indirect: 0
+    };
+    c.uniform_bindings = Array.from({ length: LIMITS3.MAX_UNIFORM_BUFFER_BINDINGS }, () => ({ buffer: 0, offset: 0, size: 0 }));
+    c.default_vao = new_vao();
+    c.attribs = c.default_vao.attribs;
+    c.vaos = /* @__PURE__ */ new Map();
+    c.vao = 0;
+    c.tfs = /* @__PURE__ */ new Map([[0, new_tf()]]);
+    c.tf = 0;
+    c.queries = /* @__PURE__ */ new Map();
+    c.active_queries = /* @__PURE__ */ new Map();
+    c.reserved3 = { vao: /* @__PURE__ */ new Set(), tf: /* @__PURE__ */ new Set(), query: /* @__PURE__ */ new Set() };
+    c.next3 = { vao: 1, tf: 1, query: 1 };
+    c.read_framebuffer = 0;
+    c.default_draw_buffer = GL3.BACK;
+    c.default_read_buffer = GL3.BACK;
+    c.unpack = { row_length: 0, image_height: 0, skip_pixels: 0, skip_rows: 0, skip_images: 0 };
+    c.pack = { row_length: 0, skip_pixels: 0, skip_rows: 0 };
+    c.hints.set(35723, 4352);
+  }
+  function extend_group3(g) {
+    if (g.samplers) return;
+    g.samplers = /* @__PURE__ */ new Map();
+    g.syncs = /* @__PURE__ */ new Map();
+    g.reserved.sampler = /* @__PURE__ */ new Set();
+    g.next.sampler = 1;
+    g.next_sync = 1;
+  }
+  function fresh_context_name(c, kind, objects) {
+    let name = c.next3[kind];
+    while (objects.has(name) || c.reserved3[kind].has(name)) name++;
+    c.next3[kind] = name + 1;
+    return name;
+  }
+  function gles3_handlers(h) {
+    const { fail: fail2, query: query2, put: put2, put_text: put_text2, i32s: i32s2, f32s: f32s2, text_of: text_of2, REFUSED: REFUSED2, base, framebuffer_status3 } = h;
+    const GL2 = GL3;
+    const round = (v) => Math.round(v);
+    const gen3 = (kind, map_of) => (shadow, c, [n, names]) => {
+      query2(shadow);
+      if (n < 0) return fail2(c, GL2.INVALID_VALUE);
+      const objects = map_of(c);
+      for (let i = 0; i < n && 4 * i + 4 <= names.size; i++) {
+        const name = fresh_context_name(c, kind, objects);
+        c.reserved3[kind].add(name);
+        names.view.setUint32(4 * i, name, true);
+      }
+      return void 0;
+    };
+    const buffer_binding = (c, target) => {
+      const which = BUFFER_TARGETS.get(target);
+      if (!which) return -1;
+      if (which === "array") return c.array_buffer;
+      if (which === "element") return c.element_array_buffer;
+      return c.buffers[which];
+    };
+    const bound_buffer3 = (c, target) => {
+      const name = buffer_binding(c, target);
+      if (name < 0) {
+        fail2(c, GL2.INVALID_ENUM);
+        return null;
+      }
+      const buffer = c.group.buffers.get(name);
+      if (!buffer) {
+        fail2(c, GL2.INVALID_OPERATION);
+        return null;
+      }
+      return buffer;
+    };
+    const set_buffer_binding = (c, target, name) => {
+      const which = BUFFER_TARGETS.get(target);
+      if (which === "array") c.array_buffer = name;
+      else if (which === "element") c.element_array_buffer = name;
+      else c.buffers[which] = name;
+    };
+    const generated = (shadow, made, name) => shadow.trusted || made.has(name);
+    const new_buffer = () => ({ size: 0, usage: 35044, mapped: null, bytes: null, gpu_newer: false });
+    const tf_bound_active = (c, name) => {
+      const tf = c.tfs.get(c.tf);
+      return !!tf && tf.active && tf.bindings.some((b) => b.buffer === name);
+    };
+    const bytes_of = (shadow, buffer) => {
+      if (!shadow.keep_bytes) return null;
+      if (!buffer.bytes || buffer.bytes.length !== buffer.size) buffer.bytes = new Uint8Array(buffer.size);
+      return buffer.bytes;
+    };
+    const target_slot = (target, c) => target === GL2.TEXTURE_2D ? SLOT.TEXTURE_2D : target === GL2.TEXTURE_CUBE_MAP ? SLOT.TEXTURE_CUBE_MAP : target === GL2.TEXTURE_EXTERNAL_OES ? SLOT.TEXTURE_EXTERNAL_OES : target === GL2.TEXTURE_3D ? SLOT.TEXTURE_3D : target === GL2.TEXTURE_2D_ARRAY ? SLOT.TEXTURE_2D_ARRAY : target === 37120 && c.version >= 31 ? SLOT.TEXTURE_2D_MULTISAMPLE : target === TEXTURE_CUBE_MAP_ARRAY && c.version >= 32 ? SLOT.TEXTURE_CUBE_MAP_ARRAY : -1;
+    const bound_texture3 = (c, target) => {
+      const slot = target_slot(target, c);
+      if (slot < 0) {
+        fail2(c, GL2.INVALID_ENUM);
+        return null;
+      }
+      const name = c.textures[c.active_texture][slot];
+      let texture = c.group.textures.get(name);
+      if (!texture && !name) {
+        c.defaults = c.defaults || /* @__PURE__ */ new Map();
+        texture = c.defaults.get(target);
+        if (!texture) c.defaults.set(target, texture = h.new_texture(target));
+      }
+      return texture || null;
+    };
+    const face_of2 = (target) => {
+      if (target === GL2.TEXTURE_2D) return 0;
+      const face = target - GL2.TEXTURE_CUBE_MAP_POSITIVE_X;
+      return face >= 0 && face < 6 ? face : -1;
+    };
+    const image_key = (face, level) => face * 32 + level;
+    const unpack_store = (c) => ({
+      alignment: c.unpack_alignment,
+      row_length: c.unpack.row_length,
+      image_height: c.unpack.image_height,
+      skip_pixels: c.unpack.skip_pixels,
+      skip_rows: c.unpack.skip_rows,
+      skip_images: c.unpack.skip_images
+    });
+    const source_ok = (c, needed, bytes, offset, type) => {
+      if (offset === void 0) {
+        if (c.buffers.pixel_unpack) return true;
+        if (bytes && bytes.length < needed) {
+          fail2(c, GL2.INVALID_OPERATION);
+          return false;
+        }
+        return true;
+      }
+      const buffer = c.group.buffers.get(c.buffers.pixel_unpack);
+      if (!buffer) {
+        fail2(c, GL2.INVALID_OPERATION);
+        return false;
+      }
+      if (buffer.mapped || offset < 0 || offset + needed > buffer.size) {
+        fail2(c, GL2.INVALID_OPERATION);
+        return false;
+      }
+      if (type !== void 0 && offset % (DATUM_BYTES[type] || 1)) {
+        fail2(c, GL2.INVALID_OPERATION);
+        return false;
+      }
+      return true;
+    };
+    const max_level_of = (target) => target === GL2.TEXTURE_3D ? MAX_LEVELS_3D - 1 : MAX_LEVELS_2D - 1;
+    const size_ok = (c, target, level, width, height, depth, border) => {
+      const max = target === GL2.TEXTURE_3D ? LIMITS3.MAX_3D_TEXTURE_SIZE : LIMITS3.MAX_TEXTURE_SIZE;
+      if (level < 0 || level > max_level_of(target) || width < 0 || height < 0 || depth < 0 || border !== 0 || width > max >> level || height > max >> level || (target === GL2.TEXTURE_3D ? depth > max >> level : layered(c, target) ? depth > LIMITS3.MAX_ARRAY_TEXTURE_LAYERS : false) || target !== GL2.TEXTURE_2D && target !== GL2.TEXTURE_3D && target !== GL2.TEXTURE_2D_ARRAY && width !== height || target === TEXTURE_CUBE_MAP_ARRAY && depth % 6) {
+        fail2(c, GL2.INVALID_VALUE);
+        return false;
+      }
+      return true;
+    };
+    const tex_image = (shadow, c, three, args) => {
+      const [target, level, internalformat, width, height, depth, border, format, type, data] = three ? args : [args[0], args[1], args[2], args[3], args[4], 1, args[5], args[6], args[7], args[8]];
+      const offset = typeof data === "number" ? data : void 0;
+      let texture, face;
+      if (three) {
+        if (target !== GL2.TEXTURE_3D && !layered(c, target)) return fail2(c, GL2.INVALID_ENUM);
+        texture = bound_texture3(c, target);
+        face = 0;
+      } else {
+        face = face_of2(target);
+        if (face < 0) return fail2(c, GL2.INVALID_ENUM);
+        texture = bound_texture3(c, target === GL2.TEXTURE_2D ? GL2.TEXTURE_2D : GL2.TEXTURE_CUBE_MAP);
+      }
+      if (!texture) return REFUSED2;
+      if (three && target === GL2.TEXTURE_3D && (format === 6402 || format === 34041)) return fail2(c, GL2.INVALID_OPERATION);
+      const f = tex_image_format(internalformat, format, type);
+      if (f.error) return fail2(c, f.error);
+      const info = format_info(f.internal);
+      if (three && target === GL2.TEXTURE_3D && info && (info.kind === "depth" || info.kind === "depth_stencil")) return fail2(c, GL2.INVALID_OPERATION);
+      if (!size_ok(c, target, level, width, height, depth, border)) return REFUSED2;
+      if (texture.immutable) return fail2(c, GL2.INVALID_OPERATION);
+      const needed = image_bytes3(width, height, depth, format, type, unpack_store(c));
+      if (!source_ok(c, needed, offset === void 0 ? data : null, offset, type)) return REFUSED2;
+      texture.images.set(image_key(face, level), { width, height, depth, format, type, internal: f.internal, compressed: false });
+      return void 0;
+    };
+    const tex_sub_image = (shadow, c, three, args) => {
+      const [target, level, x, y, z, width, height, depth, format, type, data] = three ? args : [args[0], args[1], args[2], args[3], 0, args[4], args[5], 1, args[6], args[7], args[8]];
+      const offset = typeof data === "number" ? data : void 0;
+      let texture, face;
+      if (three) {
+        if (target !== GL2.TEXTURE_3D && !layered(c, target)) return fail2(c, GL2.INVALID_ENUM);
+        texture = bound_texture3(c, target);
+        face = 0;
+      } else {
+        face = face_of2(target);
+        if (face < 0) return fail2(c, GL2.INVALID_ENUM);
+        texture = bound_texture3(c, target === GL2.TEXTURE_2D ? GL2.TEXTURE_2D : GL2.TEXTURE_CUBE_MAP);
+      }
+      if (!texture) return REFUSED2;
+      if (pixel_bytes(format, type) === 0) return fail2(c, GL2.INVALID_ENUM);
+      if (level < 0 || level > max_level_of(target) || x < 0 || y < 0 || z < 0 || width < 0 || height < 0 || depth < 0) return fail2(c, GL2.INVALID_VALUE);
+      const image = texture.images.get(image_key(face, level));
+      if (!image || image.compressed) return fail2(c, GL2.INVALID_OPERATION);
+      if (x + width > image.width || y + height > image.height || z + depth > (image.depth || 1)) return fail2(c, GL2.INVALID_VALUE);
+      if (tex_image_format(image.internal || image.format, format, type).error) return fail2(c, GL2.INVALID_OPERATION);
+      const needed = image_bytes3(width, height, depth, format, type, unpack_store(c));
+      if (!source_ok(c, needed, offset === void 0 ? data : null, offset, type)) return REFUSED2;
+      return void 0;
+    };
+    const tex_storage = (shadow, c, target, levels, internalformat, width, height, depth) => {
+      const two_d = target === GL2.TEXTURE_2D || target === GL2.TEXTURE_CUBE_MAP;
+      if (!two_d && depth === void 0 || two_d && depth !== void 0 && depth !== 1) return fail2(c, GL2.INVALID_ENUM);
+      const texture = bound_texture3(c, target);
+      if (!texture) return REFUSED2;
+      const info = SIZED_FORMATS.get(internalformat);
+      const compressed = COMPRESSED_FORMATS.get(internalformat);
+      if (!info && !compressed) return fail2(c, GL2.INVALID_ENUM);
+      if (depth === void 0) depth = 1;
+      if (width < 1 || height < 1 || depth < 1 || levels < 1) return fail2(c, GL2.INVALID_VALUE);
+      const max = target === GL2.TEXTURE_3D ? LIMITS3.MAX_3D_TEXTURE_SIZE : LIMITS3.MAX_TEXTURE_SIZE;
+      if (width > max || height > max || target === GL2.TEXTURE_3D && depth > max || layered(c, target) && depth > LIMITS3.MAX_ARRAY_TEXTURE_LAYERS || (target === GL2.TEXTURE_CUBE_MAP || target === TEXTURE_CUBE_MAP_ARRAY) && width !== height || target === TEXTURE_CUBE_MAP_ARRAY && depth % 6) {
+        return fail2(c, GL2.INVALID_VALUE);
+      }
+      const largest = target === GL2.TEXTURE_3D ? Math.max(width, height, depth) : Math.max(width, height);
+      if (levels > Math.floor(Math.log2(largest)) + 1) return fail2(c, GL2.INVALID_OPERATION);
+      if (texture.immutable) return fail2(c, GL2.INVALID_OPERATION);
+      if (info && target === GL2.TEXTURE_3D && (info.kind === "depth" || info.kind === "depth_stencil")) return fail2(c, GL2.INVALID_OPERATION);
+      if (compressed && target === GL2.TEXTURE_3D) return fail2(c, GL2.INVALID_OPERATION);
+      texture.images.clear();
+      const faces = target === GL2.TEXTURE_CUBE_MAP ? 6 : 1;
+      for (let level = 0; level < levels; level++) {
+        const w = Math.max(1, width >> level), hh = Math.max(1, height >> level);
+        const d = target === GL2.TEXTURE_3D ? Math.max(1, depth >> level) : depth;
+        for (let face = 0; face < faces; face++) {
+          texture.images.set(image_key(face, level), {
+            width: w,
+            height: hh,
+            depth: d,
+            format: info ? info.format : internalformat,
+            type: info ? info.types[0] : 5121,
+            internal: internalformat,
+            compressed: !!compressed
+          });
+        }
+      }
+      texture.immutable = true;
+      texture.immutable_levels = levels;
+      return void 0;
+    };
+    const compressed_image = (shadow, c, three, args) => {
+      const [target, level, internalformat, width, height, depth, border, size, data] = three ? args : [args[0], args[1], args[2], args[3], args[4], 1, args[5], args[6], args[7]];
+      const offset = typeof data === "number" ? data : void 0;
+      const face = three ? 0 : face_of2(target);
+      if (three ? !layered(c, target) && target !== GL2.TEXTURE_3D : face < 0) return fail2(c, GL2.INVALID_ENUM);
+      const texture = bound_texture3(c, three ? target : target === GL2.TEXTURE_2D ? GL2.TEXTURE_2D : GL2.TEXTURE_CUBE_MAP);
+      if (!texture) return REFUSED2;
+      if (!COMPRESSED_FORMATS.has(internalformat)) return fail2(c, GL2.INVALID_ENUM);
+      if (target === GL2.TEXTURE_3D) return fail2(c, GL2.INVALID_OPERATION);
+      if (!size_ok(c, three ? target : target === GL2.TEXTURE_2D ? GL2.TEXTURE_2D : GL2.TEXTURE_CUBE_MAP, level, width, height, depth, border)) return REFUSED2;
+      if (texture.immutable) return fail2(c, GL2.INVALID_OPERATION);
+      if (size !== compressed_bytes(internalformat, width, height, depth)) return fail2(c, GL2.INVALID_VALUE);
+      if (offset === void 0 ? !c.buffers.pixel_unpack && data && data.length < size : !source_ok(c, size, null, offset)) return fail2(c, GL2.INVALID_VALUE);
+      texture.images.set(image_key(face, level), {
+        width,
+        height,
+        depth,
+        format: internalformat,
+        type: 5121,
+        internal: internalformat,
+        compressed: true
+      });
+      return void 0;
+    };
+    const compressed_sub_image = (shadow, c, three, args) => {
+      const [target, level, x, y, z, width, height, depth, format, size] = three ? args : [args[0], args[1], args[2], args[3], 0, args[4], args[5], 1, args[6], args[7]];
+      const face = three ? 0 : face_of2(target);
+      if (three ? !layered(c, target) && target !== GL2.TEXTURE_3D : face < 0) return fail2(c, GL2.INVALID_ENUM);
+      const texture = bound_texture3(c, three ? target : target === GL2.TEXTURE_2D ? GL2.TEXTURE_2D : GL2.TEXTURE_CUBE_MAP);
+      if (!texture) return REFUSED2;
+      if (!COMPRESSED_FORMATS.has(format)) return fail2(c, GL2.INVALID_ENUM);
+      if (level < 0 || level > max_level_of(target) || x < 0 || y < 0 || z < 0 || width < 0 || height < 0 || depth < 0) return fail2(c, GL2.INVALID_VALUE);
+      const image = texture.images.get(image_key(face, level));
+      if (!image || !image.compressed || image.internal !== format || format === 36196) return fail2(c, GL2.INVALID_OPERATION);
+      const { block_width: bw, block_height: bh } = COMPRESSED_FORMATS.get(format);
+      if (x % bw || y % bh || x + width > image.width || y + height > image.height || z + depth > image.depth || width % bw && x + width !== image.width || height % bh && y + height !== image.height) {
+        return fail2(c, GL2.INVALID_OPERATION);
+      }
+      if (size !== compressed_bytes(format, width, height, depth)) return fail2(c, GL2.INVALID_VALUE);
+      return void 0;
+    };
+    const framebuffer_of = (c, target) => target === GL2.FRAMEBUFFER || target === GL2.DRAW_FRAMEBUFFER ? c.framebuffer : target === GL2.READ_FRAMEBUFFER ? c.read_framebuffer : -1;
+    const color_attachment = (attachment) => attachment >= GL2.COLOR_ATTACHMENT0 && attachment < GL2.COLOR_ATTACHMENT0 + LIMITS3.MAX_COLOR_ATTACHMENTS;
+    const attachment_ok = (attachment) => color_attachment(attachment) || attachment === GL2.DEPTH_ATTACHMENT || attachment === GL2.STENCIL_ATTACHMENT || attachment === GL2.DEPTH_STENCIL_ATTACHMENT;
+    const attach = (fbo, attachment, record) => {
+      const points = attachment === GL2.DEPTH_STENCIL_ATTACHMENT ? [GL2.DEPTH_ATTACHMENT, GL2.STENCIL_ATTACHMENT] : [attachment];
+      for (const point of points) {
+        if (record) fbo.attachments.set(point, Object.assign({}, record));
+        else fbo.attachments.delete(point);
+      }
+    };
+    const attachment_image = (c, a) => {
+      if (a.type === GL2.RENDERBUFFER) {
+        const rb = c.group.renderbuffers.get(a.name);
+        if (!rb || !rb.width || !rb.height) return null;
+        return { width: rb.width, height: rb.height, samples: rb.samples || 0, info: format_info(rb.format) || h.renderbuffer_info(rb.format) };
+      }
+      const texture = c.group.textures.get(a.name);
+      const image = texture && texture.images.get(image_key(a.face, a.level));
+      if (!image || !image.width || !image.height) return null;
+      if ((texture.target === GL2.TEXTURE_3D || layered(c, texture.target)) && a.layer >= (image.depth || 1)) return null;
+      return {
+        width: image.width,
+        height: image.height,
+        samples: image.samples || 0,
+        info: image.compressed ? null : format_info(image.internal || image.format) || h.renderbuffer_info(image.format)
+      };
+    };
+    const status_of = (c, name) => {
+      if (!name) return GL2.FRAMEBUFFER_COMPLETE;
+      const fbo = c.framebuffers.get(name);
+      let any = false, samples = -1;
+      for (const [attachment, a] of fbo.attachments) {
+        const image = attachment_image(c, a);
+        if (!image || !image.info) return GL2.INCOMPLETE_ATTACHMENT;
+        const k = image.info.kind;
+        if (color_attachment(attachment) ? !renderable(image.info, c.color_buffer_float) || k === "depth" || k === "depth_stencil" : attachment === GL2.DEPTH_ATTACHMENT ? k !== "depth" && k !== "depth_stencil" : k !== "depth_stencil" && image.info.value !== 36168) {
+          return GL2.INCOMPLETE_ATTACHMENT;
+        }
+        if (samples >= 0 && samples !== image.samples) return GL2.INCOMPLETE_MULTISAMPLE;
+        samples = image.samples;
+        any = true;
+      }
+      if (!any) return c.version >= 31 && fbo.default_width > 0 && fbo.default_height > 0 ? GL2.FRAMEBUFFER_COMPLETE : GL2.INCOMPLETE_MISSING_ATTACHMENT;
+      const depth = fbo.attachments.get(GL2.DEPTH_ATTACHMENT), stencil = fbo.attachments.get(GL2.STENCIL_ATTACHMENT);
+      if (depth && stencil && (depth.type !== stencil.type || depth.name !== stencil.name || depth.level !== stencil.level || depth.face !== stencil.face || depth.layer !== stencil.layer)) {
+        return GL2.FRAMEBUFFER_UNSUPPORTED;
+      }
+      return GL2.FRAMEBUFFER_COMPLETE;
+    };
+    framebuffer_status3.fn = status_of;
+    const complete = (c, read) => {
+      if (status_of(c, c.framebuffer) !== GL2.FRAMEBUFFER_COMPLETE || read && status_of(c, c.read_framebuffer) !== GL2.FRAMEBUFFER_COMPLETE) {
+        fail2(c, GL2.INVALID_FRAMEBUFFER_OPERATION);
+        return false;
+      }
+      return true;
+    };
+    const read_image = (c) => {
+      if (!c.read_framebuffer) {
+        if (c.default_read_buffer === GL2.NONE) return null;
+        const bits = h.framebuffer_bits(c);
+        return { info: { kind: "unorm", bits, value: bits[3] ? 32856 : 32849, format: bits[3] ? 6408 : 6407 }, samples: 0 };
+      }
+      const fbo = c.framebuffers.get(c.read_framebuffer);
+      if (fbo.read_buffer === GL2.NONE) return null;
+      const a = fbo.attachments.get(fbo.read_buffer);
+      return a ? attachment_image(c, a) : null;
+    };
+    const current_tf = (c) => c.tfs.get(c.tf);
+    const primitives = (mode, count) => mode === GL2.POINTS ? count : mode === GL2.LINES ? count >> 1 : mode === GL2.TRIANGLES ? Math.floor(count / 3) : 0;
+    const tf_draw = (shadow, c, mode, count, instances, elements) => {
+      const tf = current_tf(c);
+      if (!tf.active || tf.paused) return true;
+      if (elements || mode !== tf.mode) {
+        fail2(c, GL2.INVALID_OPERATION);
+        return false;
+      }
+      const program = c.group.objects.get(tf.program);
+      const varyings = program && program.info && program.info.tf_varyings || [];
+      const prims = primitives(mode, count) * instances;
+      const vertices = prims * (mode === GL2.POINTS ? 1 : mode === GL2.LINES ? 2 : 3);
+      const interleaved = program && program.info && program.info.tf_mode === GL2.INTERLEAVED_ATTRIBS;
+      const strides = interleaved ? [varyings.reduce((n, v) => n + v.bytes, 0)] : varyings.map((v) => v.bytes);
+      for (let i = 0; i < strides.length; i++) {
+        const b = tf.bindings[i];
+        const buffer = c.group.buffers.get(b.buffer);
+        const room = buffer ? Math.floor(((b.size || buffer.size - b.offset) - tf.vertices[i] * strides[i]) / Math.max(1, strides[i])) : 0;
+        if (vertices > room) {
+          fail2(c, GL2.INVALID_OPERATION);
+          return false;
+        }
+      }
+      for (let i = 0; i < strides.length; i++) tf.vertices[i] += vertices;
+      const q = c.active_queries.get(GL2.TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN);
+      if (q) c.queries.get(q).result += prims;
+      for (const b of tf.bindings) {
+        const buffer = c.group.buffers.get(b.buffer);
+        if (buffer) buffer.gpu_newer = true;
+      }
+      return true;
+    };
+    const geometry_of = (c) => {
+      const pipeline = !c.program && c.program_pipelines && c.program_pipelines.get(c.program_pipeline);
+      const program = c.group.objects.get(c.program || pipeline && pipeline.stages[4]);
+      return program && program.info && program.info.ok && program.info.geometry || null;
+    };
+    const tessellates = (c) => {
+      const pipeline = !c.program && c.program_pipelines && c.program_pipelines.get(c.program_pipeline);
+      const program = c.group.objects.get(c.program || pipeline && pipeline.stages[16]);
+      return !!(program && program.info && program.info.ok && program.info.tessellation && program.info.tessellation.evaluation);
+    };
+    const draw_checks = (shadow, c, mode, count, instances, elements, type) => {
+      if (!mode_ok(c, mode) || elements && !INDEX_TYPES.has(type)) return fail2(c, GL2.INVALID_ENUM);
+      if (count < 0 || instances < 0) return fail2(c, GL2.INVALID_VALUE);
+      const tessellation = c.version >= 32 && tessellates(c);
+      if (tessellation !== (mode === PATCHES)) return fail2(c, GL2.INVALID_OPERATION);
+      const geometry = c.version >= 32 && !tessellation ? geometry_of(c) : null;
+      if (geometry && !(GEOMETRY_MODES.get(geometry.input) || []).includes(mode)) return fail2(c, GL2.INVALID_OPERATION);
+      if (c.version >= 32 && c.enabled.has(3042) && ADVANCED_EQUATIONS.includes(c.blend_equation[0])) {
+        const fbo = c.framebuffer && c.framebuffers.get(c.framebuffer);
+        if (fbo && fbo.draw_buffers.slice(1).some((b) => b !== GL2.NONE)) return fail2(c, GL2.INVALID_OPERATION);
+        const pipeline = !c.program && c.program_pipelines && c.program_pipelines.get(c.program_pipeline);
+        const fragment = c.group.objects.get(c.program || pipeline && pipeline.stages[2]);
+        const support = fragment && fragment.info && fragment.info.blend_support || [];
+        if (!support.includes(c.blend_equation[0])) return fail2(c, GL2.INVALID_OPERATION);
+      }
+      if (!complete(c, false)) return REFUSED2;
+      if (!tf_draw(shadow, c, mode, count, instances, elements)) return REFUSED2;
+      const occlusion = [GL2.ANY_SAMPLES_PASSED, GL2.ANY_SAMPLES_PASSED_CONSERVATIVE].map((t) => c.active_queries.get(t)).filter(Boolean);
+      for (const q of occlusion) c.queries.get(q).drawn = true;
+      return void 0;
+    };
+    const uniform_at3 = (c, location, count) => {
+      const program = c.group.objects.get(c.program);
+      if (!program || !program.info || !program.info.ok) return fail2(c, GL2.INVALID_OPERATION);
+      if (count < 0) return fail2(c, GL2.INVALID_VALUE);
+      if (location === -1) return null;
+      const at = program.info.by_location[location];
+      if (!at) return fail2(c, GL2.INVALID_OPERATION);
+      if (count > 1 && at.uniform.size === 1 && at.uniform.name === at.uniform.base) return fail2(c, GL2.INVALID_OPERATION);
+      return { program, at };
+    };
+    const uniform3 = (components, kind, vector, columns, rows) => (shadow, c, args) => {
+      const location = args[0];
+      let count = 1, values;
+      if (kind === "m") {
+        count = args[1];
+        values = f32s2(args[3]);
+      } else if (vector) {
+        count = args[1];
+        values = kind === "f" ? f32s2(args[2]) : kind === "ui" ? i32s2(args[2]).map((v) => v >>> 0) : i32s2(args[2]);
+      } else values = args.slice(1).map((v) => kind === "ui" ? v >>> 0 : v);
+      const target = uniform_at3(c, location, count);
+      if (target === REFUSED2 || target === null) return target === null ? void 0 : target;
+      const u = target.at.uniform;
+      if (kind === "m" && args[2] && c.version < 30) return fail2(c, GL2.INVALID_VALUE);
+      const ok = kind === "m" ? u.columns === columns && u.rows === rows : !u.columns && u.components === components && (u.bool || (u.sampler || u.opaque ? kind === "i" && components === 1 : kind === "f" ? !u.int : kind === "i" ? u.int && !u.uint : u.uint));
+      if (!ok) return fail2(c, GL2.INVALID_OPERATION);
+      if (u.sampler && values.slice(0, count).some((v) => v < 0 || v >= MAX_UNITS)) return fail2(c, GL2.INVALID_VALUE);
+      const size = kind === "m" ? columns * rows : components;
+      const first = target.at.element;
+      const n = Math.min(count, u.size - first);
+      for (let i = 0; i < n; i++) {
+        let v = values.slice(i * size, (i + 1) * size);
+        if (kind === "m" && args[2]) {
+          const t = [];
+          for (let col = 0; col < columns; col++) for (let row = 0; row < rows; row++) t.push(v[row * columns + col]);
+          v = t;
+        }
+        if (u.bool) v = v.map((x) => x ? 1 : 0);
+        target.program.values.set(u.location + first + i, v);
+      }
+      return void 0;
+    };
+    const get_uniform3 = (as) => (shadow, c, [p, location, params]) => {
+      query2(shadow);
+      const program = c.group.objects.get(p);
+      if (!program) {
+        fail2(c, GL2.INVALID_VALUE);
+        return;
+      }
+      if (program.kind !== "program" || !program.info || !program.info.ok) {
+        fail2(c, GL2.INVALID_OPERATION);
+        return;
+      }
+      const at = program.info.by_location[location];
+      if (!at) {
+        fail2(c, GL2.INVALID_OPERATION);
+        return;
+      }
+      const u = at.uniform;
+      const values = program.values.get(location) || new Array(u.columns ? u.columns * u.rows : u.components).fill(0);
+      if (as === "f") put2(params, values, "f", "f");
+      else if (as === "ui") put2(params, values.map((v) => u.int ? v >>> 0 : Math.round(v) >>> 0), "i", "i");
+      else put2(params, values.map((v) => u.int ? v | 0 : Math.round(v)), "i", "i");
+    };
+    const program_of = (c, p) => {
+      const program = c.group.objects.get(p);
+      if (!program) {
+        fail2(c, GL2.INVALID_VALUE);
+        return null;
+      }
+      if (program.kind !== "program") {
+        fail2(c, GL2.INVALID_OPERATION);
+        return null;
+      }
+      return program;
+    };
+    const put64 = (out, values) => {
+      for (let i = 0; i < values.length && 8 * i + 8 <= out.size; i++) out.view.setBigInt64(8 * i, BigInt(Math.trunc(values[i])), true);
+    };
+    const float_attrib = (name) => (shadow, c, args) => {
+      const r = base[name](shadow, c, args);
+      if (args[0] < MAX_ATTRIBS) attrib_current(c, args[0], c.attribs[args[0]].current, "f");
+      return r;
+    };
+    const H = {
+      // ---- state
+      "glEnable": (shadow, c, [cap]) => {
+        if (cap === GL2.RASTERIZER_DISCARD || cap === GL2.PRIMITIVE_RESTART_FIXED_INDEX) {
+          c.enabled.add(cap);
+          return void 0;
+        }
+        return base["glEnable"](shadow, c, [cap]);
+      },
+      "glDisable": (shadow, c, [cap]) => {
+        if (cap === GL2.RASTERIZER_DISCARD || cap === GL2.PRIMITIVE_RESTART_FIXED_INDEX) {
+          c.enabled.delete(cap);
+          return void 0;
+        }
+        return base["glDisable"](shadow, c, [cap]);
+      },
+      "glIsEnabled": (shadow, c, [cap]) => {
+        if (cap === GL2.RASTERIZER_DISCARD || cap === GL2.PRIMITIVE_RESTART_FIXED_INDEX) {
+          query2(shadow);
+          return c.enabled.has(cap) ? 1 : 0;
+        }
+        return base["glIsEnabled"](shadow, c, [cap]);
+      },
+      "glHint": (shadow, c, [target, mode]) => {
+        if (target !== 33170 && target !== 35723 || ![4352, 4353, 4354].includes(mode)) return fail2(c, GL2.INVALID_ENUM);
+        c.hints.set(target, mode);
+        return void 0;
+      },
+      "glPixelStorei": (shadow, c, [pname, param]) => {
+        const fields = {
+          3314: ["unpack", "row_length"],
+          32878: ["unpack", "image_height"],
+          3316: ["unpack", "skip_pixels"],
+          3315: ["unpack", "skip_rows"],
+          32877: ["unpack", "skip_images"],
+          3330: ["pack", "row_length"],
+          3332: ["pack", "skip_pixels"],
+          3331: ["pack", "skip_rows"]
+        };
+        if (fields[pname]) {
+          if (param < 0) return fail2(c, GL2.INVALID_VALUE);
+          c[fields[pname][0]][fields[pname][1]] = param;
+          return void 0;
+        }
+        return base["glPixelStorei"](shadow, c, [pname, param]);
+      },
+      "glGetInteger64v": (shadow, c, [pname, data]) => {
+        query2(shadow);
+        const v = shadow.state_value(c, pname);
+        if (!v) {
+          fail2(c, GL2.INVALID_ENUM);
+          return;
+        }
+        put64(data, h.state_kind(pname) === "n" ? v.map((x) => x * 2147483647) : v);
+      },
+      "glGetIntegeri_v": (shadow, c, [target, index, data]) => {
+        query2(shadow);
+        indexed(c, target, index, data, false);
+      },
+      "glGetInteger64i_v": (shadow, c, [target, index, data]) => {
+        query2(shadow);
+        indexed(c, target, index, data, true);
+      },
+      // (GLES 3.1's; its own targets are gles31_state.js's, GLES 3.0's these)
+      "glGetBooleani_v": (shadow, c, [target, index, data]) => {
+        query2(shadow);
+        indexed(c, target, index, data, "b");
+      },
+      // ---- buffers
+      "glBindBuffer": (shadow, c, [target, name]) => {
+        if (!target_ok(c, target)) return fail2(c, GL2.INVALID_ENUM);
+        if (name && !c.group.buffers.has(name)) c.group.buffers.set(name, new_buffer());
+        set_buffer_binding(c, target, name);
+        return void 0;
+      },
+      "glDeleteBuffers": (shadow, c, [n, names]) => {
+        if (n < 0) return fail2(c, GL2.INVALID_VALUE);
+        for (const name of i32s2(names).slice(0, n)) {
+          if (!name) continue;
+          c.group.reserved.buffer.delete(name);
+          if (!c.group.buffers.delete(name)) continue;
+          for (const target of BUFFER_TARGETS.keys()) if (buffer_binding(c, target) === name) set_buffer_binding(c, target, 0);
+          const vao = c.vao ? c.vaos.get(c.vao) : c.default_vao;
+          if (vao) {
+            for (const a of vao.attribs) if (a.buffer === name) a.buffer = 0;
+            if (vao.element_array_buffer === name) vao.element_array_buffer = 0;
+            for (const b of vao.bindings || []) if (b.buffer === name) b.buffer = 0;
+          }
+          for (const b of [...c.uniform_bindings, ...c.storage_bindings || [], ...c.atomic_bindings || []]) {
+            if (b.buffer === name) Object.assign(b, { buffer: 0, offset: 0, size: 0 });
+          }
+          for (const b of current_tf(c).bindings) if (b.buffer === name) Object.assign(b, { buffer: 0, offset: 0, size: 0 });
+        }
+        return void 0;
+      },
+      "glBufferData": (shadow, c, [target, size, data, usage]) => {
+        if (!target_ok(c, target) || !USAGES3.has(usage)) return fail2(c, GL2.INVALID_ENUM);
+        if (size < 0) return fail2(c, GL2.INVALID_VALUE);
+        const buffer = bound_buffer3(c, target);
+        if (!buffer) return REFUSED2;
+        if (tf_bound_active(c, buffer_binding(c, target)) && target === GL2.TRANSFORM_FEEDBACK_BUFFER) return fail2(c, GL2.INVALID_OPERATION);
+        buffer.size = size;
+        buffer.usage = usage;
+        buffer.mapped = null;
+        buffer.gpu_newer = false;
+        const bytes = bytes_of(shadow, buffer);
+        if (bytes && data) bytes.set(data.subarray(0, size));
+        return void 0;
+      },
+      "glBufferSubData": (shadow, c, [target, offset, size, data]) => {
+        if (!target_ok(c, target)) return fail2(c, GL2.INVALID_ENUM);
+        const buffer = bound_buffer3(c, target);
+        if (!buffer) return REFUSED2;
+        if (offset < 0 || size < 0 || offset + size > buffer.size) return fail2(c, GL2.INVALID_VALUE);
+        if (buffer.mapped) return fail2(c, GL2.INVALID_OPERATION);
+        const bytes = bytes_of(shadow, buffer);
+        if (bytes && data && !buffer.gpu_newer) bytes.set(data.subarray(0, size), offset);
+        return void 0;
+      },
+      "glGetBufferParameteriv": (shadow, c, [target, pname, params]) => {
+        query2(shadow);
+        if (!target_ok(c, target)) {
+          fail2(c, GL2.INVALID_ENUM);
+          return;
+        }
+        const buffer = bound_buffer3(c, target);
+        if (!buffer) return;
+        const m = buffer.mapped;
+        const values = {
+          34660: buffer.size,
+          34661: buffer.usage,
+          37151: m ? m.access : 0,
+          35004: m ? 1 : 0,
+          37152: m ? m.length : 0,
+          37153: m ? m.offset : 0
+        };
+        if (!(pname in values) || pname === 37152 || pname === 37153) {
+          fail2(c, GL2.INVALID_ENUM);
+          return;
+        }
+        put2(params, [values[pname]], "i", "i");
+      },
+      "glMapBufferRangeAEMU": (shadow, c, [target, offset, length, access, mapped]) => {
+        query2(shadow);
+        if (!target_ok(c, target)) {
+          fail2(c, GL2.INVALID_ENUM);
+          return;
+        }
+        const buffer = bound_buffer3(c, target);
+        if (!buffer) return;
+        if (offset < 0 || length < 0 || offset + length > buffer.size || access & ~63) {
+          fail2(c, GL2.INVALID_VALUE);
+          return;
+        }
+        if (buffer.mapped || !length || !(access & 3) || access & GL2.MAP_READ_BIT && access & (GL2.MAP_INVALIDATE_RANGE_BIT | GL2.MAP_INVALIDATE_BUFFER_BIT | GL2.MAP_UNSYNCHRONIZED_BIT) || access & GL2.MAP_FLUSH_EXPLICIT_BIT && !(access & GL2.MAP_WRITE_BIT)) {
+          fail2(c, GL2.INVALID_OPERATION);
+          return;
+        }
+        buffer.mapped = { offset, length, access };
+        const bytes = bytes_of(shadow, buffer);
+        if (bytes && mapped && mapped.size) mapped.data.set(bytes.subarray(offset, offset + Math.min(length, mapped.size)));
+        if (buffer.gpu_newer && bytes && !(access & (GL2.MAP_INVALIDATE_RANGE_BIT | GL2.MAP_INVALIDATE_BUFFER_BIT))) {
+          shadow.stale_map = { name: buffer_binding(c, target), offset, length, bytes };
+        }
+      },
+      "glUnmapBufferAEMU": (shadow, c, [target, offset, length, access, guest_buffer, out_res]) => {
+        if (!target_ok(c, target)) return fail2(c, GL2.INVALID_ENUM);
+        const buffer = bound_buffer3(c, target);
+        if (!buffer) return REFUSED2;
+        if (!buffer.mapped && !shadow.trusted) return fail2(c, GL2.INVALID_OPERATION);
+        buffer.mapped = null;
+        const bytes = bytes_of(shadow, buffer);
+        if (bytes && guest_buffer && access & GL2.MAP_WRITE_BIT && !(access & GL2.MAP_FLUSH_EXPLICIT_BIT) && offset >= 0 && offset + length <= buffer.size) {
+          bytes.set(guest_buffer.subarray(0, length), offset);
+        }
+        if (out_res && out_res.size) out_res.data[0] = 1;
+        return void 0;
+      },
+      "glFlushMappedBufferRangeAEMU": (shadow, c, [target, offset, length, access, guest_buffer]) => {
+        if (!target_ok(c, target)) return fail2(c, GL2.INVALID_ENUM);
+        const buffer = bound_buffer3(c, target);
+        if (!buffer) return REFUSED2;
+        const m = buffer.mapped;
+        if (!shadow.trusted) {
+          if (!m || !(m.access & GL2.MAP_FLUSH_EXPLICIT_BIT)) return fail2(c, GL2.INVALID_OPERATION);
+          if (offset < m.offset || length < 0 || offset + length > m.offset + m.length) return fail2(c, GL2.INVALID_VALUE);
+        }
+        const bytes = bytes_of(shadow, buffer);
+        if (bytes && guest_buffer && offset >= 0 && offset + length <= buffer.size) bytes.set(guest_buffer.subarray(0, length), offset);
+        return void 0;
+      },
+      "glCopyBufferSubData": (shadow, c, [read_target, write_target, read_offset, write_offset, size]) => {
+        if (!target_ok(c, read_target) || !target_ok(c, write_target)) return fail2(c, GL2.INVALID_ENUM);
+        const from = bound_buffer3(c, read_target), to = from && bound_buffer3(c, write_target);
+        if (!to) return REFUSED2;
+        if (read_offset < 0 || write_offset < 0 || size < 0 || read_offset + size > from.size || write_offset + size > to.size) return fail2(c, GL2.INVALID_VALUE);
+        if (from === to && Math.abs(read_offset - write_offset) < size) return fail2(c, GL2.INVALID_VALUE);
+        if (from.mapped || to.mapped) return fail2(c, GL2.INVALID_OPERATION);
+        const a = bytes_of(shadow, from), b = bytes_of(shadow, to);
+        if (a && b && !from.gpu_newer) b.set(a.slice(read_offset, read_offset + size), write_offset);
+        else to.gpu_newer = to.gpu_newer || from.gpu_newer;
+        return void 0;
+      },
+      "glBindBufferRange": (shadow, c, [target, index, buffer, offset, size]) => bind_buffer_indexed(shadow, c, target, index, buffer, offset, size, true),
+      "glBindBufferBase": (shadow, c, [target, index, buffer]) => bind_buffer_indexed(shadow, c, target, index, buffer, 0, 0, false),
+      // ---- vertex arrays and attributes
+      "glGenVertexArrays": gen3("vao", (c) => c.vaos),
+      "glBindVertexArray": (shadow, c, [name]) => {
+        if (name && !c.vaos.has(name)) {
+          if (!generated(shadow, c.reserved3.vao, name)) return fail2(c, GL2.INVALID_OPERATION);
+          c.vaos.set(name, new_vao());
+        }
+        const vao = name ? c.vaos.get(name) : c.default_vao;
+        const old = c.vao ? c.vaos.get(c.vao) : c.default_vao;
+        old.element_array_buffer = c.element_array_buffer;
+        c.attribs = vao.attribs;
+        c.element_array_buffer = vao.element_array_buffer;
+        c.vao = name;
+        return void 0;
+      },
+      "glDeleteVertexArrays": (shadow, c, [n, names]) => {
+        if (n < 0) return fail2(c, GL2.INVALID_VALUE);
+        for (const name of i32s2(names).slice(0, n)) {
+          if (!name) continue;
+          c.reserved3.vao.delete(name);
+          if (!c.vaos.has(name)) continue;
+          if (c.vao === name) H["glBindVertexArray"](shadow, c, [0]);
+          c.vaos.delete(name);
+        }
+        return void 0;
+      },
+      "glIsVertexArray": (shadow, c, [name]) => {
+        query2(shadow);
+        return c.vaos.has(name) ? 1 : 0;
+      },
+      "glVertexAttribPointerData": (shadow, c, args) => {
+        if (c.vao) return fail2(c, GL2.INVALID_OPERATION);
+        return attrib3(c, args[0], args[1], args[2], args[3], args[4], 0, 0, false);
+      },
+      "glVertexAttribPointerOffset": (shadow, c, [index, size, type, normalized, stride, offset]) => {
+        if (c.vao && !c.array_buffer && offset) return fail2(c, GL2.INVALID_OPERATION);
+        return attrib3(c, index, size, type, normalized, stride, c.array_buffer, offset, false);
+      },
+      "glVertexAttribIPointerDataAEMU": (shadow, c, [index, size, type, stride]) => {
+        if (c.vao) return fail2(c, GL2.INVALID_OPERATION);
+        return attrib3(c, index, size, type, false, stride, 0, 0, true);
+      },
+      "glVertexAttribIPointerOffsetAEMU": (shadow, c, [index, size, type, stride, offset]) => {
+        if (c.vao && !c.array_buffer && offset) return fail2(c, GL2.INVALID_OPERATION);
+        return attrib3(c, index, size, type, false, stride, c.array_buffer, offset, true);
+      },
+      "glVertexAttribDivisor": (shadow, c, [index, divisor]) => {
+        if (index >= MAX_ATTRIBS) return fail2(c, GL2.INVALID_VALUE);
+        c.attribs[index].divisor = divisor >>> 0;
+        return void 0;
+      },
+      "glVertexAttrib1f": float_attrib("glVertexAttrib1f"),
+      "glVertexAttrib2f": float_attrib("glVertexAttrib2f"),
+      "glVertexAttrib3f": float_attrib("glVertexAttrib3f"),
+      "glVertexAttrib4f": float_attrib("glVertexAttrib4f"),
+      "glVertexAttrib1fv": float_attrib("glVertexAttrib1fv"),
+      "glVertexAttrib2fv": float_attrib("glVertexAttrib2fv"),
+      "glVertexAttrib3fv": float_attrib("glVertexAttrib3fv"),
+      "glVertexAttrib4fv": float_attrib("glVertexAttrib4fv"),
+      "glVertexAttribI4i": (shadow, c, [index, ...v]) => attrib_current(c, index, v, "i"),
+      "glVertexAttribI4ui": (shadow, c, [index, ...v]) => attrib_current(c, index, v.map((x) => x >>> 0), "ui"),
+      "glVertexAttribI4iv": (shadow, c, [index, v]) => attrib_current(c, index, i32s2(v).slice(0, 4), "i"),
+      "glVertexAttribI4uiv": (shadow, c, [index, v]) => attrib_current(c, index, i32s2(v).slice(0, 4).map((x) => x >>> 0), "ui"),
+      "glGetVertexAttribIiv": (shadow, c, [index, pname, params]) => get_attrib3(shadow, c, index, pname, params, "i"),
+      "glGetVertexAttribIuiv": (shadow, c, [index, pname, params]) => get_attrib3(shadow, c, index, pname, params, "ui"),
+      "glGetVertexAttribiv": (shadow, c, [index, pname, params]) => get_attrib3(shadow, c, index, pname, params, "iv"),
+      "glGetVertexAttribfv": (shadow, c, [index, pname, params]) => get_attrib3(shadow, c, index, pname, params, "f"),
+      // ---- drawing
+      "glDrawArrays": (shadow, c, [mode, first, count]) => {
+        if (first < 0) return mode_ok(c, mode) ? fail2(c, GL2.INVALID_VALUE) : fail2(c, GL2.INVALID_ENUM);
+        return draw_checks(shadow, c, mode, count, 1, false);
+      },
+      "glDrawArraysInstanced": (shadow, c, [mode, first, count, instances]) => {
+        if (first < 0) return mode_ok(c, mode) ? fail2(c, GL2.INVALID_VALUE) : fail2(c, GL2.INVALID_ENUM);
+        return draw_checks(shadow, c, mode, count, instances, false);
+      },
+      "glDrawElementsOffset": (shadow, c, [mode, count, type]) => elements3(shadow, c, mode, count, type, 1, true),
+      "glDrawElementsData": (shadow, c, [mode, count, type]) => elements3(shadow, c, mode, count, type, 1, false),
+      "glDrawElementsInstancedOffsetAEMU": (shadow, c, [mode, count, type, offset, instances]) => elements3(shadow, c, mode, count, type, instances, true),
+      "glDrawElementsInstancedDataAEMU": (shadow, c, [mode, count, type, data, instances]) => elements3(shadow, c, mode, count, type, instances, false),
+      "glDrawRangeElementsOffsetAEMU": (shadow, c, [mode, start, end, count, type]) => {
+        if (end < start) return fail2(c, GL2.INVALID_VALUE);
+        return elements3(shadow, c, mode, count, type, 1, true);
+      },
+      "glDrawRangeElementsDataAEMU": (shadow, c, [mode, start, end, count, type]) => {
+        if (end < start) return fail2(c, GL2.INVALID_VALUE);
+        return elements3(shadow, c, mode, count, type, 1, false);
+      },
+      "glClear": (shadow, c, [mask]) => {
+        if (mask & ~(16384 | 256 | 1024)) return fail2(c, GL2.INVALID_VALUE);
+        if (!complete(c, false)) return REFUSED2;
+        return void 0;
+      },
+      "glClearBufferiv": (shadow, c, [buffer, drawbuffer]) => clear_buffer(c, buffer, drawbuffer, "i"),
+      "glClearBufferuiv": (shadow, c, [buffer, drawbuffer]) => clear_buffer(c, buffer, drawbuffer, "ui"),
+      "glClearBufferfv": (shadow, c, [buffer, drawbuffer]) => clear_buffer(c, buffer, drawbuffer, "f"),
+      "glClearBufferfi": (shadow, c, [buffer, drawbuffer]) => clear_buffer(c, buffer, drawbuffer, "fi"),
+      "glReadPixels": (shadow, c, [x, y, width, height, format, type]) => read_pixels3(shadow, c, width, height, format, type, false),
+      "glReadPixelsOffsetAEMU": (shadow, c, [x, y, width, height, format, type, offset]) => {
+        const buffer = c.group.buffers.get(c.buffers.pixel_pack);
+        if (!buffer || buffer.mapped) return fail2(c, GL2.INVALID_OPERATION);
+        const r = read_pixels3(shadow, c, width, height, format, type, true);
+        if (r === REFUSED2) return r;
+        const needed = image_bytes3(width, height, 1, format, type, {
+          alignment: c.pack_alignment,
+          row_length: c.pack.row_length,
+          image_height: 0,
+          skip_pixels: c.pack.skip_pixels,
+          skip_rows: c.pack.skip_rows,
+          skip_images: 0
+        });
+        if (offset < 0 || offset + needed > buffer.size || offset % Math.max(1, pixel_bytes(format, type) >= 4 ? 4 : pixel_bytes(format, type))) {
+          return fail2(c, GL2.INVALID_OPERATION);
+        }
+        buffer.gpu_newer = true;
+        return void 0;
+      },
+      // ---- textures
+      "glActiveTexture": (shadow, c, [unit]) => {
+        const index = unit - 33984;
+        if (index < 0 || index >= MAX_UNITS) return fail2(c, GL2.INVALID_ENUM);
+        c.active_texture = index;
+        return void 0;
+      },
+      "glBindTexture": (shadow, c, [target, name]) => {
+        const slot = target_slot(target, c);
+        if (slot < 0) return fail2(c, GL2.INVALID_ENUM);
+        if (name) {
+          const texture = c.group.textures.get(name);
+          if (texture && texture.target !== target) return fail2(c, GL2.INVALID_OPERATION);
+          if (!texture) c.group.textures.set(name, h.new_texture(target));
+        }
+        c.textures[c.active_texture][slot] = name;
+        return void 0;
+      },
+      "glDeleteTextures": (shadow, c, [n, names]) => {
+        if (n < 0) return fail2(c, GL2.INVALID_VALUE);
+        for (const name of i32s2(names).slice(0, n)) {
+          if (!name) continue;
+          c.group.reserved.texture.delete(name);
+          const texture = c.group.textures.get(name);
+          if (!c.group.textures.delete(name)) continue;
+          for (const unit of c.textures) for (let i = 0; i < unit.length; i++) if (unit[i] === name) unit[i] = 0;
+          for (const fbo of c.framebuffers.values()) {
+            if (fbo.name !== c.framebuffer && fbo.name !== c.read_framebuffer) continue;
+            for (const [attachment, a] of fbo.attachments) if (a.type === GL2.TEXTURE && a.name === name) fbo.attachments.delete(attachment);
+          }
+          h.detach(c, GL2.TEXTURE, name);
+          h.keep_orphan(c, GL2.TEXTURE, c.group.textures, name, texture);
+        }
+        return void 0;
+      },
+      "glTexImage2D": (shadow, c, args) => tex_image(shadow, c, false, args),
+      "glTexImage2DOffsetAEMU": (shadow, c, args) => tex_image(shadow, c, false, args),
+      "glTexImage3D": (shadow, c, args) => tex_image(shadow, c, true, args),
+      "glTexImage3DOffsetAEMU": (shadow, c, args) => tex_image(shadow, c, true, args),
+      "glTexSubImage2D": (shadow, c, args) => tex_sub_image(shadow, c, false, args),
+      "glTexSubImage2DOffsetAEMU": (shadow, c, args) => tex_sub_image(shadow, c, false, args),
+      "glTexSubImage3D": (shadow, c, args) => tex_sub_image(shadow, c, true, args),
+      "glTexSubImage3DOffsetAEMU": (shadow, c, args) => tex_sub_image(shadow, c, true, args),
+      "glTexStorage2D": (shadow, c, [target, levels, internalformat, width, height]) => {
+        if (target !== GL2.TEXTURE_2D && target !== GL2.TEXTURE_CUBE_MAP) return fail2(c, GL2.INVALID_ENUM);
+        return tex_storage(shadow, c, target, levels, internalformat, width, height, void 0);
+      },
+      "glTexStorage3D": (shadow, c, [target, levels, internalformat, width, height, depth]) => {
+        if (target !== GL2.TEXTURE_3D && !layered(c, target)) return fail2(c, GL2.INVALID_ENUM);
+        return tex_storage(shadow, c, target, levels, internalformat, width, height, depth);
+      },
+      "glCompressedTexImage2D": (shadow, c, args) => compressed_image(shadow, c, false, args),
+      "glCompressedTexImage2DOffsetAEMU": (shadow, c, args) => compressed_image(shadow, c, false, args),
+      "glCompressedTexImage3D": (shadow, c, args) => compressed_image(shadow, c, true, args),
+      "glCompressedTexImage3DOffsetAEMU": (shadow, c, args) => compressed_image(shadow, c, true, args),
+      "glCompressedTexSubImage2D": (shadow, c, args) => compressed_sub_image(shadow, c, false, args),
+      "glCompressedTexSubImage2DOffsetAEMU": (shadow, c, args) => compressed_sub_image(shadow, c, false, args),
+      "glCompressedTexSubImage3D": (shadow, c, args) => compressed_sub_image(shadow, c, true, args),
+      "glCompressedTexSubImage3DOffsetAEMU": (shadow, c, args) => compressed_sub_image(shadow, c, true, args),
+      "glCopyTexImage2D": (shadow, c, [target, level, internalformat, x, y, width, height, border]) => {
+        const face = face_of2(target);
+        if (face < 0) return fail2(c, GL2.INVALID_ENUM);
+        const texture = bound_texture3(c, target === GL2.TEXTURE_2D ? GL2.TEXTURE_2D : GL2.TEXTURE_CUBE_MAP);
+        if (!texture) return REFUSED2;
+        const info = format_info(internalformat) || ([6407, 6408].includes(internalformat) ? format_info(internalformat === 6407 ? 32849 : 32856) : null);
+        if (!info) return fail2(c, GL2.INVALID_ENUM);
+        if (!size_ok(c, target === GL2.TEXTURE_2D ? GL2.TEXTURE_2D : GL2.TEXTURE_CUBE_MAP, level, width, height, 1, border)) return REFUSED2;
+        if (texture.immutable) return fail2(c, GL2.INVALID_OPERATION);
+        if (!complete(c, true)) return REFUSED2;
+        const source = read_image(c);
+        if (!source || !copy_compatible(source.info, info) || source.samples) return fail2(c, GL2.INVALID_OPERATION);
+        texture.images.set(image_key(face, level), {
+          width,
+          height,
+          depth: 1,
+          format: info.format,
+          type: info.types[0],
+          internal: info.sized ? info.value : internalformat,
+          compressed: false
+        });
+        return void 0;
+      },
+      "glCopyTexSubImage2D": (shadow, c, [target, level, xoffset, yoffset, x, y, width, height]) => copy_sub(shadow, c, target, level, xoffset, yoffset, 0, width, height, false),
+      "glCopyTexSubImage3D": (shadow, c, [target, level, xoffset, yoffset, zoffset, x, y, width, height]) => copy_sub(shadow, c, target, level, xoffset, yoffset, zoffset, width, height, true),
+      "glGenerateMipmap": (shadow, c, [target]) => {
+        if (![GL2.TEXTURE_2D, GL2.TEXTURE_CUBE_MAP, GL2.TEXTURE_3D, GL2.TEXTURE_2D_ARRAY].includes(target) && !layered(c, target)) return fail2(c, GL2.INVALID_ENUM);
+        const texture = bound_texture3(c, target);
+        if (!texture) return REFUSED2;
+        const base_level = Math.min(texture.base_level || 0, 31);
+        const faces = target === GL2.TEXTURE_CUBE_MAP ? 6 : 1;
+        const first = texture.images.get(image_key(0, base_level));
+        if (!first) return fail2(c, GL2.INVALID_OPERATION);
+        const info = first.compressed ? null : format_info(first.internal || first.format);
+        if (!info || !info.filterable || info.sized && !renderable(info, c.color_buffer_float) || info.kind === "depth" || info.kind === "depth_stencil") {
+          return fail2(c, GL2.INVALID_OPERATION);
+        }
+        for (let face = 0; face < faces; face++) {
+          const image = texture.images.get(image_key(face, base_level));
+          if (!image || image.width !== first.width || image.height !== first.height || image.internal !== first.internal) return fail2(c, GL2.INVALID_OPERATION);
+        }
+        const last = texture.immutable ? texture.immutable_levels - 1 : 31;
+        for (let face = 0; face < faces; face++) {
+          let w = first.width, hh = first.height, d = first.depth || 1;
+          for (let level = base_level + 1; level <= last && (w > 1 || hh > 1 || target === GL2.TEXTURE_3D && d > 1); level++) {
+            w = Math.max(1, w >> 1);
+            hh = Math.max(1, hh >> 1);
+            if (target === GL2.TEXTURE_3D) d = Math.max(1, d >> 1);
+            texture.images.set(image_key(face, level), Object.assign({}, first, { width: w, height: hh, depth: d }));
+          }
+        }
+        return void 0;
+      },
+      "glTexParameterf": (shadow, c, [target, pname, param]) => tex_parameter3(shadow, c, target, pname, [param], true),
+      "glTexParameteri": (shadow, c, [target, pname, param]) => tex_parameter3(shadow, c, target, pname, [param], false),
+      "glTexParameterfv": (shadow, c, [target, pname, params]) => tex_parameter3(shadow, c, target, pname, f32s2(params), true, true),
+      "glTexParameteriv": (shadow, c, [target, pname, params]) => tex_parameter3(shadow, c, target, pname, i32s2(params), false, true),
+      "glGetTexParameteriv": (shadow, c, [target, pname, params]) => get_tex_parameter3(shadow, c, target, pname, params, "i"),
+      "glGetTexParameterfv": (shadow, c, [target, pname, params]) => get_tex_parameter3(shadow, c, target, pname, params, "f"),
+      // ---- samplers
+      "glGenSamplers": (shadow, c, [n, names]) => {
+        query2(shadow);
+        if (n < 0) return fail2(c, GL2.INVALID_VALUE);
+        for (let i = 0; i < n && 4 * i + 4 <= names.size; i++) {
+          const name = c.group.fresh("sampler", c.group.samplers);
+          c.group.samplers.set(name, new_sampler());
+          names.view.setUint32(4 * i, name, true);
+        }
+        return void 0;
+      },
+      "glDeleteSamplers": (shadow, c, [n, names]) => {
+        if (n < 0) return fail2(c, GL2.INVALID_VALUE);
+        for (const name of i32s2(names).slice(0, n)) {
+          if (!c.group.samplers.delete(name)) continue;
+          for (let i = 0; i < c.samplers.length; i++) if (c.samplers[i] === name) c.samplers[i] = 0;
+        }
+        return void 0;
+      },
+      "glIsSampler": (shadow, c, [name]) => {
+        query2(shadow);
+        return c.group.samplers.has(name) ? 1 : 0;
+      },
+      "glBindSampler": (shadow, c, [unit, name]) => {
+        if (unit >= MAX_UNITS) return fail2(c, GL2.INVALID_VALUE);
+        if (name && !c.group.samplers.has(name)) {
+          if (!shadow.trusted) return fail2(c, GL2.INVALID_OPERATION);
+          c.group.samplers.set(name, new_sampler());
+        }
+        c.samplers[unit] = name;
+        return void 0;
+      },
+      "glSamplerParameterf": (shadow, c, [s, pname, param]) => sampler_parameter(shadow, c, s, pname, [param], true),
+      "glSamplerParameteri": (shadow, c, [s, pname, param]) => sampler_parameter(shadow, c, s, pname, [param], false),
+      "glSamplerParameterfv": (shadow, c, [s, pname, params]) => sampler_parameter(shadow, c, s, pname, f32s2(params), true, true),
+      "glSamplerParameteriv": (shadow, c, [s, pname, params]) => sampler_parameter(shadow, c, s, pname, i32s2(params), false, true),
+      "glGetSamplerParameterfv": (shadow, c, [s, pname, params]) => get_sampler_parameter(shadow, c, s, pname, params, "f"),
+      "glGetSamplerParameteriv": (shadow, c, [s, pname, params]) => get_sampler_parameter(shadow, c, s, pname, params, "i"),
+      // ---- renderbuffers and framebuffers
+      "glRenderbufferStorage": (shadow, c, [target, format, width, height]) => renderbuffer_storage(c, target, 0, format, width, height),
+      "glRenderbufferStorageMultisample": (shadow, c, [target, samples, format, width, height]) => renderbuffer_storage(c, target, samples, format, width, height),
+      "glGetRenderbufferParameteriv": (shadow, c, [target, pname, params]) => {
+        if (pname === 36011) {
+          query2(shadow);
+          if (target !== GL2.RENDERBUFFER) {
+            fail2(c, GL2.INVALID_ENUM);
+            return void 0;
+          }
+          const rb = c.group.renderbuffers.get(c.renderbuffer);
+          if (!rb) {
+            fail2(c, GL2.INVALID_OPERATION);
+            return void 0;
+          }
+          put2(params, [rb.samples || 0], "i", "i");
+          return void 0;
+        }
+        return base["glGetRenderbufferParameteriv"](shadow, c, [target, pname, params]);
+      },
+      "glGetInternalformativ": (shadow, c, [target, internalformat, pname, size, params]) => {
+        query2(shadow);
+        const textures = c.version >= 31 && target === 37120 || c.version >= 32 && target === 37122;
+        if (target !== GL2.RENDERBUFFER && !textures || pname !== 32937 && pname !== 37760) {
+          fail2(c, GL2.INVALID_ENUM);
+          return;
+        }
+        const info = format_info(internalformat) || (internalformat === 36168 ? { kind: "stencil" } : null);
+        if (!info || !(info.kind === "stencil" || renderable(info, c.color_buffer_float))) {
+          fail2(c, GL2.INVALID_ENUM);
+          return;
+        }
+        if (size < 0) {
+          fail2(c, GL2.INVALID_VALUE);
+          return;
+        }
+        const counts = info.kind === "int" || info.kind === "uint" ? [] : [4];
+        if (pname === 37760) put2(params, [counts.length], "i", "i");
+        else put2(params, counts.slice(0, Math.max(0, size)), "i", "i");
+      },
+      "glGenFramebuffers": (shadow, c, args) => base["glGenFramebuffers"](shadow, c, args),
+      "glBindFramebuffer": (shadow, c, [target, name]) => {
+        if (framebuffer_of(c, target) < 0) return fail2(c, GL2.INVALID_ENUM);
+        if (name && !c.framebuffers.has(name)) c.framebuffers.set(name, Object.assign(new_framebuffer3(), { name }));
+        if (target !== GL2.READ_FRAMEBUFFER) c.framebuffer = name;
+        if (target !== GL2.DRAW_FRAMEBUFFER) c.read_framebuffer = name;
+        return void 0;
+      },
+      "glDeleteFramebuffers": (shadow, c, [n, names]) => {
+        if (n < 0) return fail2(c, GL2.INVALID_VALUE);
+        for (const name of i32s2(names).slice(0, n)) {
+          if (!name) continue;
+          c.reserved_framebuffers.delete(name);
+          if (!c.framebuffers.delete(name)) continue;
+          if (c.framebuffer === name) c.framebuffer = 0;
+          if (c.read_framebuffer === name) c.read_framebuffer = 0;
+        }
+        return void 0;
+      },
+      "glCheckFramebufferStatus": (shadow, c, [target]) => {
+        query2(shadow);
+        const name = framebuffer_of(c, target);
+        if (name < 0) {
+          fail2(c, GL2.INVALID_ENUM);
+          return 0;
+        }
+        return status_of(c, name);
+      },
+      "glFramebufferRenderbuffer": (shadow, c, [target, attachment, rbtarget, name]) => {
+        const fb = framebuffer_of(c, target);
+        if (fb < 0 || !attachment_ok(attachment) || rbtarget !== GL2.RENDERBUFFER) return fail2(c, GL2.INVALID_ENUM);
+        const fbo = c.framebuffers.get(fb);
+        if (!fbo || name && !c.group.renderbuffers.has(name)) return fail2(c, GL2.INVALID_OPERATION);
+        attach(fbo, attachment, name ? { type: GL2.RENDERBUFFER, name, level: 0, face: 0, layer: 0 } : null);
+        return void 0;
+      },
+      "glFramebufferTexture2D": (shadow, c, [target, attachment, textarget, name, level]) => {
+        const fb = framebuffer_of(c, target);
+        if (fb < 0 || !attachment_ok(attachment)) return fail2(c, GL2.INVALID_ENUM);
+        const fbo = c.framebuffers.get(fb);
+        if (!fbo) return fail2(c, GL2.INVALID_OPERATION);
+        if (!name) {
+          attach(fbo, attachment, null);
+          return void 0;
+        }
+        const face = face_of2(textarget);
+        if (face < 0) return fail2(c, GL2.INVALID_ENUM);
+        const texture = c.group.textures.get(name);
+        if (!texture || texture.target === GL2.TEXTURE_CUBE_MAP !== (textarget !== GL2.TEXTURE_2D) || texture.target !== GL2.TEXTURE_2D && texture.target !== GL2.TEXTURE_CUBE_MAP) {
+          return fail2(c, GL2.INVALID_OPERATION);
+        }
+        if (level < 0 || level >= MAX_LEVELS_2D) return fail2(c, GL2.INVALID_VALUE);
+        attach(fbo, attachment, { type: GL2.TEXTURE, name, level, face, layer: 0 });
+        return void 0;
+      },
+      "glFramebufferTextureLayer": (shadow, c, [target, attachment, name, level, layer]) => {
+        const fb = framebuffer_of(c, target);
+        if (fb < 0 || !attachment_ok(attachment)) return fail2(c, GL2.INVALID_ENUM);
+        const fbo = c.framebuffers.get(fb);
+        if (!fbo) return fail2(c, GL2.INVALID_OPERATION);
+        if (!name) {
+          attach(fbo, attachment, null);
+          return void 0;
+        }
+        const texture = c.group.textures.get(name);
+        if (!texture || texture.target !== GL2.TEXTURE_3D && !layered(c, texture.target)) return fail2(c, GL2.INVALID_OPERATION);
+        const max_layer = texture.target === GL2.TEXTURE_3D ? LIMITS3.MAX_3D_TEXTURE_SIZE : LIMITS3.MAX_ARRAY_TEXTURE_LAYERS;
+        if (layer < 0 || layer >= max_layer || level < 0 || level > max_level_of(texture.target)) return fail2(c, GL2.INVALID_VALUE);
+        attach(fbo, attachment, { type: GL2.TEXTURE, name, level, face: 0, layer });
+        return void 0;
+      },
+      "glGetFramebufferAttachmentParameteriv": (shadow, c, [target, attachment, pname, params]) => {
+        query2(shadow);
+        const fb = framebuffer_of(c, target);
+        if (fb < 0) {
+          fail2(c, GL2.INVALID_ENUM);
+          return;
+        }
+        const value = attachment_parameter(c, fb, attachment, pname);
+        if (value !== null) put2(params, [value], "i", "i");
+      },
+      "glDrawBuffers": (shadow, c, [n, bufs]) => {
+        const list = i32s2(bufs).slice(0, Math.max(0, n));
+        if (n < 0 || n > LIMITS3.MAX_DRAW_BUFFERS) return fail2(c, GL2.INVALID_VALUE);
+        if (!c.framebuffer) {
+          if (n !== 1 || list[0] !== GL2.BACK && list[0] !== GL2.NONE) return fail2(c, GL2.INVALID_OPERATION);
+          c.default_draw_buffer = list[0];
+          return void 0;
+        }
+        for (let i = 0; i < n; i++) {
+          if (list[i] !== GL2.NONE && list[i] !== GL2.COLOR_ATTACHMENT0 + i) {
+            return color_attachment(list[i]) || list[i] === GL2.BACK ? fail2(c, GL2.INVALID_OPERATION) : fail2(c, GL2.INVALID_ENUM);
+          }
+        }
+        const fbo = c.framebuffers.get(c.framebuffer);
+        fbo.draw_buffers = Array.from({ length: LIMITS3.MAX_DRAW_BUFFERS }, (_, i) => i < n ? list[i] : GL2.NONE);
+        return void 0;
+      },
+      "glReadBuffer": (shadow, c, [src]) => {
+        if (src !== GL2.BACK && src !== GL2.NONE && !(src >= GL2.COLOR_ATTACHMENT0 && src < GL2.COLOR_ATTACHMENT0 + 32)) return fail2(c, GL2.INVALID_ENUM);
+        if (!c.read_framebuffer) {
+          if (src !== GL2.BACK && src !== GL2.NONE) return fail2(c, GL2.INVALID_OPERATION);
+          c.default_read_buffer = src;
+          return void 0;
+        }
+        if (src === GL2.BACK) return fail2(c, GL2.INVALID_OPERATION);
+        if (src !== GL2.NONE && !color_attachment(src)) return fail2(c, GL2.INVALID_OPERATION);
+        c.framebuffers.get(c.read_framebuffer).read_buffer = src;
+        return void 0;
+      },
+      "glBlitFramebuffer": (shadow, c, [sx0, sy0, sx1, sy1, dx0, dy0, dx1, dy1, mask, filter]) => {
+        if (mask & ~(16384 | 256 | 1024)) return fail2(c, GL2.INVALID_VALUE);
+        if (filter !== GL2.NEAREST && filter !== GL2.LINEAR) return fail2(c, GL2.INVALID_ENUM);
+        if (filter === GL2.LINEAR && mask & (256 | 1024)) return fail2(c, GL2.INVALID_OPERATION);
+        if (!complete(c, true)) return REFUSED2;
+        const source = read_image(c);
+        if (mask & 16384 && source) {
+          if (source.samples && (sx0 !== dx0 || sy0 !== dy0 || sx1 !== dx1 || sy1 !== dy1)) return fail2(c, GL2.INVALID_OPERATION);
+          const kind = source.info.kind;
+          if ((kind === "int" || kind === "uint") && filter === GL2.LINEAR) return fail2(c, GL2.INVALID_OPERATION);
+          for (const image of draw_images(c)) {
+            const dk = image.info.kind;
+            const integer = (k) => k === "int" || k === "uint";
+            if (integer(kind) !== integer(dk) || integer(kind) && kind !== dk) return fail2(c, GL2.INVALID_OPERATION);
+            if (source.samples && image.info.value !== source.info.value) return fail2(c, GL2.INVALID_OPERATION);
+          }
+          if (draw_images(c).some((i) => i.samples)) return fail2(c, GL2.INVALID_OPERATION);
+        }
+        for (const [bit, point] of [[256, GL2.DEPTH_ATTACHMENT], [1024, GL2.STENCIL_ATTACHMENT]]) {
+          if (!(mask & bit)) continue;
+          const a = depth_stencil_image(c, c.read_framebuffer, point), b = depth_stencil_image(c, c.framebuffer, point);
+          if (a && b && a.info.value !== b.info.value) return fail2(c, GL2.INVALID_OPERATION);
+        }
+        if (c.read_framebuffer && c.read_framebuffer === c.framebuffer) return fail2(c, GL2.INVALID_OPERATION);
+        return void 0;
+      },
+      "glInvalidateFramebuffer": (shadow, c, [target, n, attachments]) => invalidate(c, target, n, attachments, 0, 0),
+      "glInvalidateSubFramebuffer": (shadow, c, [target, n, attachments, x, y, width, height]) => invalidate(c, target, n, attachments, width, height),
+      // ---- programs: uniform blocks, transform feedback varyings, the rest of GLES 3.0's
+      "glGetUniformBlockIndex": (shadow, c, [p, name]) => {
+        query2(shadow);
+        const program = program_of(c, p);
+        if (!program) return -1 >>> 0;
+        if (!program.info || !program.info.ok) {
+          fail2(c, GL2.INVALID_OPERATION);
+          return -1 >>> 0;
+        }
+        const text = text_of2(name);
+        const index = (program.info.blocks || []).findIndex((b) => b.name === text || b.name + "[0]" === text);
+        return index < 0 ? 4294967295 : index;
+      },
+      "glGetActiveUniformBlockiv": (shadow, c, [p, index, pname, params]) => {
+        query2(shadow);
+        const program = program_of(c, p);
+        if (!program) return;
+        const blocks = program.info && program.info.ok ? program.info.blocks || [] : [];
+        if (index >= blocks.length) {
+          fail2(c, GL2.INVALID_VALUE);
+          return;
+        }
+        const b = blocks[index];
+        const binding = (program.block_bindings || [])[index] || 0;
+        const values = {
+          35391: [binding],
+          35392: [b.size],
+          35393: [b.name.length + 1],
+          35394: [b.members.length],
+          35395: b.members,
+          35396: [b.stages & 1 ? 1 : 0],
+          35398: [b.stages & 16 ? 1 : 0]
+        };
+        if (!(pname in values)) {
+          fail2(c, GL2.INVALID_ENUM);
+          return;
+        }
+        put2(params, values[pname], "i", "i");
+      },
+      "glGetActiveUniformBlockName": (shadow, c, [p, index, size, length, name]) => {
+        query2(shadow);
+        const program = program_of(c, p);
+        if (!program) return;
+        const blocks = program.info && program.info.ok ? program.info.blocks || [] : [];
+        if (index >= blocks.length || size < 0) {
+          fail2(c, GL2.INVALID_VALUE);
+          return;
+        }
+        const written = put_text2(name, blocks[index].name);
+        if (length && length.size) put2(length, [written], "i", "i");
+      },
+      "glUniformBlockBinding": (shadow, c, [p, index, binding]) => {
+        const program = program_of(c, p);
+        if (!program) return REFUSED2;
+        const blocks = program.info && program.info.ok ? program.info.blocks || [] : [];
+        if (index >= blocks.length || binding >= LIMITS3.MAX_UNIFORM_BUFFER_BINDINGS) return fail2(c, GL2.INVALID_VALUE);
+        program.block_bindings = program.block_bindings || blocks.map((b) => b.binding);
+        program.block_bindings[index] = binding;
+        return void 0;
+      },
+      "glGetUniformIndicesAEMU": (shadow, c, [p, count, packed, length, indices]) => {
+        query2(shadow);
+        const program = program_of(c, p);
+        if (!program) return;
+        if (count < 0) {
+          fail2(c, GL2.INVALID_VALUE);
+          return;
+        }
+        const names = text_of2(packed).split(";").slice(0, count);
+        const uniforms = program.info && program.info.ok ? program.info.uniforms : [];
+        put2(indices, names.map((n) => {
+          const i = uniforms.findIndex((u) => u.name === n || u.base === n && u.name.endsWith("[0]"));
+          return i < 0 ? -1 : i;
+        }), "i", "i");
+      },
+      "glGetActiveUniformsiv": (shadow, c, [p, count, indices, pname, params]) => {
+        query2(shadow);
+        const program = program_of(c, p);
+        if (!program) return;
+        if (count < 0) {
+          fail2(c, GL2.INVALID_VALUE);
+          return;
+        }
+        const uniforms = program.info && program.info.ok ? program.info.uniforms : [];
+        const list = i32s2(indices).slice(0, count);
+        if (list.some((i) => i < 0 || i >= uniforms.length)) {
+          fail2(c, GL2.INVALID_VALUE);
+          return;
+        }
+        const in_buffer = (u) => u.block_index >= 0 || u.opaque === "atomic";
+        const field = {
+          35383: (u) => u.type,
+          35384: (u) => u.size,
+          35385: (u) => u.name.length + 1,
+          35386: (u) => u.block_index,
+          35387: (u) => in_buffer(u) ? u.offset : -1,
+          35388: (u) => !in_buffer(u) ? -1 : u.size > 1 || u.name.endsWith("]") ? u.array_stride : 0,
+          35389: (u) => !in_buffer(u) ? -1 : u.columns ? u.matrix_stride : 0,
+          35390: (u) => u.row_major ? 1 : 0
+        }[pname];
+        if (!field) {
+          fail2(c, GL2.INVALID_ENUM);
+          return;
+        }
+        put2(params, list.map((i) => field(uniforms[i])), "i", "i");
+      },
+      "glUniform1ui": uniform3(1, "ui", false),
+      "glUniform2ui": uniform3(2, "ui", false),
+      "glUniform3ui": uniform3(3, "ui", false),
+      "glUniform4ui": uniform3(4, "ui", false),
+      "glUniform1uiv": uniform3(1, "ui", true),
+      "glUniform2uiv": uniform3(2, "ui", true),
+      "glUniform3uiv": uniform3(3, "ui", true),
+      "glUniform4uiv": uniform3(4, "ui", true),
+      "glUniform1f": uniform3(1, "f", false),
+      "glUniform2f": uniform3(2, "f", false),
+      "glUniform3f": uniform3(3, "f", false),
+      "glUniform4f": uniform3(4, "f", false),
+      "glUniform1fv": uniform3(1, "f", true),
+      "glUniform2fv": uniform3(2, "f", true),
+      "glUniform3fv": uniform3(3, "f", true),
+      "glUniform4fv": uniform3(4, "f", true),
+      "glUniform1i": uniform3(1, "i", false),
+      "glUniform2i": uniform3(2, "i", false),
+      "glUniform3i": uniform3(3, "i", false),
+      "glUniform4i": uniform3(4, "i", false),
+      "glUniform1iv": uniform3(1, "i", true),
+      "glUniform2iv": uniform3(2, "i", true),
+      "glUniform3iv": uniform3(3, "i", true),
+      "glUniform4iv": uniform3(4, "i", true),
+      "glUniformMatrix2fv": uniform3(0, "m", true, 2, 2),
+      "glUniformMatrix3fv": uniform3(0, "m", true, 3, 3),
+      "glUniformMatrix4fv": uniform3(0, "m", true, 4, 4),
+      "glUniformMatrix2x3fv": uniform3(0, "m", true, 2, 3),
+      "glUniformMatrix3x2fv": uniform3(0, "m", true, 3, 2),
+      "glUniformMatrix2x4fv": uniform3(0, "m", true, 2, 4),
+      "glUniformMatrix4x2fv": uniform3(0, "m", true, 4, 2),
+      "glUniformMatrix3x4fv": uniform3(0, "m", true, 3, 4),
+      "glUniformMatrix4x3fv": uniform3(0, "m", true, 4, 3),
+      "glGetUniformfv": get_uniform3("f"),
+      "glGetUniformiv": get_uniform3("i"),
+      "glGetUniformuiv": get_uniform3("ui"),
+      "glGetFragDataLocation": (shadow, c, [p, name]) => {
+        query2(shadow);
+        const program = program_of(c, p);
+        if (!program) return -1;
+        if (!program.info || !program.info.ok) {
+          fail2(c, GL2.INVALID_OPERATION);
+          return -1;
+        }
+        const text = text_of2(name);
+        if (program.info.spirv && !program.info.spirv.some((m) => m.stage === "fragment")) return -1;
+        const outputs = program.info.reflection && program.info.reflection.outputs || program.info.outputs || [];
+        const o = outputs.find((x) => x.name === text || x.name === text + "[0]" || x.name.replace(/\[0\]$/, "") === text.replace(/\[\d+\]$/, ""));
+        if (!o) return -1;
+        const element = /\[(\d+)\]$/.exec(text);
+        return (o.location >= 0 ? o.location : 0) + (element ? +element[1] : 0);
+      },
+      "glGetProgramiv": (shadow, c, [p, pname, params]) => {
+        const own = [35971, 35967, 35958, 35382, 35381, 33367, 34625];
+        if (!own.includes(pname)) return base["glGetProgramiv"](shadow, c, [p, pname, params]);
+        query2(shadow);
+        const program = program_of(c, p);
+        if (!program) return void 0;
+        const info = program.info && program.info.ok ? program.info : null;
+        const varyings = info ? info.tf_varyings || [] : [];
+        const blocks = info ? info.blocks || [] : [];
+        const longest = (list) => list.reduce((n, x) => Math.max(n, x.name.length + 1), 0);
+        const value = {
+          35971: varyings.length,
+          35967: info ? info.tf_mode || GL2.INTERLEAVED_ATTRIBS : GL2.INTERLEAVED_ATTRIBS,
+          35958: longest(varyings),
+          35382: blocks.length,
+          35381: longest(blocks),
+          33367: program.binary_hint || 0,
+          34625: 0
+        }[pname];
+        put2(params, [value], "i", "i");
+        return void 0;
+      },
+      "glProgramParameteri": (shadow, c, [p, pname, value]) => {
+        const program = program_of(c, p);
+        if (!program) return REFUSED2;
+        if (pname !== 33367) return fail2(c, GL2.INVALID_ENUM);
+        if (value !== 0 && value !== 1) return fail2(c, GL2.INVALID_VALUE);
+        program.binary_hint = value;
+        return void 0;
+      },
+      "glGetProgramBinary": (shadow, c, [p, size, length]) => {
+        query2(shadow);
+        const program = program_of(c, p);
+        if (!program) return;
+        if (!program.info || !program.info.ok) {
+          fail2(c, GL2.INVALID_OPERATION);
+          return;
+        }
+        fail2(c, GL2.INVALID_OPERATION);
+        if (length && length.size) put2(length, [0], "i", "i");
+      },
+      "glProgramBinary": (shadow, c, [p]) => {
+        const program = program_of(c, p);
+        if (!program) return REFUSED2;
+        return fail2(c, GL2.INVALID_ENUM);
+      },
+      "glTransformFeedbackVaryingsAEMU": (shadow, c, [p, count, packed, length, mode]) => {
+        const program = program_of(c, p);
+        if (!program) return REFUSED2;
+        if (mode !== GL2.INTERLEAVED_ATTRIBS && mode !== GL2.SEPARATE_ATTRIBS) return fail2(c, GL2.INVALID_ENUM);
+        if (count < 0 || mode === GL2.SEPARATE_ATTRIBS && count > LIMITS3.MAX_TRANSFORM_FEEDBACK_SEPARATE_ATTRIBS) return fail2(c, GL2.INVALID_VALUE);
+        program.tf_request = { names: text_of2(packed).split(";").slice(0, count), mode };
+        return void 0;
+      },
+      "glGetTransformFeedbackVarying": (shadow, c, [p, index, size, length, out_size, type, name]) => {
+        query2(shadow);
+        const program = program_of(c, p);
+        if (!program) return;
+        const varyings = program.info && program.info.ok ? program.info.tf_varyings || [] : [];
+        if (index >= varyings.length || size < 0) {
+          fail2(c, GL2.INVALID_VALUE);
+          return;
+        }
+        const v = varyings[index];
+        const written = put_text2(name, v.name);
+        if (length && length.size) put2(length, [written], "i", "i");
+        if (out_size && out_size.size) put2(out_size, [v.size], "i", "i");
+        if (type && type.size) put2(type, [v.type], "i", "i");
+      },
+      // ---- transform feedback objects
+      "glGenTransformFeedbacks": gen3("tf", (c) => c.tfs),
+      "glDeleteTransformFeedbacks": (shadow, c, [n, names]) => {
+        if (n < 0) return fail2(c, GL2.INVALID_VALUE);
+        const list = i32s2(names).slice(0, n);
+        if (list.some((name) => name && c.tfs.has(name) && c.tfs.get(name).active)) return fail2(c, GL2.INVALID_OPERATION);
+        for (const name of list) {
+          if (!name) continue;
+          c.reserved3.tf.delete(name);
+          if (!c.tfs.delete(name)) continue;
+          if (c.tf === name) c.tf = 0;
+        }
+        return void 0;
+      },
+      "glIsTransformFeedback": (shadow, c, [name]) => {
+        query2(shadow);
+        return name && c.tfs.has(name) && c.tfs.get(name).bound_once ? 1 : 0;
+      },
+      "glBindTransformFeedback": (shadow, c, [target, name]) => {
+        if (target !== GL2.TRANSFORM_FEEDBACK) return fail2(c, GL2.INVALID_ENUM);
+        const tf = current_tf(c);
+        if (tf.active && !tf.paused) return fail2(c, GL2.INVALID_OPERATION);
+        if (name && !c.tfs.has(name)) {
+          if (!generated(shadow, c.reserved3.tf, name)) return fail2(c, GL2.INVALID_OPERATION);
+          c.tfs.set(name, new_tf());
+        }
+        c.tf = name;
+        c.tfs.get(name).bound_once = true;
+        return void 0;
+      },
+      "glBeginTransformFeedback": (shadow, c, [mode]) => {
+        if (mode !== GL2.POINTS && mode !== GL2.LINES && mode !== GL2.TRIANGLES) return fail2(c, GL2.INVALID_ENUM);
+        const tf = current_tf(c);
+        if (tf.active) return fail2(c, GL2.INVALID_OPERATION);
+        const program = c.group.objects.get(c.program);
+        const varyings = program && program.info && program.info.ok ? program.info.tf_varyings || [] : [];
+        if (!varyings.length) return fail2(c, GL2.INVALID_OPERATION);
+        const buffers = program.info.tf_mode === GL2.INTERLEAVED_ATTRIBS ? 1 : varyings.length;
+        for (let i = 0; i < buffers; i++) if (!tf.bindings[i].buffer) return fail2(c, GL2.INVALID_OPERATION);
+        Object.assign(tf, { active: true, paused: false, mode, program: c.program, vertices: [0, 0, 0, 0] });
+        return void 0;
+      },
+      "glEndTransformFeedback": (shadow, c) => {
+        const tf = current_tf(c);
+        if (!tf.active) return fail2(c, GL2.INVALID_OPERATION);
+        tf.active = tf.paused = false;
+        return void 0;
+      },
+      "glPauseTransformFeedback": (shadow, c) => {
+        const tf = current_tf(c);
+        if (!tf.active || tf.paused) return fail2(c, GL2.INVALID_OPERATION);
+        tf.paused = true;
+        return void 0;
+      },
+      "glResumeTransformFeedback": (shadow, c) => {
+        const tf = current_tf(c);
+        if (!tf.active || !tf.paused || tf.program !== c.program) return fail2(c, GL2.INVALID_OPERATION);
+        tf.paused = false;
+        return void 0;
+      },
+      "glUseProgram": (shadow, c, args) => {
+        const tf = current_tf(c);
+        if (tf.active && !tf.paused) return fail2(c, GL2.INVALID_OPERATION);
+        return base["glUseProgram"](shadow, c, args);
+      },
+      "glLinkProgram": (shadow, c, args) => {
+        const tf = current_tf(c);
+        if (tf.active && tf.program === args[0]) return fail2(c, GL2.INVALID_OPERATION);
+        return base["glLinkProgram"](shadow, c, args);
+      },
+      // ---- queries
+      "glGenQueries": gen3("query", (c) => c.queries),
+      "glDeleteQueries": (shadow, c, [n, names]) => {
+        if (n < 0) return fail2(c, GL2.INVALID_VALUE);
+        for (const name of i32s2(names).slice(0, n)) {
+          if (!name) continue;
+          c.reserved3.query.delete(name);
+          for (const [target, active] of c.active_queries) if (active === name) c.active_queries.delete(target);
+          c.queries.delete(name);
+        }
+        return void 0;
+      },
+      "glIsQuery": (shadow, c, [name]) => {
+        query2(shadow);
+        return c.queries.has(name) ? 1 : 0;
+      },
+      "glBeginQuery": (shadow, c, [target, name]) => {
+        if (!QUERY_TARGETS.has(target)) return fail2(c, GL2.INVALID_ENUM);
+        const occlusion = target !== GL2.TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN;
+        if (c.active_queries.has(target) || occlusion && c.active_queries.has(target === GL2.ANY_SAMPLES_PASSED ? GL2.ANY_SAMPLES_PASSED_CONSERVATIVE : GL2.ANY_SAMPLES_PASSED)) {
+          return fail2(c, GL2.INVALID_OPERATION);
+        }
+        if (!name || !c.queries.has(name) && !generated(shadow, c.reserved3.query, name)) return fail2(c, GL2.INVALID_OPERATION);
+        const q = c.queries.get(name);
+        if (q && q.target !== target) return fail2(c, GL2.INVALID_OPERATION);
+        if ([...c.active_queries.values()].includes(name)) return fail2(c, GL2.INVALID_OPERATION);
+        c.queries.set(name, { target, result: 0, drawn: false, available: false, ended: false });
+        c.active_queries.set(target, name);
+        return void 0;
+      },
+      "glEndQuery": (shadow, c, [target]) => {
+        if (!QUERY_TARGETS.has(target)) return fail2(c, GL2.INVALID_ENUM);
+        const name = c.active_queries.get(target);
+        if (!name) return fail2(c, GL2.INVALID_OPERATION);
+        c.active_queries.delete(target);
+        const q = c.queries.get(name);
+        q.ended = true;
+        if (target !== GL2.TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN) q.result = q.drawn ? 1 : 0;
+        q.available = true;
+        return void 0;
+      },
+      "glGetQueryiv": (shadow, c, [target, pname, params]) => {
+        query2(shadow);
+        if (!QUERY_TARGETS.has(target) || pname !== 34917) {
+          fail2(c, GL2.INVALID_ENUM);
+          return;
+        }
+        put2(params, [c.active_queries.get(target) || 0], "i", "i");
+      },
+      "glGetQueryObjectuiv": (shadow, c, [name, pname, params]) => {
+        query2(shadow);
+        if (pname !== 34918 && pname !== 34919) {
+          fail2(c, GL2.INVALID_ENUM);
+          return;
+        }
+        const q = c.queries.get(name);
+        if (!q || !q.ended || [...c.active_queries.values()].includes(name)) {
+          fail2(c, GL2.INVALID_OPERATION);
+          return;
+        }
+        put2(params, [pname === 34919 ? q.available ? 1 : 0 : q.result], "i", "i");
+        if (pname === 34918 && q.target !== GL2.TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN && q.drawn && !q.answered) shadow.query_read = { name, query: q };
+      },
+      // ---- sync objects (GLES 3.0's own, not EGL's: done in order, as renderControl's)
+      "glFenceSyncAEMU": (shadow, c, [condition, flags]) => {
+        query2(shadow);
+        if (condition !== 37143) {
+          fail2(c, GL2.INVALID_ENUM);
+          return 0;
+        }
+        if (flags) {
+          fail2(c, GL2.INVALID_VALUE);
+          return 0;
+        }
+        const handle = c.group.next_sync++;
+        c.group.syncs.set(handle, { condition, flags });
+        return handle;
+      },
+      "glClientWaitSyncAEMU": (shadow, c, [sync, flags]) => {
+        query2(shadow);
+        if (!c.group.syncs.has(sync)) {
+          fail2(c, GL2.INVALID_VALUE);
+          return 37149;
+        }
+        if (flags & ~1) {
+          fail2(c, GL2.INVALID_VALUE);
+          return 37149;
+        }
+        return 37146;
+      },
+      "glWaitSyncAEMU": (shadow, c, [sync, flags, timeout]) => {
+        if (!c.group.syncs.has(sync)) return fail2(c, GL2.INVALID_VALUE);
+        if (flags || timeout < 2 ** 63) return fail2(c, GL2.INVALID_VALUE);
+        return void 0;
+      },
+      "glDeleteSyncAEMU": (shadow, c, [sync]) => {
+        if (sync && !c.group.syncs.delete(sync)) return fail2(c, GL2.INVALID_VALUE);
+        return void 0;
+      },
+      "glIsSyncAEMU": (shadow, c, [sync]) => {
+        query2(shadow);
+        return c.group.syncs.has(sync) ? 1 : 0;
+      },
+      "glGetSyncivAEMU": (shadow, c, [sync, pname, size, length, values]) => {
+        query2(shadow);
+        const s = c.group.syncs.get(sync);
+        if (!s) {
+          fail2(c, GL2.INVALID_VALUE);
+          return;
+        }
+        const value = { 37138: 37142, 37139: s.condition, 37140: 37145, 37141: s.flags }[pname];
+        if (value === void 0) {
+          fail2(c, GL2.INVALID_ENUM);
+          return;
+        }
+        if (size < 0) {
+          fail2(c, GL2.INVALID_VALUE);
+          return;
+        }
+        if (size > 0) put2(values, [value], "i", "i");
+        if (length && length.size) put2(length, [size > 0 ? 1 : 0], "i", "i");
+      },
+      "glGetStringi": (shadow, c, [name, index]) => {
+        query2(shadow);
+        if (name !== 7939) {
+          fail2(c, GL2.INVALID_ENUM);
+          return 0;
+        }
+        if (index >= h.extensions(c).length) fail2(c, GL2.INVALID_VALUE);
+        return 0;
+      },
+      "glGetCompressedTextureFormats": (shadow, c, [count, formats]) => {
+        query2(shadow);
+        put2(formats, c.version >= 32 ? COMPRESSED_TEXTURE_FORMATS_32 : COMPRESSED_TEXTURE_FORMATS_3, "i", "i");
+      }
+    };
+    function bind_buffer_indexed(shadow, c, target, index, name, offset, size, range) {
+      if (target !== GL2.UNIFORM_BUFFER && target !== GL2.TRANSFORM_FEEDBACK_BUFFER) return fail2(c, GL2.INVALID_ENUM);
+      const tf = current_tf(c);
+      const max = target === GL2.UNIFORM_BUFFER ? LIMITS3.MAX_UNIFORM_BUFFER_BINDINGS : LIMITS3.MAX_TRANSFORM_FEEDBACK_SEPARATE_ATTRIBS;
+      if (index >= max) return fail2(c, GL2.INVALID_VALUE);
+      if (range && name && (size <= 0 || offset < 0)) return fail2(c, GL2.INVALID_VALUE);
+      if (target === GL2.UNIFORM_BUFFER && range && name && offset % LIMITS3.UNIFORM_BUFFER_OFFSET_ALIGNMENT) return fail2(c, GL2.INVALID_VALUE);
+      if (target === GL2.TRANSFORM_FEEDBACK_BUFFER && range && name && (offset % 4 || size % 4)) return fail2(c, GL2.INVALID_VALUE);
+      if (target === GL2.TRANSFORM_FEEDBACK_BUFFER && tf.active) return fail2(c, GL2.INVALID_OPERATION);
+      if (name && !c.group.buffers.has(name)) c.group.buffers.set(name, new_buffer());
+      const list = target === GL2.UNIFORM_BUFFER ? c.uniform_bindings : tf.bindings;
+      list[index] = { buffer: name, offset: range ? offset : 0, size: range ? size : 0 };
+      if (target === GL2.UNIFORM_BUFFER) c.buffers.uniform = name;
+      else c.buffers.transform_feedback = name;
+      return void 0;
+    }
+    function indexed(c, target, index, data, wide) {
+      let list, field;
+      switch (target) {
+        case 35368:
+          list = c.uniform_bindings;
+          field = "buffer";
+          break;
+        case 35369:
+          list = c.uniform_bindings;
+          field = "offset";
+          break;
+        case 35370:
+          list = c.uniform_bindings;
+          field = "size";
+          break;
+        case 35983:
+          list = current_tf(c).bindings;
+          field = "buffer";
+          break;
+        case 35972:
+          list = current_tf(c).bindings;
+          field = "offset";
+          break;
+        case 35973:
+          list = current_tf(c).bindings;
+          field = "size";
+          break;
+        default:
+          fail2(c, GL2.INVALID_ENUM);
+          return;
+      }
+      if (index >= list.length) {
+        fail2(c, GL2.INVALID_VALUE);
+        return;
+      }
+      const value = list[index][field];
+      if (wide === "b") put2(data, [value], "b", "b");
+      else if (wide) put64(data, [value]);
+      else put2(data, [value], "i", "i");
+    }
+    function attrib3(c, index, size, type, normalized, stride, buffer, offset, integer) {
+      if (index >= MAX_ATTRIBS || size < 1 || size > 4 || stride < 0 || stride > 255) return fail2(c, GL2.INVALID_VALUE);
+      const types = integer ? [5120, 5121, 5122, 5123, 5124, 5125] : [5120, 5121, 5122, 5123, 5124, 5125, 5126, 5131, 36193, 5132, 33640, 36255];
+      if (!types.includes(type)) return fail2(c, GL2.INVALID_ENUM);
+      if ((type === 33640 || type === 36255) && size !== 4) return fail2(c, GL2.INVALID_OPERATION);
+      Object.assign(c.attribs[index], { size, type, normalized: !!normalized, stride, buffer, offset, integer });
+      return void 0;
+    }
+    function attrib_current(c, index, values, kind) {
+      if (index >= MAX_ATTRIBS) return fail2(c, GL2.INVALID_VALUE);
+      c.attribs[index].current = values.slice(0, 4);
+      c.attribs[index].current_type = kind;
+      c.current_values = c.current_values || [];
+      c.current_values[index] = { values: values.slice(0, 4), kind };
+      return void 0;
+    }
+    function get_attrib3(shadow, c, index, pname, params, as) {
+      query2(shadow);
+      if (index >= MAX_ATTRIBS) {
+        fail2(c, GL2.INVALID_VALUE);
+        return;
+      }
+      const a = c.attribs[index];
+      if (pname === 34342) {
+        const current = c.current_values && c.current_values[index] || { values: a.current, kind: a.current_type || "f" };
+        if (as === "f") put2(params, current.values, "f", "f");
+        else if (as === "ui") put2(params, current.values.map((v) => v >>> 0), "i", "i");
+        else put2(params, current.values.map((v) => current.kind === "f" ? Math.round(v) : v | 0), "i", "i");
+        return;
+      }
+      const values = {
+        34338: a.enabled ? 1 : 0,
+        34339: a.size,
+        34340: a.stride,
+        34341: a.type,
+        34922: a.normalized ? 1 : 0,
+        34975: a.buffer,
+        35069: a.integer ? 1 : 0,
+        35070: a.divisor
+      };
+      if (!(pname in values)) {
+        fail2(c, GL2.INVALID_ENUM);
+        return;
+      }
+      put2(params, [values[pname]], as === "f" ? "f" : "i", "i");
+    }
+    function elements3(shadow, c, mode, count, type, instances, from_buffer) {
+      if (!mode_ok(c, mode) || !INDEX_TYPES.has(type)) return fail2(c, GL2.INVALID_ENUM);
+      if (count < 0 || instances < 0) return fail2(c, GL2.INVALID_VALUE);
+      if (from_buffer && !c.element_array_buffer) return fail2(c, GL2.INVALID_OPERATION);
+      const buffer = c.group.buffers.get(c.element_array_buffer);
+      if (buffer && buffer.mapped) return fail2(c, GL2.INVALID_OPERATION);
+      return draw_checks(shadow, c, mode, count, instances, true, type);
+    }
+    function draw_images(c) {
+      if (!c.framebuffer) return [{ info: { kind: "unorm", value: 32856 }, samples: 0 }];
+      const fbo = c.framebuffers.get(c.framebuffer);
+      return fbo.draw_buffers.filter((b) => b !== GL2.NONE).map((b) => fbo.attachments.get(b)).filter(Boolean).map((a) => attachment_image(c, a)).filter(Boolean);
+    }
+    function depth_stencil_image(c, fb, point) {
+      if (!fb) return null;
+      const a = c.framebuffers.get(fb).attachments.get(point);
+      return a ? attachment_image(c, a) : null;
+    }
+    function clear_buffer(c, buffer, drawbuffer, kind) {
+      const ok = { i: [GL2.COLOR, GL2.STENCIL], ui: [GL2.COLOR], f: [GL2.COLOR, GL2.DEPTH], fi: [GL2.DEPTH_STENCIL] }[kind];
+      if (!ok.includes(buffer)) return fail2(c, GL2.INVALID_ENUM);
+      if (buffer === GL2.COLOR ? drawbuffer < 0 || drawbuffer >= LIMITS3.MAX_DRAW_BUFFERS : drawbuffer !== 0) return fail2(c, GL2.INVALID_VALUE);
+      if (!complete(c, false)) return REFUSED2;
+      return void 0;
+    }
+    function read_pixels3(shadow, c, width, height, format, type, pack3) {
+      if (width < 0 || height < 0) return fail2(c, GL2.INVALID_VALUE);
+      if (pixel_bytes(format, type) === 0) return fail2(c, GL2.INVALID_ENUM);
+      if (!pack3 && c.buffers.pixel_pack) return fail2(c, GL2.INVALID_OPERATION);
+      if (!complete(c, true)) return REFUSED2;
+      const source = read_image(c);
+      if (!source) return fail2(c, GL2.INVALID_OPERATION);
+      if (source.samples) return fail2(c, GL2.INVALID_OPERATION);
+      const kind = source.info.kind;
+      const [rf, rt] = implementation_read(source.info);
+      const normal = kind === "int" ? format === 36249 && type === 5124 : kind === "uint" ? format === 36249 && type === 5125 : kind === "float" ? format === 6408 && type === 5126 : format === 6408 && (type === 5121 || source.info.value === 32857 && type === 33640);
+      if (!normal && !(format === rf && type === rt)) return fail2(c, GL2.INVALID_OPERATION);
+      return void 0;
+    }
+    function implementation_read(info) {
+      if (!info || !info.format || !info.types) return [6408, 5121];
+      return [info.format, info.types[info.types.length > 1 && info.types[0] === 5121 ? 1 : 0]];
+    }
+    function copy_compatible(source, dest) {
+      if (!source || !dest) return false;
+      const integer = (k) => k === "int" || k === "uint";
+      if (integer(source.kind) !== integer(dest.kind) || integer(source.kind) && source.kind !== dest.kind) return false;
+      if (source.kind === "float" !== (dest.kind === "float") && dest.sized) return false;
+      const channels = (info) => info.bits.slice(0, 4).map((b) => b > 0);
+      const s = channels(source), d = channels(dest);
+      if (dest.value === 6409 || dest.value === 6410) d[0] = true;
+      return d.every((need, i) => !need || s[i]);
+    }
+    function copy_sub(shadow, c, target, level, x, y, z, width, height, three) {
+      let texture, face;
+      if (three) {
+        if (target !== GL2.TEXTURE_3D && !layered(c, target)) return fail2(c, GL2.INVALID_ENUM);
+        texture = bound_texture3(c, target);
+        face = 0;
+      } else {
+        face = face_of2(target);
+        if (face < 0) return fail2(c, GL2.INVALID_ENUM);
+        texture = bound_texture3(c, target === GL2.TEXTURE_2D ? GL2.TEXTURE_2D : GL2.TEXTURE_CUBE_MAP);
+      }
+      if (!texture) return REFUSED2;
+      if (level < 0 || level > max_level_of(target) || x < 0 || y < 0 || z < 0 || width < 0 || height < 0) return fail2(c, GL2.INVALID_VALUE);
+      const image = texture.images.get(image_key(face, level));
+      if (!image) return fail2(c, GL2.INVALID_OPERATION);
+      if (x + width > image.width || y + height > image.height || z >= (image.depth || 1)) return fail2(c, GL2.INVALID_VALUE);
+      if (!complete(c, true)) return REFUSED2;
+      const source = read_image(c);
+      if (image.compressed || !source || source.samples || !copy_compatible(source.info, format_info(image.internal || image.format))) {
+        return fail2(c, GL2.INVALID_OPERATION);
+      }
+      return void 0;
+    }
+    function tex_parameter3(shadow, c, target, pname, params, float, vector = false) {
+      const texture = bound_texture3(c, target);
+      if (!texture) return REFUSED2;
+      const value = params[0];
+      const integer = float ? Math.round(value) : value;
+      const external = target === GL2.TEXTURE_EXTERNAL_OES;
+      if (target === 37120 || target === 37122) {
+        if (SAMPLER_STATES.has(pname)) return fail2(c, GL2.INVALID_ENUM);
+        if (pname === 33084 && integer !== 0) return fail2(c, GL2.INVALID_OPERATION);
+      }
+      switch (pname) {
+        case 10241:
+          if (!MIN_FILTERS.has(integer) || external && integer !== GL2.NEAREST && integer !== GL2.LINEAR) return fail2(c, GL2.INVALID_ENUM);
+          texture.min_filter = integer;
+          return void 0;
+        case 10240:
+          if (integer !== GL2.NEAREST && integer !== GL2.LINEAR) return fail2(c, GL2.INVALID_ENUM);
+          texture.mag_filter = integer;
+          return void 0;
+        case 10242:
+        case 10243:
+        case 32882:
+          if (!wrap_ok(c, integer) || external && integer !== GL2.CLAMP_TO_EDGE) return fail2(c, GL2.INVALID_ENUM);
+          texture[{ 10242: "wrap_s", 10243: "wrap_t", 32882: "wrap_r" }[pname]] = integer;
+          return void 0;
+        case 33082:
+          texture.min_lod = Math.fround(value);
+          return void 0;
+        case 33083:
+          texture.max_lod = Math.fround(value);
+          return void 0;
+        case 33084:
+          if (integer < 0 || external && integer !== 0) return fail2(c, external ? GL2.INVALID_OPERATION : GL2.INVALID_VALUE);
+          texture.base_level = integer;
+          return void 0;
+        case 33085:
+          if (integer < 0) return fail2(c, GL2.INVALID_VALUE);
+          texture.max_level = integer;
+          return void 0;
+        case 34892:
+          if (integer !== 0 && integer !== 34894) return fail2(c, GL2.INVALID_ENUM);
+          texture.compare_mode = integer;
+          return void 0;
+        case 34893:
+          if (!COMPARE_FUNCS.has(integer)) return fail2(c, GL2.INVALID_ENUM);
+          texture.compare_func = integer;
+          return void 0;
+        case 36418:
+        case 36419:
+        case 36420:
+        case 36421:
+          if (!SWIZZLES.has(integer)) return fail2(c, GL2.INVALID_ENUM);
+          texture.swizzle = texture.swizzle || [6403, 6404, 6405, 6406];
+          texture.swizzle[pname - 36418] = integer;
+          return void 0;
+        case TEXTURE_BORDER_COLOR:
+          if (c.version < 32 || !vector || external) return fail2(c, GL2.INVALID_ENUM);
+          texture.border_color = border_color(params, float);
+          return void 0;
+        case DEPTH_STENCIL_TEXTURE_MODE:
+          if (c.version < 31) return fail2(c, GL2.INVALID_ENUM);
+          if (integer !== 6402 && integer !== 6401) return fail2(c, GL2.INVALID_ENUM);
+          texture.depth_stencil_mode = integer;
+          return void 0;
+      }
+      return fail2(c, GL2.INVALID_ENUM);
+    }
+    function get_tex_parameter3(shadow, c, target, pname, params, as) {
+      query2(shadow);
+      const texture = bound_texture3(c, target);
+      if (!texture) return;
+      const swizzle = texture.swizzle || [6403, 6404, 6405, 6406];
+      const values = {
+        10241: texture.min_filter,
+        10240: texture.mag_filter,
+        10242: texture.wrap_s,
+        10243: texture.wrap_t,
+        32882: texture.wrap_r || GL2.REPEAT,
+        33082: texture.min_lod === void 0 ? -1e3 : texture.min_lod,
+        33083: texture.max_lod === void 0 ? 1e3 : texture.max_lod,
+        33084: texture.base_level || 0,
+        33085: texture.max_level === void 0 ? 1e3 : texture.max_level,
+        34892: texture.compare_mode || 0,
+        34893: texture.compare_func || 515,
+        36418: swizzle[0],
+        36419: swizzle[1],
+        36420: swizzle[2],
+        36421: swizzle[3],
+        37167: texture.immutable ? 1 : 0,
+        33503: texture.immutable_levels || 0
+      };
+      if (target === GL2.TEXTURE_EXTERNAL_OES) values[36200] = 1;
+      if (c.version >= 31) values[DEPTH_STENCIL_TEXTURE_MODE] = texture.depth_stencil_mode || 6402;
+      if (pname === TEXTURE_BORDER_COLOR && c.version >= 32) {
+        const color = texture.border_color || [0, 0, 0, 0];
+        return void put2(params, as === "f" ? color : color.map(border_int), as, as === "f" ? "f" : "i");
+      }
+      if (!(pname in values)) {
+        fail2(c, GL2.INVALID_ENUM);
+        return;
+      }
+      put2(params, [as === "i" && (pname === 33082 || pname === 33083) ? round(values[pname]) : values[pname]], as, as === "f" ? "f" : "i");
+    }
+    function sampler_parameter(shadow, c, s, pname, params, float, vector = false) {
+      if (s && shadow.trusted && !c.group.samplers.has(s)) c.group.samplers.set(s, new_sampler());
+      const sampler = c.group.samplers.get(s);
+      if (!sampler) return fail2(c, GL2.INVALID_OPERATION);
+      const value = params[0];
+      const integer = float ? Math.round(value) : value;
+      switch (pname) {
+        case 10241:
+          if (!MIN_FILTERS.has(integer)) return fail2(c, GL2.INVALID_ENUM);
+          sampler.min_filter = integer;
+          return void 0;
+        case 10240:
+          if (integer !== GL2.NEAREST && integer !== GL2.LINEAR) return fail2(c, GL2.INVALID_ENUM);
+          sampler.mag_filter = integer;
+          return void 0;
+        case 10242:
+        case 10243:
+        case 32882:
+          if (!wrap_ok(c, integer)) return fail2(c, GL2.INVALID_ENUM);
+          sampler[{ 10242: "wrap_s", 10243: "wrap_t", 32882: "wrap_r" }[pname]] = integer;
+          return void 0;
+        case TEXTURE_BORDER_COLOR:
+          if (c.version < 32 || !vector) return fail2(c, GL2.INVALID_ENUM);
+          sampler.border_color = border_color(params, float);
+          return void 0;
+        case 33082:
+          sampler.min_lod = Math.fround(value);
+          return void 0;
+        case 33083:
+          sampler.max_lod = Math.fround(value);
+          return void 0;
+        case 34892:
+          if (integer !== 0 && integer !== 34894) return fail2(c, GL2.INVALID_ENUM);
+          sampler.compare_mode = integer;
+          return void 0;
+        case 34893:
+          if (!COMPARE_FUNCS.has(integer)) return fail2(c, GL2.INVALID_ENUM);
+          sampler.compare_func = integer;
+          return void 0;
+      }
+      return fail2(c, GL2.INVALID_ENUM);
+    }
+    function get_sampler_parameter(shadow, c, s, pname, params, as) {
+      query2(shadow);
+      const sampler = c.group.samplers.get(s);
+      if (!sampler) {
+        fail2(c, GL2.INVALID_OPERATION);
+        return;
+      }
+      const values = {
+        10241: sampler.min_filter,
+        10240: sampler.mag_filter,
+        10242: sampler.wrap_s,
+        10243: sampler.wrap_t,
+        32882: sampler.wrap_r,
+        33082: sampler.min_lod,
+        33083: sampler.max_lod,
+        34892: sampler.compare_mode,
+        34893: sampler.compare_func
+      };
+      if (pname === TEXTURE_BORDER_COLOR && c.version >= 32) {
+        const color = sampler.border_color || [0, 0, 0, 0];
+        return void put2(params, as === "f" ? color : color.map(border_int), as, as === "f" ? "f" : "i");
+      }
+      if (!(pname in values)) {
+        fail2(c, GL2.INVALID_ENUM);
+        return;
+      }
+      put2(params, [as === "i" && (pname === 33082 || pname === 33083) ? round(values[pname]) : values[pname]], as, as === "f" ? "f" : "i");
+    }
+    function renderbuffer_storage(c, target, samples, format, width, height) {
+      if (target !== GL2.RENDERBUFFER) return fail2(c, GL2.INVALID_ENUM);
+      const info = format_info(format);
+      const stencil = format === 36168;
+      const legacy = h.renderbuffer_info(format);
+      if (!stencil && !(info && renderable(info, c.color_buffer_float)) && !legacy) return fail2(c, GL2.INVALID_ENUM);
+      if (samples < 0 || width < 0 || height < 0 || width > LIMITS3.MAX_TEXTURE_SIZE || height > LIMITS3.MAX_TEXTURE_SIZE) return fail2(c, GL2.INVALID_VALUE);
+      if (samples > LIMITS3.MAX_SAMPLES || samples > 0 && info && (info.kind === "int" || info.kind === "uint")) return fail2(c, GL2.INVALID_OPERATION);
+      const rb = c.group.renderbuffers.get(c.renderbuffer);
+      if (!rb) return fail2(c, GL2.INVALID_OPERATION);
+      Object.assign(rb, { width, height, format, image: 0, samples: samples ? LIMITS3.MAX_SAMPLES : 0 });
+      return void 0;
+    }
+    function attachment_parameter(c, fb, attachment, pname) {
+      if (!fb) {
+        if (attachment !== GL2.BACK && attachment !== 6145 && attachment !== 6146) {
+          fail2(c, GL2.INVALID_ENUM);
+          return null;
+        }
+        const bits2 = h.framebuffer_bits(c);
+        const has = attachment === GL2.BACK ? true : attachment === 6145 ? bits2[4] > 0 : bits2[5] > 0;
+        if (pname === 36048) return has ? GL2.FRAMEBUFFER_DEFAULT : GL2.NONE;
+        if (!has) {
+          fail2(c, GL2.INVALID_ENUM);
+          return null;
+        }
+        const sizes = { 33298: bits2[0], 33299: bits2[1], 33300: bits2[2], 33301: bits2[3], 33302: bits2[4], 33303: bits2[5] };
+        if (pname in sizes) return attachment === GL2.BACK ? pname <= 33301 ? sizes[pname] : 0 : attachment === 6145 ? pname === 33302 ? bits2[4] : 0 : pname === 33303 ? bits2[5] : 0;
+        if (pname === 33297) return attachment === GL2.BACK ? F.UNSIGNED_NORMALIZED : attachment === 6145 ? F.UNSIGNED_NORMALIZED : F.UNSIGNED_INT;
+        if (pname === 33296) return F.LINEAR;
+        fail2(c, GL2.INVALID_ENUM);
+        return null;
+      }
+      if (!attachment_ok(attachment)) {
+        fail2(c, GL2.INVALID_ENUM);
+        return null;
+      }
+      const fbo = c.framebuffers.get(fb);
+      const point = attachment === GL2.DEPTH_STENCIL_ATTACHMENT ? GL2.DEPTH_ATTACHMENT : attachment;
+      const a = fbo.attachments.get(point);
+      if (attachment === GL2.DEPTH_STENCIL_ATTACHMENT) {
+        const s = fbo.attachments.get(GL2.STENCIL_ATTACHMENT);
+        if (a && s && (a.type !== s.type || a.name !== s.name)) {
+          fail2(c, GL2.INVALID_OPERATION);
+          return null;
+        }
+      }
+      if (pname === 36048) return a ? a.type : GL2.NONE;
+      if (!a) {
+        if (pname === 36049) return 0;
+        fail2(c, GL2.INVALID_OPERATION);
+        return null;
+      }
+      if (pname === 36049) return a.name;
+      if (a.type === GL2.TEXTURE) {
+        if (pname === 36050) return a.level;
+        if (pname === 36051) {
+          const texture = c.group.textures.get(a.name);
+          return texture && texture.target === GL2.TEXTURE_CUBE_MAP ? GL2.TEXTURE_CUBE_MAP_POSITIVE_X + a.face : 0;
+        }
+        if (pname === 36052) return a.layer || 0;
+      }
+      const image = attachment_image(c, a);
+      const info = image && image.info;
+      const bits = info ? info.bits : [0, 0, 0, 0, 0, 0];
+      if (pname >= 33298 && pname <= 33303) return bits[pname - 33298];
+      if (pname === 33297) {
+        if (attachment === GL2.DEPTH_STENCIL_ATTACHMENT) {
+          fail2(c, GL2.INVALID_OPERATION);
+          return null;
+        }
+        return info ? point === GL2.STENCIL_ATTACHMENT ? F.UNSIGNED_INT : component_type(info) : GL2.NONE;
+      }
+      if (pname === 33296) return info && info.srgb ? F.SRGB : F.LINEAR;
+      fail2(c, GL2.INVALID_ENUM);
+      return null;
+    }
+    function invalidate(c, target, n, attachments, width, height) {
+      const fb = framebuffer_of(c, target);
+      if (fb < 0) return fail2(c, GL2.INVALID_ENUM);
+      if (n < 0 || width < 0 || height < 0) return fail2(c, GL2.INVALID_VALUE);
+      for (const a of i32s2(attachments).slice(0, n)) {
+        if (fb ? !attachment_ok(a) && !(a >= GL2.COLOR_ATTACHMENT0 && a < GL2.COLOR_ATTACHMENT0 + 32) : ![6144, 6145, 6146].includes(a)) {
+          return fail2(c, GL2.INVALID_ENUM);
+        }
+        if (fb && a >= GL2.COLOR_ATTACHMENT0 + LIMITS3.MAX_COLOR_ATTACHMENTS && a < GL2.COLOR_ATTACHMENT0 + 32) return fail2(c, GL2.INVALID_OPERATION);
+      }
+      return void 0;
+    }
+    H.helpers = {
+      target_ok,
+      buffer_binding,
+      set_buffer_binding,
+      bound_buffer3,
+      generated,
+      new_buffer,
+      current_tf,
+      program_of,
+      status_of,
+      complete,
+      uniform3,
+      bound_texture3,
+      attachment_image,
+      draw_checks,
+      tf_bound_active,
+      put64,
+      get_attrib3,
+      attrib3,
+      bytes_of
+    };
+    return H;
+  }
+  function state_value3(shadow, c, pname) {
+    const L = LIMITS3;
+    const tf = c.tfs.get(c.tf);
+    const fbo = c.framebuffer && c.framebuffers.get(c.framebuffer);
+    switch (pname) {
+      case 32936:
+      case 32937: {
+        if (!fbo) return null;
+        let samples = 0;
+        for (const a of fbo.attachments.values()) {
+          const rb = a.type === 36161 ? c.group.renderbuffers.get(a.name) : null;
+          const texture = a.type === 36161 ? null : c.group.textures.get(a.name);
+          const image = texture && texture.images.get(a.face * 32 + a.level);
+          samples = Math.max(samples, rb ? rb.samples || 0 : image ? image.samples || 0 : 0);
+        }
+        return [pname === 32937 ? samples : samples > 0 ? 1 : 0];
+      }
+      // (GLES 3.1's minimums, which GLES 3.0's contexts have too: GL_STATE's are GLES 2.0's)
+      case 35661:
+        return [MAX_UNITS];
+      // GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS
+      case 36349:
+        return [L.MAX_FRAGMENT_UNIFORM_COMPONENTS / 4];
+      // GL_MAX_FRAGMENT_UNIFORM_VECTORS
+      case 33307:
+        return [3];
+      // GL_MAJOR_VERSION
+      case 33308:
+        return [c.version % 10];
+      // GL_MINOR_VERSION
+      case 33309:
+        return [shadow.extensions3(c).length];
+      // GL_NUM_EXTENSIONS
+      case 34814:
+        return [0];
+      // GL_NUM_PROGRAM_BINARY_FORMATS
+      case 34815:
+        return [];
+      // GL_PROGRAM_BINARY_FORMATS
+      case 32883:
+        return [L.MAX_3D_TEXTURE_SIZE];
+      case 35071:
+        return [L.MAX_ARRAY_TEXTURE_LAYERS];
+      case 36063:
+        return [L.MAX_COLOR_ATTACHMENTS];
+      case 34852:
+        return [L.MAX_DRAW_BUFFERS];
+      case 36183:
+        return [L.MAX_SAMPLES];
+      case 35375:
+        return [L.MAX_UNIFORM_BUFFER_BINDINGS];
+      case 35376:
+        return [L.MAX_UNIFORM_BLOCK_SIZE];
+      case 35371:
+        return [L.MAX_VERTEX_UNIFORM_BLOCKS];
+      case 35373:
+        return [L.MAX_FRAGMENT_UNIFORM_BLOCKS];
+      case 35374:
+        return [L.MAX_COMBINED_UNIFORM_BLOCKS];
+      case 35377:
+        return [L.MAX_VERTEX_UNIFORM_COMPONENTS + L.MAX_VERTEX_UNIFORM_BLOCKS * L.MAX_UNIFORM_BLOCK_SIZE / 4];
+      case 35379:
+        return [L.MAX_FRAGMENT_UNIFORM_COMPONENTS + L.MAX_FRAGMENT_UNIFORM_BLOCKS * L.MAX_UNIFORM_BLOCK_SIZE / 4];
+      case 35380:
+        return [L.UNIFORM_BUFFER_OFFSET_ALIGNMENT];
+      case 35978:
+        return [L.MAX_TRANSFORM_FEEDBACK_INTERLEAVED_COMPONENTS];
+      case 35979:
+        return [L.MAX_TRANSFORM_FEEDBACK_SEPARATE_ATTRIBS];
+      case 35968:
+        return [L.MAX_TRANSFORM_FEEDBACK_SEPARATE_COMPONENTS];
+      case 37154:
+        return [L.MAX_VERTEX_OUTPUT_COMPONENTS];
+      case 37157:
+        return [L.MAX_FRAGMENT_INPUT_COMPONENTS];
+      case 35658:
+        return [L.MAX_VERTEX_UNIFORM_COMPONENTS];
+      case 35657:
+        return [L.MAX_FRAGMENT_UNIFORM_COMPONENTS];
+      case 35659:
+        return [L.MAX_VARYING_COMPONENTS];
+      case 36203:
+        return [L.MAX_ELEMENT_INDEX];
+      case 33e3:
+      case 33001:
+        return [2147483647];
+      // GL_MAX_ELEMENTS_VERTICES, _INDICES
+      case 35077:
+        return [L.MAX_PROGRAM_TEXEL_OFFSET];
+      case 35076:
+        return [L.MIN_PROGRAM_TEXEL_OFFSET];
+      case 34045:
+        return [L.MAX_TEXTURE_LOD_BIAS];
+      case 37137:
+        return [0];
+      // GL_MAX_SERVER_WAIT_TIMEOUT
+      case 36662:
+        return [c.buffers.copy_read];
+      case 36663:
+        return [c.buffers.copy_write];
+      case 35053:
+        return [c.buffers.pixel_pack];
+      case 35055:
+        return [c.buffers.pixel_unpack];
+      case 35368:
+        return [c.buffers.uniform];
+      case 35983:
+        return [c.buffers.transform_feedback];
+      case 36389:
+        return [c.tf];
+      case 36388:
+        return [tf.active ? 1 : 0];
+      case 36387:
+        return [tf.paused ? 1 : 0];
+      case 34229:
+        return [c.vao];
+      case 35097:
+        return [c.samplers[c.active_texture]];
+      case 32874:
+        return [c.textures[c.active_texture][SLOT.TEXTURE_3D]];
+      case 35869:
+        return [c.textures[c.active_texture][SLOT.TEXTURE_2D_ARRAY]];
+      case 36010:
+        return [c.read_framebuffer];
+      case 3074:
+        return [c.read_framebuffer ? c.framebuffers.get(c.read_framebuffer).read_buffer : c.default_read_buffer];
+      case 3314:
+        return [c.unpack.row_length];
+      case 32878:
+        return [c.unpack.image_height];
+      case 3316:
+        return [c.unpack.skip_pixels];
+      case 3315:
+        return [c.unpack.skip_rows];
+      case 32877:
+        return [c.unpack.skip_images];
+      case 3330:
+        return [c.pack.row_length];
+      case 3332:
+        return [c.pack.skip_pixels];
+      case 3331:
+        return [c.pack.skip_rows];
+      case 35977:
+        return [c.enabled.has(35977) ? 1 : 0];
+      case 36201:
+        return [c.enabled.has(36201) ? 1 : 0];
+      case 35723:
+        return [c.hints.get(35723)];
+      case 34024:
+        return [L.MAX_TEXTURE_SIZE];
+      // GL_MAX_RENDERBUFFER_SIZE
+      // (GLES 3.2's: ASTC's too)
+      case 34466:
+        return [(c.version >= 32 ? COMPRESSED_TEXTURE_FORMATS_32 : COMPRESSED_TEXTURE_FORMATS_3).length];
+      case 34467:
+        return c.version >= 32 ? COMPRESSED_TEXTURE_FORMATS_32 : COMPRESSED_TEXTURE_FORMATS_3;
+      case 35738:
+      case 35739: {
+        const info = shadow.read_info3(c);
+        if (!info) {
+          shadow.read_error3 = true;
+          return null;
+        }
+        return [pname === 35739 ? info[0] : info[1]];
+      }
+    }
+    if (pname >= 34853 && pname < 34853 + L.MAX_DRAW_BUFFERS) {
+      const i = pname - 34853;
+      return [fbo ? fbo.draw_buffers[i] : i === 0 ? c.default_draw_buffer : 0];
+    }
+    return null;
+  }
+  var INT64_STATE = /* @__PURE__ */ new Set([36203, 37137, 35376, 35377, 35379]);
+
+  // src/gles/gles31_state.js
+  var GL31 = {
+    SHADER_STORAGE_BUFFER: 37074,
+    ATOMIC_COUNTER_BUFFER: 37568,
+    DISPATCH_INDIRECT_BUFFER: 37102,
+    DRAW_INDIRECT_BUFFER: 36671,
+    TEXTURE_2D_MULTISAMPLE: 37120,
+    COMPUTE_SHADER: 37305,
+    PROGRAM_SEPARABLE: 33368,
+    READ_ONLY: 35e3,
+    WRITE_ONLY: 35001,
+    READ_WRITE: 35002,
+    ALL_BARRIER_BITS: 4294967295,
+    VERTEX_SHADER_BIT: 1,
+    FRAGMENT_SHADER_BIT: 2,
+    COMPUTE_SHADER_BIT: 32
+  };
+  var LIMITS31 = {
+    MAX_COMPUTE_WORK_GROUP_COUNT: [65535, 65535, 65535],
+    MAX_COMPUTE_WORK_GROUP_SIZE: [128, 128, 64],
+    MAX_COMPUTE_WORK_GROUP_INVOCATIONS: 128,
+    MAX_COMPUTE_SHARED_MEMORY_SIZE: 16384,
+    MAX_COMPUTE_UNIFORM_BLOCKS: 12,
+    MAX_COMPUTE_TEXTURE_IMAGE_UNITS: 16,
+    MAX_COMPUTE_UNIFORM_COMPONENTS: 1024,
+    MAX_COMPUTE_ATOMIC_COUNTER_BUFFERS: 1,
+    MAX_COMPUTE_ATOMIC_COUNTERS: 8,
+    MAX_COMPUTE_IMAGE_UNIFORMS: 4,
+    MAX_COMPUTE_SHADER_STORAGE_BLOCKS: 4,
+    MAX_UNIFORM_LOCATIONS: 1024,
+    MAX_FRAMEBUFFER_WIDTH: 4096,
+    MAX_FRAMEBUFFER_HEIGHT: 4096,
+    MAX_FRAMEBUFFER_SAMPLES: 4,
+    MAX_VERTEX_ATOMIC_COUNTER_BUFFERS: 0,
+    MAX_FRAGMENT_ATOMIC_COUNTER_BUFFERS: 0,
+    MAX_COMBINED_ATOMIC_COUNTER_BUFFERS: 1,
+    MAX_VERTEX_ATOMIC_COUNTERS: 0,
+    MAX_FRAGMENT_ATOMIC_COUNTERS: 0,
+    MAX_COMBINED_ATOMIC_COUNTERS: 8,
+    MAX_ATOMIC_COUNTER_BUFFER_SIZE: 32,
+    MAX_ATOMIC_COUNTER_BUFFER_BINDINGS: 4,
+    MAX_VERTEX_IMAGE_UNIFORMS: 0,
+    MAX_FRAGMENT_IMAGE_UNIFORMS: 0,
+    MAX_COMBINED_IMAGE_UNIFORMS: 4,
+    MAX_IMAGE_UNITS: 4,
+    MAX_VERTEX_SHADER_STORAGE_BLOCKS: 0,
+    MAX_FRAGMENT_SHADER_STORAGE_BLOCKS: 0,
+    MAX_COMBINED_SHADER_STORAGE_BLOCKS: 4,
+    MAX_SHADER_STORAGE_BUFFER_BINDINGS: 8,
+    MAX_SHADER_STORAGE_BLOCK_SIZE: 1 << 27,
+    SHADER_STORAGE_BUFFER_OFFSET_ALIGNMENT: 256,
+    MAX_COMBINED_SHADER_OUTPUT_RESOURCES: 4,
+    MAX_VERTEX_ATTRIB_RELATIVE_OFFSET: 2047,
+    MAX_VERTEX_ATTRIB_BINDINGS: 16,
+    MAX_VERTEX_ATTRIB_STRIDE: 2048,
+    MAX_SAMPLE_MASK_WORDS: 1,
+    MAX_COLOR_TEXTURE_SAMPLES: 4,
+    MAX_DEPTH_TEXTURE_SAMPLES: 4,
+    MAX_INTEGER_SAMPLES: 4,
+    MIN_PROGRAM_TEXTURE_GATHER_OFFSET: -8,
+    MAX_PROGRAM_TEXTURE_GATHER_OFFSET: 7
+  };
+  var IMAGE_FORMATS = /* @__PURE__ */ new Set([34836, 34842, 33326, 36208, 36214, 36220, 33334, 36226, 36232, 36238, 33333, 32856, 36759]);
+  var SAMPLE_POSITIONS_4 = [[0.375, 0.125], [0.875, 0.375], [0.125, 0.625], [0.625, 0.875]];
+  var MAX_ATTRIBS2 = 16;
+  function pad_context31(c) {
+    while (c.storage_bindings.length < LIMITS31.MAX_SHADER_STORAGE_BUFFER_BINDINGS) c.storage_bindings.push({ buffer: 0, offset: 0, size: 0 });
+    while (c.atomic_bindings.length < LIMITS31.MAX_ATOMIC_COUNTER_BUFFER_BINDINGS) c.atomic_bindings.push({ buffer: 0, offset: 0, size: 0 });
+  }
+  function extend_context31(c) {
+    const bindings = (n) => Array.from({ length: n }, () => ({ buffer: 0, offset: 0, size: 0 }));
+    c.storage_bindings = bindings(LIMITS31.MAX_SHADER_STORAGE_BUFFER_BINDINGS);
+    c.atomic_bindings = bindings(LIMITS31.MAX_ATOMIC_COUNTER_BUFFER_BINDINGS);
+    c.image_units = Array.from({ length: LIMITS31.MAX_IMAGE_UNITS }, () => ({
+      texture: 0,
+      level: 0,
+      layered: false,
+      layer: 0,
+      access: GL31.READ_ONLY,
+      format: 33334
+    }));
+    c.program_pipelines = /* @__PURE__ */ new Map();
+    c.program_pipeline = 0;
+    c.reserved3.pipeline = /* @__PURE__ */ new Set();
+    c.next3.pipeline = 1;
+    c.sample_mask = 4294967295;
+  }
+  function vertex_bindings(c) {
+    const vao = c.vao ? c.vaos.get(c.vao) : c.default_vao;
+    if (!vao.bindings) {
+      vao.bindings = vao.attribs.map((a) => ({ buffer: a.buffer, offset: a.offset, stride: a.stride || element_bytes(a), divisor: a.divisor }));
+      vao.attribs.forEach((a, i) => {
+        a.binding = i;
+        a.relative_offset = 0;
+      });
+    }
+    return vao.bindings;
+  }
+  function element_bytes(a) {
+    return a.type === 33640 || a.type === 36255 ? 4 : a.size * ({ 5120: 1, 5121: 1, 5122: 2, 5123: 2, 5131: 2, 36193: 2 }[a.type] || 4);
+  }
+  function follow_binding(c, index) {
+    const bindings = vertex_bindings(c);
+    const b = bindings[index];
+    c.attribs.forEach((a) => {
+      if (a.binding !== index) return;
+      a.buffer = b.buffer;
+      a.offset = b.offset + (a.relative_offset || 0);
+      a.stride = b.stride;
+      a.divisor = b.divisor;
+    });
+  }
+  var INTERFACES = {
+    UNIFORM: 37601,
+    UNIFORM_BLOCK: 37602,
+    PROGRAM_INPUT: 37603,
+    PROGRAM_OUTPUT: 37604,
+    BUFFER_VARIABLE: 37605,
+    SHADER_STORAGE_BLOCK: 37606,
+    ATOMIC_COUNTER_BUFFER: 37568,
+    TRANSFORM_FEEDBACK_VARYING: 37620
+  };
+  var MATRICES = {
+    35674: [2, 2],
+    35675: [3, 3],
+    35676: [4, 4],
+    35685: [2, 3],
+    35686: [2, 4],
+    35687: [3, 2],
+    35688: [3, 4],
+    35689: [4, 2],
+    35690: [4, 3]
+  };
+  var REFERENCED = { 37638: 1 << 0, 37642: 1 << 4, 37643: 1 << 5 };
+  function resources(program, iface) {
+    const info = program.info;
+    if (!info || !info.ok) return [];
+    const reflection = info.reflection || {};
+    const stages = (s) => Object.fromEntries(Object.entries(REFERENCED).map(([p, bit]) => [p, s & bit ? 1 : 0]));
+    const array_name = (name, size) => size > 1 && !name.endsWith("]") ? name + "[0]" : name;
+    switch (iface) {
+      case INTERFACES.UNIFORM: {
+        const counter_buffers = [...atomic_buffers(info).keys()];
+        return info.uniforms.map((u) => {
+          const atomic = u.opaque === "atomic", in_buffer = u.block_index >= 0 || atomic;
+          return { name: array_name(u.name, u.size), props: Object.assign({
+            37626: u.type,
+            37627: u.size,
+            37628: in_buffer ? u.offset : -1,
+            37629: u.block_index,
+            37630: in_buffer ? u.array_stride || 0 : -1,
+            37631: in_buffer ? u.matrix_stride || 0 : -1,
+            37632: u.row_major ? 1 : 0,
+            37633: atomic ? counter_buffers.indexOf(u.binding) : -1,
+            37646: in_buffer ? -1 : u.location
+          }, stages(u.stages)) };
+        });
+      }
+      case INTERFACES.UNIFORM_BLOCK:
+        return (info.blocks || []).map((b, i) => ({ name: b.name, props: Object.assign({
+          37634: program.block_bindings ? program.block_bindings[i] : b.binding,
+          37635: b.size,
+          37636: b.members.length,
+          37637: b.members
+        }, stages(b.stages)) }));
+      case INTERFACES.SHADER_STORAGE_BLOCK: {
+        const blocks = reflection.bufferBlocks || [];
+        const array_of = (k) => blocks[k] ? blocks[k].name.replace(/(?:\[\d+\])+$/, "") : null;
+        return (info.storage_blocks || []).map((b, i) => {
+          const element = !!blocks[i] && blocks[i].name.endsWith("]");
+          const members = (reflection.bufferVariables || []).map((v, k) => [v, k]).filter(([v]) => v.index === i || element && array_of(v.index) === array_of(i)).map(([, k]) => k);
+          const block = blocks[i] || {};
+          return { name: b.name, props: Object.assign({
+            37634: program.storage_bindings ? program.storage_bindings[i] : b.binding,
+            37635: b.size,
+            37636: members.length,
+            37637: members
+          }, stages(block.stages || 0)) };
+        });
+      }
+      case INTERFACES.BUFFER_VARIABLE:
+        return (reflection.bufferVariables || []).map((v) => {
+          const own_array = /^(?:\w+\.)?\w+\[0\]$/.test(array_name(v.name, v.size));
+          const unsized = own_array && v.topLevelArraySize === 0;
+          const block = (reflection.bufferBlocks || [])[v.index];
+          const prefix = block ? block.name.replace(/\[\d+\]$/, "") + "." : "";
+          const top_array = /^\w+\[/.test(prefix && v.name.startsWith(prefix) ? v.name.slice(prefix.length) : v.name);
+          const top_level = own_array || !top_array;
+          const matrix = MATRICES[v.type];
+          const vector = matrix ? v.rowMajor ? matrix[0] : matrix[1] : 0;
+          const matrix_stride = !matrix ? 0 : v.packing === "std140" || vector > 2 ? 16 : 8;
+          return { name: array_name(v.name, v.size), props: Object.assign({
+            37626: v.type,
+            37627: unsized ? 0 : Math.max(0, v.size),
+            37628: v.offset,
+            37629: v.index,
+            37630: v.arrayStride || 0,
+            37631: v.matrixStride || matrix_stride,
+            37632: v.rowMajor && matrix ? 1 : 0,
+            37644: top_level || v.topLevelArraySize === void 0 ? 1 : v.topLevelArraySize,
+            37645: top_level ? 0 : v.topLevelArrayStride || 0
+          }, stages(v.stages || 0)) };
+        });
+      case INTERFACES.PROGRAM_INPUT:
+        return (reflection.inputs || []).filter((i) => i.stages & (info.spirv && info.spirv.some((m) => m.stage === "vertex") ? 1 : 1 << 4)).map((i) => ({ name: array_name(i.name, i.size), props: Object.assign({
+          37626: i.type,
+          37627: Math.max(1, i.size),
+          37646: i.builtIn ? -1 : (info.attributes.find((a) => a.name === i.name) || { location: i.location }).location
+        }, stages(i.stages || 0)) }));
+      case INTERFACES.PROGRAM_OUTPUT: {
+        const fragment = !info.spirv || info.spirv.some((m) => m.stage === "fragment");
+        return (reflection.outputs || []).map((o) => ({ name: array_name(o.name, o.size), props: Object.assign({
+          37626: o.type,
+          37627: Math.max(1, o.size),
+          37646: o.builtIn ? -1 : fragment ? Math.max(0, o.location) : o.location
+        }, stages(o.stages || 0)) }));
+      }
+      case INTERFACES.TRANSFORM_FEEDBACK_VARYING:
+        return (info.tf_varyings || []).map((v) => ({ name: v.name, props: { 37626: v.type, 37627: v.size } }));
+      case INTERFACES.ATOMIC_COUNTER_BUFFER:
+        return [...atomic_buffers(info)].map(([binding, b]) => ({ name: "", props: Object.assign({
+          37634: binding,
+          37635: b.size,
+          37636: b.members.length,
+          37637: b.members
+        }, stages(b.stages)) }));
+    }
+    return null;
+  }
+  function atomic_buffers(info) {
+    const buffers = /* @__PURE__ */ new Map();
+    info.uniforms.forEach((u, k) => {
+      if (u.opaque !== "atomic") return;
+      if (!buffers.has(u.binding)) buffers.set(u.binding, { members: [], size: (info.counter_buffers || {})[u.binding] || 0, stages: 0 });
+      const b = buffers.get(u.binding);
+      b.members.push(k);
+      b.size = Math.max(b.size, Math.max(0, u.offset) + 4 * u.size);
+      b.stages |= u.stages;
+    });
+    return buffers;
+  }
+  function gles31_handlers(h, H3) {
+    const { fail: fail2, query: query2, put: put2, put_text: put_text2, i32s: i32s2, f32s: f32s2, text_of: text_of2, REFUSED: REFUSED2, base, initial_values: initial_values2 } = h;
+    const { bound_buffer3, generated, new_buffer, current_tf, program_of, put64, get_attrib3, status_of } = H3.helpers;
+    const GL2 = GL3;
+    const stage_program = (c, stage_bit) => {
+      if (c.program) return c.group.objects.get(c.program) || null;
+      const pipeline = c.program_pipelines.get(c.program_pipeline);
+      const name = pipeline && pipeline.stages[stage_bit];
+      return name ? c.group.objects.get(name) || null : null;
+    };
+    const written = (c, programs) => {
+      const info = programs.map((p) => p && p.info).filter(Boolean);
+      if (info.some((i) => (i.storage_blocks || []).length)) for (const b of c.storage_bindings) mark(c, b.buffer);
+      if (info.some((i) => i.uniforms.some((u) => u.opaque === "atomic"))) for (const b of c.atomic_bindings) mark(c, b.buffer);
+    };
+    const mark = (c, name) => {
+      const buffer = name && c.group.buffers.get(name);
+      if (buffer) buffer.gpu_newer = true;
+    };
+    const on_program = (c, name, run) => {
+      const saved = c.program;
+      c.program = name;
+      try {
+        return run();
+      } finally {
+        c.program = saved;
+      }
+    };
+    const draw31 = (handler) => (shadow, c, args) => {
+      if (pipeline_refused(c)) return fail2(c, GL2.INVALID_OPERATION);
+      const r = handler(shadow, c, args);
+      if (r !== REFUSED2) written(c, [stage_program(c, GL31.VERTEX_SHADER_BIT), stage_program(c, GL31.FRAGMENT_SHADER_BIT)]);
+      return r;
+    };
+    const indirect = (shadow, c, mode, type, data, offset, elements) => {
+      if (![0, 1, 2, 3, 4, 5, 6].includes(mode) || elements && ![5121, 5123, 5125].includes(type)) return fail2(c, GL2.INVALID_ENUM);
+      if (!c.vao) return fail2(c, GL2.INVALID_OPERATION);
+      if (elements && !c.element_array_buffer) return fail2(c, GL2.INVALID_OPERATION);
+      if (current_tf(c).active && !current_tf(c).paused || pipeline_refused(c)) return fail2(c, GL2.INVALID_OPERATION);
+      if (offset !== void 0) {
+        const buffer = c.group.buffers.get(c.buffers.draw_indirect);
+        if (!buffer) return fail2(c, GL2.INVALID_OPERATION);
+        if (offset % 4) return fail2(c, GL2.INVALID_VALUE);
+        if (offset + (elements ? 20 : 16) > buffer.size || buffer.mapped) return fail2(c, GL2.INVALID_OPERATION);
+      }
+      if (!H3.helpers.complete(c, false)) return REFUSED2;
+      written(c, [stage_program(c, GL31.VERTEX_SHADER_BIT), stage_program(c, GL31.FRAGMENT_SHADER_BIT)]);
+      void data;
+      return void 0;
+    };
+    const indexed31 = (shadow, c, [target, index, data], as) => {
+      query2(shadow);
+      const list = (bindings, field) => {
+        if (index >= bindings.length) {
+          fail2(c, GL2.INVALID_VALUE);
+          return null;
+        }
+        return [bindings[index][field]];
+      };
+      let value;
+      switch (target) {
+        case 37075:
+          value = list(c.storage_bindings, "buffer");
+          break;
+        case 37076:
+          value = list(c.storage_bindings, "offset");
+          break;
+        case 37077:
+          value = list(c.storage_bindings, "size");
+          break;
+        case 37569:
+          value = list(c.atomic_bindings, "buffer");
+          break;
+        case 37570:
+          value = list(c.atomic_bindings, "offset");
+          break;
+        case 37571:
+          value = list(c.atomic_bindings, "size");
+          break;
+        case 36666:
+          value = list(c.image_units, "texture");
+          break;
+        case 36667:
+          value = list(c.image_units, "level");
+          break;
+        case 36668:
+          value = list(c.image_units, "layered");
+          if (value) value = [value[0] ? 1 : 0];
+          break;
+        case 36669:
+          value = list(c.image_units, "layer");
+          break;
+        case 36670:
+          value = list(c.image_units, "access");
+          break;
+        case 36974:
+          value = list(c.image_units, "format");
+          break;
+        case 36687:
+          value = list(vertex_bindings(c), "buffer");
+          break;
+        case 33495:
+          value = list(vertex_bindings(c), "offset");
+          break;
+        case 33496:
+          value = list(vertex_bindings(c), "stride");
+          break;
+        case 33494:
+          value = list(vertex_bindings(c), "divisor");
+          break;
+        case 37310:
+          value = index < 3 ? [LIMITS31.MAX_COMPUTE_WORK_GROUP_COUNT[index]] : (fail2(c, GL2.INVALID_VALUE), null);
+          break;
+        case 37311:
+          value = index < 3 ? [LIMITS31.MAX_COMPUTE_WORK_GROUP_SIZE[index]] : (fail2(c, GL2.INVALID_VALUE), null);
+          break;
+        case 36434:
+          value = index < 1 ? [c.sample_mask | 0] : (fail2(c, GL2.INVALID_VALUE), null);
+          break;
+        default:
+          H3[as === "64" ? "glGetInteger64i_v" : as === "b" ? "glGetBooleani_v" : "glGetIntegeri_v"](shadow, c, [target, index, data]);
+          return;
+      }
+      if (!value) return;
+      if (as === "64") put64(data, value);
+      else if (as === "b") put2(data, value.map((v) => v ? 1 : 0), "b", "b");
+      else put2(data, value, "i", "i");
+    };
+    const own_cap = (c, cap) => cap === 36433 || c.version >= 32 && (cap === 35894 || cap === 37600 || cap === 33346);
+    const NOT_HERE = /* @__PURE__ */ Symbol("GLES 3.0's");
+    const bind_indexed31 = (shadow, c, target, index, name, offset, size, range) => {
+      const storage = target === GL31.SHADER_STORAGE_BUFFER;
+      if (!storage && target !== GL31.ATOMIC_COUNTER_BUFFER) return NOT_HERE;
+      const list = storage ? c.storage_bindings : c.atomic_bindings;
+      if (index >= list.length) return fail2(c, GL2.INVALID_VALUE);
+      if (range && name && (size <= 0 || offset < 0)) return fail2(c, GL2.INVALID_VALUE);
+      if (range && name && (storage ? offset % LIMITS31.SHADER_STORAGE_BUFFER_OFFSET_ALIGNMENT : offset % 4)) return fail2(c, GL2.INVALID_VALUE);
+      if (name && !c.group.buffers.has(name)) c.group.buffers.set(name, new_buffer());
+      list[index] = { buffer: name, offset: range ? offset : 0, size: range ? size : 0 };
+      c.buffers[storage ? "shader_storage" : "atomic_counter"] = name;
+      return void 0;
+    };
+    const program_uniform = (uniform2) => (shadow, c, [p, ...args]) => {
+      const program = program_of(c, p);
+      if (!program) return REFUSED2;
+      return on_program(c, p, () => H3[uniform2](shadow, c, args));
+    };
+    const uniform31 = (uniform2) => (shadow, c, args) => {
+      if (c.program || !c.program_pipeline) return H3[uniform2](shadow, c, args);
+      const pipeline = c.program_pipelines.get(c.program_pipeline);
+      return on_program(c, pipeline ? pipeline.active : 0, () => H3[uniform2](shadow, c, args));
+    };
+    const pipeline_of = (shadow, c, name, make) => {
+      let pipeline = c.program_pipelines.get(name);
+      if (!pipeline && make && name && generated(shadow, c.reserved3.pipeline, name)) {
+        c.program_pipelines.set(name, pipeline = { stages: {}, active: 0, log: "", valid: false });
+      }
+      return pipeline || null;
+    };
+    const pipeline_problem = (c, pipeline) => {
+      const programs = Object.entries(pipeline.stages).filter(([, p]) => p).map(([bit, p]) => [+bit, c.group.objects.get(p)]);
+      const problem = !programs.length ? "no program" : programs.some(([, p]) => !p || !p.info || !p.info.ok) ? "a program is not linked" : programs.some(([, p]) => !p.separable) ? "a program is not separable" : !!pipeline.stages[GL31.VERTEX_SHADER_BIT] !== !!pipeline.stages[GL31.FRAGMENT_SHADER_BIT] && !pipeline.stages[GL31.COMPUTE_SHADER_BIT] ? "a vertex shader without a fragment shader, or the other way" : "";
+      const vertex = pipeline.stages[GL31.VERTEX_SHADER_BIT], fragment = pipeline.stages[GL31.FRAGMENT_SHADER_BIT];
+      if (problem || !vertex || !fragment || vertex === fragment) return problem;
+      const all_outputs = (c.group.objects.get(vertex).info.reflection || {}).outputs || [];
+      if (!all_outputs.length) return "";
+      const outputs = all_outputs.filter((o) => !o.builtIn);
+      const inputs = ((c.group.objects.get(fragment).info.reflection || {}).inputs || []).filter((x) => !x.builtIn);
+      const match = (x, list) => x.location >= 0 ? list.find((y) => y.location === x.location) : list.find((y) => y.name === x.name && !(y.location >= 0));
+      for (const i of inputs) {
+        const o = match(i, outputs);
+        if (!o) return "the fragment shader's input " + i.name + " is no output of the vertex shader";
+        if (o.location >= 0 !== i.location >= 0) return "the fragment shader's input " + i.name + " has a location, the output not, or the other way";
+        if (o.type !== i.type || o.size !== i.size || !!o.flat !== !!i.flat) return "the fragment shader's input " + i.name + " and its output differ";
+      }
+      const unread = outputs.find((o) => !match(o, inputs));
+      return unread ? "the vertex shader's output " + unread.name + " is no input of the fragment shader" : "";
+    };
+    const validate = (c, pipeline) => {
+      const problem = pipeline_problem(c, pipeline);
+      pipeline.valid = !problem;
+      pipeline.log = problem;
+      return !problem;
+    };
+    const pipeline_refused = (c) => {
+      const pipeline = !c.program && c.program_pipeline && c.program_pipelines.get(c.program_pipeline);
+      return !!pipeline && !!pipeline_problem(c, pipeline);
+    };
+    const H = {
+      // (GLES 3.1's capability: the sample mask; GLES 3.2's: sample shading, KHR_debug's output)
+      "glEnable": (shadow, c, [cap]) => own_cap(c, cap) ? void c.enabled.add(cap) : H3["glEnable"](shadow, c, [cap]),
+      "glDisable": (shadow, c, [cap]) => own_cap(c, cap) ? void c.enabled.delete(cap) : H3["glDisable"](shadow, c, [cap]),
+      "glIsEnabled": (shadow, c, [cap]) => {
+        if (!own_cap(c, cap)) return H3["glIsEnabled"](shadow, c, [cap]);
+        query2(shadow);
+        return c.enabled.has(cap) ? 1 : 0;
+      },
+      "glCreateShader": (shadow, c, [type]) => {
+        const own = type === GL31.COMPUTE_SHADER || c.version >= 32 && STAGES32.includes(type);
+        if (!own) return base["glCreateShader"](shadow, c, [type]);
+        const name = shadow.given_name || c.group.fresh("object", c.group.objects);
+        c.group.objects.set(name, { kind: "shader", type, source: null, compiled: null, compiled_source: null, deleted: false, attached: 0 });
+        return name;
+      },
+      "glProgramParameteri": (shadow, c, [p, pname, value]) => {
+        if (pname !== GL31.PROGRAM_SEPARABLE) return H3["glProgramParameteri"](shadow, c, [p, pname, value]);
+        const program = program_of(c, p);
+        if (!program) return REFUSED2;
+        if (value !== 0 && value !== 1) return fail2(c, GL2.INVALID_VALUE);
+        program.separable = !!value;
+        return void 0;
+      },
+      "glGetProgramiv": (shadow, c, [p, pname, params]) => {
+        const geometry = c.version >= 32 && GEOMETRY_QUERIES.has(pname), tessellation = c.version >= 32 && TESSELLATION_QUERIES.has(pname);
+        if (![GL31.PROGRAM_SEPARABLE, 37593, 33383].includes(pname) && !geometry && !tessellation) return H3["glGetProgramiv"](shadow, c, [p, pname, params]);
+        query2(shadow);
+        const program = program_of(c, p);
+        if (!program) return void 0;
+        const info = program.info && program.info.ok ? program.info : null;
+        if (geometry) {
+          if (!info || !info.geometry) return void fail2(c, GL2.INVALID_OPERATION);
+          put2(params, [info.geometry[GEOMETRY_QUERIES.get(pname)]], "i", "i");
+        } else if (tessellation) {
+          const t = info && info.tessellation;
+          if (!t || !(pname === 36469 ? t.control : t.evaluation)) return void fail2(c, GL2.INVALID_OPERATION);
+          put2(params, [t[TESSELLATION_QUERIES.get(pname)]], "i", "i");
+        } else if (pname === GL31.PROGRAM_SEPARABLE) put2(params, [program.separable ? 1 : 0], "i", "i");
+        else if (pname === 37593) put2(params, [info ? new Set(info.uniforms.filter((u) => u.opaque === "atomic").map((u) => u.binding)).size : 0], "i", "i");
+        else if (!info || !(info.local_size && info.local_size.some(Boolean))) fail2(c, GL2.INVALID_OPERATION);
+        else put2(params, info.local_size.slice(0, 3), "i", "i");
+        return void 0;
+      },
+      "glCreateShaderProgramvAEMU": (shadow, c, [type, count, packed]) => {
+        if (type !== 35633 && type !== 35632 && type !== GL31.COMPUTE_SHADER) {
+          fail2(c, GL2.INVALID_ENUM);
+          return 0;
+        }
+        if (count < 0) {
+          fail2(c, GL2.INVALID_VALUE);
+          return 0;
+        }
+        const name = shadow.given_name || c.group.fresh("object", c.group.objects);
+        const source = text_of2(packed);
+        const program = {
+          kind: "program",
+          shaders: /* @__PURE__ */ new Set(),
+          bindings: /* @__PURE__ */ new Map(),
+          info: null,
+          linked_once: true,
+          validated: 0,
+          deleted: false,
+          values: /* @__PURE__ */ new Map(),
+          separable: true
+        };
+        c.group.objects.set(name, program);
+        const compiled = shadow.compile(source, type, c.glslang);
+        if (shadow.pending_links && shadow.pending_links.has(name)) {
+          program.provided = shadow.pending_links.get(name);
+          shadow.pending_links.delete(name);
+        }
+        program.info = compiled.ok ? shadow.link(program, [{ type, compiled, compiled_source: source }]) : { ok: false, log: compiled.log, attributes: [], uniforms: [], locations: /* @__PURE__ */ new Map(), by_location: [], reflection: null };
+        program.link = { vs: null, fs: null, bindings: [], glslang: true, shaders: [[type, source]], separable: true, tf: null };
+        program.keep_info = !shadow.glslang;
+        program.values = initial_values2(program.info);
+        return name;
+      },
+      // ---- buffers
+      "glBindBufferRange": (shadow, c, args) => {
+        const r = bind_indexed31(shadow, c, args[0], args[1], args[2], args[3], args[4], true);
+        return r === NOT_HERE ? H3["glBindBufferRange"](shadow, c, args) : r;
+      },
+      "glBindBufferBase": (shadow, c, args) => {
+        const r = bind_indexed31(shadow, c, args[0], args[1], args[2], 0, 0, false);
+        return r === NOT_HERE ? H3["glBindBufferBase"](shadow, c, args) : r;
+      },
+      "glGetIntegeri_v": (shadow, c, args) => indexed31(shadow, c, args, "i"),
+      "glGetInteger64i_v": (shadow, c, args) => indexed31(shadow, c, args, "64"),
+      "glGetBooleani_v": (shadow, c, args) => indexed31(shadow, c, args, "b"),
+      "glMemoryBarrier": (shadow, c, [barriers]) => {
+        if (barriers !== GL31.ALL_BARRIER_BITS && barriers & ~16383) return fail2(c, GL2.INVALID_VALUE);
+        return void 0;
+      },
+      "glMemoryBarrierByRegion": (shadow, c, [barriers]) => {
+        if (barriers !== GL31.ALL_BARRIER_BITS && barriers & ~(4 | 8 | 32 | 1024 | 4096 | 8192)) return fail2(c, GL2.INVALID_VALUE);
+        return void 0;
+      },
+      // ---- compute
+      "glDispatchCompute": (shadow, c, [x, y, z]) => {
+        const program = stage_program(c, GL31.COMPUTE_SHADER_BIT);
+        if (!program || !program.info || !program.info.ok || !(program.info.spirv || []).some((m) => m.stage === "compute") && !(program.info.local_size && program.info.local_size.some(Boolean))) {
+          return fail2(c, GL2.INVALID_OPERATION);
+        }
+        const max = LIMITS31.MAX_COMPUTE_WORK_GROUP_COUNT;
+        if (x > max[0] || y > max[1] || z > max[2]) return fail2(c, GL2.INVALID_VALUE);
+        written(c, [program]);
+        return void 0;
+      },
+      "glDispatchComputeIndirect": (shadow, c, [offset]) => {
+        const program = stage_program(c, GL31.COMPUTE_SHADER_BIT);
+        if (!program || !program.info || !program.info.ok) return fail2(c, GL2.INVALID_OPERATION);
+        if (offset < 0 || offset % 4) return fail2(c, GL2.INVALID_VALUE);
+        const buffer = c.group.buffers.get(c.buffers.dispatch_indirect);
+        if (!buffer || offset + 12 > buffer.size || buffer.mapped) return fail2(c, GL2.INVALID_OPERATION);
+        written(c, [program]);
+        return void 0;
+      },
+      // ---- draws (what they write), indirect draws
+      "glDrawArrays": draw31(H3["glDrawArrays"]),
+      "glDrawArraysInstanced": draw31(H3["glDrawArraysInstanced"]),
+      "glDrawElementsOffset": draw31(H3["glDrawElementsOffset"]),
+      "glDrawElementsData": draw31(H3["glDrawElementsData"]),
+      "glDrawElementsInstancedOffsetAEMU": draw31(H3["glDrawElementsInstancedOffsetAEMU"]),
+      "glDrawElementsInstancedDataAEMU": draw31(H3["glDrawElementsInstancedDataAEMU"]),
+      "glDrawRangeElementsOffsetAEMU": draw31(H3["glDrawRangeElementsOffsetAEMU"]),
+      "glDrawRangeElementsDataAEMU": draw31(H3["glDrawRangeElementsDataAEMU"]),
+      "glDrawArraysIndirectDataAEMU": (shadow, c, [mode, data]) => indirect(shadow, c, mode, 0, data, void 0, false),
+      "glDrawArraysIndirectOffsetAEMU": (shadow, c, [mode, offset]) => indirect(shadow, c, mode, 0, null, offset, false),
+      "glDrawElementsIndirectDataAEMU": (shadow, c, [mode, type, data]) => indirect(shadow, c, mode, type, data, void 0, true),
+      "glDrawElementsIndirectOffsetAEMU": (shadow, c, [mode, type, offset]) => indirect(shadow, c, mode, type, null, offset, true),
+      // ---- vertex attribute bindings
+      "glBindVertexBuffer": (shadow, c, [index, buffer, offset, stride]) => {
+        if (index >= LIMITS31.MAX_VERTEX_ATTRIB_BINDINGS || offset < 0 || stride < 0 || stride > LIMITS31.MAX_VERTEX_ATTRIB_STRIDE) {
+          return fail2(c, GL2.INVALID_VALUE);
+        }
+        if (!c.vao) return fail2(c, GL2.INVALID_OPERATION);
+        if (buffer && !c.group.buffers.has(buffer)) {
+          if (!generated(shadow, c.group.reserved.buffer, buffer)) return fail2(c, GL2.INVALID_OPERATION);
+          c.group.buffers.set(buffer, new_buffer());
+        }
+        Object.assign(vertex_bindings(c)[index], { buffer, offset, stride });
+        follow_binding(c, index);
+        return void 0;
+      },
+      "glVertexAttribBinding": (shadow, c, [attrib, binding]) => {
+        if (attrib >= MAX_ATTRIBS2 || binding >= LIMITS31.MAX_VERTEX_ATTRIB_BINDINGS) return fail2(c, GL2.INVALID_VALUE);
+        if (!c.vao) return fail2(c, GL2.INVALID_OPERATION);
+        vertex_bindings(c);
+        c.attribs[attrib].binding = binding;
+        follow_binding(c, binding);
+        return void 0;
+      },
+      "glVertexAttribFormat": (shadow, c, [attrib, size, type, normalized, relative]) => attrib_format(shadow, c, attrib, size, type, normalized, relative, false),
+      "glVertexAttribIFormat": (shadow, c, [attrib, size, type, relative]) => attrib_format(shadow, c, attrib, size, type, false, relative, true),
+      "glVertexBindingDivisor": (shadow, c, [binding, divisor]) => {
+        if (binding >= LIMITS31.MAX_VERTEX_ATTRIB_BINDINGS) return fail2(c, GL2.INVALID_VALUE);
+        if (!c.vao) return fail2(c, GL2.INVALID_OPERATION);
+        vertex_bindings(c)[binding].divisor = divisor >>> 0;
+        follow_binding(c, binding);
+        return void 0;
+      },
+      // (GLES 3.0's calls in 3.1's model: the attribute's own binding point)
+      "glVertexAttribPointerOffset": (shadow, c, args) => pointer31(shadow, c, args, "glVertexAttribPointerOffset"),
+      "glVertexAttribPointerData": (shadow, c, args) => pointer31(shadow, c, args, "glVertexAttribPointerData"),
+      "glVertexAttribIPointerOffsetAEMU": (shadow, c, args) => pointer31(shadow, c, args, "glVertexAttribIPointerOffsetAEMU"),
+      "glVertexAttribIPointerDataAEMU": (shadow, c, args) => pointer31(shadow, c, args, "glVertexAttribIPointerDataAEMU"),
+      "glVertexAttribDivisor": (shadow, c, [index, divisor]) => {
+        if (index >= MAX_ATTRIBS2) return fail2(c, GL2.INVALID_VALUE);
+        vertex_bindings(c);
+        c.attribs[index].binding = index;
+        vertex_bindings(c)[index].divisor = divisor >>> 0;
+        follow_binding(c, index);
+        return void 0;
+      },
+      "glGetVertexAttribiv": (shadow, c, args) => attrib_query31(shadow, c, args, "iv"),
+      "glGetVertexAttribfv": (shadow, c, args) => attrib_query31(shadow, c, args, "f"),
+      "glGetVertexAttribIiv": (shadow, c, args) => attrib_query31(shadow, c, args, "i"),
+      "glGetVertexAttribIuiv": (shadow, c, args) => attrib_query31(shadow, c, args, "ui"),
+      // ---- images
+      "glBindImageTexture": (shadow, c, [unit, texture, level, layered2, layer, access, format]) => {
+        if (unit >= LIMITS31.MAX_IMAGE_UNITS || level < 0 || layer < 0) return fail2(c, GL2.INVALID_VALUE);
+        if (![GL31.READ_ONLY, GL31.WRITE_ONLY, GL31.READ_WRITE].includes(access) || !IMAGE_FORMATS.has(format)) return fail2(c, GL2.INVALID_VALUE);
+        if (texture) {
+          const t = c.group.textures.get(texture);
+          if (!t) return fail2(c, GL2.INVALID_VALUE);
+          if (!t.immutable) return fail2(c, GL2.INVALID_OPERATION);
+        }
+        c.image_units[unit] = { texture, level, layered: !!layered2, layer, access, format };
+        return void 0;
+      },
+      // ---- multisampled textures, the sample mask
+      "glTexStorage2DMultisample": (shadow, c, [target, samples, internalformat, width, height, fixed]) => {
+        if (target !== GL31.TEXTURE_2D_MULTISAMPLE) return fail2(c, GL2.INVALID_ENUM);
+        const name = c.textures[c.active_texture][SLOT.TEXTURE_2D_MULTISAMPLE];
+        const texture = name ? c.group.textures.get(name) : null;
+        if (!texture || texture.immutable) return fail2(c, GL2.INVALID_OPERATION);
+        const info = format_info(internalformat);
+        if (!info || !info.sized || !(info.renderable || info.kind === "depth" || info.kind === "depth_stencil")) return fail2(c, GL2.INVALID_ENUM);
+        if (width < 1 || height < 1 || samples < 1) return fail2(c, GL2.INVALID_VALUE);
+        if (width > LIMITS3.MAX_TEXTURE_SIZE || height > LIMITS3.MAX_TEXTURE_SIZE) return fail2(c, GL2.INVALID_VALUE);
+        if (samples > LIMITS31.MAX_COLOR_TEXTURE_SAMPLES) return fail2(c, GL2.INVALID_OPERATION);
+        texture.images.clear();
+        texture.images.set(0, {
+          width,
+          height,
+          depth: 1,
+          format: info.format,
+          type: info.types[0],
+          internal: internalformat,
+          compressed: false,
+          samples: 4,
+          fixed_locations: !!fixed
+        });
+        texture.immutable = true;
+        texture.immutable_levels = 1;
+        return void 0;
+      },
+      "glSampleMaski": (shadow, c, [index, mask]) => {
+        if (index >= LIMITS31.MAX_SAMPLE_MASK_WORDS) return fail2(c, GL2.INVALID_VALUE);
+        c.sample_mask = mask >>> 0;
+        return void 0;
+      },
+      "glGetMultisamplefv": (shadow, c, [pname, index, val]) => {
+        query2(shadow);
+        if (pname !== 36432) {
+          fail2(c, GL2.INVALID_ENUM);
+          return;
+        }
+        if (index >= 4) {
+          fail2(c, GL2.INVALID_VALUE);
+          return;
+        }
+        put2(val, SAMPLE_POSITIONS_4[index], "f", "f");
+      },
+      "glGetTexLevelParameteriv": (shadow, c, args) => tex_level_parameter(shadow, c, args, "i"),
+      "glGetTexLevelParameterfv": (shadow, c, args) => tex_level_parameter(shadow, c, args, "f"),
+      "glFramebufferTexture2D": (shadow, c, [target, attachment, textarget, name, level]) => {
+        if (textarget !== GL31.TEXTURE_2D_MULTISAMPLE) return H3["glFramebufferTexture2D"](shadow, c, [target, attachment, textarget, name, level]);
+        const fb = target === GL2.READ_FRAMEBUFFER ? c.read_framebuffer : target === GL2.FRAMEBUFFER || target === GL2.DRAW_FRAMEBUFFER ? c.framebuffer : -1;
+        if (fb < 0) return fail2(c, GL2.INVALID_ENUM);
+        const fbo = c.framebuffers.get(fb);
+        if (!fbo) return fail2(c, GL2.INVALID_OPERATION);
+        const texture = name ? c.group.textures.get(name) : null;
+        if (name && (!texture || texture.target !== GL31.TEXTURE_2D_MULTISAMPLE)) return fail2(c, GL2.INVALID_OPERATION);
+        if (name && level !== 0) return fail2(c, GL2.INVALID_VALUE);
+        const points = attachment === 33306 ? [GL2.DEPTH_ATTACHMENT, GL2.STENCIL_ATTACHMENT] : [attachment];
+        for (const point of points) {
+          if (name) fbo.attachments.set(point, { type: GL2.TEXTURE, name, level: 0, face: 0, layer: 0 });
+          else fbo.attachments.delete(point);
+        }
+        return void 0;
+      },
+      // ---- framebuffers without attachments
+      "glFramebufferParameteri": (shadow, c, [target, pname, param]) => {
+        const name = target === GL2.READ_FRAMEBUFFER ? c.read_framebuffer : target === GL2.FRAMEBUFFER || target === GL2.DRAW_FRAMEBUFFER ? c.framebuffer : -1;
+        if (name < 0) return fail2(c, GL2.INVALID_ENUM);
+        if (!name) return fail2(c, GL2.INVALID_OPERATION);
+        const fbo = c.framebuffers.get(name);
+        switch (pname) {
+          case 37648:
+            if (param < 0 || param > LIMITS31.MAX_FRAMEBUFFER_WIDTH) return fail2(c, GL2.INVALID_VALUE);
+            fbo.default_width = param;
+            break;
+          case 37649:
+            if (param < 0 || param > LIMITS31.MAX_FRAMEBUFFER_HEIGHT) return fail2(c, GL2.INVALID_VALUE);
+            fbo.default_height = param;
+            break;
+          case 37651:
+            if (param < 0 || param > LIMITS31.MAX_FRAMEBUFFER_SAMPLES) return fail2(c, GL2.INVALID_VALUE);
+            fbo.default_samples = param;
+            break;
+          case 37652:
+            fbo.default_fixed = !!param;
+            break;
+          default:
+            return fail2(c, GL2.INVALID_ENUM);
+        }
+        return void 0;
+      },
+      "glGetFramebufferParameteriv": (shadow, c, [target, pname, params]) => {
+        query2(shadow);
+        const name = target === GL2.READ_FRAMEBUFFER ? c.read_framebuffer : target === GL2.FRAMEBUFFER || target === GL2.DRAW_FRAMEBUFFER ? c.framebuffer : -1;
+        if (name < 0) {
+          fail2(c, GL2.INVALID_ENUM);
+          return;
+        }
+        if (!name) {
+          fail2(c, GL2.INVALID_OPERATION);
+          return;
+        }
+        const fbo = c.framebuffers.get(name);
+        const values = {
+          37648: fbo.default_width || 0,
+          37649: fbo.default_height || 0,
+          37651: fbo.default_samples || 0,
+          37652: fbo.default_fixed ? 1 : 0
+        };
+        if (!(pname in values)) {
+          fail2(c, GL2.INVALID_ENUM);
+          return;
+        }
+        put2(params, [values[pname]], "i", "i");
+      },
+      // ---- program pipelines
+      "glGenProgramPipelines": (shadow, c, [n, names]) => {
+        query2(shadow);
+        if (n < 0) {
+          fail2(c, GL2.INVALID_VALUE);
+          return;
+        }
+        for (let i = 0; i < n && 4 * i + 4 <= names.size; i++) {
+          let name = c.next3.pipeline;
+          while (c.program_pipelines.has(name) || c.reserved3.pipeline.has(name)) name++;
+          c.next3.pipeline = name + 1;
+          c.reserved3.pipeline.add(name);
+          names.view.setUint32(4 * i, name, true);
+        }
+      },
+      "glDeleteProgramPipelines": (shadow, c, [n, names]) => {
+        if (n < 0) return fail2(c, GL2.INVALID_VALUE);
+        for (const name of i32s2(names).slice(0, n)) {
+          c.reserved3.pipeline.delete(name);
+          c.program_pipelines.delete(name);
+          if (c.program_pipeline === name) c.program_pipeline = 0;
+        }
+        return void 0;
+      },
+      "glIsProgramPipeline": (shadow, c, [name]) => {
+        query2(shadow);
+        return c.program_pipelines.has(name) ? 1 : 0;
+      },
+      "glBindProgramPipeline": (shadow, c, [name]) => {
+        if (name && !pipeline_of(shadow, c, name, true)) return fail2(c, GL2.INVALID_OPERATION);
+        if (current_tf(c).active && !current_tf(c).paused) return fail2(c, GL2.INVALID_OPERATION);
+        c.program_pipeline = name;
+        return void 0;
+      },
+      "glUseProgramStages": (shadow, c, [name, stages, p]) => {
+        const bits = [GL31.VERTEX_SHADER_BIT, GL31.FRAGMENT_SHADER_BIT, GL31.COMPUTE_SHADER_BIT, ...c.version >= 32 ? STAGE_BITS32 : []];
+        if (stages !== GL31.ALL_BARRIER_BITS && stages & ~bits.reduce((m, b) => m | b, 0)) return fail2(c, GL2.INVALID_VALUE);
+        const pipeline = pipeline_of(shadow, c, name, true);
+        if (!pipeline) return fail2(c, GL2.INVALID_OPERATION);
+        if (p) {
+          const program = program_of(c, p);
+          if (!program) return REFUSED2;
+          if (!program.separable || !program.info || !program.info.ok) return fail2(c, GL2.INVALID_OPERATION);
+        }
+        for (const bit of bits) if (stages & bit) pipeline.stages[bit] = p;
+        return void 0;
+      },
+      "glActiveShaderProgram": (shadow, c, [name, p]) => {
+        const pipeline = pipeline_of(shadow, c, name, true);
+        if (!pipeline) return fail2(c, GL2.INVALID_OPERATION);
+        if (p && !program_of(c, p)) return REFUSED2;
+        if (p && !c.group.objects.get(p).info?.ok) return fail2(c, GL2.INVALID_OPERATION);
+        pipeline.active = p;
+        return void 0;
+      },
+      "glValidateProgramPipeline": (shadow, c, [name]) => {
+        const pipeline = pipeline_of(shadow, c, name, true);
+        if (!pipeline) return fail2(c, GL2.INVALID_OPERATION);
+        validate(c, pipeline);
+        return void 0;
+      },
+      "glGetProgramPipelineiv": (shadow, c, [name, pname, params]) => {
+        query2(shadow);
+        const pipeline = pipeline_of(shadow, c, name, true);
+        if (!pipeline) {
+          fail2(c, GL2.INVALID_OPERATION);
+          return;
+        }
+        const values = {
+          33369: pipeline.active,
+          35633: pipeline.stages[GL31.VERTEX_SHADER_BIT] || 0,
+          35632: pipeline.stages[GL31.FRAGMENT_SHADER_BIT] || 0,
+          37305: pipeline.stages[GL31.COMPUTE_SHADER_BIT] || 0,
+          35716: pipeline.log ? pipeline.log.length + 1 : 0,
+          35715: pipeline.valid ? 1 : 0
+        };
+        if (c.version >= 32) STAGES32.forEach((type, i) => {
+          values[type] = pipeline.stages[STAGE_BITS32[i]] || 0;
+        });
+        if (!(pname in values)) {
+          fail2(c, GL2.INVALID_ENUM);
+          return;
+        }
+        put2(params, [values[pname]], "i", "i");
+      },
+      "glGetProgramPipelineInfoLog": (shadow, c, [name, size, length, log]) => {
+        query2(shadow);
+        const pipeline = pipeline_of(shadow, c, name, true);
+        if (!pipeline) {
+          fail2(c, GL2.INVALID_OPERATION);
+          return;
+        }
+        const n = put_text2(log, pipeline.log);
+        if (length && length.size) length.view.setInt32(0, n, true);
+        void size;
+      },
+      // ---- program interface queries
+      "glGetProgramInterfaceiv": (shadow, c, [p, iface, pname, params]) => {
+        query2(shadow);
+        const program = program_of(c, p);
+        if (!program) return;
+        const list = resources(program, iface);
+        if (!list || ![37621, 37622, 37623].includes(pname)) {
+          fail2(c, GL2.INVALID_ENUM);
+          return;
+        }
+        if (pname === 37622 && iface === INTERFACES.ATOMIC_COUNTER_BUFFER) {
+          fail2(c, GL2.INVALID_OPERATION);
+          return;
+        }
+        if (pname === 37623 && ![INTERFACES.UNIFORM_BLOCK, INTERFACES.SHADER_STORAGE_BLOCK, INTERFACES.ATOMIC_COUNTER_BUFFER].includes(iface)) {
+          fail2(c, GL2.INVALID_OPERATION);
+          return;
+        }
+        const value = pname === 37621 ? list.length : pname === 37622 ? list.reduce((n, r) => Math.max(n, r.name.length + 1), 0) : list.reduce((n, r) => Math.max(n, r.props[37636] || 0), 0);
+        put2(params, [value], "i", "i");
+      },
+      "glGetProgramResourceIndex": (shadow, c, [p, iface, name]) => {
+        query2(shadow);
+        const program = program_of(c, p);
+        if (!program) return 4294967295;
+        const list = resources(program, iface);
+        if (!list || iface === INTERFACES.ATOMIC_COUNTER_BUFFER) {
+          fail2(c, GL2.INVALID_ENUM);
+          return 4294967295;
+        }
+        const wanted = text_of2(name);
+        const index = list.findIndex((r) => r.name === wanted || r.name === wanted + "[0]");
+        return index < 0 ? 4294967295 : index;
+      },
+      "glGetProgramResourceName": (shadow, c, [p, iface, index, size, length, name]) => {
+        query2(shadow);
+        const program = program_of(c, p);
+        if (!program) return;
+        const list = resources(program, iface);
+        if (!list || iface === INTERFACES.ATOMIC_COUNTER_BUFFER) {
+          fail2(c, GL2.INVALID_ENUM);
+          return;
+        }
+        if (index >= list.length) {
+          fail2(c, GL2.INVALID_VALUE);
+          return;
+        }
+        const n = put_text2(name, list[index].name);
+        if (length && length.size) length.view.setInt32(0, n, true);
+        void size;
+      },
+      "glGetProgramResourceiv": (shadow, c, [p, iface, index, count, props, size, length, params]) => {
+        query2(shadow);
+        const program = program_of(c, p);
+        if (!program) return;
+        const list = resources(program, iface);
+        if (!list) {
+          fail2(c, GL2.INVALID_ENUM);
+          return;
+        }
+        if (index >= list.length || count <= 0 || size < 0) {
+          fail2(c, GL2.INVALID_VALUE);
+          return;
+        }
+        const r = list[index];
+        const values = [];
+        for (const prop of i32s2(props).slice(0, count)) {
+          const v = prop === 37625 ? iface === INTERFACES.ATOMIC_COUNTER_BUFFER ? void 0 : r.name.length + 1 : r.props[prop];
+          if (v === void 0) {
+            fail2(c, GL2.INVALID_OPERATION);
+            return;
+          }
+          values.push(...Array.isArray(v) ? v : [v]);
+        }
+        put2(params, values.slice(0, Math.max(0, size)), "i", "i");
+        if (length && length.size) length.view.setInt32(0, Math.min(values.length, size), true);
+      },
+      "glGetProgramResourceLocation": (shadow, c, [p, iface, name]) => {
+        query2(shadow);
+        const program = program_of(c, p);
+        if (!program) return -1;
+        if (![INTERFACES.UNIFORM, INTERFACES.PROGRAM_INPUT, INTERFACES.PROGRAM_OUTPUT].includes(iface)) {
+          fail2(c, GL2.INVALID_ENUM);
+          return -1;
+        }
+        if (!program.info || !program.info.ok) {
+          fail2(c, GL2.INVALID_OPERATION);
+          return -1;
+        }
+        const wanted = text_of2(name);
+        if (iface === INTERFACES.UNIFORM) {
+          const at = program.info.locations.get(wanted);
+          return at === void 0 ? -1 : at;
+        }
+        const r = resources(program, iface).find((x) => x.name === wanted || x.name === wanted + "[0]");
+        return r ? r.props[37646] : -1;
+      },
+      // ---- robustness (EXT_robustness): no context is ever lost
+      "glGetGraphicsResetStatusEXT": (shadow) => {
+        query2(shadow);
+        return 0;
+      },
+      "glReadnPixelsEXT": (shadow, c, [x, y, width, height, format, type, size]) => {
+        const r = H3["glReadPixels"](shadow, c, [x, y, width, height, format, type]);
+        if (r === REFUSED2) return r;
+        const needed = image_bytes3(width, height, 1, format, type, {
+          alignment: c.pack_alignment,
+          row_length: c.pack.row_length,
+          image_height: 0,
+          skip_pixels: c.pack.skip_pixels,
+          skip_rows: c.pack.skip_rows,
+          skip_images: 0
+        });
+        if (needed > size) return fail2(c, GL2.INVALID_OPERATION);
+        return r;
+      },
+      "glGetnUniformfvEXT": (shadow, c, [p, location, size, params]) => H3["glGetUniformfv"](shadow, c, [p, location, params]),
+      "glGetnUniformivEXT": (shadow, c, [p, location, size, params]) => H3["glGetUniformiv"](shadow, c, [p, location, params])
+    };
+    function attrib_format(shadow, c, attrib, size, type, normalized, relative, integer) {
+      if (attrib >= MAX_ATTRIBS2 || size < 1 || size > 4 || relative < 0 || relative > LIMITS31.MAX_VERTEX_ATTRIB_RELATIVE_OFFSET) {
+        return fail2(c, GL2.INVALID_VALUE);
+      }
+      if (!c.vao) return fail2(c, GL2.INVALID_OPERATION);
+      const types = integer ? [5120, 5121, 5122, 5123, 5124, 5125] : [5120, 5121, 5122, 5123, 5124, 5125, 5126, 5131, 5132, 33640, 36255];
+      if (!types.includes(type)) return fail2(c, GL2.INVALID_ENUM);
+      if ((type === 33640 || type === 36255) && size !== 4) return fail2(c, GL2.INVALID_OPERATION);
+      vertex_bindings(c);
+      Object.assign(c.attribs[attrib], { size, type, normalized: !!normalized, integer, relative_offset: relative });
+      follow_binding(c, c.attribs[attrib].binding);
+      return void 0;
+    }
+    function pointer31(shadow, c, args, name) {
+      const r = H3[name](shadow, c, args);
+      if (r === REFUSED2) return r;
+      const index = args[0];
+      const a = c.attribs[index];
+      const bindings = vertex_bindings(c);
+      const element = element_bytes(a);
+      Object.assign(bindings[index], { buffer: a.buffer, offset: a.offset, stride: a.stride || element });
+      a.binding = index;
+      a.relative_offset = 0;
+      follow_binding(c, index);
+      a.stride = a.stride === element && !args[name.includes("IPointer") ? 3 : 4] ? 0 : a.stride;
+      return r;
+    }
+    function attrib_query31(shadow, c, [index, pname, params], as) {
+      if (pname !== 33492 && pname !== 33493) return get_attrib3(shadow, c, index, pname, params, as);
+      query2(shadow);
+      if (index >= MAX_ATTRIBS2) {
+        fail2(c, GL2.INVALID_VALUE);
+        return void 0;
+      }
+      vertex_bindings(c);
+      const a = c.attribs[index];
+      put2(params, [pname === 33492 ? a.binding : a.relative_offset || 0], as === "f" ? "f" : "i", "i");
+      return void 0;
+    }
+    function tex_level_parameter(shadow, c, [target, level, pname, params], as) {
+      query2(shadow);
+      const face = target >= 34069 && target <= 34074 ? target - 34069 : 0;
+      const slot = target === GL2.TEXTURE_2D ? SLOT.TEXTURE_2D : face || target === 34069 ? SLOT.TEXTURE_CUBE_MAP : target === GL2.TEXTURE_3D ? SLOT.TEXTURE_3D : target === GL2.TEXTURE_2D_ARRAY ? SLOT.TEXTURE_2D_ARRAY : target === GL31.TEXTURE_2D_MULTISAMPLE ? SLOT.TEXTURE_2D_MULTISAMPLE : -1;
+      if (slot < 0) {
+        fail2(c, GL2.INVALID_ENUM);
+        return;
+      }
+      if (level < 0 || level > 31) {
+        fail2(c, GL2.INVALID_VALUE);
+        return;
+      }
+      const name = c.textures[c.active_texture][slot];
+      const texture = name ? c.group.textures.get(name) : c.defaults && c.defaults.get(target);
+      const image = texture && texture.images.get(face * 32 + level);
+      const info = image && !image.compressed ? format_info(image.internal || image.format) : null;
+      const bits = info ? info.bits : [0, 0, 0, 0, 0, 0];
+      const kind = info ? info.kind : "";
+      const type = (k) => !image ? 0 : bits[k] ? {
+        unorm: 35863,
+        snorm: 36764,
+        float: 5126,
+        int: 5124,
+        uint: 5125,
+        depth: 35863,
+        depth_stencil: k === 5 ? 35863 : 35863
+      }[kind] || 35863 : 0;
+      const values = {
+        4096: image ? image.width : 0,
+        4097: image ? image.height : 0,
+        32881: image ? image.depth || 1 : 0,
+        4099: image ? image.internal || image.format : 6408,
+        32860: bits[0],
+        32861: bits[1],
+        32862: bits[2],
+        32863: bits[3],
+        34890: bits[4],
+        35057: bits[5],
+        35903: info && info.value === 35901 ? 5 : 0,
+        35856: type(0),
+        35857: type(1),
+        35858: type(2),
+        35859: type(3),
+        35862: type(4),
+        37126: image && image.samples ? image.samples : 0,
+        37127: image ? image.fixed_locations !== false ? 1 : 0 : 1,
+        34465: image && image.compressed ? 1 : 0,
+        34464: image && image.compressed ? image.size || 0 : 0
+      };
+      if (!(pname in values)) {
+        fail2(c, GL2.INVALID_ENUM);
+        return;
+      }
+      put2(params, [values[pname]], as === "f" ? "f" : "i", "i");
+    }
+    const uniforms = [
+      "1f",
+      "2f",
+      "3f",
+      "4f",
+      "1i",
+      "2i",
+      "3i",
+      "4i",
+      "1ui",
+      "2ui",
+      "3ui",
+      "4ui",
+      "1fv",
+      "2fv",
+      "3fv",
+      "4fv",
+      "1iv",
+      "2iv",
+      "3iv",
+      "4iv",
+      "1uiv",
+      "2uiv",
+      "3uiv",
+      "4uiv",
+      "Matrix2fv",
+      "Matrix3fv",
+      "Matrix4fv",
+      "Matrix2x3fv",
+      "Matrix3x2fv",
+      "Matrix2x4fv",
+      "Matrix4x2fv",
+      "Matrix3x4fv",
+      "Matrix4x3fv"
+    ];
+    for (const u of uniforms) {
+      H["glProgramUniform" + u] = program_uniform("glUniform" + u);
+      H["glUniform" + u] = uniform31("glUniform" + u);
+    }
+    void f32s2;
+    void status_of;
+    void bound_buffer3;
+    return H;
+  }
+  var STAGES32 = [36313, 36488, 36487];
+  var STAGE_BITS32 = [4, 8, 16];
+  var GEOMETRY_QUERIES = /* @__PURE__ */ new Map([[35094, "vertices"], [35095, "input"], [35096, "output"], [34943, "invocations"]]);
+  var TESSELLATION_QUERIES = /* @__PURE__ */ new Map([[36469, "vertices"], [36470, "mode"], [36471, "spacing"], [36472, "order"], [36473, "point_mode"]]);
+  var STATE32 = /* @__PURE__ */ new Map([
+    [33310, [0]],
+    [37187, [1024]],
+    [37188, [1]],
+    [37189, [0]],
+    [33347, [0]],
+    [33388, [64]],
+    [33389, [1]],
+    [33512, [256]],
+    [37566, [-1, -1, -1, 1, 1, 1, 1, 1]],
+    [37761, [1, 1]],
+    [37762, [1]],
+    [35895, [0]],
+    [33366, [33377]],
+    [37107, [0]],
+    [37655, [256]],
+    [33374, [36430]],
+    [36445, [4]],
+    [36443, [-0.5]],
+    [36444, [0.5]],
+    [36466, [3]],
+    // geometry
+    [36319, [1024]],
+    [35372, [12]],
+    [37155, [64]],
+    [37156, [64]],
+    [36320, [256]],
+    [36321, [1024]],
+    [35881, [16]],
+    [36442, [32]],
+    [37583, [0]],
+    [37589, [0]],
+    [37069, [0]],
+    [37079, [0]],
+    [35378, [1024 + 12 * 4096]],
+    // tessellation
+    [36477, [32]],
+    [36478, [64]],
+    [36479, [1024]],
+    [36480, [1024]],
+    [36481, [16]],
+    [36482, [16]],
+    [36483, [64]],
+    [36484, [120]],
+    [36485, [2048]],
+    [36486, [64]],
+    [36489, [12]],
+    [36490, [12]],
+    [34924, [64]],
+    [34925, [64]],
+    [37581, [0]],
+    [37582, [0]],
+    [37587, [0]],
+    [37588, [0]],
+    [37067, [0]],
+    [37068, [0]],
+    [37080, [0]],
+    [37081, [0]],
+    [36382, [1024 + 12 * 4096]],
+    [36383, [1024 + 12 * 4096]],
+    // texture buffers (no entry point reaches them: their limits are the minimums)
+    [35883, [65536]],
+    [37279, [256]],
+    [35884, [0]],
+    [35882, [0]]
+  ]);
+  function glslang_limits(version, es2) {
+    if (es2) return version < 300 ? GLSLANG_LIMITS_ES2_100 : GLSLANG_LIMITS_ES2_3;
+    return version < 300 ? GLSLANG_LIMITS_100 : GLSLANG_LIMITS_3;
+  }
+  var GLSLANG_LIMITS_3 = (() => {
+    const L = LIMITS3, M = LIMITS31, one = (pname) => (GL_STATE.get(pname) || STATE32.get(pname))[0];
+    return {
+      "MaxVertexAttribs": one(34921),
+      "MaxVertexUniformVectors": one(36347),
+      "MaxVaryingVectors": one(36348),
+      "MaxFragmentUniformVectors": L.MAX_FRAGMENT_UNIFORM_COMPONENTS / 4,
+      "MaxCombinedTextureImageUnits": MAX_UNITS,
+      "MaxVertexTextureImageUnits": one(35660),
+      "MaxTextureImageUnits": one(34930),
+      "MaxDrawBuffers": L.MAX_DRAW_BUFFERS,
+      "MaxVertexOutputVectors": L.MAX_VERTEX_OUTPUT_COMPONENTS / 4,
+      "MaxFragmentInputVectors": L.MAX_FRAGMENT_INPUT_COMPONENTS / 4,
+      "MaxVertexOutputComponents": L.MAX_VERTEX_OUTPUT_COMPONENTS,
+      "MaxFragmentInputComponents": L.MAX_FRAGMENT_INPUT_COMPONENTS,
+      "MaxVertexUniformComponents": L.MAX_VERTEX_UNIFORM_COMPONENTS,
+      "MaxFragmentUniformComponents": L.MAX_FRAGMENT_UNIFORM_COMPONENTS,
+      "MaxVaryingComponents": L.MAX_VARYING_COMPONENTS,
+      "MinProgramTexelOffset": L.MIN_PROGRAM_TEXEL_OFFSET,
+      "MaxProgramTexelOffset": L.MAX_PROGRAM_TEXEL_OFFSET,
+      "MaxSamples": L.MAX_SAMPLES,
+      "MaxTransformFeedbackInterleavedComponents": L.MAX_TRANSFORM_FEEDBACK_INTERLEAVED_COMPONENTS,
+      "MaxTransformFeedbackBuffers": L.MAX_TRANSFORM_FEEDBACK_SEPARATE_ATTRIBS,
+      // GLES 3.1's
+      "MaxComputeWorkGroupCountX": M.MAX_COMPUTE_WORK_GROUP_COUNT[0],
+      "MaxComputeWorkGroupCountY": M.MAX_COMPUTE_WORK_GROUP_COUNT[1],
+      "MaxComputeWorkGroupCountZ": M.MAX_COMPUTE_WORK_GROUP_COUNT[2],
+      "MaxComputeWorkGroupSizeX": M.MAX_COMPUTE_WORK_GROUP_SIZE[0],
+      "MaxComputeWorkGroupSizeY": M.MAX_COMPUTE_WORK_GROUP_SIZE[1],
+      "MaxComputeWorkGroupSizeZ": M.MAX_COMPUTE_WORK_GROUP_SIZE[2],
+      "MaxComputeUniformComponents": M.MAX_COMPUTE_UNIFORM_COMPONENTS,
+      "MaxComputeTextureImageUnits": M.MAX_COMPUTE_TEXTURE_IMAGE_UNITS,
+      "MaxComputeImageUniforms": M.MAX_COMPUTE_IMAGE_UNIFORMS,
+      "MaxComputeAtomicCounters": M.MAX_COMPUTE_ATOMIC_COUNTERS,
+      "MaxComputeAtomicCounterBuffers": M.MAX_COMPUTE_ATOMIC_COUNTER_BUFFERS,
+      "MaxVertexAtomicCounters": M.MAX_VERTEX_ATOMIC_COUNTERS,
+      "MaxFragmentAtomicCounters": M.MAX_FRAGMENT_ATOMIC_COUNTERS,
+      "MaxCombinedAtomicCounters": M.MAX_COMBINED_ATOMIC_COUNTERS,
+      "MaxAtomicCounterBindings": M.MAX_ATOMIC_COUNTER_BUFFER_BINDINGS,
+      "MaxVertexAtomicCounterBuffers": M.MAX_VERTEX_ATOMIC_COUNTER_BUFFERS,
+      "MaxFragmentAtomicCounterBuffers": M.MAX_FRAGMENT_ATOMIC_COUNTER_BUFFERS,
+      "MaxCombinedAtomicCounterBuffers": M.MAX_COMBINED_ATOMIC_COUNTER_BUFFERS,
+      "MaxAtomicCounterBufferSize": M.MAX_ATOMIC_COUNTER_BUFFER_SIZE,
+      "MaxImageUnits": M.MAX_IMAGE_UNITS,
+      "MaxVertexImageUniforms": M.MAX_VERTEX_IMAGE_UNIFORMS,
+      "MaxFragmentImageUniforms": M.MAX_FRAGMENT_IMAGE_UNIFORMS,
+      "MaxCombinedImageUniforms": M.MAX_COMBINED_IMAGE_UNIFORMS,
+      "MaxCombinedShaderOutputResources": M.MAX_COMBINED_SHADER_OUTPUT_RESOURCES,
+      // GLES 3.2's (STATE32): geometry, tessellation
+      "MaxGeometryUniformComponents": one(36319),
+      "MaxGeometryInputComponents": one(37155),
+      "MaxGeometryOutputComponents": one(37156),
+      "MaxGeometryOutputVertices": one(36320),
+      "MaxGeometryTotalOutputComponents": one(36321),
+      "MaxGeometryTextureImageUnits": one(35881),
+      "MaxGeometryAtomicCounterBuffers": one(37583),
+      "MaxGeometryAtomicCounters": one(37589),
+      "MaxGeometryImageUniforms": one(37069),
+      "MaxPatchVertices": one(36477),
+      "MaxTessGenLevel": one(36478),
+      "MaxTessControlUniformComponents": one(36479),
+      "MaxTessEvaluationUniformComponents": one(36480),
+      "MaxTessControlTextureImageUnits": one(36481),
+      "MaxTessEvaluationTextureImageUnits": one(36482),
+      "MaxTessControlOutputComponents": one(36483),
+      "MaxTessPatchComponents": one(36484),
+      "MaxTessControlTotalOutputComponents": one(36485),
+      "MaxTessEvaluationOutputComponents": one(36486),
+      "MaxTessControlInputComponents": one(34924),
+      "MaxTessEvaluationInputComponents": one(34925),
+      "MaxTessControlAtomicCounterBuffers": one(37581),
+      "MaxTessEvaluationAtomicCounterBuffers": one(37582),
+      "MaxTessControlAtomicCounters": one(37587),
+      "MaxTessEvaluationAtomicCounters": one(37588),
+      "MaxTessControlImageUniforms": one(37067),
+      "MaxTessEvaluationImageUniforms": one(37068)
+    };
+  })();
+  var GLSLANG_LIMITS_100 = Object.assign({}, GLSLANG_LIMITS_3, { "MaxDrawBuffers": 1 });
+  var ES2_LIMITS = { "MaxFragmentUniformVectors": GL_STATE.get(36349)[0], "MaxCombinedTextureImageUnits": GL_STATE.get(35661)[0] };
+  var GLSLANG_LIMITS_ES2_100 = Object.assign({}, GLSLANG_LIMITS_100, ES2_LIMITS);
+  var GLSLANG_LIMITS_ES2_3 = Object.assign({}, GLSLANG_LIMITS_3, ES2_LIMITS);
+  var FLOAT_STATE32 = /* @__PURE__ */ new Set([37566, 37761, 37762, 35895, 36443, 36444]);
+  function state_value31(shadow, c, pname) {
+    const L = LIMITS31;
+    if (c.version >= 32 && STATE32.has(pname)) return STATE32.get(pname);
+    if (c.version >= 32 && (pname === 37600 || pname === 33346 || pname === 35894)) return [c.enabled.has(pname) ? 1 : 0];
+    switch (pname) {
+      case 37083:
+        return [L.MAX_COMPUTE_SHADER_STORAGE_BLOCKS];
+      case 37307:
+        return [L.MAX_COMPUTE_UNIFORM_BLOCKS];
+      case 37308:
+        return [L.MAX_COMPUTE_TEXTURE_IMAGE_UNITS];
+      case 37309:
+        return [L.MAX_COMPUTE_IMAGE_UNIFORMS];
+      case 33378:
+        return [L.MAX_COMPUTE_SHARED_MEMORY_SIZE];
+      case 33379:
+        return [L.MAX_COMPUTE_UNIFORM_COMPONENTS];
+      case 33380:
+        return [L.MAX_COMPUTE_ATOMIC_COUNTER_BUFFERS];
+      case 33381:
+        return [L.MAX_COMPUTE_ATOMIC_COUNTERS];
+      case 33382:
+        return [L.MAX_COMPUTE_UNIFORM_COMPONENTS + L.MAX_COMPUTE_UNIFORM_BLOCKS * LIMITS3.MAX_UNIFORM_BLOCK_SIZE / 4];
+      case 37099:
+        return [L.MAX_COMPUTE_WORK_GROUP_INVOCATIONS];
+      case 33390:
+        return [L.MAX_UNIFORM_LOCATIONS];
+      case 37653:
+        return [L.MAX_FRAMEBUFFER_WIDTH];
+      case 37654:
+        return [L.MAX_FRAMEBUFFER_HEIGHT];
+      case 37656:
+        return [L.MAX_FRAMEBUFFER_SAMPLES];
+      case 37580:
+        return [L.MAX_VERTEX_ATOMIC_COUNTER_BUFFERS];
+      case 37584:
+        return [L.MAX_FRAGMENT_ATOMIC_COUNTER_BUFFERS];
+      case 37585:
+        return [L.MAX_COMBINED_ATOMIC_COUNTER_BUFFERS];
+      case 37586:
+        return [L.MAX_VERTEX_ATOMIC_COUNTERS];
+      case 37590:
+        return [L.MAX_FRAGMENT_ATOMIC_COUNTERS];
+      case 37591:
+        return [L.MAX_COMBINED_ATOMIC_COUNTERS];
+      case 37592:
+        return [L.MAX_ATOMIC_COUNTER_BUFFER_SIZE];
+      case 37596:
+        return [L.MAX_ATOMIC_COUNTER_BUFFER_BINDINGS];
+      case 37066:
+        return [L.MAX_VERTEX_IMAGE_UNIFORMS];
+      case 37070:
+        return [L.MAX_FRAGMENT_IMAGE_UNIFORMS];
+      case 37071:
+        return [L.MAX_COMBINED_IMAGE_UNIFORMS];
+      case 36664:
+        return [L.MAX_IMAGE_UNITS];
+      case 37078:
+        return [L.MAX_VERTEX_SHADER_STORAGE_BLOCKS];
+      case 37082:
+        return [L.MAX_FRAGMENT_SHADER_STORAGE_BLOCKS];
+      case 37084:
+        return [L.MAX_COMBINED_SHADER_STORAGE_BLOCKS];
+      case 37085:
+        return [L.MAX_SHADER_STORAGE_BUFFER_BINDINGS];
+      case 37086:
+        return [L.MAX_SHADER_STORAGE_BLOCK_SIZE];
+      case 37087:
+        return [L.SHADER_STORAGE_BUFFER_OFFSET_ALIGNMENT];
+      case 36665:
+        return [L.MAX_COMBINED_SHADER_OUTPUT_RESOURCES];
+      case 33497:
+        return [L.MAX_VERTEX_ATTRIB_RELATIVE_OFFSET];
+      case 33498:
+        return [L.MAX_VERTEX_ATTRIB_BINDINGS];
+      case 33509:
+        return [L.MAX_VERTEX_ATTRIB_STRIDE];
+      case 36441:
+        return [L.MAX_SAMPLE_MASK_WORDS];
+      case 37134:
+        return [L.MAX_COLOR_TEXTURE_SAMPLES];
+      case 37135:
+        return [L.MAX_DEPTH_TEXTURE_SAMPLES];
+      case 37136:
+        return [L.MAX_INTEGER_SAMPLES];
+      case 36446:
+        return [L.MIN_PROGRAM_TEXTURE_GATHER_OFFSET];
+      case 36447:
+        return [L.MAX_PROGRAM_TEXTURE_GATHER_OFFSET];
+      case 37103:
+        return [c.buffers.dispatch_indirect];
+      case 36675:
+        return [c.buffers.draw_indirect];
+      case 37075:
+        return [c.buffers.shader_storage];
+      case 37569:
+        return [c.buffers.atomic_counter];
+      case 33370:
+        return [c.program_pipeline];
+      case 37124:
+        return [c.textures[c.active_texture][SLOT.TEXTURE_2D_MULTISAMPLE]];
+      case 36874:
+        return c.version >= 32 ? [c.textures[c.active_texture][SLOT.TEXTURE_CUBE_MAP_ARRAY]] : null;
+      case 36433:
+        return [c.enabled.has(36433) ? 1 : 0];
+    }
+    return null;
+  }
+
+  // src/gles/gles1_state.js
+  var IDENTITY = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
+  var UNITS = 4;
+  var LIGHTS = 8;
+  var CLIP_PLANES = 6;
+  var STACK_DEPTH = { 5888: 16, 5889: 2, 5890: 2 };
+  var STACK_OVERFLOW = 1283;
+  var STACK_UNDERFLOW = 1284;
+  var INVALID_ENUM = 1280;
+  var INVALID_VALUE = 1281;
+  var FIXED = 5132;
+  var FLOAT = 5126;
+  var BYTE = 5120;
+  var UNSIGNED_BYTE = 5121;
+  var SHORT = 5122;
+  var CLIENT_ARRAYS = { 32884: "vertex", 32885: "normal", 32886: "color", 32888: "texcoord", 35740: "point_size" };
+  function mat_mul(a, b) {
+    const m = new Array(16);
+    for (let c = 0; c < 4; c++) {
+      for (let r = 0; r < 4; r++) {
+        m[c * 4 + r] = a[r] * b[c * 4] + a[4 + r] * b[c * 4 + 1] + a[8 + r] * b[c * 4 + 2] + a[12 + r] * b[c * 4 + 3];
+      }
+    }
+    return m;
+  }
+  function mat_inverse(m) {
+    const inv = new Array(16);
+    inv[0] = m[5] * m[10] * m[15] - m[5] * m[11] * m[14] - m[9] * m[6] * m[15] + m[9] * m[7] * m[14] + m[13] * m[6] * m[11] - m[13] * m[7] * m[10];
+    inv[4] = -m[4] * m[10] * m[15] + m[4] * m[11] * m[14] + m[8] * m[6] * m[15] - m[8] * m[7] * m[14] - m[12] * m[6] * m[11] + m[12] * m[7] * m[10];
+    inv[8] = m[4] * m[9] * m[15] - m[4] * m[11] * m[13] - m[8] * m[5] * m[15] + m[8] * m[7] * m[13] + m[12] * m[5] * m[11] - m[12] * m[7] * m[9];
+    inv[12] = -m[4] * m[9] * m[14] + m[4] * m[10] * m[13] + m[8] * m[5] * m[14] - m[8] * m[6] * m[13] - m[12] * m[5] * m[10] + m[12] * m[6] * m[9];
+    inv[1] = -m[1] * m[10] * m[15] + m[1] * m[11] * m[14] + m[9] * m[2] * m[15] - m[9] * m[3] * m[14] - m[13] * m[2] * m[11] + m[13] * m[3] * m[10];
+    inv[5] = m[0] * m[10] * m[15] - m[0] * m[11] * m[14] - m[8] * m[2] * m[15] + m[8] * m[3] * m[14] + m[12] * m[2] * m[11] - m[12] * m[3] * m[10];
+    inv[9] = -m[0] * m[9] * m[15] + m[0] * m[11] * m[13] + m[8] * m[1] * m[15] - m[8] * m[3] * m[13] - m[12] * m[1] * m[11] + m[12] * m[3] * m[9];
+    inv[13] = m[0] * m[9] * m[14] - m[0] * m[10] * m[13] - m[8] * m[1] * m[14] + m[8] * m[2] * m[13] + m[12] * m[1] * m[10] - m[12] * m[2] * m[9];
+    inv[2] = m[1] * m[6] * m[15] - m[1] * m[7] * m[14] - m[5] * m[2] * m[15] + m[5] * m[3] * m[14] + m[13] * m[2] * m[7] - m[13] * m[3] * m[6];
+    inv[6] = -m[0] * m[6] * m[15] + m[0] * m[7] * m[14] + m[4] * m[2] * m[15] - m[4] * m[3] * m[14] - m[12] * m[2] * m[7] + m[12] * m[3] * m[6];
+    inv[10] = m[0] * m[5] * m[15] - m[0] * m[7] * m[13] - m[4] * m[1] * m[15] + m[4] * m[3] * m[13] + m[12] * m[1] * m[7] - m[12] * m[3] * m[5];
+    inv[14] = -m[0] * m[5] * m[14] + m[0] * m[6] * m[13] + m[4] * m[1] * m[14] - m[4] * m[2] * m[13] - m[12] * m[1] * m[6] + m[12] * m[2] * m[5];
+    inv[3] = -m[1] * m[6] * m[11] + m[1] * m[7] * m[10] + m[5] * m[2] * m[11] - m[5] * m[3] * m[10] - m[9] * m[2] * m[7] + m[9] * m[3] * m[6];
+    inv[7] = m[0] * m[6] * m[11] - m[0] * m[7] * m[10] - m[4] * m[2] * m[11] + m[4] * m[3] * m[10] + m[8] * m[2] * m[7] - m[8] * m[3] * m[6];
+    inv[11] = -m[0] * m[5] * m[11] + m[0] * m[7] * m[9] + m[4] * m[1] * m[11] - m[4] * m[3] * m[9] - m[8] * m[1] * m[7] + m[8] * m[3] * m[5];
+    inv[15] = m[0] * m[5] * m[10] - m[0] * m[6] * m[9] - m[4] * m[1] * m[10] + m[4] * m[2] * m[9] + m[8] * m[1] * m[6] - m[8] * m[2] * m[5];
+    const det = m[0] * inv[0] + m[1] * inv[4] + m[2] * inv[8] + m[3] * inv[12];
+    if (!det) return IDENTITY.slice();
+    return inv.map((v) => v / det);
+  }
+  function transform(m, v) {
+    return [0, 1, 2, 3].map((r) => m[r] * v[0] + m[4 + r] * v[1] + m[8 + r] * v[2] + m[12 + r] * v[3]);
+  }
+  function new_ff_state() {
+    const pointer2 = () => ({ enabled: false, size: 4, type: FLOAT, stride: 0, buffer: 0, offset: 0, data: null });
+    return {
+      matrix_mode: 5888,
+      stacks: { 5888: [IDENTITY.slice()], 5889: [IDENTITY.slice()], 5890: Array.from({ length: UNITS }, () => [IDENTITY.slice()]) },
+      color: [1, 1, 1, 1],
+      normal: [0, 0, 1],
+      texcoord: Array.from({ length: UNITS }, () => [0, 0, 0, 1]),
+      client_active_texture: 0,
+      arrays: {
+        vertex: pointer2(),
+        normal: Object.assign(pointer2(), { size: 3 }),
+        color: pointer2(),
+        point_size: Object.assign(pointer2(), { size: 1 }),
+        texcoord: Array.from({ length: UNITS }, pointer2)
+      },
+      texture_enabled: Array.from({ length: UNITS }, () => ({ 3553: false, 36197: false })),
+      lights: Array.from({ length: LIGHTS }, (_, i) => ({
+        ambient: [0, 0, 0, 1],
+        diffuse: i ? [0, 0, 0, 1] : [1, 1, 1, 1],
+        specular: i ? [0, 0, 0, 1] : [1, 1, 1, 1],
+        position: [0, 0, 1, 0],
+        spot_direction: [0, 0, -1],
+        spot_exponent: 0,
+        spot_cutoff: 180,
+        attenuation: [1, 0, 0]
+      })),
+      light_model: { ambient: [0.2, 0.2, 0.2, 1], two_side: 0 },
+      material: { ambient: [0.2, 0.2, 0.2, 1], diffuse: [0.8, 0.8, 0.8, 1], specular: [0, 0, 0, 1], emission: [0, 0, 0, 1], shininess: 0 },
+      shade_model: 7425,
+      env: Array.from({ length: UNITS }, () => ({
+        mode: 8448,
+        color: [0, 0, 0, 0],
+        combine_rgb: 8448,
+        combine_alpha: 8448,
+        src_rgb: [5890, 34168, 34166],
+        src_alpha: [5890, 34168, 34166],
+        operand_rgb: [768, 768, 770],
+        operand_alpha: [770, 770, 770],
+        rgb_scale: 1,
+        alpha_scale: 1,
+        coord_replace: 0
+      })),
+      fog: { mode: 2048, density: 1, start: 0, end: 1, color: [0, 0, 0, 0] },
+      alpha_func: 519,
+      alpha_ref: 0,
+      clip_planes: Array.from({ length: CLIP_PLANES }, () => [0, 0, 0, 0]),
+      point: { size: 1, min: 0, max: 1, fade: 1, attenuation: [1, 0, 0] },
+      logic_op: 5379
+    };
+  }
+  function stack(ff, active_texture) {
+    const s = ff.stacks[ff.matrix_mode];
+    return ff.matrix_mode === 5890 ? s[active_texture] : s;
+  }
+  function modelview(c) {
+    return c.ff.stacks[5888].at(-1);
+  }
+  var x2f = (v) => v / 65536;
+  var xs = (values) => values.map(x2f);
+  function values_of(bytes, fixed) {
+    if (!bytes) return [];
+    const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+    const out = [];
+    for (let at = 0; at + 4 <= bytes.length; at += 4) out.push(fixed ? view.getInt32(at, true) / 65536 : view.getFloat32(at, true));
+    return out;
+  }
+  function matrix_op(build) {
+    return (shadow, c, args, fail2) => {
+      const m = build(args);
+      if (typeof m === "number") return fail2(c, m);
+      const s = stack(c.ff, c.active_texture);
+      s[s.length - 1] = mat_mul(s.at(-1), m);
+      return void 0;
+    };
+  }
+  var translate = ([x, y, z]) => [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, x, y, z, 1];
+  var scale = ([x, y, z]) => [x, 0, 0, 0, 0, y, 0, 0, 0, 0, z, 0, 0, 0, 0, 1];
+  function rotate([angle, x, y, z]) {
+    const length = Math.hypot(x, y, z);
+    if (!length) return IDENTITY.slice();
+    x /= length;
+    y /= length;
+    z /= length;
+    const a = angle * Math.PI / 180, cs = Math.cos(a), sn = Math.sin(a), t = 1 - cs;
+    return [
+      x * x * t + cs,
+      y * x * t + z * sn,
+      x * z * t - y * sn,
+      0,
+      x * y * t - z * sn,
+      y * y * t + cs,
+      y * z * t + x * sn,
+      0,
+      x * z * t + y * sn,
+      y * z * t - x * sn,
+      z * z * t + cs,
+      0,
+      0,
+      0,
+      0,
+      1
+    ];
+  }
+  function frustum([l, r, b, t, n, f]) {
+    if (n <= 0 || f <= 0 || l === r || b === t || n === f) return INVALID_VALUE;
+    return [
+      2 * n / (r - l),
+      0,
+      0,
+      0,
+      0,
+      2 * n / (t - b),
+      0,
+      0,
+      (r + l) / (r - l),
+      (t + b) / (t - b),
+      -(f + n) / (f - n),
+      -1,
+      0,
+      0,
+      -2 * f * n / (f - n),
+      0
+    ];
+  }
+  function ortho([l, r, b, t, n, f]) {
+    if (l === r || b === t || n === f) return INVALID_VALUE;
+    return [2 / (r - l), 0, 0, 0, 0, 2 / (t - b), 0, 0, 0, 0, -2 / (f - n), 0, -(r + l) / (r - l), -(t + b) / (t - b), -(f + n) / (f - n), 1];
+  }
+  function light(shadow, c, light_enum, pname, v, scalar, fail2) {
+    const index = light_enum - 16384;
+    if (index < 0 || index >= LIGHTS) return fail2(c, INVALID_ENUM);
+    const l = c.ff.lights[index];
+    const vector = { 4608: "ambient", 4609: "diffuse", 4610: "specular", 4611: "position", 4612: "spot_direction" }[pname];
+    if (vector) {
+      if (scalar) return fail2(c, INVALID_ENUM);
+      if (pname === 4611) l.position = transform(modelview(c), v.slice(0, 4));
+      else if (pname === 4612) {
+        const m = modelview(c);
+        l.spot_direction = [0, 1, 2].map((r) => m[r] * v[0] + m[4 + r] * v[1] + m[8 + r] * v[2]);
+      } else l[vector] = v.slice(0, 4);
+      return void 0;
+    }
+    const value = v[0];
+    switch (pname) {
+      case 4613:
+        if (value < 0 || value > 128) return fail2(c, INVALID_VALUE);
+        l.spot_exponent = value;
+        break;
+      case 4614:
+        if ((value < 0 || value > 90) && value !== 180) return fail2(c, INVALID_VALUE);
+        l.spot_cutoff = value;
+        break;
+      case 4615:
+      case 4616:
+      case 4617:
+        if (value < 0) return fail2(c, INVALID_VALUE);
+        l.attenuation[pname - 4615] = value;
+        break;
+      default:
+        return fail2(c, INVALID_ENUM);
+    }
+    return void 0;
+  }
+  function light_model(shadow, c, pname, v, scalar, fail2) {
+    if (pname === 2899 && !scalar) c.ff.light_model.ambient = v.slice(0, 4);
+    else if (pname === 2898) c.ff.light_model.two_side = v[0] ? 1 : 0;
+    else return fail2(c, INVALID_ENUM);
+    return void 0;
+  }
+  function material(shadow, c, face, pname, v, scalar, fail2) {
+    if (face !== 1032) return fail2(c, INVALID_ENUM);
+    const m = c.ff.material;
+    switch (pname) {
+      case 5633:
+        if (v[0] < 0 || v[0] > 128) return fail2(c, INVALID_VALUE);
+        m.shininess = v[0];
+        return void 0;
+      case 4608:
+      case 4609:
+      case 4610:
+      case 5632:
+      case 5634:
+        if (scalar) return fail2(c, INVALID_ENUM);
+        if (pname === 5634) m.ambient = m.diffuse = v.slice(0, 4);
+        else m[{ 4608: "ambient", 4609: "diffuse", 4610: "specular", 5632: "emission" }[pname]] = v.slice(0, 4);
+        return void 0;
+    }
+    return fail2(c, INVALID_ENUM);
+  }
+  var ENV_PNAMES = {
+    8704: ["mode", [8448, 8449, 3042, 260, 7681, 34160]],
+    34161: ["combine_rgb", [7681, 8448, 260, 34164, 34165, 34023, 34478, 34479]],
+    34162: ["combine_alpha", [7681, 8448, 260, 34164, 34165, 34023]],
+    34163: ["rgb_scale", null],
+    3356: ["alpha_scale", null]
+  };
+  var SOURCES = [5890, 34166, 34167, 34168];
+  function tex_env(shadow, c, target, pname, v, scalar, fail2) {
+    const env = c.ff.env[c.active_texture] || c.ff.env[0];
+    if (target === 34913) {
+      if (pname !== 34914) return fail2(c, INVALID_ENUM);
+      env.coord_replace = v[0] ? 1 : 0;
+      return void 0;
+    }
+    if (target !== 8960) return fail2(c, INVALID_ENUM);
+    if (pname === 8705) {
+      if (scalar) return fail2(c, INVALID_ENUM);
+      env.color = v.slice(0, 4).map((x) => Math.min(1, Math.max(0, x)));
+      return void 0;
+    }
+    const value = v[0];
+    if (pname >= 34176 && pname <= 34186) {
+    }
+    const src = {
+      34176: ["src_rgb", 0],
+      34177: ["src_rgb", 1],
+      34178: ["src_rgb", 2],
+      34184: ["src_alpha", 0],
+      34185: ["src_alpha", 1],
+      34186: ["src_alpha", 2]
+    }[pname];
+    if (src) {
+      if (!SOURCES.includes(value)) return fail2(c, INVALID_ENUM);
+      env[src[0]][src[1]] = value;
+      return void 0;
+    }
+    const operand = {
+      34192: ["operand_rgb", 0],
+      34193: ["operand_rgb", 1],
+      34194: ["operand_rgb", 2],
+      34200: ["operand_alpha", 0],
+      34201: ["operand_alpha", 1],
+      34202: ["operand_alpha", 2]
+    }[pname];
+    if (operand) {
+      const allowed = operand[0] === "operand_rgb" ? [768, 769, 770, 771] : [770, 771];
+      if (!allowed.includes(value)) return fail2(c, INVALID_ENUM);
+      env[operand[0]][operand[1]] = value;
+      return void 0;
+    }
+    const entry = ENV_PNAMES[pname];
+    if (!entry) return fail2(c, INVALID_ENUM);
+    if (entry[1] && !entry[1].includes(value)) return fail2(c, INVALID_ENUM);
+    if (!entry[1] && value !== 1 && value !== 2 && value !== 4) return fail2(c, INVALID_VALUE);
+    env[entry[0]] = value;
+    return void 0;
+  }
+  function fog(shadow, c, pname, v, scalar, fail2) {
+    const f = c.ff.fog;
+    switch (pname) {
+      case 2917:
+        if (![9729, 2048, 2049].includes(v[0])) return fail2(c, INVALID_ENUM);
+        f.mode = v[0];
+        break;
+      case 2914:
+        if (v[0] < 0) return fail2(c, INVALID_VALUE);
+        f.density = v[0];
+        break;
+      case 2915:
+        f.start = v[0];
+        break;
+      case 2916:
+        f.end = v[0];
+        break;
+      case 2918:
+        if (scalar) return fail2(c, INVALID_ENUM);
+        f.color = v.slice(0, 4).map((x) => Math.min(1, Math.max(0, x)));
+        break;
+      default:
+        return fail2(c, INVALID_ENUM);
+    }
+    return void 0;
+  }
+  function point_parameter(shadow, c, pname, v, scalar, fail2) {
+    const p = c.ff.point;
+    switch (pname) {
+      case 33062:
+        if (v[0] < 0) return fail2(c, INVALID_VALUE);
+        p.min = v[0];
+        break;
+      case 33063:
+        if (v[0] < 0) return fail2(c, INVALID_VALUE);
+        p.max = v[0];
+        break;
+      case 33064:
+        if (v[0] < 0) return fail2(c, INVALID_VALUE);
+        p.fade = v[0];
+        break;
+      case 33065:
+        if (scalar) return fail2(c, INVALID_ENUM);
+        p.attenuation = v.slice(0, 3);
+        break;
+      default:
+        return fail2(c, INVALID_ENUM);
+    }
+    return void 0;
+  }
+  function clip_plane(shadow, c, plane, v, fail2) {
+    const index = plane - 12288;
+    if (index < 0 || index >= CLIP_PLANES) return fail2(c, INVALID_ENUM);
+    const inv = mat_inverse(modelview(c));
+    c.ff.clip_planes[index] = [0, 1, 2, 3].map((col) => v[0] * inv[col * 4] + v[1] * inv[col * 4 + 1] + v[2] * inv[col * 4 + 2] + v[3] * inv[col * 4 + 3]);
+    return void 0;
+  }
+  function pointer(array, sizes, types) {
+    return (shadow, c, args, fail2, data_form) => {
+      let unit = null, size, type, stride, rest;
+      if (array === "texcoord" && data_form) [unit, size, type, stride, ...rest] = args;
+      else if (sizes) [size, type, stride, ...rest] = args;
+      else {
+        [type, stride, ...rest] = args;
+        size = array === "normal" ? 3 : 1;
+      }
+      if (sizes && !sizes.includes(size) || stride < 0) return fail2(c, INVALID_VALUE);
+      if (!types.includes(type)) return fail2(c, INVALID_ENUM);
+      const ff = c.ff;
+      const p = array === "texcoord" ? ff.arrays.texcoord[unit === null ? ff.client_active_texture : unit] : ff.arrays[array];
+      if (!p) return fail2(c, INVALID_VALUE);
+      Object.assign(p, { size, type, stride, buffer: data_form ? 0 : c.array_buffer, offset: data_form ? 0 : rest[0], data: data_form ? rest[0] : null });
+      return void 0;
+    };
+  }
+  var POSITION_TYPES = [BYTE, SHORT, FIXED, FLOAT];
+  var ARRAY_HANDLERS = {
+    "glVertexPointer": pointer("vertex", [2, 3, 4], POSITION_TYPES),
+    "glColorPointer": pointer("color", [4], [UNSIGNED_BYTE, FIXED, FLOAT]),
+    "glNormalPointer": pointer("normal", null, POSITION_TYPES),
+    "glTexCoordPointer": pointer("texcoord", [2, 3, 4], POSITION_TYPES),
+    "glPointSizePointer": pointer("point_size", null, [FIXED, FLOAT])
+  };
+  function gles1_handlers(fail2, query2) {
+    const H = {};
+    const matrix = (build) => {
+      const op = matrix_op(build);
+      return (s, c, a) => op(s, c, a, fail2);
+    };
+    const both = (name, f) => {
+      H[name + "f"] = (s, c, a) => f(s, c, a, false);
+      H[name + "x"] = (s, c, a) => f(s, c, a.map((v, i) => typeof v === "number" ? v : v), true);
+    };
+    H["glMatrixMode"] = (s, c, [mode]) => {
+      if (!STACK_DEPTH[mode]) return fail2(c, INVALID_ENUM);
+      c.ff.matrix_mode = mode;
+      return void 0;
+    };
+    H["glLoadIdentity"] = (s, c) => {
+      const st = stack(c.ff, c.active_texture);
+      st[st.length - 1] = IDENTITY.slice();
+      return void 0;
+    };
+    H["glLoadMatrixf"] = (s, c, [m]) => {
+      const st = stack(c.ff, c.active_texture);
+      st[st.length - 1] = values_of(m, false).slice(0, 16);
+      return void 0;
+    };
+    H["glLoadMatrixx"] = (s, c, [m]) => {
+      const st = stack(c.ff, c.active_texture);
+      st[st.length - 1] = values_of(m, true).slice(0, 16);
+      return void 0;
+    };
+    H["glMultMatrixf"] = matrix(([m]) => values_of(m, false).slice(0, 16));
+    H["glMultMatrixx"] = matrix(([m]) => values_of(m, true).slice(0, 16));
+    H["glPushMatrix"] = (s, c) => {
+      const st = stack(c.ff, c.active_texture);
+      if (st.length >= STACK_DEPTH[c.ff.matrix_mode]) return fail2(c, STACK_OVERFLOW);
+      st.push(st.at(-1).slice());
+      return void 0;
+    };
+    H["glPopMatrix"] = (s, c) => {
+      const st = stack(c.ff, c.active_texture);
+      if (st.length <= 1) return fail2(c, STACK_UNDERFLOW);
+      st.pop();
+      return void 0;
+    };
+    H["glTranslatef"] = matrix(translate);
+    H["glTranslatex"] = matrix((a) => translate(xs(a)));
+    H["glScalef"] = matrix(scale);
+    H["glScalex"] = matrix((a) => scale(xs(a)));
+    H["glRotatef"] = matrix(rotate);
+    H["glRotatex"] = matrix((a) => rotate(xs(a)));
+    H["glFrustumf"] = matrix(frustum);
+    H["glFrustumx"] = matrix((a) => frustum(xs(a)));
+    H["glOrthof"] = matrix(ortho);
+    H["glOrthox"] = matrix((a) => ortho(xs(a)));
+    H["glColor4f"] = (s, c, rgba) => {
+      c.ff.color = rgba.slice();
+      return void 0;
+    };
+    H["glColor4x"] = (s, c, rgba) => {
+      c.ff.color = xs(rgba);
+      return void 0;
+    };
+    H["glColor4ub"] = (s, c, rgba) => {
+      c.ff.color = rgba.map((v) => v / 255);
+      return void 0;
+    };
+    H["glNormal3f"] = (s, c, n) => {
+      c.ff.normal = n.slice();
+      return void 0;
+    };
+    H["glNormal3x"] = (s, c, n) => {
+      c.ff.normal = xs(n);
+      return void 0;
+    };
+    const texcoord = (fixed) => (s, c, [target, ...v]) => {
+      const unit = target - 33984;
+      if (unit < 0 || unit >= UNITS) return fail2(c, INVALID_ENUM);
+      c.ff.texcoord[unit] = fixed ? xs(v) : v.slice();
+      return void 0;
+    };
+    H["glMultiTexCoord4f"] = texcoord(false);
+    H["glMultiTexCoord4x"] = texcoord(true);
+    H["glPointSize"] = (s, c, [size]) => {
+      if (!(size > 0)) return fail2(c, INVALID_VALUE);
+      c.ff.point.size = size;
+      return void 0;
+    };
+    H["glPointSizex"] = (s, c, [size]) => H["glPointSize"](s, c, [x2f(size)]);
+    H["glClientActiveTexture"] = (s, c, [texture]) => {
+      const unit = texture - 33984;
+      if (unit < 0 || unit >= UNITS) return fail2(c, INVALID_ENUM);
+      c.ff.client_active_texture = unit;
+      return void 0;
+    };
+    const client_state = (enable) => (s, c, [array]) => {
+      const name = CLIENT_ARRAYS[array];
+      if (!name) return fail2(c, INVALID_ENUM);
+      const p = name === "texcoord" ? c.ff.arrays.texcoord[c.ff.client_active_texture] : c.ff.arrays[name];
+      p.enabled = enable;
+      return void 0;
+    };
+    H["glEnableClientState"] = client_state(true);
+    H["glDisableClientState"] = client_state(false);
+    for (const [name, handler] of Object.entries(ARRAY_HANDLERS)) {
+      H[name + "Data"] = (s, c, a) => handler(s, c, a, fail2, true);
+      H[name + "Offset"] = (s, c, a) => handler(s, c, a, fail2, false);
+    }
+    for (const name of [
+      "glWeightPointerData",
+      "glWeightPointerOffset",
+      "glMatrixIndexPointerData",
+      "glMatrixIndexPointerOffset",
+      "glCurrentPaletteMatrixOES",
+      "glLoadPaletteFromModelViewMatrixOES"
+    ]) H[name] = () => void 0;
+    for (const [name, f] of [["glLight", light], ["glMaterial", material]]) {
+      H[name + "f"] = (s, c, [a, pname, v]) => f(s, c, a, pname, [v], true, fail2);
+      H[name + "x"] = (s, c, [a, pname, v]) => f(s, c, a, pname, [pname === 4614 || pname === 4613 || pname >= 4615 || pname === 5633 ? x2f(v) : x2f(v)], true, fail2);
+      H[name + "fv"] = (s, c, [a, pname, v]) => f(s, c, a, pname, values_of(v, false), false, fail2);
+      H[name + "xv"] = (s, c, [a, pname, v]) => f(s, c, a, pname, values_of(v, true), false, fail2);
+    }
+    for (const [name, f] of [["glLightModel", light_model], ["glFog", fog], ["glPointParameter", point_parameter]]) {
+      const enum_valued = (pname) => name === "glFog" && pname === 2917;
+      H[name + "f"] = (s, c, [pname, v]) => f(s, c, pname, [v], true, fail2);
+      H[name + "x"] = (s, c, [pname, v]) => f(s, c, pname, [enum_valued(pname) ? v : x2f(v)], true, fail2);
+      H[name + "fv"] = (s, c, [pname, v]) => f(s, c, pname, values_of(v, false), false, fail2);
+      H[name + "xv"] = (s, c, [pname, v]) => f(s, c, pname, enum_valued(pname) ? [values_of(v, true)[0] * 65536] : values_of(v, true), false, fail2);
+    }
+    const env_enum = (pname) => pname !== 8705 && pname !== 34163 && pname !== 3356;
+    H["glTexEnvf"] = (s, c, [t, pname, v]) => tex_env(s, c, t, pname, [v], true, fail2);
+    H["glTexEnvi"] = (s, c, [t, pname, v]) => tex_env(s, c, t, pname, [v], true, fail2);
+    H["glTexEnvx"] = (s, c, [t, pname, v]) => tex_env(s, c, t, pname, [env_enum(pname) ? v : x2f(v)], true, fail2);
+    H["glTexEnvfv"] = (s, c, [t, pname, v]) => tex_env(s, c, t, pname, values_of(v, false), false, fail2);
+    H["glTexEnviv"] = (s, c, [t, pname, v]) => tex_env(s, c, t, pname, pname === 8705 ? values_of(v, true).map((x) => x * 65536 / 2147483647) : values_of(v, true).map((x) => x * 65536), false, fail2);
+    H["glTexEnvxv"] = (s, c, [t, pname, v]) => tex_env(s, c, t, pname, env_enum(pname) ? values_of(v, true).map((x) => x * 65536) : values_of(v, true), false, fail2);
+    H["glShadeModel"] = (s, c, [mode]) => {
+      if (mode !== 7424 && mode !== 7425) return fail2(c, INVALID_ENUM);
+      c.ff.shade_model = mode;
+      return void 0;
+    };
+    H["glAlphaFunc"] = (s, c, [func, ref]) => {
+      if (func < 512 || func > 519) return fail2(c, INVALID_ENUM);
+      c.ff.alpha_func = func;
+      c.ff.alpha_ref = Math.min(1, Math.max(0, ref));
+      return void 0;
+    };
+    H["glAlphaFuncx"] = (s, c, [func, ref]) => H["glAlphaFunc"](s, c, [func, x2f(ref)]);
+    H["glClipPlanef"] = (s, c, [plane, eq]) => clip_plane(s, c, plane, values_of(eq, false), fail2);
+    H["glClipPlanex"] = (s, c, [plane, eq]) => clip_plane(s, c, plane, values_of(eq, true), fail2);
+    H["glLogicOp"] = (s, c, [op]) => {
+      if (op < 5376 || op > 5391) return fail2(c, INVALID_ENUM);
+      c.ff.logic_op = op;
+      return void 0;
+    };
+    const draw_tex = (s, c, [x, y, z, w, h]) => w <= 0 || h <= 0 ? fail2(c, INVALID_VALUE) : void 0;
+    H["glDrawTexsOES"] = draw_tex;
+    H["glDrawTexiOES"] = draw_tex;
+    H["glDrawTexfOES"] = draw_tex;
+    H["glDrawTexxOES"] = (s, c, a) => draw_tex(s, c, xs(a));
+    H["glDrawTexsvOES"] = (s, c, [v]) => draw_tex(s, c, Array.from(new Int16Array(v.slice().buffer)));
+    H["glDrawTexivOES"] = (s, c, [v]) => draw_tex(s, c, Array.from(new Int32Array(v.slice().buffer)));
+    H["glDrawTexfvOES"] = (s, c, [v]) => draw_tex(s, c, values_of(v, false));
+    H["glDrawTexxvOES"] = (s, c, [v]) => draw_tex(s, c, values_of(v, true));
+    for (const [x, f, convert] of [
+      ["glClearColorx", "glClearColor", xs],
+      ["glClearDepthx", "glClearDepthf", xs],
+      ["glDepthRangex", "glDepthRangef", xs],
+      ["glLineWidthx", "glLineWidth", xs],
+      ["glPolygonOffsetx", "glPolygonOffset", xs],
+      ["glSampleCoveragex", "glSampleCoverage", (a) => [x2f(a[0]), a[1]]]
+    ]) {
+      H[x] = (s, c, a) => s.handlers[f](s, c, convert(a));
+    }
+    H["glGetLightfv"] = (s, c, [l, pname, out]) => get_light(s, c, l, pname, out, "f", query2, fail2);
+    H["glGetLightxv"] = (s, c, [l, pname, out]) => get_light(s, c, l, pname, out, "x", query2, fail2);
+    H["glGetMaterialfv"] = (s, c, [face, pname, out]) => get_material(s, c, face, pname, out, "f", query2, fail2);
+    H["glGetMaterialxv"] = (s, c, [face, pname, out]) => get_material(s, c, face, pname, out, "x", query2, fail2);
+    H["glGetTexEnvfv"] = (s, c, [t, pname, out]) => get_tex_env(s, c, t, pname, out, "f", query2, fail2);
+    H["glGetTexEnviv"] = (s, c, [t, pname, out]) => get_tex_env(s, c, t, pname, out, "i", query2, fail2);
+    H["glGetTexEnvxv"] = (s, c, [t, pname, out]) => get_tex_env(s, c, t, pname, out, "x", query2, fail2);
+    H["glGetClipPlanef"] = (s, c, [plane, out]) => get_clip_plane(s, c, plane, out, "f", query2, fail2);
+    H["glGetClipPlanex"] = (s, c, [plane, out]) => get_clip_plane(s, c, plane, out, "x", query2, fail2);
+    void both;
+    return H;
+  }
+  function put_values(out, values, as, normalized) {
+    for (let i = 0; i < values.length && 4 * i + 4 <= out.size; i++) {
+      const v = values[i];
+      if (as === "f") out.view.setFloat32(4 * i, v, true);
+      else if (as === "x") out.view.setInt32(4 * i, Math.round(v * 65536), true);
+      else out.view.setInt32(4 * i, normalized ? Math.round(Math.max(-1, Math.min(1, v)) * 2147483647) : Math.round(v), true);
+    }
+  }
+  function get_light(s, c, light_enum, pname, out, as, query2, fail2) {
+    query2(s);
+    const l = c.ff.lights[light_enum - 16384];
+    if (!l) return fail2(c, INVALID_ENUM);
+    const value = {
+      4608: l.ambient,
+      4609: l.diffuse,
+      4610: l.specular,
+      4611: l.position,
+      4612: l.spot_direction,
+      4613: [l.spot_exponent],
+      4614: [l.spot_cutoff],
+      4615: [l.attenuation[0]],
+      4616: [l.attenuation[1]],
+      4617: [l.attenuation[2]]
+    }[pname];
+    if (!value) return fail2(c, INVALID_ENUM);
+    put_values(out, value, as, false);
+    return void 0;
+  }
+  function get_material(s, c, face, pname, out, as, query2, fail2) {
+    query2(s);
+    if (face !== 1028 && face !== 1029) return fail2(c, INVALID_ENUM);
+    const m = c.ff.material;
+    const value = { 4608: m.ambient, 4609: m.diffuse, 4610: m.specular, 5632: m.emission, 5633: [m.shininess] }[pname];
+    if (!value) return fail2(c, INVALID_ENUM);
+    put_values(out, value, as, false);
+    return void 0;
+  }
+  function get_tex_env(s, c, target, pname, out, as, query2, fail2) {
+    query2(s);
+    const env = c.ff.env[c.active_texture] || c.ff.env[0];
+    if (target === 34913 && pname === 34914) {
+      put_values(out, [env.coord_replace], as === "x" ? "i" : as, false);
+      return void 0;
+    }
+    if (target !== 8960) return fail2(c, INVALID_ENUM);
+    if (pname === 8705) {
+      put_values(out, env.color, as, as === "i");
+      return void 0;
+    }
+    const value = {
+      8704: env.mode,
+      34161: env.combine_rgb,
+      34162: env.combine_alpha,
+      34163: env.rgb_scale,
+      3356: env.alpha_scale,
+      34176: env.src_rgb[0],
+      34177: env.src_rgb[1],
+      34178: env.src_rgb[2],
+      34184: env.src_alpha[0],
+      34185: env.src_alpha[1],
+      34186: env.src_alpha[2],
+      34192: env.operand_rgb[0],
+      34193: env.operand_rgb[1],
+      34194: env.operand_rgb[2],
+      34200: env.operand_alpha[0],
+      34201: env.operand_alpha[1],
+      34202: env.operand_alpha[2]
+    }[pname];
+    if (value === void 0) return fail2(c, INVALID_ENUM);
+    const scale2 = pname === 34163 || pname === 3356;
+    put_values(out, [value], as === "x" && !scale2 ? "i" : as, false);
+    return void 0;
+  }
+  function get_clip_plane(s, c, plane, out, as, query2, fail2) {
+    query2(s);
+    const p = c.ff.clip_planes[plane - 12288];
+    if (!p) return fail2(c, INVALID_ENUM);
+    put_values(out, p, as, false);
+    return void 0;
+  }
+  function gles1_state_value(c, pname) {
+    const ff = c.ff;
+    const unit = c.active_texture;
+    const tex = ff.arrays.texcoord[ff.client_active_texture];
+    switch (pname) {
+      case 2976:
+        return [[ff.matrix_mode], "i"];
+      case 2982:
+        return [ff.stacks[5888].at(-1), "f"];
+      case 2983:
+        return [ff.stacks[5889].at(-1), "f"];
+      case 2984:
+        return [ff.stacks[5890][unit].at(-1), "f"];
+      case 2979:
+        return [[ff.stacks[5888].length], "i"];
+      case 2980:
+        return [[ff.stacks[5889].length], "i"];
+      case 2981:
+        return [[ff.stacks[5890][unit].length], "i"];
+      case 2816:
+        return [ff.color, "n"];
+      case 2818:
+        return [ff.normal, "n"];
+      case 2819:
+        return [ff.texcoord[unit], "f"];
+      case 2833:
+        return [[ff.point.size], "f"];
+      case 33062:
+        return [[ff.point.min], "f"];
+      case 33063:
+        return [[ff.point.max], "f"];
+      case 33064:
+        return [[ff.point.fade], "f"];
+      case 33065:
+        return [ff.point.attenuation, "f"];
+      case 2900:
+        return [[ff.shade_model], "i"];
+      case 2899:
+        return [ff.light_model.ambient, "n"];
+      case 2898:
+        return [[ff.light_model.two_side], "b"];
+      case 2917:
+        return [[ff.fog.mode], "i"];
+      case 2914:
+        return [[ff.fog.density], "f"];
+      case 2915:
+        return [[ff.fog.start], "f"];
+      case 2916:
+        return [[ff.fog.end], "f"];
+      case 2918:
+        return [ff.fog.color, "n"];
+      case 3009:
+        return [[ff.alpha_func], "i"];
+      case 3010:
+        return [[ff.alpha_ref], "n"];
+      case 3056:
+        return [[ff.logic_op], "i"];
+      case 34017:
+        return [[33984 + ff.client_active_texture], "i"];
+      case 32890:
+        return [[ff.arrays.vertex.size], "i"];
+      case 32891:
+        return [[ff.arrays.vertex.type], "i"];
+      case 32892:
+        return [[ff.arrays.vertex.stride], "i"];
+      case 32894:
+        return [[ff.arrays.normal.type], "i"];
+      case 32895:
+        return [[ff.arrays.normal.stride], "i"];
+      case 32897:
+        return [[ff.arrays.color.size], "i"];
+      case 32898:
+        return [[ff.arrays.color.type], "i"];
+      case 32899:
+        return [[ff.arrays.color.stride], "i"];
+      case 32904:
+        return [[tex.size], "i"];
+      case 32905:
+        return [[tex.type], "i"];
+      case 32906:
+        return [[tex.stride], "i"];
+      case 35210:
+        return [[ff.arrays.point_size.type], "i"];
+      case 35211:
+        return [[ff.arrays.point_size.stride], "i"];
+      case 34966:
+        return [[ff.arrays.vertex.buffer], "i"];
+      case 34967:
+        return [[ff.arrays.normal.buffer], "i"];
+      case 34968:
+        return [[ff.arrays.color.buffer], "i"];
+      case 34970:
+        return [[tex.buffer], "i"];
+      case 35743:
+        return [[ff.arrays.point_size.buffer], "i"];
+      case 32884:
+        return [[+ff.arrays.vertex.enabled], "b"];
+      case 32885:
+        return [[+ff.arrays.normal.enabled], "b"];
+      case 32886:
+        return [[+ff.arrays.color.enabled], "b"];
+      case 32888:
+        return [[+tex.enabled], "b"];
+      case 35740:
+        return [[+ff.arrays.point_size.enabled], "b"];
+      case 3553:
+        return [[+ff.texture_enabled[unit][3553]], "b"];
+      case 36197:
+        return [[+ff.texture_enabled[unit][36197]], "b"];
+    }
+    return null;
+  }
+
+  // src/gles/gles_snapshot.js
+  var TYPED = { Uint8Array, Int8Array, Uint8ClampedArray, Uint16Array, Int16Array, Uint32Array, Int32Array, Float32Array, Float64Array };
+  function pack2(value, options = {}) {
+    const classes = new Map(Object.entries(options.classes || {}).map(([tag, prototype]) => [prototype, tag]));
+    const skip = options.skip || (() => false);
+    const buffers = [];
+    const seen = /* @__PURE__ */ new Map();
+    const walk = (v) => {
+      if (v === void 0) return { $u: 1 };
+      if (typeof v === "number") return Number.isFinite(v) && !Object.is(v, -0) ? v : { $n: Object.is(v, -0) ? "-0" : String(v) };
+      if (typeof v === "bigint") return { $g: v.toString() };
+      if (typeof v === "function" || typeof v === "symbol") return { $u: 1 };
+      if (v === null || typeof v !== "object") return v;
+      if (ArrayBuffer.isView(v)) {
+        const name = Object.keys(TYPED).find((n) => v instanceof TYPED[n]);
+        if (!name) return { $u: 1 };
+        buffers.push(new Uint8Array(v.buffer.slice(v.byteOffset, v.byteOffset + v.byteLength)));
+        return { $t: name, $b: buffers.length - 1 };
+      }
+      if (v instanceof ArrayBuffer) {
+        buffers.push(new Uint8Array(v.slice(0)));
+        return { $t: "ArrayBuffer", $b: buffers.length - 1 };
+      }
+      if (seen.has(v)) return { $r: seen.get(v) };
+      const prototype = Object.getPrototypeOf(v);
+      const tag = classes.get(prototype);
+      if (prototype !== Object.prototype && prototype !== null && !tag && !Array.isArray(v) && !(v instanceof Map) && !(v instanceof Set)) {
+        return { $u: 1 };
+      }
+      const id = seen.size;
+      seen.set(v, id);
+      if (Array.isArray(v)) return { $i: id, $a: v.map(walk) };
+      if (v instanceof Map) return { $i: id, $m: [...v].map(([k, x]) => [walk(k), walk(x)]) };
+      if (v instanceof Set) return { $i: id, $s: [...v].map(walk) };
+      const fields = {};
+      for (const key of Object.keys(v)) if (!skip(key, v)) fields[key] = walk(v[key]);
+      return tag ? { $i: id, $o: fields, $c: tag } : { $i: id, $o: fields };
+    };
+    return [JSON.stringify(walk(value)), buffers];
+  }
+  function unpack(packed, classes = {}) {
+    const [json, buffers] = packed;
+    const objects = /* @__PURE__ */ new Map();
+    const walk = (v) => {
+      if (v === null || typeof v !== "object") return v;
+      if ("$u" in v) return void 0;
+      if ("$n" in v) return v.$n === "-0" ? -0 : Number(v.$n);
+      if ("$g" in v) return BigInt(v.$g);
+      if ("$t" in v) {
+        const bytes = buffers[v.$b];
+        const copy = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
+        return v.$t === "ArrayBuffer" ? copy : new TYPED[v.$t](copy);
+      }
+      if ("$r" in v) return objects.get(v.$r);
+      if ("$a" in v) {
+        const array = [];
+        objects.set(v.$i, array);
+        for (const x of v.$a) array.push(walk(x));
+        return array;
+      }
+      if ("$m" in v) {
+        const map = /* @__PURE__ */ new Map();
+        objects.set(v.$i, map);
+        for (const [k, x] of v.$m) map.set(walk(k), walk(x));
+        return map;
+      }
+      if ("$s" in v) {
+        const set = /* @__PURE__ */ new Set();
+        objects.set(v.$i, set);
+        for (const x of v.$s) set.add(walk(x));
+        return set;
+      }
+      const object = Object.create(v.$c ? classes[v.$c] : Object.prototype);
+      objects.set(v.$i, object);
+      for (const [key, x] of Object.entries(v.$o)) object[key] = walk(x);
+      return object;
+    };
+    return walk(JSON.parse(json));
+  }
+  function shadow_skip(key, owner) {
+    return key === "gpu" || owner.kind === "shader" && key === "compiled" || owner.kind === "program" && key === "info" && !(owner.link && owner.link.glslang && owner.keep_info);
+  }
+  function relink(groups, shadow) {
+    const cache = /* @__PURE__ */ new Map();
+    const compiled = (source, stage) => {
+      const key = stage + "\n" + source;
+      if (!cache.has(key)) cache.set(key, compile_shader(source, stage));
+      return cache.get(key);
+    };
+    for (const group of groups.values()) {
+      for (const object of group.objects.values()) {
+        if (object.kind === "shader") {
+          object.compiled = object.compiled_source === null || object.compiled_source === void 0 ? null : shadow ? shadow.compile(object.compiled_source, object.type, !!group.glslang, !!group.es2) : compiled(object.compiled_source, object.type === 35633 ? "vertex" : "fragment");
+        } else if (object.kind === "program" && object.link && object.link.glslang) {
+          if (object.info) continue;
+          const link = object.link;
+          const shaders = link.shaders.map(([type, source]) => ({
+            type,
+            compiled_source: source,
+            compiled: shadow.compile(source, type, true, !!group.es2)
+          }));
+          object.info = shadow.link({ bindings: link.bindings, separable: !!link.separable, tf_request: link.tf || null }, shaders, !!group.es2);
+        } else if (object.kind === "program") {
+          const link = object.link;
+          object.info = link ? link_program(
+            link.vs === null ? null : compiled(link.vs, "vertex"),
+            link.fs === null ? null : compiled(link.fs, "fragment"),
+            new Map(link.bindings)
+          ) : null;
+        }
+      }
+    }
+  }
+
+  // src/gles/gles_shadow.js
+  var MAX_ATTRIBS3 = 16;
+  var MAX_UNITS2 = 32;
+  var MAX_VIEWPORT = MAX_SIZE;
+  var MAX_LEVEL = Math.log2(MAX_SIZE);
+  var BLEND_EQUATIONS = /* @__PURE__ */ new Set([32774, 32778, 32779]);
+  var BLEND_MINMAX = /* @__PURE__ */ new Set([32775, 32776]);
+  var equation_ok = (c, mode, advanced) => BLEND_EQUATIONS.has(mode) || c.version >= 30 && BLEND_MINMAX.has(mode) || advanced && c.version >= 32 && ADVANCED_EQUATIONS.includes(mode);
+  var BLEND_FACTORS = /* @__PURE__ */ new Set([0, 1, 768, 769, 770, 771, 772, 773, 774, 775, 32769, 32770, 32771, 32772]);
+  var SRC_ALPHA_SATURATE = 776;
+  var source_factor = (f) => BLEND_FACTORS.has(f) || f === SRC_ALPHA_SATURATE;
+  var destination_factor = (c, f) => BLEND_FACTORS.has(f) || f === SRC_ALPHA_SATURATE && c.version >= 30;
+  var COMPARE_FUNCS2 = /* @__PURE__ */ new Set([512, 513, 514, 515, 516, 517, 518, 519]);
+  var STENCIL_OPS = /* @__PURE__ */ new Set([0, 7680, 7681, 7682, 7683, 5386, 34055, 34056]);
+  var FACES = /* @__PURE__ */ new Set([1028, 1029, 1032]);
+  var FRONT = 1028;
+  var BACK = 1029;
+  var HINT_MODES = /* @__PURE__ */ new Set([4352, 4353, 4354]);
+  var MODES2 = /* @__PURE__ */ new Set([GL.POINTS, GL.LINES, GL.LINE_LOOP, GL.LINE_STRIP, GL.TRIANGLES, GL.TRIANGLE_STRIP, GL.TRIANGLE_FAN]);
+  var INDEX_TYPES2 = /* @__PURE__ */ new Set([GL.UNSIGNED_BYTE, GL.UNSIGNED_SHORT, GL.UNSIGNED_INT]);
+  var ATTRIB_TYPES = /* @__PURE__ */ new Set([GL.BYTE, GL.UNSIGNED_BYTE, GL.SHORT, GL.UNSIGNED_SHORT, GL.FLOAT, GL.FIXED, GL.HALF_FLOAT_OES]);
+  var CLEAR_BITS = 16384 | 256 | 1024;
+  var USAGES = /* @__PURE__ */ new Set([GL.STREAM_DRAW, GL.STATIC_DRAW, GL.DYNAMIC_DRAW]);
+  var MIN_FILTERS2 = /* @__PURE__ */ new Set([GL.NEAREST, GL.LINEAR, GL.NEAREST_MIPMAP_NEAREST, GL.LINEAR_MIPMAP_NEAREST, GL.NEAREST_MIPMAP_LINEAR, GL.LINEAR_MIPMAP_LINEAR]);
+  var WRAPS2 = /* @__PURE__ */ new Set([GL.REPEAT, GL.CLAMP_TO_EDGE, GL.MIRRORED_REPEAT]);
+  var ATTACHMENTS = [GL.COLOR_ATTACHMENT0, GL.DEPTH_ATTACHMENT, GL.STENCIL_ATTACHMENT];
+  var REFUSED = /* @__PURE__ */ Symbol("refused");
+  function ShareGroup() {
+    this.textures = /* @__PURE__ */ new Map();
+    this.buffers = /* @__PURE__ */ new Map();
+    this.renderbuffers = /* @__PURE__ */ new Map();
+    this.objects = /* @__PURE__ */ new Map();
+    this.reserved = { texture: /* @__PURE__ */ new Set(), buffer: /* @__PURE__ */ new Set(), renderbuffer: /* @__PURE__ */ new Set() };
+    this.next = { texture: 1, buffer: 1, renderbuffer: 1, object: 1 };
+    this.contexts = 0;
+  }
+  ShareGroup.prototype.fresh = function(kind, objects) {
+    const reserved = this.reserved[kind];
+    let name = this.next[kind];
+    while (objects.has(name) || reserved && reserved.has(name)) name++;
+    this.next[kind] = name + 1;
+    return name;
+  };
+  function new_texture(target) {
+    const external = target === GL.TEXTURE_EXTERNAL_OES;
+    return {
+      target,
+      images: /* @__PURE__ */ new Map(),
+      min_filter: external ? GL.LINEAR : GL.NEAREST_MIPMAP_LINEAR,
+      mag_filter: GL.LINEAR,
+      wrap_s: external ? GL.CLAMP_TO_EDGE : GL.REPEAT,
+      wrap_t: external ? GL.CLAMP_TO_EDGE : GL.REPEAT,
+      generate_mipmap: 0,
+      crop: [0, 0, 0, 0]
+    };
+  }
+  function new_attrib() {
+    return { enabled: false, size: 4, type: GL.FLOAT, normalized: false, stride: 0, buffer: 0, offset: 0, current: [0, 0, 0, 1] };
+  }
+  function Context(api, group) {
+    this.api = api >= 30 ? 3 : api === 20 ? 2 : api;
+    this.version = api >= 30 ? api : api === 1 ? 11 : 20;
+    this.glslang = api === 20 || api >= 30;
+    this.group = group;
+    this.error = GL.NO_ERROR;
+    this.surface = null;
+    this.made_current = false;
+    this.framebuffers = /* @__PURE__ */ new Map();
+    this.reserved_framebuffers = /* @__PURE__ */ new Set();
+    this.next_framebuffer = 1;
+    this.enabled = /* @__PURE__ */ new Set([3024, ...api === 1 ? [32925] : []]);
+    this.viewport = [0, 0, 0, 0];
+    this.scissor = [0, 0, 0, 0];
+    this.depth_range = [0, 1];
+    this.line_width = 1;
+    this.cull_face = BACK;
+    this.front_face = 2305;
+    this.polygon_offset = [0, 0];
+    this.sample_coverage = [1, 0];
+    this.clear_color = [0, 0, 0, 0];
+    this.clear_depth = 1;
+    this.clear_stencil = 0;
+    this.color_mask = [1, 1, 1, 1];
+    this.depth_mask = 1;
+    this.stencil_writemask = [-1, -1];
+    this.blend_func = [1, 0, 1, 0];
+    this.blend_equation = [32774, 32774];
+    this.blend_color = [0, 0, 0, 0];
+    this.depth_func = 513;
+    this.stencil_func = [[519, 0, -1], [519, 0, -1]];
+    this.stencil_op = [[7680, 7680, 7680], [7680, 7680, 7680]];
+    this.unpack_alignment = 4;
+    this.pack_alignment = 4;
+    this.hints = /* @__PURE__ */ new Map([[33170, 4352], [35723, 4352], [3152, 4352], [3153, 4352], [3154, 4352], [3156, 4352]]);
+    this.active_texture = 0;
+    this.textures = Array.from({ length: MAX_UNITS2 }, () => [0, 0, 0]);
+    this.array_buffer = 0;
+    this.element_array_buffer = 0;
+    this.framebuffer = 0;
+    this.renderbuffer = 0;
+    this.program = 0;
+    this.attribs = Array.from({ length: MAX_ATTRIBS3 }, new_attrib);
+    this.ff = api === 1 ? new_ff_state() : null;
+    if (this.api === 3) {
+      extend_group3(group);
+      extend_context3(this);
+      if (this.version >= 31) extend_context31(this);
+    }
+  }
+  function initial_values(info) {
+    const values = /* @__PURE__ */ new Map();
+    if (!info || !info.ok) return values;
+    for (const u of info.uniforms) {
+      if (u.opaque !== "sampler" && u.opaque !== "image" || !(u.binding > 0) || u.location < 0) continue;
+      for (let e = 0; e < u.size; e++) values.set(u.location + e, [u.binding + e]);
+    }
+    return values;
+  }
+  function texture_slot(target) {
+    return target === GL.TEXTURE_2D ? 0 : target === GL.TEXTURE_CUBE_MAP ? 1 : target === GL.TEXTURE_EXTERNAL_OES ? 2 : -1;
+  }
+  function face_of(target) {
+    if (target === GL.TEXTURE_2D) return 0;
+    const face = target - GL.TEXTURE_CUBE_MAP_POSITIVE_X;
+    return face >= 0 && face < 6 ? face : -1;
+  }
+  function i32s(bytes) {
+    if (!bytes) return [];
+    const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+    const values = [];
+    for (let at = 0; at + 4 <= bytes.length; at += 4) values.push(view.getInt32(at, true));
+    return values;
+  }
+  function f32s(bytes) {
+    if (!bytes) return [];
+    const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+    const values = [];
+    for (let at = 0; at + 4 <= bytes.length; at += 4) values.push(view.getFloat32(at, true));
+    return values;
+  }
+  function text_of(bytes) {
+    if (!bytes) return "";
+    const end = bytes.indexOf(0);
+    return new TextDecoder().decode(end < 0 ? bytes : bytes.subarray(0, end));
+  }
+  function put(out, values, as, kind) {
+    const size = as === "b" ? 1 : 4;
+    for (let i = 0; i < values.length && (i + 1) * size <= out.size; i++) {
+      const v = values[i];
+      switch (as) {
+        case "b":
+          out.data[i] = v ? 1 : 0;
+          break;
+        case "f":
+          out.view.setFloat32(4 * i, kind === "b" ? v ? 1 : 0 : v, true);
+          break;
+        case "x":
+          out.view.setInt32(4 * i, Math.round(v * 65536), true);
+          break;
+        default:
+          if (kind === "n") out.view.setInt32(4 * i, Math.round(Math.max(-1, Math.min(1, v)) * 2147483647), true);
+          else out.view.setInt32(4 * i, kind === "f" ? Math.round(v) : v | 0, true);
+      }
+    }
+  }
+  function put_text(out, text) {
+    if (!out.size) return 0;
+    const bytes = new TextEncoder().encode(text).subarray(0, out.size - 1);
+    out.data.set(bytes);
+    out.data[bytes.length] = 0;
+    return bytes.length;
+  }
+  var STATE_KIND = new Map([
+    [2928, "n"],
+    [2849, "f"],
+    [32824, "f"],
+    [10752, "f"],
+    [32938, "f"],
+    [3106, "n"],
+    [2931, "n"],
+    [32773, "n"],
+    [33901, "f"],
+    [33902, "f"],
+    [2834, "f"],
+    [2850, "f"],
+    [3107, "b"],
+    [2930, "b"],
+    [32939, "b"],
+    [36346, "b"],
+    // (GLES 3.2's: gles31_state.js's FLOAT_STATE32)
+    ...[...FLOAT_STATE32].map((pname) => [pname, "f"])
+  ]);
+  function GLESShadow(rc) {
+    this.rc = rc;
+    this.contexts = /* @__PURE__ */ new Map();
+    this.groups = /* @__PURE__ */ new Map();
+    this.keep = true;
+    this.given_name = 0;
+    this.handlers = HANDLERS;
+    this.stats = { compiled: 0, compile_failed: 0, linked: 0, link_failed: 0, failures: [], compile_ms: 0 };
+    this.glslang = null;
+    this.last_link = null;
+  }
+  var GLSLANG_LIMITS = { maxVaryingVectors: 15, maxDrawBuffers: 4 };
+  function stage_of(type) {
+    return ["vertex", "tess_control", "tess_evaluation", "geometry", "fragment", "compute"][STAGE_OF_GL_TYPE.get(type)];
+  }
+  GLESShadow.prototype.compile = function(source, type, es100, es2) {
+    const version = glsl_version(source);
+    const stage = stage_of(type);
+    if (version >= 300 || es100) {
+      if (!this.glslang) return { ok: true, log: "", glslang: true, stage };
+      this.glslang.set_limits(glslang_limits(version, es2));
+      const checked = this.glslang.check_shader(STAGE_OF_GL_TYPE.get(type), source);
+      const refused = checked.ok ? es3_rules(source) : null;
+      if (refused) return { ok: false, log: refused, glslang: true, stage };
+      return { ok: checked.ok, log: checked.log, glslang: true, stage };
+    }
+    return compile_shader(source, stage);
+  };
+  GLESShadow.prototype.link = function(program, shaders, es2) {
+    this.last_link = null;
+    if (!shaders.some((s) => s.compiled && s.compiled.glslang)) {
+      const shader = (type) => shaders.find((s) => s.type === type);
+      const vs = shader(GL.VERTEX_SHADER), fs = shader(GL.FRAGMENT_SHADER);
+      return link_program(vs && vs.compiled, fs && fs.compiled, new Map(program.bindings));
+    }
+    const failed = (log) => ({ ok: false, log, attributes: [], uniforms: [], locations: /* @__PURE__ */ new Map(), by_location: [], reflection: null });
+    if (program.provided) {
+      const info2 = program.provided;
+      program.provided = null;
+      return info2;
+    }
+    if (!this.glslang) return failed("ERROR: no link of this program came with the batch");
+    if (shaders.some((s) => !s.compiled || !s.compiled.glslang)) return failed("ERROR: the shaders' versions differ");
+    if (shaders.some((s) => !s.compiled.ok)) return failed("ERROR: a shader is not compiled");
+    this.glslang.set_limits(glslang_limits(glsl_version(shaders[0].compiled_source), es2));
+    const info = link_glslang_program(
+      this.glslang,
+      shaders.map((s) => ({ stage: s.compiled.stage, source: s.compiled_source })),
+      { bindings: new Map(program.bindings), separable: !!program.separable, limits: GLSLANG_LIMITS, tf: program.tf_request || null }
+    );
+    if (info.ok) this.last_link = info;
+    return info;
+  };
+  var SHADOW_CLASSES = { "ShareGroup": ShareGroup.prototype, "Context": Context.prototype };
+  GLESShadow.prototype.get_state = function() {
+    return { contexts: this.contexts, groups: this.groups, stats: this.stats };
+  };
+  GLESShadow.prototype.set_state = function(state) {
+    this.contexts = state.contexts;
+    this.groups = state.groups;
+    this.stats = state.stats;
+    for (const c of this.contexts.values()) {
+      if (c && c.version >= 30 && c.textures && c.uniform_bindings) pad_context3(c);
+      if (c && c.version >= 31 && c.storage_bindings && c.atomic_bindings) pad_context31(c);
+    }
+    relink(this.groups, this);
+  };
+  GLESShadow.prototype.create_context = function(handle, api, share) {
+    const group_id = share || handle;
+    let group = this.groups.get(group_id);
+    if (!group) this.groups.set(group_id, group = new ShareGroup());
+    group.contexts++;
+    const context = new Context(api, group);
+    context.group_id = group_id;
+    if (context.glslang) group.glslang = true;
+    if (context.glslang && context.api === 2) group.es2 = true;
+    this.contexts.set(handle, context);
+  };
+  GLESShadow.prototype.destroy_context = function(handle) {
+    const context = this.contexts.get(handle);
+    if (!context) return;
+    this.contexts.delete(handle);
+    if (--context.group.contexts === 0) this.groups.delete(context.group_id);
+  };
+  GLESShadow.prototype.make_current = function(handle, surface) {
+    const context = this.contexts.get(handle);
+    if (!context) return;
+    context.surface = surface;
+    if (!context.made_current && surface) {
+      context.viewport = [0, 0, surface.width, surface.height];
+      context.scissor = [0, 0, surface.width, surface.height];
+    }
+    context.made_current = context.made_current || !!surface;
+  };
+  GLESShadow.prototype.context = function(handle) {
+    return this.contexts.get(handle) || null;
+  };
+  GLESShadow.prototype.call = function(handle, command, args) {
+    const context = this.contexts.get(handle);
+    if (!context) return { ret: 0, keep: false };
+    const name = command.name, base = name.replace(/OES$/, "");
+    const handler = context.api === 1 && (GLES1_HANDLERS[name] || GLES1_HANDLERS[base]) || context.version >= 31 && (GLES31_HANDLERS[name] || GLES31_HANDLERS[base]) || context.api === 3 && (GLES3_HANDLERS[name] || GLES3_HANDLERS[base]) || HANDLERS[name] || HANDLERS[base];
+    this.keep = true;
+    if (!handler) {
+      return { ret: 0, keep: true };
+    }
+    const ret = handler(this, context, args);
+    if (ret === REFUSED) return { ret: 0, keep: false };
+    return { ret, keep: this.keep };
+  };
+  function fail(context, error) {
+    if (context.error === GL.NO_ERROR) context.error = error;
+    return REFUSED;
+  }
+  function query(shadow) {
+    shadow.keep = false;
+  }
+  GLESShadow.prototype.attachment_image = function(context, a) {
+    if (a.type === GL.RENDERBUFFER) {
+      const rb = context.group.renderbuffers.get(a.name);
+      if (!rb || !rb.width || !rb.height) return null;
+      return { width: rb.width, height: rb.height, kind: RENDERBUFFER_FORMATS.get(rb.format) || texture_kind(GL.RGBA, GL.UNSIGNED_BYTE) };
+    }
+    const texture = context.group.textures.get(a.name);
+    const image = texture && texture.images.get(a.face * 32 + a.level);
+    if (!image || !image.width || !image.height) return null;
+    return { width: image.width, height: image.height, kind: texture_kind(image.format, image.type) };
+  };
+  GLESShadow.prototype.framebuffer_status = function(context) {
+    if (context.api === 3) return FRAMEBUFFER_STATUS3.fn(context, context.framebuffer);
+    if (!context.framebuffer) return GL.FRAMEBUFFER_COMPLETE;
+    const fbo = context.framebuffers.get(context.framebuffer);
+    let size = null, any = false;
+    for (const [attachment, a] of fbo.attachments) {
+      const image = this.attachment_image(context, a);
+      if (!image) return GL.FRAMEBUFFER_INCOMPLETE_ATTACHMENT;
+      const k = image.kind;
+      if (attachment === GL.COLOR_ATTACHMENT0 ? !k.color : attachment === GL.DEPTH_ATTACHMENT ? !k.depth : !k.stencil) {
+        return GL.FRAMEBUFFER_INCOMPLETE_ATTACHMENT;
+      }
+      if (size && (size[0] !== image.width || size[1] !== image.height)) return GL.FRAMEBUFFER_INCOMPLETE_DIMENSIONS;
+      size = [image.width, image.height];
+      any = true;
+    }
+    if (!any) return GL.FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT;
+    const depth = fbo.attachments.get(GL.DEPTH_ATTACHMENT), stencil = fbo.attachments.get(GL.STENCIL_ATTACHMENT);
+    if (depth && stencil && (depth.type !== stencil.type || depth.name !== stencil.name)) return GL.FRAMEBUFFER_UNSUPPORTED;
+    return GL.FRAMEBUFFER_COMPLETE;
+  };
+  GLESShadow.prototype.framebuffer_bits = function(context) {
+    if (!context.framebuffer) {
+      const config = context.surface && context.surface.config;
+      const value = (attribute) => config ? config[CONFIG_ATTRIBUTES.indexOf(attribute)] : 0;
+      return [value(EGL.RED_SIZE), value(EGL.GREEN_SIZE), value(EGL.BLUE_SIZE), value(EGL.ALPHA_SIZE), value(EGL.DEPTH_SIZE), value(EGL.STENCIL_SIZE)];
+    }
+    const fbo = context.framebuffers.get(context.framebuffer);
+    const bits = [0, 0, 0, 0, 0, 0];
+    for (const [attachment, a] of fbo.attachments) {
+      const image = this.attachment_image(context, a);
+      if (!image) continue;
+      const k = image.kind.bits;
+      if (attachment === GL.COLOR_ATTACHMENT0) for (let i = 0; i < 4; i++) bits[i] = k[i];
+      if (attachment === GL.DEPTH_ATTACHMENT) bits[4] = k[4];
+      if (attachment === GL.STENCIL_ATTACHMENT) bits[5] = k[5];
+    }
+    return bits;
+  };
+  function framebuffer_ok(shadow, context) {
+    if (shadow.framebuffer_status(context) === GL.FRAMEBUFFER_COMPLETE) return true;
+    fail(context, GL.INVALID_FRAMEBUFFER_OPERATION);
+    return false;
+  }
+  function detach(context, type, name) {
+    const fbo = context.framebuffer && context.framebuffers.get(context.framebuffer);
+    if (!fbo) return;
+    for (const [attachment, a] of fbo.attachments) if (a.type === type && a.name === name) fbo.attachments.delete(attachment);
+  }
+  function keep_orphan(context, type, objects, name, object) {
+    let orphan = 0;
+    for (const fbo of context.framebuffers.values()) {
+      for (const a of fbo.attachments.values()) {
+        if (a.type !== type || a.name !== name) continue;
+        if (!orphan) orphan = context.group.next_orphan = (context.group.next_orphan || 1073741824) + 1;
+        a.name = orphan;
+      }
+    }
+    if (orphan) objects.set(orphan, object);
+  }
+  GLESShadow.prototype.state_value = function(context, pname) {
+    const c = context;
+    if (c.api === 3) {
+      const value = c.version >= 31 && state_value31(this, c, pname) || state_value3(this, c, pname);
+      if (value) return value;
+      if (this.read_error3) {
+        this.read_error3 = false;
+        return null;
+      }
+    }
+    switch (pname) {
+      case 2978:
+        return c.viewport;
+      case 3088:
+        return c.scissor;
+      case 2928:
+        return c.depth_range;
+      case 2849:
+        return [c.line_width];
+      case 2885:
+        return [c.cull_face];
+      case 2886:
+        return [c.front_face];
+      case 32824:
+        return [c.polygon_offset[0]];
+      case 10752:
+        return [c.polygon_offset[1]];
+      case 32938:
+        return [c.sample_coverage[0]];
+      case 32939:
+        return [c.sample_coverage[1]];
+      case 3106:
+        return c.clear_color;
+      case 2931:
+        return [c.clear_depth];
+      case 2961:
+        return [c.clear_stencil];
+      case 3107:
+        return c.color_mask;
+      case 2930:
+        return [c.depth_mask];
+      // (the masks are unsigned: a float or 64-bit query of all bits set is 4294967295)
+      case 2968:
+        return [c.stencil_writemask[0] >>> 0];
+      case 36005:
+        return [c.stencil_writemask[1] >>> 0];
+      case 32969:
+        return [c.blend_func[0]];
+      case 32968:
+        return [c.blend_func[1]];
+      case 32971:
+        return [c.blend_func[2]];
+      case 32970:
+        return [c.blend_func[3]];
+      case 3041:
+        return [c.blend_func[0]];
+      // GLES 1.1's GL_BLEND_SRC
+      case 3040:
+        return [c.blend_func[1]];
+      case 32777:
+        return [c.blend_equation[0]];
+      case 34877:
+        return [c.blend_equation[1]];
+      case 32773:
+        return c.blend_color;
+      case 2932:
+        return [c.depth_func];
+      case 2962:
+        return [c.stencil_func[0][0]];
+      case 2967:
+        return [c.stencil_func[0][1]];
+      case 2963:
+        return [c.stencil_func[0][2] >>> 0];
+      case 34816:
+        return [c.stencil_func[1][0]];
+      case 36003:
+        return [c.stencil_func[1][1]];
+      case 36004:
+        return [c.stencil_func[1][2] >>> 0];
+      case 2964:
+        return [c.stencil_op[0][0]];
+      case 2965:
+        return [c.stencil_op[0][1]];
+      case 2966:
+        return [c.stencil_op[0][2]];
+      case 34817:
+        return [c.stencil_op[1][0]];
+      case 34818:
+        return [c.stencil_op[1][1]];
+      case 34819:
+        return [c.stencil_op[1][2]];
+      case GL.UNPACK_ALIGNMENT:
+        return [c.unpack_alignment];
+      case GL.PACK_ALIGNMENT:
+        return [c.pack_alignment];
+      case 34016:
+        return [GL.TEXTURE0 + c.active_texture];
+      case 32873:
+        return [c.textures[c.active_texture][0]];
+      case 34068:
+        return [c.textures[c.active_texture][1]];
+      case 36199:
+        return [c.textures[c.active_texture][2]];
+      // GL_TEXTURE_BINDING_EXTERNAL_OES
+      case 34964:
+        return [c.array_buffer];
+      case 34965:
+        return [c.element_array_buffer];
+      case 36006:
+        return [c.framebuffer];
+      case 36007:
+        return [c.renderbuffer];
+      case 35725:
+        return [c.program];
+      case 3410:
+      case 3411:
+      case 3412:
+      case 3413:
+      case 3414:
+      case 3415:
+        return [this.framebuffer_bits(c)[pname - 3410]];
+      case 34467:
+        return COMPRESSED_TEXTURE_FORMATS;
+    }
+    if (c.hints.has(pname) && (c.api === 1 || pname === 33170 || pname === 35723)) return [c.hints.get(pname)];
+    if ((c.api === 1 ? CAPS_1 : CAPS_2).has(pname)) return [c.enabled.has(pname) ? 1 : 0];
+    if (GL_STATE.has(pname)) return GL_STATE.get(pname);
+    return null;
+  };
+  function get(as) {
+    return (shadow, c, [pname, params]) => {
+      query(shadow);
+      const own = c.api === 1 ? gles1_state_value(c, pname) : null;
+      if (own) return put(params, own[0], as, own[1]);
+      let value = shadow.state_value(c, pname);
+      if (!value) return fail(c, GL.INVALID_ENUM);
+      if (INT64_STATE.has(pname) && as !== "f") value = value.map((v) => Math.min(v, 2147483647));
+      put(params, value, as, STATE_KIND.get(pname) || "i");
+      return void 0;
+    };
+  }
+  function object_of(c, name, kind) {
+    const object = c.group.objects.get(name);
+    if (!object) {
+      fail(c, GL.INVALID_VALUE);
+      return null;
+    }
+    if (object.kind !== kind) {
+      fail(c, GL.INVALID_OPERATION);
+      return null;
+    }
+    return object;
+  }
+  function bound_texture(c, target) {
+    const slot = texture_slot(target);
+    if (slot < 0) {
+      fail(c, GL.INVALID_ENUM);
+      return null;
+    }
+    const name = c.textures[c.active_texture][slot];
+    let texture = c.group.textures.get(name);
+    if (!texture && !name) {
+      c.defaults = c.defaults || /* @__PURE__ */ new Map();
+      texture = c.defaults.get(target);
+      if (!texture) c.defaults.set(target, texture = new_texture(target));
+    }
+    return texture || null;
+  }
+  function image_target(c, target) {
+    const face = face_of(target);
+    if (face < 0) {
+      fail(c, GL.INVALID_ENUM);
+      return null;
+    }
+    const texture = bound_texture(c, target === GL.TEXTURE_2D ? GL.TEXTURE_2D : GL.TEXTURE_CUBE_MAP);
+    return texture ? { texture, face } : null;
+  }
+  function image_size_ok(c, target, level, width, height, border) {
+    if (level < 0 || level > MAX_LEVEL || width < 0 || height < 0 || border !== 0 || width << level > MAX_SIZE || height << level > MAX_SIZE || target !== GL.TEXTURE_2D && width !== height) {
+      fail(c, GL.INVALID_VALUE);
+      return false;
+    }
+    return true;
+  }
+  function bound_buffer(c, target) {
+    if (target !== GL.ARRAY_BUFFER && target !== GL.ELEMENT_ARRAY_BUFFER) {
+      fail(c, GL.INVALID_ENUM);
+      return null;
+    }
+    const name = target === GL.ARRAY_BUFFER ? c.array_buffer : c.element_array_buffer;
+    const buffer = c.group.buffers.get(name);
+    if (!buffer) {
+      fail(c, GL.INVALID_OPERATION);
+      return null;
+    }
+    return buffer;
+  }
+  function uniform_at(c, location, count) {
+    const program = c.group.objects.get(c.program);
+    if (!program || !program.info || !program.info.ok) return fail(c, GL.INVALID_OPERATION);
+    if (count < 0) return fail(c, GL.INVALID_VALUE);
+    if (location === -1) return null;
+    const at = program.info.by_location[location];
+    if (!at) return fail(c, GL.INVALID_OPERATION);
+    if (count > 1 && at.uniform.size === 1 && at.uniform.name === at.uniform.base) return fail(c, GL.INVALID_OPERATION);
+    return { program, at };
+  }
+  function uniform(components, kind, vector) {
+    return (shadow, c, args) => {
+      const location = args[0];
+      let count = 1, values;
+      if (kind === "m") {
+        count = args[1];
+        if (args[2]) return fail(c, GL.INVALID_VALUE);
+        values = f32s(args[3]);
+      } else if (vector) {
+        count = args[1];
+        values = kind === "f" ? f32s(args[2]) : i32s(args[2]);
+      } else values = args.slice(1);
+      const target = uniform_at(c, location, count);
+      if (target === REFUSED || target === null) return target === null ? void 0 : target;
+      const u = target.at.uniform;
+      if (kind === "m" ? !u.columns || u.columns * u.columns !== components : u.columns || u.components !== components || (kind === "f" ? u.int && !u.bool : !u.int && !u.bool) || u.sampler && (kind !== "i" || components !== 1)) {
+        return fail(c, GL.INVALID_OPERATION);
+      }
+      const store = target.program.values;
+      const n = Math.min(count, u.size - target.at.element);
+      for (let i = 0; i < n; i++) {
+        const slice = values.slice(i * components, (i + 1) * components);
+        store.set(location + i, u.bool ? slice.map((v) => v ? 1 : 0) : kind === "f" || kind === "m" ? slice.map(Math.fround) : slice);
+      }
+    };
+  }
+  function vertex_attrib(components, vector) {
+    return (shadow, c, args) => {
+      const index = args[0];
+      if (index >= MAX_ATTRIBS3) return fail(c, GL.INVALID_VALUE);
+      const values = vector ? f32s(args[1]).slice(0, components) : args.slice(1, 1 + components);
+      const current = [0, 0, 0, 1];
+      values.forEach((v, i) => {
+        current[i] = Math.fround(v);
+      });
+      c.attribs[index].current = current;
+    };
+  }
+  function gen(kind, map_of) {
+    return (shadow, c, [n, names]) => {
+      query(shadow);
+      if (n < 0) return fail(c, GL.INVALID_VALUE);
+      const objects = map_of(c);
+      const reserved = kind === "framebuffer" ? c.reserved_framebuffers : c.group.reserved[kind];
+      for (let i = 0; i < n && 4 * i + 4 <= names.size; i++) {
+        let name;
+        if (kind === "framebuffer") {
+          name = c.next_framebuffer;
+          while (objects.has(name) || reserved.has(name)) name++;
+          c.next_framebuffer = name + 1;
+        } else name = c.group.fresh(kind, objects);
+        reserved.add(name);
+        names.view.setUint32(4 * i, name, true);
+      }
+    };
+  }
+  var HANDLERS = {
+    "glGetError": (shadow, c) => {
+      query(shadow);
+      const error = c.error;
+      c.error = GL.NO_ERROR;
+      return error;
+    },
+    "glGetGraphicsResetStatusEXT": (shadow) => {
+      query(shadow);
+      return 0;
+    },
+    "glFinishRoundTrip": (shadow) => {
+      query(shadow);
+      return 0;
+    },
+    "glFinish": () => {
+    },
+    "glFlush": () => {
+    },
+    "glGetBooleanv": get("b"),
+    "glGetIntegerv": get("i"),
+    "glGetFloatv": get("f"),
+    "glGetFixedv": get("x"),
+    "glGetCompressedTextureFormats": (shadow, c, [count, formats]) => {
+      query(shadow);
+      put(formats, COMPRESSED_TEXTURE_FORMATS, "i", "i");
+    },
+    "glGetShaderPrecisionFormat": (shadow, c, [shadertype, precisiontype, range, precision]) => {
+      query(shadow);
+      if (shadertype !== GL.VERTEX_SHADER && shadertype !== GL.FRAGMENT_SHADER || precisiontype < 36336 || precisiontype > 36341) {
+        return fail(c, GL.INVALID_ENUM);
+      }
+      const float = precisiontype <= 36338;
+      put(range, float ? [127, 127] : [31, 30], "i", "i");
+      put(precision, [float ? 23 : 0], "i", "i");
+    },
+    "glEnable": (shadow, c, [cap]) => {
+      if (!(c.api === 1 ? CAPS_1 : CAPS_2).has(cap)) return fail(c, GL.INVALID_ENUM);
+      c.enabled.add(cap);
+    },
+    "glDisable": (shadow, c, [cap]) => {
+      if (!(c.api === 1 ? CAPS_1 : CAPS_2).has(cap)) return fail(c, GL.INVALID_ENUM);
+      c.enabled.delete(cap);
+    },
+    "glIsEnabled": (shadow, c, [cap]) => {
+      query(shadow);
+      if (!(c.api === 1 ? CAPS_1 : CAPS_2).has(cap)) {
+        fail(c, GL.INVALID_ENUM);
+        return 0;
+      }
+      return c.enabled.has(cap) ? 1 : 0;
+    },
+    "glViewport": (shadow, c, [x, y, width, height]) => {
+      if (width < 0 || height < 0) return fail(c, GL.INVALID_VALUE);
+      c.viewport = [x, y, Math.min(width, MAX_VIEWPORT), Math.min(height, MAX_VIEWPORT)];
+    },
+    "glScissor": (shadow, c, [x, y, width, height]) => {
+      if (width < 0 || height < 0) return fail(c, GL.INVALID_VALUE);
+      c.scissor = [x, y, width, height];
+    },
+    "glDepthRangef": (shadow, c, [near, far]) => {
+      c.depth_range = [Math.min(1, Math.max(0, near)), Math.min(1, Math.max(0, far))].map(Math.fround);
+    },
+    "glLineWidth": (shadow, c, [width]) => {
+      if (!(width > 0)) return fail(c, GL.INVALID_VALUE);
+      c.line_width = Math.fround(width);
+    },
+    "glCullFace": (shadow, c, [mode]) => {
+      if (!FACES.has(mode)) return fail(c, GL.INVALID_ENUM);
+      c.cull_face = mode;
+    },
+    "glFrontFace": (shadow, c, [mode]) => {
+      if (mode !== 2304 && mode !== 2305) return fail(c, GL.INVALID_ENUM);
+      c.front_face = mode;
+    },
+    "glPolygonOffset": (shadow, c, [factor, units]) => {
+      c.polygon_offset = [Math.fround(factor), Math.fround(units)];
+    },
+    "glSampleCoverage": (shadow, c, [value, invert]) => {
+      c.sample_coverage = [Math.fround(Math.min(1, Math.max(0, value))), invert ? 1 : 0];
+    },
+    "glClearColor": (shadow, c, rgba) => {
+      c.clear_color = rgba.map((v) => Math.fround(Math.min(1, Math.max(0, v))));
+    },
+    "glClearDepthf": (shadow, c, [depth]) => {
+      c.clear_depth = Math.fround(Math.min(1, Math.max(0, depth)));
+    },
+    "glClearStencil": (shadow, c, [s]) => {
+      c.clear_stencil = s;
+    },
+    "glColorMask": (shadow, c, rgba) => {
+      c.color_mask = rgba.map((v) => v ? 1 : 0);
+    },
+    "glDepthMask": (shadow, c, [flag]) => {
+      c.depth_mask = flag ? 1 : 0;
+    },
+    "glStencilMask": (shadow, c, [mask]) => {
+      c.stencil_writemask = [mask | 0, mask | 0];
+    },
+    "glStencilMaskSeparate": (shadow, c, [face, mask]) => {
+      if (!FACES.has(face)) return fail(c, GL.INVALID_ENUM);
+      if (face !== BACK) c.stencil_writemask[0] = mask | 0;
+      if (face !== FRONT) c.stencil_writemask[1] = mask | 0;
+    },
+    "glBlendColor": (shadow, c, rgba) => {
+      c.blend_color = rgba.map((v) => Math.fround(Math.min(1, Math.max(0, v))));
+    },
+    "glBlendEquation": (shadow, c, [mode]) => {
+      if (!equation_ok(c, mode, true)) return fail(c, GL.INVALID_ENUM);
+      c.blend_equation = [mode, mode];
+    },
+    "glBlendEquationSeparate": (shadow, c, [rgb, alpha]) => {
+      if (!equation_ok(c, rgb, false) || !equation_ok(c, alpha, false)) return fail(c, GL.INVALID_ENUM);
+      c.blend_equation = [rgb, alpha];
+    },
+    "glBlendFunc": (shadow, c, [src, dst]) => {
+      if (!source_factor(src) || !destination_factor(c, dst)) return fail(c, GL.INVALID_ENUM);
+      c.blend_func = [src, dst, src, dst];
+    },
+    "glBlendFuncSeparate": (shadow, c, [src_rgb, dst_rgb, src_alpha, dst_alpha]) => {
+      if (!source_factor(src_rgb) || !source_factor(src_alpha) || !destination_factor(c, dst_rgb) || !destination_factor(c, dst_alpha)) {
+        return fail(c, GL.INVALID_ENUM);
+      }
+      c.blend_func = [src_rgb, dst_rgb, src_alpha, dst_alpha];
+    },
+    "glDepthFunc": (shadow, c, [func]) => {
+      if (!COMPARE_FUNCS2.has(func)) return fail(c, GL.INVALID_ENUM);
+      c.depth_func = func;
+    },
+    "glStencilFunc": (shadow, c, [func, ref, mask]) => {
+      if (!COMPARE_FUNCS2.has(func)) return fail(c, GL.INVALID_ENUM);
+      c.stencil_func = [[func, ref, mask | 0], [func, ref, mask | 0]];
+    },
+    "glStencilFuncSeparate": (shadow, c, [face, func, ref, mask]) => {
+      if (!FACES.has(face) || !COMPARE_FUNCS2.has(func)) return fail(c, GL.INVALID_ENUM);
+      if (face !== BACK) c.stencil_func[0] = [func, ref, mask | 0];
+      if (face !== FRONT) c.stencil_func[1] = [func, ref, mask | 0];
+    },
+    "glStencilOp": (shadow, c, ops) => {
+      if (!ops.every((op) => STENCIL_OPS.has(op))) return fail(c, GL.INVALID_ENUM);
+      c.stencil_op = [ops.slice(), ops.slice()];
+    },
+    "glStencilOpSeparate": (shadow, c, [face, ...ops]) => {
+      if (!FACES.has(face) || !ops.every((op) => STENCIL_OPS.has(op))) return fail(c, GL.INVALID_ENUM);
+      if (face !== BACK) c.stencil_op[0] = ops.slice();
+      if (face !== FRONT) c.stencil_op[1] = ops.slice();
+    },
+    "glHint": (shadow, c, [target, mode]) => {
+      if (!(c.api === 1 ? c.hints.has(target) : target === 33170 || target === 35723) || !HINT_MODES.has(mode)) return fail(c, GL.INVALID_ENUM);
+      c.hints.set(target, mode);
+    },
+    "glPixelStorei": (shadow, c, [pname, param]) => {
+      if (pname !== GL.UNPACK_ALIGNMENT && pname !== GL.PACK_ALIGNMENT) return fail(c, GL.INVALID_ENUM);
+      if (![1, 2, 4, 8].includes(param)) return fail(c, GL.INVALID_VALUE);
+      if (pname === GL.UNPACK_ALIGNMENT) c.unpack_alignment = param;
+      else c.pack_alignment = param;
+    },
+    // ---- textures
+    "glActiveTexture": (shadow, c, [unit]) => {
+      const index = unit - GL.TEXTURE0;
+      if (index < 0 || index >= (c.api === 1 ? GL_STATE.get(34018)[0] : MAX_UNITS2)) return fail(c, GL.INVALID_ENUM);
+      c.active_texture = index;
+    },
+    "glGenTextures": gen("texture", (c) => c.group.textures),
+    "glBindTexture": (shadow, c, [target, name]) => {
+      const slot = texture_slot(target);
+      if (slot < 0) return fail(c, GL.INVALID_ENUM);
+      if (name) {
+        const texture = c.group.textures.get(name);
+        if (texture && texture.target !== target) return fail(c, GL.INVALID_OPERATION);
+        if (!texture) c.group.textures.set(name, new_texture(target));
+      }
+      c.textures[c.active_texture][slot] = name;
+    },
+    "glDeleteTextures": (shadow, c, [n, names]) => {
+      if (n < 0) return fail(c, GL.INVALID_VALUE);
+      for (const name of i32s(names).slice(0, n)) {
+        if (!name) continue;
+        c.group.reserved.texture.delete(name);
+        if (!c.group.textures.delete(name)) continue;
+        for (const unit of c.textures) for (let i = 0; i < 3; i++) if (unit[i] === name) unit[i] = 0;
+        detach(c, GL.TEXTURE, name);
+      }
+    },
+    "glIsTexture": (shadow, c, [name]) => {
+      query(shadow);
+      return c.group.textures.has(name) ? 1 : 0;
+    },
+    "glTexImage2D": (shadow, c, [target, level, internalformat, width, height, border, format, type, pixels]) => {
+      const t = image_target(c, target);
+      if (!t) return REFUSED;
+      const error = texture_format_error(format, type);
+      if (error) return fail(c, error);
+      if (internalformat !== format) return fail(c, texture_format_error(internalformat, type) === GL.INVALID_ENUM ? GL.INVALID_VALUE : GL.INVALID_OPERATION);
+      if (!image_size_ok(c, target, level, width, height, border)) return REFUSED;
+      if (pixels && pixels.length < image_bytes(width, height, texel_bytes(format, type), c.unpack_alignment)) return fail(c, GL.INVALID_OPERATION);
+      t.texture.images.set(t.face * 32 + level, { width, height, format, type, compressed: false });
+    },
+    "glTexSubImage2D": (shadow, c, [target, level, x, y, width, height, format, type, pixels]) => {
+      const t = image_target(c, target);
+      if (!t) return REFUSED;
+      const error = texture_format_error(format, type);
+      if (error) return fail(c, error);
+      if (level < 0 || level > MAX_LEVEL || x < 0 || y < 0 || width < 0 || height < 0) return fail(c, GL.INVALID_VALUE);
+      const image = t.texture.images.get(t.face * 32 + level);
+      if (!image || image.compressed) return fail(c, GL.INVALID_OPERATION);
+      if (x + width > image.width || y + height > image.height) return fail(c, GL.INVALID_VALUE);
+      if (image.format !== format || image.type !== type) return fail(c, GL.INVALID_OPERATION);
+    },
+    "glCompressedTexImage2D": (shadow, c, [target, level, internalformat, width, height, border, size, data]) => {
+      const t = image_target(c, target);
+      if (!t) return REFUSED;
+      if (internalformat !== GL.ETC1_RGB8_OES) return fail(c, GL.INVALID_ENUM);
+      if (!image_size_ok(c, target, level, width, height, border)) return REFUSED;
+      if (size !== etc1_bytes(width, height) || (data ? data.length : 0) < size) return fail(c, GL.INVALID_VALUE);
+      t.texture.images.set(t.face * 32 + level, { width, height, format: internalformat, type: GL.UNSIGNED_BYTE, compressed: true });
+    },
+    // (ETC1 has no partial updates: OES_compressed_ETC1_RGB8_texture)
+    "glCompressedTexSubImage2D": (shadow, c, [target]) => {
+      if (!image_target(c, target)) return REFUSED;
+      return fail(c, GL.INVALID_OPERATION);
+    },
+    "glCopyTexImage2D": (shadow, c, [target, level, internalformat, x, y, width, height, border]) => {
+      const t = image_target(c, target);
+      if (!t) return REFUSED;
+      if (![GL.ALPHA, GL.LUMINANCE, GL.LUMINANCE_ALPHA, GL.RGB, GL.RGBA].includes(internalformat)) return fail(c, GL.INVALID_ENUM);
+      if (!image_size_ok(c, target, level, width, height, border)) return REFUSED;
+      if (!framebuffer_ok(shadow, c)) return REFUSED;
+      const bits = shadow.framebuffer_bits(c);
+      if ((internalformat === GL.ALPHA || internalformat === GL.LUMINANCE_ALPHA || internalformat === GL.RGBA) && !bits[3]) return fail(c, GL.INVALID_OPERATION);
+      t.texture.images.set(t.face * 32 + level, { width, height, format: internalformat, type: GL.UNSIGNED_BYTE, compressed: false });
+    },
+    "glCopyTexSubImage2D": (shadow, c, [target, level, xoffset, yoffset, x, y, width, height]) => {
+      const t = image_target(c, target);
+      if (!t) return REFUSED;
+      if (level < 0 || level > MAX_LEVEL || xoffset < 0 || yoffset < 0 || width < 0 || height < 0) return fail(c, GL.INVALID_VALUE);
+      const image = t.texture.images.get(t.face * 32 + level);
+      if (!image || image.compressed) return fail(c, GL.INVALID_OPERATION);
+      if (xoffset + width > image.width || yoffset + height > image.height) return fail(c, GL.INVALID_VALUE);
+      if (!framebuffer_ok(shadow, c)) return REFUSED;
+    },
+    "glGenerateMipmap": (shadow, c, [target]) => {
+      if (target !== GL.TEXTURE_2D && target !== GL.TEXTURE_CUBE_MAP) return fail(c, GL.INVALID_ENUM);
+      const texture = bound_texture(c, target);
+      const faces = target === GL.TEXTURE_2D ? 1 : 6;
+      const base = texture.images.get(0);
+      if (!base || base.compressed) return fail(c, GL.INVALID_OPERATION);
+      for (let face = 0; face < faces; face++) {
+        const image = texture.images.get(face * 32);
+        if (!image || image.width !== base.width || image.height !== base.height || image.format !== base.format) return fail(c, GL.INVALID_OPERATION);
+      }
+      for (let face = 0; face < faces; face++) {
+        let w = base.width, h = base.height;
+        for (let level = 1; w > 1 || h > 1; level++) {
+          w = Math.max(1, w >> 1);
+          h = Math.max(1, h >> 1);
+          texture.images.set(face * 32 + level, { width: w, height: h, format: base.format, type: base.type, compressed: false });
+        }
+      }
+    },
+    "glTexParameterf": (shadow, c, [target, pname, param]) => tex_parameter(c, target, pname, [param]),
+    "glTexParameteri": (shadow, c, [target, pname, param]) => tex_parameter(c, target, pname, [param]),
+    "glTexParameterx": (shadow, c, [target, pname, param]) => tex_parameter(c, target, pname, [param]),
+    "glTexParameterfv": (shadow, c, [target, pname, params]) => tex_parameter(c, target, pname, f32s(params)),
+    "glTexParameteriv": (shadow, c, [target, pname, params]) => tex_parameter(c, target, pname, i32s(params)),
+    "glTexParameterxv": (shadow, c, [target, pname, params]) => tex_parameter(c, target, pname, i32s(params)),
+    "glGetTexParameteriv": (shadow, c, [target, pname, params]) => get_tex_parameter(shadow, c, target, pname, params, "i"),
+    "glGetTexParameterfv": (shadow, c, [target, pname, params]) => get_tex_parameter(shadow, c, target, pname, params, "f"),
+    "glGetTexParameterxv": (shadow, c, [target, pname, params]) => get_tex_parameter(shadow, c, target, pname, params, "i"),
+    // EGL images (OES_EGL_image): the image's color buffer is the texture's level 0
+    "glEGLImageTargetTexture2DOES": (shadow, c, [target, image]) => {
+      if (target !== GL.TEXTURE_2D && target !== GL.TEXTURE_EXTERNAL_OES) return fail(c, GL.INVALID_ENUM);
+      const size = shadow.image_size(image);
+      if (!size) return fail(c, GL.INVALID_VALUE);
+      const texture = bound_texture(c, target);
+      if (!texture) return REFUSED;
+      texture.images.clear();
+      texture.images.set(0, { width: size.width, height: size.height, format: size.format, type: GL.UNSIGNED_BYTE, compressed: false, image });
+    },
+    "glEGLImageTargetRenderbufferStorageOES": (shadow, c, [target, image]) => {
+      if (target !== GL.RENDERBUFFER) return fail(c, GL.INVALID_ENUM);
+      const size = shadow.image_size(image);
+      if (!size) return fail(c, GL.INVALID_VALUE);
+      const rb = c.group.renderbuffers.get(c.renderbuffer);
+      if (!rb) return fail(c, GL.INVALID_OPERATION);
+      Object.assign(rb, { width: size.width, height: size.height, format: size.format === GL.RGB ? GL.RGB8_OES : GL.RGBA8_OES, image });
+    },
+    // ---- buffers
+    "glGenBuffers": gen("buffer", (c) => c.group.buffers),
+    "glBindBuffer": (shadow, c, [target, name]) => {
+      if (target !== GL.ARRAY_BUFFER && target !== GL.ELEMENT_ARRAY_BUFFER) return fail(c, GL.INVALID_ENUM);
+      if (name && !c.group.buffers.has(name)) c.group.buffers.set(name, { size: 0, usage: GL.STATIC_DRAW });
+      if (target === GL.ARRAY_BUFFER) c.array_buffer = name;
+      else c.element_array_buffer = name;
+    },
+    "glDeleteBuffers": (shadow, c, [n, names]) => {
+      if (n < 0) return fail(c, GL.INVALID_VALUE);
+      for (const name of i32s(names).slice(0, n)) {
+        if (!name) continue;
+        c.group.reserved.buffer.delete(name);
+        if (!c.group.buffers.delete(name)) continue;
+        if (c.array_buffer === name) c.array_buffer = 0;
+        if (c.element_array_buffer === name) c.element_array_buffer = 0;
+        for (const a of c.attribs) if (a.buffer === name) a.buffer = 0;
+      }
+    },
+    "glIsBuffer": (shadow, c, [name]) => {
+      query(shadow);
+      return c.group.buffers.has(name) ? 1 : 0;
+    },
+    "glBufferData": (shadow, c, [target, size, data, usage]) => {
+      if (target !== GL.ARRAY_BUFFER && target !== GL.ELEMENT_ARRAY_BUFFER || !USAGES.has(usage)) return fail(c, GL.INVALID_ENUM);
+      if (size < 0) return fail(c, GL.INVALID_VALUE);
+      const buffer = bound_buffer(c, target);
+      if (!buffer) return REFUSED;
+      buffer.size = size;
+      buffer.usage = usage;
+    },
+    "glBufferSubData": (shadow, c, [target, offset, size, data]) => {
+      const buffer = bound_buffer(c, target);
+      if (!buffer) return REFUSED;
+      if (offset < 0 || size < 0 || offset + size > buffer.size) return fail(c, GL.INVALID_VALUE);
+    },
+    "glGetBufferParameteriv": (shadow, c, [target, pname, params]) => {
+      query(shadow);
+      if (pname !== 34660 && pname !== 34661) {
+        fail(c, GL.INVALID_ENUM);
+        return;
+      }
+      const buffer = bound_buffer(c, target);
+      if (!buffer) return;
+      put(params, [pname === 34660 ? buffer.size : buffer.usage], "i", "i");
+    },
+    // ---- renderbuffers and framebuffers
+    "glGenRenderbuffers": gen("renderbuffer", (c) => c.group.renderbuffers),
+    "glBindRenderbuffer": (shadow, c, [target, name]) => {
+      if (target !== GL.RENDERBUFFER) return fail(c, GL.INVALID_ENUM);
+      if (name && !c.group.renderbuffers.has(name)) c.group.renderbuffers.set(name, { width: 0, height: 0, format: GL.RGBA4, image: 0 });
+      c.renderbuffer = name;
+    },
+    "glDeleteRenderbuffers": (shadow, c, [n, names]) => {
+      if (n < 0) return fail(c, GL.INVALID_VALUE);
+      for (const name of i32s(names).slice(0, n)) {
+        if (!name) continue;
+        c.group.reserved.renderbuffer.delete(name);
+        const renderbuffer = c.group.renderbuffers.get(name);
+        if (!c.group.renderbuffers.delete(name)) continue;
+        if (c.renderbuffer === name) c.renderbuffer = 0;
+        detach(c, GL.RENDERBUFFER, name);
+        keep_orphan(c, GL.RENDERBUFFER, c.group.renderbuffers, name, renderbuffer);
+      }
+    },
+    "glIsRenderbuffer": (shadow, c, [name]) => {
+      query(shadow);
+      return c.group.renderbuffers.has(name) ? 1 : 0;
+    },
+    "glRenderbufferStorage": (shadow, c, [target, format, width, height]) => {
+      if (target !== GL.RENDERBUFFER || !RENDERBUFFER_FORMATS.has(format)) return fail(c, GL.INVALID_ENUM);
+      if (width < 0 || height < 0 || width > MAX_SIZE || height > MAX_SIZE) return fail(c, GL.INVALID_VALUE);
+      const rb = c.group.renderbuffers.get(c.renderbuffer);
+      if (!rb) return fail(c, GL.INVALID_OPERATION);
+      Object.assign(rb, { width, height, format, image: 0 });
+    },
+    "glGetRenderbufferParameteriv": (shadow, c, [target, pname, params]) => {
+      query(shadow);
+      if (target !== GL.RENDERBUFFER) {
+        fail(c, GL.INVALID_ENUM);
+        return;
+      }
+      const rb = c.group.renderbuffers.get(c.renderbuffer);
+      if (!rb) {
+        fail(c, GL.INVALID_OPERATION);
+        return;
+      }
+      const bits = rb.width ? (RENDERBUFFER_FORMATS.get(rb.format) || format_info(rb.format) || { bits: [0, 0, 0, 0, 0, 0] }).bits : [0, 0, 0, 0, 0, 0];
+      const values = {
+        36162: rb.width,
+        36163: rb.height,
+        36164: rb.format,
+        36176: bits[0],
+        36177: bits[1],
+        36178: bits[2],
+        36179: bits[3],
+        36180: bits[4],
+        36181: bits[5]
+      };
+      if (!(pname in values)) {
+        fail(c, GL.INVALID_ENUM);
+        return;
+      }
+      put(params, [values[pname]], "i", "i");
+    },
+    "glGenFramebuffers": gen("framebuffer", (c) => c.framebuffers),
+    "glBindFramebuffer": (shadow, c, [target, name]) => {
+      if (target !== GL.FRAMEBUFFER) return fail(c, GL.INVALID_ENUM);
+      if (name && !c.framebuffers.has(name)) c.framebuffers.set(name, { attachments: /* @__PURE__ */ new Map() });
+      c.framebuffer = name;
+    },
+    "glDeleteFramebuffers": (shadow, c, [n, names]) => {
+      if (n < 0) return fail(c, GL.INVALID_VALUE);
+      for (const name of i32s(names).slice(0, n)) {
+        if (!name) continue;
+        c.reserved_framebuffers.delete(name);
+        if (!c.framebuffers.delete(name)) continue;
+        if (c.framebuffer === name) c.framebuffer = 0;
+      }
+    },
+    "glIsFramebuffer": (shadow, c, [name]) => {
+      query(shadow);
+      return c.framebuffers.has(name) ? 1 : 0;
+    },
+    "glCheckFramebufferStatus": (shadow, c, [target]) => {
+      query(shadow);
+      if (target !== GL.FRAMEBUFFER) {
+        fail(c, GL.INVALID_ENUM);
+        return 0;
+      }
+      return shadow.framebuffer_status(c);
+    },
+    "glFramebufferRenderbuffer": (shadow, c, [target, attachment, rbtarget, name]) => {
+      if (target !== GL.FRAMEBUFFER || !ATTACHMENTS.includes(attachment) || rbtarget !== GL.RENDERBUFFER) return fail(c, GL.INVALID_ENUM);
+      const fbo = c.framebuffers.get(c.framebuffer);
+      if (!fbo || name && !c.group.renderbuffers.has(name)) return fail(c, GL.INVALID_OPERATION);
+      if (name) fbo.attachments.set(attachment, { type: GL.RENDERBUFFER, name, level: 0, face: 0 });
+      else fbo.attachments.delete(attachment);
+    },
+    "glFramebufferTexture2D": (shadow, c, [target, attachment, textarget, name, level]) => {
+      if (target !== GL.FRAMEBUFFER || !ATTACHMENTS.includes(attachment)) return fail(c, GL.INVALID_ENUM);
+      const fbo = c.framebuffers.get(c.framebuffer);
+      if (!fbo) return fail(c, GL.INVALID_OPERATION);
+      if (!name) {
+        fbo.attachments.delete(attachment);
+        return;
+      }
+      const face = face_of(textarget);
+      if (face < 0) return fail(c, GL.INVALID_ENUM);
+      if (level !== 0) return fail(c, GL.INVALID_VALUE);
+      const texture = c.group.textures.get(name);
+      if (!texture || texture.target === GL.TEXTURE_CUBE_MAP !== (textarget !== GL.TEXTURE_2D)) return fail(c, GL.INVALID_OPERATION);
+      fbo.attachments.set(attachment, { type: GL.TEXTURE, name, level, face });
+    },
+    "glGetFramebufferAttachmentParameteriv": (shadow, c, [target, attachment, pname, params]) => {
+      query(shadow);
+      if (target !== GL.FRAMEBUFFER || !ATTACHMENTS.includes(attachment)) {
+        fail(c, GL.INVALID_ENUM);
+        return;
+      }
+      const fbo = c.framebuffers.get(c.framebuffer);
+      if (!fbo) {
+        fail(c, GL.INVALID_OPERATION);
+        return;
+      }
+      const a = fbo.attachments.get(attachment);
+      let value;
+      if (pname === 36048) value = a ? a.type : GL.NONE;
+      else if (!a || pname !== 36049 && (a.type !== GL.TEXTURE || pname !== 36050 && pname !== 36051)) {
+        fail(c, GL.INVALID_ENUM);
+        return;
+      } else value = pname === 36049 ? a.name : pname === 36050 ? a.level : a.face ? GL.TEXTURE_CUBE_MAP_POSITIVE_X + a.face : 0;
+      put(params, [value], "i", "i");
+    },
+    "glDiscardFramebufferEXT": () => {
+    },
+    // ---- drawing
+    "glClear": (shadow, c, [mask]) => {
+      if (mask & ~CLEAR_BITS) return fail(c, GL.INVALID_VALUE);
+      if (!framebuffer_ok(shadow, c)) return REFUSED;
+    },
+    "glDrawArrays": (shadow, c, [mode, first, count]) => {
+      if (!MODES2.has(mode)) return fail(c, GL.INVALID_ENUM);
+      if (first < 0 || count < 0) return fail(c, GL.INVALID_VALUE);
+      if (!framebuffer_ok(shadow, c)) return REFUSED;
+    },
+    "glDrawElementsOffset": (shadow, c, [mode, count, type, offset]) => draw_elements(shadow, c, mode, count, type, !!c.element_array_buffer),
+    "glDrawElementsData": (shadow, c, [mode, count, type, data]) => draw_elements(shadow, c, mode, count, type, true),
+    "glReadPixels": (shadow, c, [x, y, width, height, format, type]) => {
+      if (width < 0 || height < 0) return fail(c, GL.INVALID_VALUE);
+      if (texture_format_error(format, type) === GL.INVALID_ENUM) return fail(c, GL.INVALID_ENUM);
+      if (format !== GL.RGBA || type !== GL.UNSIGNED_BYTE) return fail(c, GL.INVALID_OPERATION);
+      if (!framebuffer_ok(shadow, c)) return REFUSED;
+    },
+    // ---- vertex attributes (the encoder's: client arrays' data with the pointer, or a buffer's offset)
+    "glEnableVertexAttribArray": (shadow, c, [index]) => {
+      if (index >= MAX_ATTRIBS3) return fail(c, GL.INVALID_VALUE);
+      c.attribs[index].enabled = true;
+    },
+    "glDisableVertexAttribArray": (shadow, c, [index]) => {
+      if (index >= MAX_ATTRIBS3) return fail(c, GL.INVALID_VALUE);
+      c.attribs[index].enabled = false;
+    },
+    "glVertexAttribPointerData": (shadow, c, [index, size, type, normalized, stride]) => attrib_pointer(c, index, size, type, normalized, stride, 0, 0),
+    "glVertexAttribPointerOffset": (shadow, c, [index, size, type, normalized, stride, offset]) => attrib_pointer(c, index, size, type, normalized, stride, c.array_buffer, offset),
+    "glVertexAttrib1f": vertex_attrib(1, false),
+    "glVertexAttrib2f": vertex_attrib(2, false),
+    "glVertexAttrib3f": vertex_attrib(3, false),
+    "glVertexAttrib4f": vertex_attrib(4, false),
+    "glVertexAttrib1fv": vertex_attrib(1, true),
+    "glVertexAttrib2fv": vertex_attrib(2, true),
+    "glVertexAttrib3fv": vertex_attrib(3, true),
+    "glVertexAttrib4fv": vertex_attrib(4, true),
+    "glGetVertexAttribfv": (shadow, c, [index, pname, params]) => get_vertex_attrib(shadow, c, index, pname, params, "f"),
+    "glGetVertexAttribiv": (shadow, c, [index, pname, params]) => get_vertex_attrib(shadow, c, index, pname, params, "i"),
+    // ---- shaders and programs
+    "glCreateShader": (shadow, c, [type]) => {
+      if (type !== GL.VERTEX_SHADER && type !== GL.FRAGMENT_SHADER) {
+        fail(c, GL.INVALID_ENUM);
+        return 0;
+      }
+      const name = shadow.given_name || c.group.fresh("object", c.group.objects);
+      c.group.objects.set(name, { kind: "shader", type, source: null, compiled: null, compiled_source: null, deleted: false, attached: 0 });
+      return name;
+    },
+    "glCreateProgram": (shadow, c) => {
+      const name = shadow.given_name || c.group.fresh("object", c.group.objects);
+      c.group.objects.set(name, {
+        kind: "program",
+        shaders: /* @__PURE__ */ new Set(),
+        bindings: /* @__PURE__ */ new Map(),
+        info: null,
+        linked_once: false,
+        validated: 0,
+        deleted: false,
+        values: /* @__PURE__ */ new Map()
+      });
+      return name;
+    },
+    "glShaderString": (shadow, c, [name, string]) => {
+      const shader = object_of(c, name, "shader");
+      if (!shader) return REFUSED;
+      shader.source = text_of(string);
+    },
+    "glCompileShader": (shadow, c, [name]) => {
+      const shader = object_of(c, name, "shader");
+      if (!shader) return REFUSED;
+      shader.compiled_source = shader.source || "";
+      const start = performance.now();
+      shader.compiled = shadow.compile(shader.compiled_source, shader.type, c.glslang, c.api === 2);
+      shadow.stats.compile_ms += performance.now() - start;
+      shadow.stats.compiled++;
+      if (!shader.compiled.ok) {
+        shadow.stats.compile_failed++;
+        if (shadow.stats.failures.length < 8) shadow.stats.failures.push(shader.compiled.log + "\n" + shader.source);
+      }
+    },
+    "glDeleteShader": (shadow, c, [name]) => {
+      if (!name) return void 0;
+      const shader = object_of(c, name, "shader");
+      if (!shader) return REFUSED;
+      shader.deleted = true;
+      if (!shader.attached) c.group.objects.delete(name);
+    },
+    "glDeleteProgram": (shadow, c, [name]) => {
+      if (!name) return void 0;
+      const program = object_of(c, name, "program");
+      if (!program) return REFUSED;
+      program.deleted = true;
+      if (!shadow.program_in_use(name)) shadow.free_program(c.group, name);
+    },
+    "glIsShader": (shadow, c, [name]) => {
+      query(shadow);
+      const o = c.group.objects.get(name);
+      return o && o.kind === "shader" ? 1 : 0;
+    },
+    "glIsProgram": (shadow, c, [name]) => {
+      query(shadow);
+      const o = c.group.objects.get(name);
+      return o && o.kind === "program" ? 1 : 0;
+    },
+    "glAttachShader": (shadow, c, [p, s]) => {
+      const program = object_of(c, p, "program");
+      const shader = program && object_of(c, s, "shader");
+      if (!shader) return REFUSED;
+      if (program.shaders.has(s) || [...program.shaders].some((other) => c.group.objects.get(other).type === shader.type)) return fail(c, GL.INVALID_OPERATION);
+      program.shaders.add(s);
+      shader.attached++;
+    },
+    "glDetachShader": (shadow, c, [p, s]) => {
+      const program = object_of(c, p, "program");
+      const shader = program && object_of(c, s, "shader");
+      if (!shader) return REFUSED;
+      if (!program.shaders.has(s)) return fail(c, GL.INVALID_OPERATION);
+      program.shaders.delete(s);
+      if (--shader.attached === 0 && shader.deleted) c.group.objects.delete(s);
+    },
+    "glBindAttribLocation": (shadow, c, [p, index, name]) => {
+      const program = object_of(c, p, "program");
+      if (!program) return REFUSED;
+      if (index >= MAX_ATTRIBS3) return fail(c, GL.INVALID_VALUE);
+      const text = text_of(name);
+      if (text.startsWith("gl_")) return fail(c, GL.INVALID_OPERATION);
+      program.bindings.set(text, index);
+    },
+    "glLinkProgram": (shadow, c, [p]) => {
+      const program = object_of(c, p, "program");
+      if (!program) return REFUSED;
+      const shaders = [...program.shaders].map((s) => c.group.objects.get(s));
+      const shader = (type) => shaders.find((s) => s.type === type);
+      const vs = shader(GL.VERTEX_SHADER), fs = shader(GL.FRAGMENT_SHADER);
+      const start = performance.now();
+      program.info = shadow.link(program, shaders, c.api === 2);
+      shadow.stats.compile_ms += performance.now() - start;
+      program.link = {
+        vs: vs && vs.compiled ? vs.compiled_source : null,
+        fs: fs && fs.compiled ? fs.compiled_source : null,
+        bindings: [...program.bindings]
+      };
+      if (shaders.some((s) => s.compiled && s.compiled.glslang)) {
+        program.link.glslang = true;
+        program.link.shaders = shaders.map((s) => [s.type, s.compiled_source]);
+        program.link.separable = !!program.separable;
+        program.link.tf = program.tf_request || null;
+        program.keep_info = !shadow.glslang;
+      }
+      program.linked_once = true;
+      shadow.stats.linked++;
+      if (!program.info.ok) {
+        shadow.stats.link_failed++;
+        if (shadow.stats.failures.length < 8) shadow.stats.failures.push(program.info.log);
+      }
+      program.values = initial_values(program.info);
+    },
+    "glValidateProgram": (shadow, c, [p]) => {
+      const program = object_of(c, p, "program");
+      if (!program) return REFUSED;
+      program.validated = program.info && program.info.ok ? 1 : 0;
+    },
+    "glUseProgram": (shadow, c, [p]) => {
+      if (p) {
+        const program = object_of(c, p, "program");
+        if (!program) return REFUSED;
+        if (!program.info || !program.info.ok) return fail(c, GL.INVALID_OPERATION);
+      }
+      const old = c.program;
+      c.program = p;
+      const previous = old && c.group.objects.get(old);
+      if (previous && previous.deleted && !shadow.program_in_use(old)) shadow.free_program(c.group, old);
+    },
+    "glReleaseShaderCompiler": () => {
+    },
+    "glGetShaderiv": (shadow, c, [name, pname, params]) => {
+      query(shadow);
+      const shader = object_of(c, name, "shader");
+      if (!shader) return;
+      const log = shader.compiled ? shader.compiled.log : "";
+      const values = {
+        35663: shader.type,
+        35712: shader.deleted ? 1 : 0,
+        35713: shader.compiled && shader.compiled.ok ? 1 : 0,
+        35716: log ? new TextEncoder().encode(log).length + 1 : 0,
+        35720: shader.source ? new TextEncoder().encode(shader.source).length + 1 : 0
+      };
+      if (!(pname in values)) {
+        fail(c, GL.INVALID_ENUM);
+        return;
+      }
+      put(params, [values[pname]], "i", "i");
+    },
+    "glGetShaderInfoLog": (shadow, c, [name, bufsize, length, log]) => {
+      query(shadow);
+      if (bufsize < 0) {
+        fail(c, GL.INVALID_VALUE);
+        return;
+      }
+      const shader = object_of(c, name, "shader");
+      if (!shader) return;
+      put(length, [put_text(log, shader.compiled ? shader.compiled.log : "")], "i", "i");
+    },
+    "glGetShaderSource": (shadow, c, [name, bufsize, length, source]) => {
+      query(shadow);
+      if (bufsize < 0) {
+        fail(c, GL.INVALID_VALUE);
+        return;
+      }
+      const shader = object_of(c, name, "shader");
+      if (!shader) return;
+      put(length, [put_text(source, shader.source || "")], "i", "i");
+    },
+    "glGetProgramiv": (shadow, c, [name, pname, params]) => {
+      query(shadow);
+      const program = object_of(c, name, "program");
+      if (!program) return;
+      const info = program.info;
+      const linked = info && info.ok;
+      const longest = (list) => list.reduce((n, item) => Math.max(n, new TextEncoder().encode(item.name).length + 1), 0);
+      const values = {
+        35712: program.deleted ? 1 : 0,
+        35714: linked ? 1 : 0,
+        35715: program.validated,
+        35716: info && info.log ? new TextEncoder().encode(info.log).length + 1 : 0,
+        35717: program.shaders.size,
+        35718: linked ? info.uniforms.length : 0,
+        35719: linked ? longest(info.uniforms) : 0,
+        35721: linked ? info.attributes.length : 0,
+        35722: linked ? longest(info.attributes) : 0
+      };
+      if (!(pname in values)) {
+        fail(c, GL.INVALID_ENUM);
+        return;
+      }
+      put(params, [values[pname]], "i", "i");
+    },
+    "glGetProgramInfoLog": (shadow, c, [name, bufsize, length, log]) => {
+      query(shadow);
+      if (bufsize < 0) {
+        fail(c, GL.INVALID_VALUE);
+        return;
+      }
+      const program = object_of(c, name, "program");
+      if (!program) return;
+      put(length, [put_text(log, program.info ? program.info.log : "")], "i", "i");
+    },
+    "glGetAttachedShaders": (shadow, c, [name, maxcount, count, shaders]) => {
+      query(shadow);
+      if (maxcount < 0) {
+        fail(c, GL.INVALID_VALUE);
+        return;
+      }
+      const program = object_of(c, name, "program");
+      if (!program) return;
+      const list = [...program.shaders].slice(0, maxcount);
+      put(count, [list.length], "i", "i");
+      put(shaders, list, "i", "i");
+    },
+    "glGetActiveAttrib": (shadow, c, args) => get_active(shadow, c, args, "attributes"),
+    "glGetActiveUniform": (shadow, c, args) => get_active(shadow, c, args, "uniforms"),
+    "glGetAttribLocation": (shadow, c, [name, text]) => {
+      query(shadow);
+      const program = object_of(c, name, "program");
+      if (!program) return -1;
+      if (!program.info || !program.info.ok) {
+        fail(c, GL.INVALID_OPERATION);
+        return -1;
+      }
+      const attribute = program.info.attributes.find((a) => a.name === text_of(text));
+      return attribute ? attribute.location : -1;
+    },
+    "glGetUniformLocation": (shadow, c, [name, text]) => {
+      query(shadow);
+      const program = object_of(c, name, "program");
+      if (!program) return -1;
+      if (!program.info || !program.info.ok) {
+        fail(c, GL.INVALID_OPERATION);
+        return -1;
+      }
+      const location = program.info.locations.get(text_of(text));
+      return location === void 0 ? -1 : location;
+    },
+    "glGetUniformfv": (shadow, c, [name, location, params]) => get_uniform(shadow, c, name, location, params, "f"),
+    "glGetUniformiv": (shadow, c, [name, location, params]) => get_uniform(shadow, c, name, location, params, "i"),
+    "glUniform1f": uniform(1, "f", false),
+    "glUniform2f": uniform(2, "f", false),
+    "glUniform3f": uniform(3, "f", false),
+    "glUniform4f": uniform(4, "f", false),
+    "glUniform1i": uniform(1, "i", false),
+    "glUniform2i": uniform(2, "i", false),
+    "glUniform3i": uniform(3, "i", false),
+    "glUniform4i": uniform(4, "i", false),
+    "glUniform1fv": uniform(1, "f", true),
+    "glUniform2fv": uniform(2, "f", true),
+    "glUniform3fv": uniform(3, "f", true),
+    "glUniform4fv": uniform(4, "f", true),
+    "glUniform1iv": uniform(1, "i", true),
+    "glUniform2iv": uniform(2, "i", true),
+    "glUniform3iv": uniform(3, "i", true),
+    "glUniform4iv": uniform(4, "i", true),
+    "glUniformMatrix2fv": uniform(4, "m", true),
+    "glUniformMatrix3fv": uniform(9, "m", true),
+    "glUniformMatrix4fv": uniform(16, "m", true),
+    // (no binary formats: GL_NUM_SHADER_BINARY_FORMATS is 0)
+    "glShaderBinary": (shadow, c) => fail(c, GL.INVALID_ENUM),
+    "glUnmapBufferOES": (shadow) => {
+      query(shadow);
+      return 1;
+    }
+  };
+  var GLES1_HANDLERS = gles1_handlers(fail, query);
+  var FRAMEBUFFER_STATUS3 = { fn: null };
+  var GLES3_HANDLERS = gles3_handlers({
+    fail,
+    query,
+    put,
+    put_text,
+    i32s,
+    f32s,
+    text_of,
+    REFUSED,
+    base: HANDLERS,
+    framebuffer_status3: FRAMEBUFFER_STATUS3,
+    new_texture,
+    detach,
+    keep_orphan,
+    state_kind: (pname) => STATE_KIND.get(pname) || (INT64_STATE.has(pname) ? "i" : "i"),
+    // (the default framebuffer's: the draw surface's configuration)
+    framebuffer_bits: (c) => GLESShadow.prototype.framebuffer_bits.call(null, { framebuffer: 0, surface: c.surface }),
+    extensions: () => EXTENSIONS_3,
+    renderbuffer_info: (format) => {
+      const r = RENDERBUFFER_FORMATS.get(format);
+      if (!r) return null;
+      return {
+        kind: r.depth && r.stencil ? "depth_stencil" : r.depth ? "depth" : r.stencil ? "stencil" : "unorm",
+        bits: r.bits,
+        value: format,
+        format: r.color ? r.bits[3] ? 6408 : 6407 : 0,
+        types: [5121],
+        renderable: true,
+        sized: true
+      };
+    }
+  });
+  var GLES31_HANDLERS = gles31_handlers({ fail, query, put, put_text, i32s, f32s, text_of, REFUSED, base: HANDLERS, initial_values }, GLES3_HANDLERS);
+  GLESShadow.prototype.extensions3 = function() {
+    return EXTENSIONS_3;
+  };
+  GLESShadow.prototype.read_info3 = function(c) {
+    if (!c.read_framebuffer) return [c.default_read_buffer === 0 ? 6408 : 6408, 5121];
+    const fbo = c.framebuffers.get(c.read_framebuffer);
+    const a = fbo.attachments.get(fbo.read_buffer);
+    if (!a) return null;
+    const rb = a.type === GL.RENDERBUFFER ? c.group.renderbuffers.get(a.name) : null;
+    const texture = a.type === GL.RENDERBUFFER ? null : c.group.textures.get(a.name);
+    const image = texture && texture.images.get(a.face * 32 + a.level);
+    const format = rb ? rb.format : image ? image.internal || image.format : 0;
+    const info = format_info(format);
+    if (!info || !info.types) return [6408, 5121];
+    return [info.format, info.types[info.types.length > 1 && info.types[0] === 5121 ? 1 : 0]];
+  };
+  for (const [name, enable] of [["glEnable", true], ["glDisable", false]]) {
+    GLES1_HANDLERS[name] = (shadow, c, [cap]) => {
+      if (cap === GL.TEXTURE_2D || cap === GL.TEXTURE_EXTERNAL_OES) {
+        c.ff.texture_enabled[c.active_texture][cap] = enable;
+        return void 0;
+      }
+      if (CLIENT_ARRAYS[cap]) return fail(c, GL.INVALID_ENUM);
+      return HANDLERS[name](shadow, c, [cap]);
+    };
+  }
+  GLES1_HANDLERS["glIsEnabled"] = (shadow, c, [cap]) => {
+    const own = gles1_state_value(c, cap);
+    if (own && own[1] === "b") {
+      query(shadow);
+      return own[0][0] ? 1 : 0;
+    }
+    return HANDLERS["glIsEnabled"](shadow, c, [cap]);
+  };
+  function draw_elements(shadow, c, mode, count, type, indices) {
+    if (!MODES2.has(mode) || !INDEX_TYPES2.has(type)) return fail(c, GL.INVALID_ENUM);
+    if (count < 0) return fail(c, GL.INVALID_VALUE);
+    if (!framebuffer_ok(shadow, c)) return REFUSED;
+    return void 0;
+  }
+  function attrib_pointer(c, index, size, type, normalized, stride, buffer, offset) {
+    if (index >= MAX_ATTRIBS3 || size < 1 || size > 4 || stride < 0) return fail(c, GL.INVALID_VALUE);
+    if (!ATTRIB_TYPES.has(type)) return fail(c, GL.INVALID_ENUM);
+    Object.assign(c.attribs[index], { size, type, normalized: !!normalized, stride, buffer, offset });
+    return void 0;
+  }
+  function tex_parameter(c, target, pname, params) {
+    const texture = bound_texture(c, target);
+    if (!texture) return REFUSED;
+    const value = params[0];
+    const external = target === GL.TEXTURE_EXTERNAL_OES;
+    switch (pname) {
+      case GL.TEXTURE_MIN_FILTER:
+        if (!MIN_FILTERS2.has(value) || external && value !== GL.NEAREST && value !== GL.LINEAR) return fail(c, GL.INVALID_ENUM);
+        texture.min_filter = value;
+        return void 0;
+      case GL.TEXTURE_MAG_FILTER:
+        if (value !== GL.NEAREST && value !== GL.LINEAR) return fail(c, GL.INVALID_ENUM);
+        texture.mag_filter = value;
+        return void 0;
+      case GL.TEXTURE_WRAP_S:
+      case GL.TEXTURE_WRAP_T:
+        if (!WRAPS2.has(value) || external && value !== GL.CLAMP_TO_EDGE) return fail(c, GL.INVALID_ENUM);
+        if (pname === GL.TEXTURE_WRAP_S) texture.wrap_s = value;
+        else texture.wrap_t = value;
+        return void 0;
+      case GL.GENERATE_MIPMAP:
+        if (c.api !== 1) return fail(c, GL.INVALID_ENUM);
+        texture.generate_mipmap = value ? 1 : 0;
+        return void 0;
+      case GL.TEXTURE_CROP_RECT_OES:
+        if (c.api !== 1) return fail(c, GL.INVALID_ENUM);
+        texture.crop = params.slice(0, 4);
+        return void 0;
+    }
+    return fail(c, GL.INVALID_ENUM);
+  }
+  function get_tex_parameter(shadow, c, target, pname, params, as) {
+    query(shadow);
+    const texture = bound_texture(c, target);
+    if (!texture) return;
+    const values = {
+      [GL.TEXTURE_MIN_FILTER]: [texture.min_filter],
+      [GL.TEXTURE_MAG_FILTER]: [texture.mag_filter],
+      [GL.TEXTURE_WRAP_S]: [texture.wrap_s],
+      [GL.TEXTURE_WRAP_T]: [texture.wrap_t]
+    };
+    if (c.api === 1) {
+      values[GL.GENERATE_MIPMAP] = [texture.generate_mipmap];
+      values[GL.TEXTURE_CROP_RECT_OES] = texture.crop;
+    }
+    if (!(pname in values)) {
+      fail(c, GL.INVALID_ENUM);
+      return;
+    }
+    put(params, values[pname], as, "i");
+  }
+  function get_vertex_attrib(shadow, c, index, pname, params, as) {
+    query(shadow);
+    if (index >= MAX_ATTRIBS3) {
+      fail(c, GL.INVALID_VALUE);
+      return;
+    }
+    const a = c.attribs[index];
+    const values = {
+      34338: [a.enabled ? 1 : 0],
+      34339: [a.size],
+      34340: [a.stride],
+      34341: [a.type],
+      34922: [a.normalized ? 1 : 0],
+      34975: [a.buffer],
+      34342: a.current
+    };
+    if (!(pname in values)) {
+      fail(c, GL.INVALID_ENUM);
+      return;
+    }
+    put(params, values[pname], as, pname === 34342 ? "f" : "i");
+  }
+  function get_active(shadow, c, [name, index, bufsize, length, size, type, text], list) {
+    query(shadow);
+    const program = object_of(c, name, "program");
+    if (!program) return;
+    const items = program.info && program.info.ok ? program.info[list] : [];
+    if (index >= items.length || bufsize < 0) {
+      fail(c, GL.INVALID_VALUE);
+      return;
+    }
+    const item = items[index];
+    put(length, [put_text(text, item.name)], "i", "i");
+    put(size, [item.size], "i", "i");
+    put(type, [item.type], "i", "i");
+  }
+  function get_uniform(shadow, c, name, location, params, as) {
+    query(shadow);
+    const program = object_of(c, name, "program");
+    if (!program) return;
+    if (!program.info || !program.info.ok) {
+      fail(c, GL.INVALID_OPERATION);
+      return;
+    }
+    const at = program.info.by_location[location];
+    if (!at) {
+      fail(c, GL.INVALID_OPERATION);
+      return;
+    }
+    const u = at.uniform;
+    const count = u.columns ? u.columns * u.columns : u.components;
+    const values = program.values.get(location) || new Array(count).fill(0);
+    put(params, values, as, u.int || u.bool ? "i" : "f");
+  }
+  GLESShadow.prototype.bind_color_buffer = function(handle, color_buffer, texture) {
+    const c = this.contexts.get(handle);
+    const cb = this.rc && this.rc.color_buffers.get(color_buffer);
+    if (!c || !cb) return false;
+    const format = cb.format === GL.RGB ? GL.RGB : GL.RGBA;
+    if (texture) {
+      const t = bound_texture(c, GL.TEXTURE_2D);
+      t.images.clear();
+      t.images.set(0, { width: cb.width, height: cb.height, format, type: GL.UNSIGNED_BYTE, compressed: false, color_buffer });
+      return true;
+    }
+    const rb = c.group.renderbuffers.get(c.renderbuffer);
+    if (!rb) return false;
+    Object.assign(rb, { width: cb.width, height: cb.height, format: format === GL.RGB ? GL.RGB8_OES : GL.RGBA8_OES, image: 0 });
+    return true;
+  };
+  GLESShadow.prototype.program_in_use = function(name) {
+    for (const context of this.contexts.values()) if (context.program === name) return true;
+    return false;
+  };
+  GLESShadow.prototype.free_program = function(group, name) {
+    const program = group.objects.get(name);
+    if (!program) return;
+    for (const s of program.shaders) {
+      const shader = group.objects.get(s);
+      if (shader && --shader.attached === 0 && shader.deleted) group.objects.delete(s);
+    }
+    group.objects.delete(name);
+  };
+  GLESShadow.prototype.image_size = function(image) {
+    if (!this.rc) return null;
+    const object = this.rc.images.get(image);
+    if (!object) return null;
+    const cb = this.rc.color_buffers.get(object.buffer);
+    if (!cb) return null;
+    return { width: cb.width, height: cb.height, format: cb.format === GL.RGB ? GL.RGB : GL.RGBA };
+  };
+
+  // src/graphics_adapters/renderer_protocol.js
+  var RESPONSE_REGION_OFFSET = 12 << 20;
+  var RESPONSE_REGION_BYTES = 4 << 20;
+  var QUERY_REGION_BYTES = 16 * 1024;
+  var READBACK_HEADER_BYTES = 16;
+  var READBACK_MAX_BYTES = RESPONSE_REGION_BYTES - QUERY_REGION_BYTES - READBACK_HEADER_BYTES - 16;
+  var GX_MAGIC = 808540231;
+  var GLES_MAGIC = 808535367;
+  var GLES = {
+    COMMAND: 1,
+    // connection, answer, byte length, then the command's bytes
+    CONTEXT_CREATE: 2,
+    // context, config, share group (its first context), API (1 or 2)
+    CONTEXT_DESTROY: 3,
+    // context
+    SURFACE_CREATE: 4,
+    // surface, config, width, height
+    SURFACE_DESTROY: 5,
+    // surface
+    SURFACE_COLOR_BUFFER: 6,
+    // surface, color buffer (rcSetWindowColorBuffer)
+    MAKE_CURRENT: 7,
+    // connection, context, draw surface, read surface
+    COLOR_BUFFER_CREATE: 8,
+    // color buffer, width, height, internal format
+    COLOR_BUFFER_DESTROY: 9,
+    // color buffer (its last reference went)
+    COLOR_BUFFER_UPDATE: 10,
+    // color buffer, x, y, width, height, format, type, byte length, then the pixels
+    COLOR_BUFFER_READ: 11,
+    // color buffer, x, y, width, height, format, type, request id
+    COLOR_BUFFER_BIND: 12,
+    // connection, color buffer, as a texture (1) or a renderbuffer (0) of its context
+    IMAGE_CREATE: 13,
+    // image, context, target (EGL_GL_TEXTURE_2D_KHR, EGL_NATIVE_BUFFER_ANDROID), texture or color buffer
+    IMAGE_DESTROY: 14,
+    // image
+    POST: 15,
+    // color buffer: the screen (rcFBPost)
+    FLUSH_SURFACE: 16,
+    // surface: what was drawn to it is its color buffer's (rcFlushWindowColorBuffer)
+    READ_PIXELS: 17,
+    // connection, request id, x, y, width, height, format, type (glReadPixels)
+    CONNECTION_CLOSE: 18,
+    // connection (nothing is current on it any more)
+    PROGRAM_LINK: 19,
+    // connection, program, byte length, then the link's result (glsl_program.js's pack_program):
+    // before its glLinkProgram, which the page then links with it (it has no glslang)
+    BUFFER_READ: 20,
+    // connection, request id, buffer, offset, length: a buffer's bytes the GPU wrote (glMapBufferRange's)
+    QUERY_READ: 21
+    // connection, request id, query: an occlusion query's result (a u32: whether a sample passed)
+  };
+  function GXWriter(magic) {
+    this.magic = magic || GX_MAGIC;
+    this.words = new Uint32Array(1 << 14);
+    this.length = 4;
+    this.count = 0;
+    this.before = null;
+    this.listener = null;
+  }
+  GXWriter.prototype.empty = function() {
+    return this.count === 0;
+  };
+  GXWriter.prototype.size = function() {
+    return this.length * 4;
+  };
+  GXWriter.prototype.reserve = function(dwords) {
+    if (this.length + dwords <= this.words.length) return;
+    let capacity = this.words.length;
+    while (capacity < this.length + dwords) capacity *= 2;
+    const bigger = new Uint32Array(capacity);
+    bigger.set(this.words.subarray(0, this.length));
+    this.words = bigger;
+  };
+  GXWriter.prototype.command = function(op, dwords, bytes) {
+    if (this.before) this.before();
+    if (this.listener) this.listener(op, dwords, bytes);
+    const byte_count = bytes ? bytes.length : 0;
+    const body = dwords.length + (byte_count + 3 >> 2);
+    this.reserve(2 + body);
+    const w = this.words;
+    w[this.length++] = op;
+    w[this.length++] = body;
+    for (let i = 0; i < dwords.length; i++) w[this.length++] = dwords[i];
+    if (bytes) {
+      const tail = new Uint8Array(w.buffer, this.length * 4, body * 4 - dwords.length * 4);
+      tail.fill(0);
+      tail.set(bytes);
+      this.length += byte_count + 3 >> 2;
+    }
+    this.count++;
+  };
+  GXWriter.prototype.finish = function() {
+    const w = this.words;
+    w[0] = this.magic;
+    w[1] = 1;
+    w[2] = this.length;
+    w[3] = this.count;
+    const bytes = new Uint8Array(w.buffer.slice(0, this.length * 4));
+    this.length = 4;
+    this.count = 0;
+    return bytes;
+  };
+
+  // src/gles/gles_protocol.js
+  var GLES_APIS = {
+    rc: { base: 1e4, commands: [
+      ["rcGetRendererVersion", "i32", []],
+      ["rcGetEGLVersion", "i32", [["major", "ptr", "out"], ["minor", "ptr", "out"]]],
+      ["rcQueryEGLString", "i32", [["name", "u32"], ["buffer", "ptr", "out"], ["bufferSize", "i32"]]],
+      ["rcGetGLString", "i32", [["name", "u32"], ["buffer", "ptr", "out"], ["bufferSize", "i32"]]],
+      ["rcGetNumConfigs", "i32", [["numAttribs", "ptr", "out"]]],
+      ["rcGetConfigs", "i32", [["bufSize", "u32"], ["buffer", "ptr", "out"]]],
+      ["rcChooseConfig", "i32", [["attribs", "ptr", "in"], ["attribs_size", "u32"], ["configs", "ptr", "out", ["nullAllowed"]], ["configs_size", "u32"]]],
+      ["rcGetFBParam", "i32", [["param", "i32"]]],
+      ["rcCreateContext", "u32", [["config", "u32"], ["share", "u32"], ["glVersion", "u32"]]],
+      ["rcDestroyContext", "void", [["context", "u32"]]],
+      ["rcCreateWindowSurface", "u32", [["config", "u32"], ["width", "u32"], ["height", "u32"]]],
+      ["rcDestroyWindowSurface", "void", [["windowSurface", "u32"]]],
+      ["rcCreateColorBuffer", "u32", [["width", "u32"], ["height", "u32"], ["internalFormat", "u32"]]],
+      ["rcOpenColorBuffer", "void", [["colorbuffer", "u32"]]],
+      ["rcCloseColorBuffer", "void", [["colorbuffer", "u32"]], ["flushOnEncode"]],
+      ["rcSetWindowColorBuffer", "void", [["windowSurface", "u32"], ["colorBuffer", "u32"]]],
+      ["rcFlushWindowColorBuffer", "i32", [["windowSurface", "u32"]]],
+      ["rcMakeCurrent", "i32", [["context", "u32"], ["drawSurf", "u32"], ["readSurf", "u32"]]],
+      ["rcFBPost", "void", [["colorBuffer", "u32"]]],
+      ["rcFBSetSwapInterval", "void", [["interval", "i32"]]],
+      ["rcBindTexture", "void", [["colorBuffer", "u32"]]],
+      ["rcBindRenderbuffer", "void", [["colorBuffer", "u32"]]],
+      ["rcColorBufferCacheFlush", "i32", [["colorbuffer", "u32"], ["postCount", "i32"], ["forRead", "i32"]]],
+      ["rcReadColorBuffer", "void", [["colorbuffer", "u32"], ["x", "i32"], ["y", "i32"], ["width", "i32"], ["height", "i32"], ["format", "u32"], ["type", "u32"], ["pixels", "ptr", "out"]]],
+      ["rcUpdateColorBuffer", "i32", [["colorbuffer", "u32"], ["x", "i32"], ["y", "i32"], ["width", "i32"], ["height", "i32"], ["format", "u32"], ["type", "u32"], ["pixels", "ptr", "in", ["isLarge"]]]],
+      ["rcOpenColorBuffer2", "i32", [["colorbuffer", "u32"]]],
+      ["rcCreateClientImage", "u32", [["context", "u32"], ["target", "u32"], ["buffer", "u32"]]],
+      ["rcDestroyClientImage", "i32", [["image", "u32"]]],
+      ["rcSelectChecksumHelper", "void", [["newProtocol", "u32"], ["reserved", "u32"]]],
+      ["rcCreateSyncKHR", "void", [["type", "u32"], ["attribs", "ptr", "in"], ["num_attribs", "u32"], ["destroy_when_signaled", "i32"], ["glsync_out", "ptr", "out"], ["syncthread_out", "ptr", "out"]]],
+      ["rcClientWaitSyncKHR", "i32", [["sync", "u64"], ["flags", "i32"], ["timeout", "u64"]]],
+      ["rcFlushWindowColorBufferAsync", "void", [["windowSurface", "u32"]]],
+      ["rcDestroySyncKHR", "i32", [["sync", "u64"]]],
+      ["rcSetPuid", "void", [["puid", "u64"]]],
+      ["rcUpdateColorBufferDMA", "i32", [["colorbuffer", "u32"], ["x", "i32"], ["y", "i32"], ["width", "i32"], ["height", "i32"], ["format", "u32"], ["type", "u32"], ["pixels", "ptr", "in", ["DMA"]], ["pixels_size", "u32"]], ["flushOnEncode"]],
+      ["rcCreateColorBufferDMA", "u32", [["width", "u32"], ["height", "u32"], ["internalFormat", "u32"], ["frameworkFormat", "i32"]]],
+      ["rcWaitSyncKHR", "void", [["sync", "u64"], ["flags", "i32"]]],
+      ["rcCompose", "i32", [["bufferSize", "u32"], ["buffer", "ptr", "in"]], ["flushOnEncode"]],
+      ["rcCreateDisplay", "i32", [["displayId", "ptr", "out"]]],
+      ["rcDestroyDisplay", "i32", [["displayId", "u32"]]],
+      ["rcSetDisplayColorBuffer", "i32", [["displayId", "u32"], ["colorBuffer", "u32"]]],
+      ["rcGetDisplayColorBuffer", "i32", [["displayId", "u32"], ["colorBuffer", "ptr", "out"]]],
+      ["rcGetColorBufferDisplay", "i32", [["colorBuffer", "u32"], ["displayId", "ptr", "out"]]],
+      ["rcGetDisplayPose", "i32", [["displayId", "u32"], ["x", "ptr", "out"], ["y", "ptr", "out"], ["w", "ptr", "out"], ["h", "ptr", "out"]]],
+      ["rcSetDisplayPose", "i32", [["displayId", "u32"], ["x", "i32"], ["y", "i32"], ["w", "u32"], ["h", "u32"]]],
+      ["rcSetColorBufferVulkanMode", "i32", [["colorBuffer", "u32"], ["mode", "u32"]]],
+      ["rcReadColorBufferYUV", "void", [["colorbuffer", "u32"], ["x", "i32"], ["y", "i32"], ["width", "i32"], ["height", "i32"], ["pixels", "ptr", "out"], ["pixels_size", "u32"]]],
+      ["rcIsSyncSignaled", "i32", [["sync", "u64"]]],
+      ["rcCreateColorBufferWithHandle", "void", [["width", "u32"], ["height", "u32"], ["internalFormat", "u32"], ["handle", "u32"]]],
+      ["rcCreateBuffer", "u32", [["size", "u32"]]],
+      ["rcCloseBuffer", "void", [["buffer", "u32"]]],
+      ["rcSetColorBufferVulkanMode2", "i32", [["colorBuffer", "u32"], ["mode", "u32"], ["memoryProperty", "u32"]]],
+      ["rcMapGpaToBufferHandle", "i32", [["bufferHandle", "u32"], ["gpa", "u64"]]],
+      ["rcCreateBuffer2", "u32", [["size", "u64"], ["memoryProperty", "u32"]]],
+      ["rcMapGpaToBufferHandle2", "i32", [["bufferHandle", "u32"], ["gpa", "u64"], ["size", "u64"]]],
+      ["rcFlushWindowColorBufferAsyncWithFrameNumber", "void", [["windowSurface", "u32"], ["frameNumber", "u32"]]],
+      ["rcSetTracingForPuid", "void", [["puid", "u64"], ["enable", "u32"], ["guestTime", "u64"]]],
+      ["rcMakeCurrentAsync", "void", [["context", "u32"], ["drawSurf", "u32"], ["readSurf", "u32"]], ["flushOnEncode"]],
+      ["rcComposeAsync", "void", [["bufferSize", "u32"], ["buffer", "ptr", "in"]], ["flushOnEncode"]],
+      ["rcDestroySyncKHRAsync", "void", [["sync", "u64"]], ["flushOnEncode"]],
+      ["rcComposeWithoutPost", "i32", [["bufferSize", "u32"], ["buffer", "ptr", "in"]], ["flushOnEncode"]],
+      ["rcComposeAsyncWithoutPost", "void", [["bufferSize", "u32"], ["buffer", "ptr", "in"]], ["flushOnEncode"]],
+      ["rcCreateDisplayById", "i32", [["displayId", "u32"]]],
+      ["rcSetDisplayPoseDpi", "i32", [["displayId", "u32"], ["x", "i32"], ["y", "i32"], ["w", "u32"], ["h", "u32"], ["dpi", "u32"]]],
+      ["rcReadColorBufferDMA", "i32", [["colorbuffer", "u32"], ["x", "i32"], ["y", "i32"], ["width", "i32"], ["height", "i32"], ["format", "u32"], ["type", "u32"], ["pixels", "ptr", "out", ["DMA"]], ["pixels_size", "u32"]]],
+      ["rcGetFBDisplayConfigsCount", "i32", []],
+      ["rcGetFBDisplayConfigsParam", "i32", [["configId", "i32"], ["param", "i32"]]],
+      ["rcGetFBDisplayActiveConfig", "i32", []],
+      ["rcSetProcessMetadata", "void", [["key", "ptr", "in"], ["valuePtr", "ptr", "in"], ["valueSize", "u32"]]],
+      ["rcGetHostExtensionsString", "i32", [["bufferSize", "u32"], ["buffer", "ptr", "out"]]],
+      ["rcGetDisplayColorTransform", "i32", [["displayId", "u32"], ["outColorTransformMatrix", "ptr", "in"]]],
+      ["rcSetDisplayColorTransform", "i32", [["displayId", "u32"], ["colorTransformMatrix", "ptr", "in"]]]
+    ] },
+    gles1: { base: 1024, commands: [
+      ["glAlphaFunc", "void", [["func", "u32"], ["ref", "f32"]]],
+      ["glClearColor", "void", [["red", "f32"], ["green", "f32"], ["blue", "f32"], ["alpha", "f32"]]],
+      ["glClearDepthf", "void", [["depth", "f32"]]],
+      ["glClipPlanef", "void", [["plane", "u32"], ["equation", "ptr", "in"]]],
+      ["glColor4f", "void", [["red", "f32"], ["green", "f32"], ["blue", "f32"], ["alpha", "f32"]]],
+      ["glDepthRangef", "void", [["zNear", "f32"], ["zFar", "f32"]]],
+      ["glFogf", "void", [["pname", "u32"], ["param", "f32"]]],
+      ["glFogfv", "void", [["pname", "u32"], ["params", "ptr", "in"]]],
+      ["glFrustumf", "void", [["left", "f32"], ["right", "f32"], ["bottom", "f32"], ["top", "f32"], ["zNear", "f32"], ["zFar", "f32"]]],
+      ["glGetClipPlanef", "void", [["pname", "u32"], ["eqn", "ptr", "out"]]],
+      ["glGetFloatv", "void", [["pname", "u32"], ["params", "ptr", "out"]]],
+      ["glGetLightfv", "void", [["light", "u32"], ["pname", "u32"], ["params", "ptr", "out"]]],
+      ["glGetMaterialfv", "void", [["face", "u32"], ["pname", "u32"], ["params", "ptr", "out"]]],
+      ["glGetTexEnvfv", "void", [["env", "u32"], ["pname", "u32"], ["params", "ptr", "out"]]],
+      ["glGetTexParameterfv", "void", [["target", "u32"], ["pname", "u32"], ["params", "ptr", "out"]]],
+      ["glLightModelf", "void", [["pname", "u32"], ["param", "f32"]]],
+      ["glLightModelfv", "void", [["pname", "u32"], ["params", "ptr", "in"]]],
+      ["glLightf", "void", [["light", "u32"], ["pname", "u32"], ["param", "f32"]]],
+      ["glLightfv", "void", [["light", "u32"], ["pname", "u32"], ["params", "ptr", "in"]]],
+      ["glLineWidth", "void", [["width", "f32"]]],
+      ["glLoadMatrixf", "void", [["m", "ptr", "in"]]],
+      ["glMaterialf", "void", [["face", "u32"], ["pname", "u32"], ["param", "f32"]]],
+      ["glMaterialfv", "void", [["face", "u32"], ["pname", "u32"], ["params", "ptr", "in"]]],
+      ["glMultMatrixf", "void", [["m", "ptr", "in"]]],
+      ["glMultiTexCoord4f", "void", [["target", "u32"], ["s", "f32"], ["t", "f32"], ["r", "f32"], ["q", "f32"]]],
+      ["glNormal3f", "void", [["nx", "f32"], ["ny", "f32"], ["nz", "f32"]]],
+      ["glOrthof", "void", [["left", "f32"], ["right", "f32"], ["bottom", "f32"], ["top", "f32"], ["zNear", "f32"], ["zFar", "f32"]]],
+      ["glPointParameterf", "void", [["pname", "u32"], ["param", "f32"]]],
+      ["glPointParameterfv", "void", [["pname", "u32"], ["params", "ptr", "in"]]],
+      ["glPointSize", "void", [["size", "f32"]]],
+      ["glPolygonOffset", "void", [["factor", "f32"], ["units", "f32"]]],
+      ["glRotatef", "void", [["angle", "f32"], ["x", "f32"], ["y", "f32"], ["z", "f32"]]],
+      ["glScalef", "void", [["x", "f32"], ["y", "f32"], ["z", "f32"]]],
+      ["glTexEnvf", "void", [["target", "u32"], ["pname", "u32"], ["param", "f32"]]],
+      ["glTexEnvfv", "void", [["target", "u32"], ["pname", "u32"], ["params", "ptr", "in"]]],
+      ["glTexParameterf", "void", [["target", "u32"], ["pname", "u32"], ["param", "f32"]]],
+      ["glTexParameterfv", "void", [["target", "u32"], ["pname", "u32"], ["params", "ptr", "in"]]],
+      ["glTranslatef", "void", [["x", "f32"], ["y", "f32"], ["z", "f32"]]],
+      ["glActiveTexture", "void", [["texture", "u32"]]],
+      ["glAlphaFuncx", "void", [["func", "u32"], ["ref", "i32"]]],
+      ["glBindBuffer", "void", [["target", "u32"], ["buffer", "u32"]]],
+      ["glBindTexture", "void", [["target", "u32"], ["texture", "u32"]]],
+      ["glBlendFunc", "void", [["sfactor", "u32"], ["dfactor", "u32"]]],
+      ["glBufferData", "void", [["target", "u32"], ["size", "i32"], ["data", "ptr", "in", ["nullAllowed"]], ["usage", "u32"]]],
+      ["glBufferSubData", "void", [["target", "u32"], ["offset", "i32"], ["size", "i32"], ["data", "ptr", "in", ["nullAllowed"]]]],
+      ["glClear", "void", [["mask", "u32"]]],
+      ["glClearColorx", "void", [["red", "i32"], ["green", "i32"], ["blue", "i32"], ["alpha", "i32"]]],
+      ["glClearDepthx", "void", [["depth", "i32"]]],
+      ["glClearStencil", "void", [["s", "i32"]]],
+      ["glClientActiveTexture", "void", [["texture", "u32"]]],
+      ["glColor4ub", "void", [["red", "u8"], ["green", "u8"], ["blue", "u8"], ["alpha", "u8"]]],
+      ["glColor4x", "void", [["red", "i32"], ["green", "i32"], ["blue", "i32"], ["alpha", "i32"]]],
+      ["glColorMask", "void", [["red", "u8"], ["green", "u8"], ["blue", "u8"], ["alpha", "u8"]]],
+      ["glColorPointer", "void", [["size", "i32"], ["type", "u32"], ["stride", "i32"], ["pointer", "ptr", "in"]], ["unsupported"]],
+      ["glCompressedTexImage2D", "void", [["target", "u32"], ["level", "i32"], ["internalformat", "u32"], ["width", "i32"], ["height", "i32"], ["border", "i32"], ["imageSize", "i32"], ["data", "ptr", "in", ["nullAllowed"]]]],
+      ["glCompressedTexSubImage2D", "void", [["target", "u32"], ["level", "i32"], ["xoffset", "i32"], ["yoffset", "i32"], ["width", "i32"], ["height", "i32"], ["format", "u32"], ["imageSize", "i32"], ["data", "ptr", "in", ["nullAllowed"]]]],
+      ["glCopyTexImage2D", "void", [["target", "u32"], ["level", "i32"], ["internalformat", "u32"], ["x", "i32"], ["y", "i32"], ["width", "i32"], ["height", "i32"], ["border", "i32"]]],
+      ["glCopyTexSubImage2D", "void", [["target", "u32"], ["level", "i32"], ["xoffset", "i32"], ["yoffset", "i32"], ["x", "i32"], ["y", "i32"], ["width", "i32"], ["height", "i32"]]],
+      ["glCullFace", "void", [["mode", "u32"]]],
+      ["glDeleteBuffers", "void", [["n", "i32"], ["buffers", "ptr", "in"]], ["custom_decoder"]],
+      ["glDeleteTextures", "void", [["n", "i32"], ["textures", "ptr", "in"]], ["custom_decoder"]],
+      ["glDepthFunc", "void", [["func", "u32"]]],
+      ["glDepthMask", "void", [["flag", "u8"]]],
+      ["glDepthRangex", "void", [["zNear", "i32"], ["zFar", "i32"]]],
+      ["glDisable", "void", [["cap", "u32"]]],
+      ["glDisableClientState", "void", [["array", "u32"]]],
+      ["glDrawArrays", "void", [["mode", "u32"], ["first", "i32"], ["count", "i32"]]],
+      ["glDrawElements", "void", [["mode", "u32"], ["count", "i32"], ["type", "u32"], ["indices", "ptr", "in"]], ["unsupported"]],
+      ["glEnable", "void", [["cap", "u32"]]],
+      ["glEnableClientState", "void", [["array", "u32"]]],
+      ["glFinish", "void", []],
+      ["glFlush", "void", []],
+      ["glFogx", "void", [["pname", "u32"], ["param", "i32"]]],
+      ["glFogxv", "void", [["pname", "u32"], ["params", "ptr", "in"]]],
+      ["glFrontFace", "void", [["mode", "u32"]]],
+      ["glFrustumx", "void", [["left", "i32"], ["right", "i32"], ["bottom", "i32"], ["top", "i32"], ["zNear", "i32"], ["zFar", "i32"]]],
+      ["glGetBooleanv", "void", [["pname", "u32"], ["params", "ptr", "out"]]],
+      ["glGetBufferParameteriv", "void", [["target", "u32"], ["pname", "u32"], ["params", "ptr", "out"]]],
+      ["glClipPlanex", "void", [["pname", "u32"], ["eqn", "ptr", "in"]]],
+      ["glGenBuffers", "void", [["n", "i32"], ["buffers", "ptr", "out"]], ["custom_decoder"]],
+      ["glGenTextures", "void", [["n", "i32"], ["textures", "ptr", "out"]], ["custom_decoder"]],
+      ["glGetError", "u32", []],
+      ["glGetFixedv", "void", [["pname", "u32"], ["params", "ptr", "out"]]],
+      ["glGetIntegerv", "void", [["pname", "u32"], ["params", "ptr", "out"]]],
+      ["glGetLightxv", "void", [["light", "u32"], ["pname", "u32"], ["params", "ptr", "out"]]],
+      ["glGetMaterialxv", "void", [["face", "u32"], ["pname", "u32"], ["params", "ptr", "out"]]],
+      ["glGetPointerv", "void", [["pname", "u32"], ["params", "ptr", "in"]], ["unsupported"]],
+      ["glGetString", "u32", [["name", "u32"]], ["unsupported"]],
+      ["glGetTexEnviv", "void", [["env", "u32"], ["pname", "u32"], ["params", "ptr", "out"]]],
+      ["glGetTexEnvxv", "void", [["env", "u32"], ["pname", "u32"], ["params", "ptr", "out"]]],
+      ["glGetTexParameteriv", "void", [["target", "u32"], ["pname", "u32"], ["params", "ptr", "out"]]],
+      ["glGetTexParameterxv", "void", [["target", "u32"], ["pname", "u32"], ["params", "ptr", "out"]]],
+      ["glHint", "void", [["target", "u32"], ["mode", "u32"]]],
+      ["glIsBuffer", "u8", [["buffer", "u32"]]],
+      ["glIsEnabled", "u8", [["cap", "u32"]]],
+      ["glIsTexture", "u8", [["texture", "u32"]]],
+      ["glLightModelx", "void", [["pname", "u32"], ["param", "i32"]]],
+      ["glLightModelxv", "void", [["pname", "u32"], ["params", "ptr", "in"]]],
+      ["glLightx", "void", [["light", "u32"], ["pname", "u32"], ["param", "i32"]]],
+      ["glLightxv", "void", [["light", "u32"], ["pname", "u32"], ["params", "ptr", "in"]]],
+      ["glLineWidthx", "void", [["width", "i32"]]],
+      ["glLoadIdentity", "void", []],
+      ["glLoadMatrixx", "void", [["m", "ptr", "in"]]],
+      ["glLogicOp", "void", [["opcode", "u32"]]],
+      ["glMaterialx", "void", [["face", "u32"], ["pname", "u32"], ["param", "i32"]]],
+      ["glMaterialxv", "void", [["face", "u32"], ["pname", "u32"], ["params", "ptr", "in"]]],
+      ["glMatrixMode", "void", [["mode", "u32"]]],
+      ["glMultMatrixx", "void", [["m", "ptr", "in"]]],
+      ["glMultiTexCoord4x", "void", [["target", "u32"], ["s", "i32"], ["t", "i32"], ["r", "i32"], ["q", "i32"]]],
+      ["glNormal3x", "void", [["nx", "i32"], ["ny", "i32"], ["nz", "i32"]]],
+      ["glNormalPointer", "void", [["type", "u32"], ["stride", "i32"], ["pointer", "ptr", "in"]], ["unsupported"]],
+      ["glOrthox", "void", [["left", "i32"], ["right", "i32"], ["bottom", "i32"], ["top", "i32"], ["zNear", "i32"], ["zFar", "i32"]]],
+      ["glPixelStorei", "void", [["pname", "u32"], ["param", "i32"]]],
+      ["glPointParameterx", "void", [["pname", "u32"], ["param", "i32"]]],
+      ["glPointParameterxv", "void", [["pname", "u32"], ["params", "ptr", "in"]]],
+      ["glPointSizex", "void", [["size", "i32"]]],
+      ["glPolygonOffsetx", "void", [["factor", "i32"], ["units", "i32"]]],
+      ["glPopMatrix", "void", []],
+      ["glPushMatrix", "void", []],
+      ["glReadPixels", "void", [["x", "i32"], ["y", "i32"], ["width", "i32"], ["height", "i32"], ["format", "u32"], ["type", "u32"], ["pixels", "ptr", "out"]]],
+      ["glRotatex", "void", [["angle", "i32"], ["x", "i32"], ["y", "i32"], ["z", "i32"]]],
+      ["glSampleCoverage", "void", [["value", "f32"], ["invert", "u8"]]],
+      ["glSampleCoveragex", "void", [["value", "i32"], ["invert", "u8"]]],
+      ["glScalex", "void", [["x", "i32"], ["y", "i32"], ["z", "i32"]]],
+      ["glScissor", "void", [["x", "i32"], ["y", "i32"], ["width", "i32"], ["height", "i32"]]],
+      ["glShadeModel", "void", [["mode", "u32"]]],
+      ["glStencilFunc", "void", [["func", "u32"], ["ref", "i32"], ["mask", "u32"]]],
+      ["glStencilMask", "void", [["mask", "u32"]]],
+      ["glStencilOp", "void", [["fail", "u32"], ["zfail", "u32"], ["zpass", "u32"]]],
+      ["glTexCoordPointer", "void", [["size", "i32"], ["type", "u32"], ["stride", "i32"], ["pointer", "ptr", "in"]], ["unsupported"]],
+      ["glTexEnvi", "void", [["target", "u32"], ["pname", "u32"], ["param", "i32"]]],
+      ["glTexEnvx", "void", [["target", "u32"], ["pname", "u32"], ["param", "i32"]]],
+      ["glTexEnviv", "void", [["target", "u32"], ["pname", "u32"], ["params", "ptr", "in"]]],
+      ["glTexEnvxv", "void", [["target", "u32"], ["pname", "u32"], ["params", "ptr", "in"]]],
+      ["glTexImage2D", "void", [["target", "u32"], ["level", "i32"], ["internalformat", "i32"], ["width", "i32"], ["height", "i32"], ["border", "i32"], ["format", "u32"], ["type", "u32"], ["pixels", "ptr", "in", ["nullAllowed", "isLarge"]]]],
+      ["glTexParameteri", "void", [["target", "u32"], ["pname", "u32"], ["param", "i32"]]],
+      ["glTexParameterx", "void", [["target", "u32"], ["pname", "u32"], ["param", "i32"]]],
+      ["glTexParameteriv", "void", [["target", "u32"], ["pname", "u32"], ["params", "ptr", "in"]]],
+      ["glTexParameterxv", "void", [["target", "u32"], ["pname", "u32"], ["params", "ptr", "in"]]],
+      ["glTexSubImage2D", "void", [["target", "u32"], ["level", "i32"], ["xoffset", "i32"], ["yoffset", "i32"], ["width", "i32"], ["height", "i32"], ["format", "u32"], ["type", "u32"], ["pixels", "ptr", "in", ["nullAllowed", "isLarge"]]]],
+      ["glTranslatex", "void", [["x", "i32"], ["y", "i32"], ["z", "i32"]]],
+      ["glVertexPointer", "void", [["size", "i32"], ["type", "u32"], ["stride", "i32"], ["pointer", "ptr", "in"]], ["unsupported"]],
+      ["glViewport", "void", [["x", "i32"], ["y", "i32"], ["width", "i32"], ["height", "i32"]]],
+      ["glPointSizePointerOES", "void", [["type", "u32"], ["stride", "i32"], ["pointer", "ptr", "in"]], ["unsupported"]],
+      ["glVertexPointerOffset", "void", [["size", "i32"], ["type", "u32"], ["stride", "i32"], ["offset", "u32"]], ["custom_decoder", "not_api"]],
+      ["glColorPointerOffset", "void", [["size", "i32"], ["type", "u32"], ["stride", "i32"], ["offset", "u32"]], ["custom_decoder", "not_api"]],
+      ["glNormalPointerOffset", "void", [["type", "u32"], ["stride", "i32"], ["offset", "u32"]], ["custom_decoder", "not_api"]],
+      ["glPointSizePointerOffset", "void", [["type", "u32"], ["stride", "i32"], ["offset", "u32"]], ["custom_decoder", "not_api"]],
+      ["glTexCoordPointerOffset", "void", [["size", "i32"], ["type", "u32"], ["stride", "i32"], ["offset", "u32"]], ["custom_decoder", "not_api"]],
+      ["glWeightPointerOffset", "void", [["size", "i32"], ["type", "u32"], ["stride", "i32"], ["offset", "u32"]], ["custom_decoder", "not_api"]],
+      ["glMatrixIndexPointerOffset", "void", [["size", "i32"], ["type", "u32"], ["stride", "i32"], ["offset", "u32"]], ["custom_decoder", "not_api"]],
+      ["glVertexPointerData", "void", [["size", "i32"], ["type", "u32"], ["stride", "i32"], ["data", "ptr", "in"], ["datalen", "u32"]], ["custom_decoder", "not_api"]],
+      ["glColorPointerData", "void", [["size", "i32"], ["type", "u32"], ["stride", "i32"], ["data", "ptr", "in"], ["datalen", "u32"]], ["custom_decoder", "not_api"]],
+      ["glNormalPointerData", "void", [["type", "u32"], ["stride", "i32"], ["data", "ptr", "in"], ["datalen", "u32"]], ["custom_decoder", "not_api"]],
+      ["glTexCoordPointerData", "void", [["unit", "i32"], ["size", "i32"], ["type", "u32"], ["stride", "i32"], ["data", "ptr", "in"], ["datalen", "u32"]], ["custom_decoder", "not_api"]],
+      ["glPointSizePointerData", "void", [["type", "u32"], ["stride", "i32"], ["data", "ptr", "in"], ["datalen", "u32"]], ["custom_decoder", "not_api"]],
+      ["glWeightPointerData", "void", [["size", "i32"], ["type", "u32"], ["stride", "i32"], ["data", "ptr", "in"], ["datalen", "u32"]], ["custom_decoder", "not_api"]],
+      ["glMatrixIndexPointerData", "void", [["size", "i32"], ["type", "u32"], ["stride", "i32"], ["data", "ptr", "in"], ["datalen", "u32"]], ["custom_decoder", "not_api"]],
+      ["glDrawElementsOffset", "void", [["mode", "u32"], ["count", "i32"], ["type", "u32"], ["offset", "u32"]], ["custom_decoder", "not_api"]],
+      ["glDrawElementsData", "void", [["mode", "u32"], ["count", "i32"], ["type", "u32"], ["data", "ptr", "in"], ["datalen", "u32"]], ["custom_decoder", "not_api"]],
+      ["glGetCompressedTextureFormats", "void", [["count", "i32"], ["formats", "ptr", "out"]], ["custom_decoder", "not_api"]],
+      ["glFinishRoundTrip", "i32", [], ["custom_decoder", "not_api"]],
+      ["glBlendEquationSeparateOES", "void", [["modeRGB", "u32"], ["modeAlpha", "u32"]]],
+      ["glBlendFuncSeparateOES", "void", [["srcRGB", "u32"], ["dstRGB", "u32"], ["srcAlpha", "u32"], ["dstAlpha", "u32"]]],
+      ["glBlendEquationOES", "void", [["mode", "u32"]]],
+      ["glDrawTexsOES", "void", [["x", "i16"], ["y", "i16"], ["z", "i16"], ["width", "i16"], ["height", "i16"]]],
+      ["glDrawTexiOES", "void", [["x", "i32"], ["y", "i32"], ["z", "i32"], ["width", "i32"], ["height", "i32"]]],
+      ["glDrawTexxOES", "void", [["x", "i32"], ["y", "i32"], ["z", "i32"], ["width", "i32"], ["height", "i32"]]],
+      ["glDrawTexsvOES", "void", [["coords", "ptr", "in"]]],
+      ["glDrawTexivOES", "void", [["coords", "ptr", "in"]]],
+      ["glDrawTexxvOES", "void", [["coords", "ptr", "in"]]],
+      ["glDrawTexfOES", "void", [["x", "f32"], ["y", "f32"], ["z", "f32"], ["width", "f32"], ["height", "f32"]]],
+      ["glDrawTexfvOES", "void", [["coords", "ptr", "in"]]],
+      ["glEGLImageTargetTexture2DOES", "void", [["target", "u32"], ["image", "u32"]]],
+      ["glEGLImageTargetRenderbufferStorageOES", "void", [["target", "u32"], ["image", "u32"]]],
+      ["glAlphaFuncxOES", "void", [["func", "u32"], ["ref", "i32"]]],
+      ["glClearColorxOES", "void", [["red", "i32"], ["green", "i32"], ["blue", "i32"], ["alpha", "i32"]]],
+      ["glClearDepthxOES", "void", [["depth", "i32"]]],
+      ["glClipPlanexOES", "void", [["plane", "u32"], ["equation", "ptr", "in"]]],
+      ["glClipPlanexIMG", "void", [["plane", "u32"], ["equation", "ptr", "in"]]],
+      ["glColor4xOES", "void", [["red", "i32"], ["green", "i32"], ["blue", "i32"], ["alpha", "i32"]]],
+      ["glDepthRangexOES", "void", [["zNear", "i32"], ["zFar", "i32"]]],
+      ["glFogxOES", "void", [["pname", "u32"], ["param", "i32"]]],
+      ["glFogxvOES", "void", [["pname", "u32"], ["params", "ptr", "in"]]],
+      ["glFrustumxOES", "void", [["left", "i32"], ["right", "i32"], ["bottom", "i32"], ["top", "i32"], ["zNear", "i32"], ["zFar", "i32"]]],
+      ["glGetClipPlanexOES", "void", [["pname", "u32"], ["eqn", "ptr", "out"]]],
+      ["glGetClipPlanex", "void", [["pname", "u32"], ["eqn", "ptr", "out"]]],
+      ["glGetFixedvOES", "void", [["pname", "u32"], ["params", "ptr", "out"]]],
+      ["glGetLightxvOES", "void", [["light", "u32"], ["pname", "u32"], ["params", "ptr", "out"]]],
+      ["glGetMaterialxvOES", "void", [["face", "u32"], ["pname", "u32"], ["params", "ptr", "out"]]],
+      ["glGetTexEnvxvOES", "void", [["env", "u32"], ["pname", "u32"], ["params", "ptr", "out"]]],
+      ["glGetTexParameterxvOES", "void", [["target", "u32"], ["pname", "u32"], ["params", "ptr", "out"]]],
+      ["glLightModelxOES", "void", [["pname", "u32"], ["param", "i32"]]],
+      ["glLightModelxvOES", "void", [["pname", "u32"], ["params", "ptr", "in"]]],
+      ["glLightxOES", "void", [["light", "u32"], ["pname", "u32"], ["param", "i32"]]],
+      ["glLightxvOES", "void", [["light", "u32"], ["pname", "u32"], ["params", "ptr", "in"]]],
+      ["glLineWidthxOES", "void", [["width", "i32"]]],
+      ["glLoadMatrixxOES", "void", [["m", "ptr", "in"]]],
+      ["glMaterialxOES", "void", [["face", "u32"], ["pname", "u32"], ["param", "i32"]]],
+      ["glMaterialxvOES", "void", [["face", "u32"], ["pname", "u32"], ["params", "ptr", "in"]]],
+      ["glMultMatrixxOES", "void", [["m", "ptr", "in"]]],
+      ["glMultiTexCoord4xOES", "void", [["target", "u32"], ["s", "i32"], ["t", "i32"], ["r", "i32"], ["q", "i32"]]],
+      ["glNormal3xOES", "void", [["nx", "i32"], ["ny", "i32"], ["nz", "i32"]]],
+      ["glOrthoxOES", "void", [["left", "i32"], ["right", "i32"], ["bottom", "i32"], ["top", "i32"], ["zNear", "i32"], ["zFar", "i32"]]],
+      ["glPointParameterxOES", "void", [["pname", "u32"], ["param", "i32"]]],
+      ["glPointParameterxvOES", "void", [["pname", "u32"], ["params", "ptr", "in"]]],
+      ["glPointSizexOES", "void", [["size", "i32"]]],
+      ["glPolygonOffsetxOES", "void", [["factor", "i32"], ["units", "i32"]]],
+      ["glRotatexOES", "void", [["angle", "i32"], ["x", "i32"], ["y", "i32"], ["z", "i32"]]],
+      ["glSampleCoveragexOES", "void", [["value", "i32"], ["invert", "u8"]]],
+      ["glScalexOES", "void", [["x", "i32"], ["y", "i32"], ["z", "i32"]]],
+      ["glTexEnvxOES", "void", [["target", "u32"], ["pname", "u32"], ["param", "i32"]]],
+      ["glTexEnvxvOES", "void", [["target", "u32"], ["pname", "u32"], ["params", "ptr", "in"]]],
+      ["glTexParameterxOES", "void", [["target", "u32"], ["pname", "u32"], ["param", "i32"]]],
+      ["glTexParameterxvOES", "void", [["target", "u32"], ["pname", "u32"], ["params", "ptr", "in"]]],
+      ["glTranslatexOES", "void", [["x", "i32"], ["y", "i32"], ["z", "i32"]]],
+      ["glIsRenderbufferOES", "u8", [["renderbuffer", "u32"]]],
+      ["glBindRenderbufferOES", "void", [["target", "u32"], ["renderbuffer", "u32"]]],
+      ["glDeleteRenderbuffersOES", "void", [["n", "i32"], ["renderbuffers", "ptr", "in"]], ["custom_decoder"]],
+      ["glGenRenderbuffersOES", "void", [["n", "i32"], ["renderbuffers", "ptr", "out"]], ["custom_decoder"]],
+      ["glRenderbufferStorageOES", "void", [["target", "u32"], ["internalformat", "u32"], ["width", "i32"], ["height", "i32"]]],
+      ["glGetRenderbufferParameterivOES", "void", [["target", "u32"], ["pname", "u32"], ["params", "ptr", "out"]]],
+      ["glIsFramebufferOES", "u8", [["framebuffer", "u32"]]],
+      ["glBindFramebufferOES", "void", [["target", "u32"], ["framebuffer", "u32"]]],
+      ["glDeleteFramebuffersOES", "void", [["n", "i32"], ["framebuffers", "ptr", "in"]], ["custom_decoder"]],
+      ["glGenFramebuffersOES", "void", [["n", "i32"], ["framebuffers", "ptr", "out"]], ["custom_decoder"]],
+      ["glCheckFramebufferStatusOES", "u32", [["target", "u32"]]],
+      ["glFramebufferRenderbufferOES", "void", [["target", "u32"], ["attachment", "u32"], ["renderbuffertarget", "u32"], ["renderbuffer", "u32"]]],
+      ["glFramebufferTexture2DOES", "void", [["target", "u32"], ["attachment", "u32"], ["textarget", "u32"], ["texture", "u32"], ["level", "i32"]]],
+      ["glGetFramebufferAttachmentParameterivOES", "void", [["target", "u32"], ["attachment", "u32"], ["pname", "u32"], ["params", "ptr", "out"]]],
+      ["glGenerateMipmapOES", "void", [["target", "u32"]]],
+      ["glMapBufferOES", "u32", [["target", "u32"], ["access", "u32"]], ["unsupported"]],
+      ["glUnmapBufferOES", "u8", [["target", "u32"]]],
+      ["glGetBufferPointervOES", "void", [["target", "u32"], ["pname", "u32"], ["params", "ptr", "in"]], ["unsupported"]],
+      ["glCurrentPaletteMatrixOES", "void", [["matrixpaletteindex", "u32"]]],
+      ["glLoadPaletteFromModelViewMatrixOES", "void", []],
+      ["glMatrixIndexPointerOES", "void", [["size", "i32"], ["type", "u32"], ["stride", "i32"], ["pointer", "ptr", "in"]], ["unsupported"]],
+      ["glWeightPointerOES", "void", [["size", "i32"], ["type", "u32"], ["stride", "i32"], ["pointer", "ptr", "in"]], ["unsupported"]],
+      ["glQueryMatrixxOES", "u32", [["mantissa", "ptr", "out"], ["exponent", "ptr", "out"]]],
+      ["glDepthRangefOES", "void", [["zNear", "f32"], ["zFar", "f32"]]],
+      ["glFrustumfOES", "void", [["left", "f32"], ["right", "f32"], ["bottom", "f32"], ["top", "f32"], ["zNear", "f32"], ["zFar", "f32"]]],
+      ["glOrthofOES", "void", [["left", "f32"], ["right", "f32"], ["bottom", "f32"], ["top", "f32"], ["zNear", "f32"], ["zFar", "f32"]]],
+      ["glClipPlanefOES", "void", [["plane", "u32"], ["equation", "ptr", "in"]]],
+      ["glClipPlanefIMG", "void", [["plane", "u32"], ["equation", "ptr", "in"]]],
+      ["glGetClipPlanefOES", "void", [["pname", "u32"], ["eqn", "ptr", "out"]]],
+      ["glClearDepthfOES", "void", [["depth", "f32"]]],
+      ["glTexGenfOES", "void", [["coord", "u32"], ["pname", "u32"], ["param", "f32"]]],
+      ["glTexGenfvOES", "void", [["coord", "u32"], ["pname", "u32"], ["params", "ptr", "in"]]],
+      ["glTexGeniOES", "void", [["coord", "u32"], ["pname", "u32"], ["param", "i32"]]],
+      ["glTexGenivOES", "void", [["coord", "u32"], ["pname", "u32"], ["params", "ptr", "in"]]],
+      ["glTexGenxOES", "void", [["coord", "u32"], ["pname", "u32"], ["param", "i32"]]],
+      ["glTexGenxvOES", "void", [["coord", "u32"], ["pname", "u32"], ["params", "ptr", "in"]]],
+      ["glGetTexGenfvOES", "void", [["coord", "u32"], ["pname", "u32"], ["params", "ptr", "in"]]],
+      ["glGetTexGenivOES", "void", [["coord", "u32"], ["pname", "u32"], ["params", "ptr", "in"]]],
+      ["glGetTexGenxvOES", "void", [["coord", "u32"], ["pname", "u32"], ["params", "ptr", "in"]]],
+      ["glBindVertexArrayOES", "void", [["array", "u32"]]],
+      ["glDeleteVertexArraysOES", "void", [["n", "i32"], ["arrays", "ptr", "in"]], ["custom_decoder"]],
+      ["glGenVertexArraysOES", "void", [["n", "i32"], ["arrays", "ptr", "out"]], ["custom_decoder"]],
+      ["glIsVertexArrayOES", "u8", [["array", "u32"]]],
+      ["glDiscardFramebufferEXT", "void", [["target", "u32"], ["numAttachments", "i32"], ["attachments", "ptr", "in"]]],
+      ["glMultiDrawArraysEXT", "void", [["mode", "u32"], ["first", "ptr", "in"], ["count", "ptr", "in"], ["primcount", "i32"]], ["unsupported"]],
+      ["glMultiDrawElementsEXT", "void", [["mode", "u32"], ["count", "ptr", "in"], ["type", "u32"], ["indices", "ptr", "in"], ["primcount", "i32"]], ["unsupported"]],
+      ["glMultiDrawArraysSUN", "void", [["mode", "u32"], ["first", "ptr", "in"], ["count", "ptr", "in"], ["primcount", "i32"]], ["unsupported"]],
+      ["glMultiDrawElementsSUN", "void", [["mode", "u32"], ["count", "ptr", "in"], ["type", "u32"], ["indices", "ptr", "in"], ["primcount", "i32"]], ["unsupported"]],
+      ["glRenderbufferStorageMultisampleIMG", "void", [["target", "u32"], ["samples", "i32"], ["internalformat", "u32"], ["width", "i32"], ["height", "i32"]]],
+      ["glFramebufferTexture2DMultisampleIMG", "void", [["target", "u32"], ["attachment", "u32"], ["textarget", "u32"], ["texture", "u32"], ["level", "i32"], ["samples", "i32"]]],
+      ["glDeleteFencesNV", "void", [["n", "i32"], ["fences", "ptr", "in"]]],
+      ["glGenFencesNV", "void", [["n", "i32"], ["fences", "ptr", "in"]]],
+      ["glIsFenceNV", "u8", [["fence", "u32"]]],
+      ["glTestFenceNV", "u8", [["fence", "u32"]]],
+      ["glGetFenceivNV", "void", [["fence", "u32"], ["pname", "u32"], ["params", "ptr", "out"]]],
+      ["glFinishFenceNV", "void", [["fence", "u32"]]],
+      ["glSetFenceNV", "void", [["fence", "u32"], ["condition", "u32"]]],
+      ["glGetDriverControlsQCOM", "void", [["num", "ptr", "out"], ["size", "i32"], ["driverControls", "ptr", "out"]]],
+      ["glGetDriverControlStringQCOM", "void", [["driverControl", "u32"], ["bufSize", "i32"], ["length", "ptr", "out"], ["driverControlString", "ptr", "out"]]],
+      ["glEnableDriverControlQCOM", "void", [["driverControl", "u32"]]],
+      ["glDisableDriverControlQCOM", "void", [["driverControl", "u32"]]],
+      ["glExtGetTexturesQCOM", "void", [["textures", "ptr", "out"], ["maxTextures", "i32"], ["numTextures", "ptr", "out"]]],
+      ["glExtGetBuffersQCOM", "void", [["buffers", "ptr", "out"], ["maxBuffers", "i32"], ["numBuffers", "ptr", "out"]]],
+      ["glExtGetRenderbuffersQCOM", "void", [["renderbuffers", "ptr", "out"], ["maxRenderbuffers", "i32"], ["numRenderbuffers", "ptr", "out"]]],
+      ["glExtGetFramebuffersQCOM", "void", [["framebuffers", "ptr", "out"], ["maxFramebuffers", "i32"], ["numFramebuffers", "ptr", "out"]]],
+      ["glExtGetTexLevelParameterivQCOM", "void", [["texture", "u32"], ["face", "u32"], ["level", "i32"], ["pname", "u32"], ["params", "ptr", "out"]]],
+      ["glExtTexObjectStateOverrideiQCOM", "void", [["target", "u32"], ["pname", "u32"], ["param", "i32"]]],
+      ["glExtGetTexSubImageQCOM", "void", [["target", "u32"], ["level", "i32"], ["xoffset", "i32"], ["yoffset", "i32"], ["zoffset", "i32"], ["width", "i32"], ["height", "i32"], ["depth", "i32"], ["format", "u32"], ["type", "u32"], ["texels", "ptr", "out"]]],
+      ["glExtGetBufferPointervQCOM", "void", [["target", "u32"], ["params", "ptr", "in"]], ["unsupported"]],
+      ["glExtGetShadersQCOM", "void", [["shaders", "ptr", "out"], ["maxShaders", "i32"], ["numShaders", "ptr", "out"]]],
+      ["glExtGetProgramsQCOM", "void", [["programs", "ptr", "out"], ["maxPrograms", "i32"], ["numPrograms", "ptr", "out"]]],
+      ["glExtIsProgramBinaryQCOM", "u8", [["program", "u32"]]],
+      ["glExtGetProgramBinarySourceQCOM", "void", [["program", "u32"], ["shadertype", "u32"], ["source", "ptr", "in"], ["length", "ptr", "in"]], ["unsupported"]],
+      ["glStartTilingQCOM", "void", [["x", "u32"], ["y", "u32"], ["width", "u32"], ["height", "u32"], ["preserveMask", "u32"]]],
+      ["glEndTilingQCOM", "void", [["preserveMask", "u32"]]],
+      ["glGetGraphicsResetStatusEXT", "u32", []],
+      ["glReadnPixelsEXT", "void", [["x", "i32"], ["y", "i32"], ["width", "i32"], ["height", "i32"], ["format", "u32"], ["type", "u32"], ["bufSize", "i32"], ["data", "ptr", "out"]]]
+    ] },
+    gles2: { base: 2048, commands: [
+      ["glActiveTexture", "void", [["texture", "u32"]]],
+      ["glAttachShader", "void", [["program", "u32"], ["shader", "u32"]], ["custom_decoder"]],
+      ["glBindAttribLocation", "void", [["program", "u32"], ["index", "u32"], ["name", "ptr", "in"]], ["custom_decoder"]],
+      ["glBindBuffer", "void", [["target", "u32"], ["buffer", "u32"]]],
+      ["glBindFramebuffer", "void", [["target", "u32"], ["framebuffer", "u32"]]],
+      ["glBindRenderbuffer", "void", [["target", "u32"], ["renderbuffer", "u32"]]],
+      ["glBindTexture", "void", [["target", "u32"], ["texture", "u32"]]],
+      ["glBlendColor", "void", [["red", "f32"], ["green", "f32"], ["blue", "f32"], ["alpha", "f32"]]],
+      ["glBlendEquation", "void", [["mode", "u32"]]],
+      ["glBlendEquationSeparate", "void", [["modeRGB", "u32"], ["modeAlpha", "u32"]]],
+      ["glBlendFunc", "void", [["sfactor", "u32"], ["dfactor", "u32"]]],
+      ["glBlendFuncSeparate", "void", [["srcRGB", "u32"], ["dstRGB", "u32"], ["srcAlpha", "u32"], ["dstAlpha", "u32"]]],
+      ["glBufferData", "void", [["target", "u32"], ["size", "i32"], ["data", "ptr", "in", ["nullAllowed", "isLarge"]], ["usage", "u32"]]],
+      ["glBufferSubData", "void", [["target", "u32"], ["offset", "i32"], ["size", "i32"], ["data", "ptr", "in", ["nullAllowed", "isLarge"]]]],
+      ["glCheckFramebufferStatus", "u32", [["target", "u32"]]],
+      ["glClear", "void", [["mask", "u32"]]],
+      ["glClearColor", "void", [["red", "f32"], ["green", "f32"], ["blue", "f32"], ["alpha", "f32"]]],
+      ["glClearDepthf", "void", [["depth", "f32"]]],
+      ["glClearStencil", "void", [["s", "i32"]]],
+      ["glColorMask", "void", [["red", "u8"], ["green", "u8"], ["blue", "u8"], ["alpha", "u8"]]],
+      ["glCompileShader", "void", [["shader", "u32"]], ["custom_decoder"]],
+      ["glCompressedTexImage2D", "void", [["target", "u32"], ["level", "i32"], ["internalformat", "u32"], ["width", "i32"], ["height", "i32"], ["border", "i32"], ["imageSize", "i32"], ["data", "ptr", "in", ["nullAllowed", "isLarge"]]]],
+      ["glCompressedTexSubImage2D", "void", [["target", "u32"], ["level", "i32"], ["xoffset", "i32"], ["yoffset", "i32"], ["width", "i32"], ["height", "i32"], ["format", "u32"], ["imageSize", "i32"], ["data", "ptr", "in", ["nullAllowed", "isLarge"]]]],
+      ["glCopyTexImage2D", "void", [["target", "u32"], ["level", "i32"], ["internalformat", "u32"], ["x", "i32"], ["y", "i32"], ["width", "i32"], ["height", "i32"], ["border", "i32"]]],
+      ["glCopyTexSubImage2D", "void", [["target", "u32"], ["level", "i32"], ["xoffset", "i32"], ["yoffset", "i32"], ["x", "i32"], ["y", "i32"], ["width", "i32"], ["height", "i32"]]],
+      ["glCreateProgram", "u32", [], ["custom_decoder"]],
+      ["glCreateShader", "u32", [["type", "u32"]], ["custom_decoder"]],
+      ["glCullFace", "void", [["mode", "u32"]]],
+      ["glDeleteBuffers", "void", [["n", "i32"], ["buffers", "ptr", "in"]], ["custom_decoder"]],
+      ["glDeleteFramebuffers", "void", [["n", "i32"], ["framebuffers", "ptr", "in"]], ["custom_decoder"]],
+      ["glDeleteProgram", "void", [["program", "u32"]], ["custom_decoder"]],
+      ["glDeleteRenderbuffers", "void", [["n", "i32"], ["renderbuffers", "ptr", "in"]], ["custom_decoder"]],
+      ["glDeleteShader", "void", [["shader", "u32"]], ["custom_decoder"]],
+      ["glDeleteTextures", "void", [["n", "i32"], ["textures", "ptr", "in"]], ["custom_decoder"]],
+      ["glDepthFunc", "void", [["func", "u32"]]],
+      ["glDepthMask", "void", [["flag", "u8"]]],
+      ["glDepthRangef", "void", [["zNear", "f32"], ["zFar", "f32"]]],
+      ["glDetachShader", "void", [["program", "u32"], ["shader", "u32"]], ["custom_decoder"]],
+      ["glDisable", "void", [["cap", "u32"]]],
+      ["glDisableVertexAttribArray", "void", [["index", "u32"]]],
+      ["glDrawArrays", "void", [["mode", "u32"], ["first", "i32"], ["count", "i32"]]],
+      ["glDrawElements", "void", [["mode", "u32"], ["count", "i32"], ["type", "u32"], ["indices", "ptr", "in"]], ["unsupported"]],
+      ["glEnable", "void", [["cap", "u32"]]],
+      ["glEnableVertexAttribArray", "void", [["index", "u32"]]],
+      ["glFinish", "void", []],
+      ["glFlush", "void", []],
+      ["glFramebufferRenderbuffer", "void", [["target", "u32"], ["attachment", "u32"], ["renderbuffertarget", "u32"], ["renderbuffer", "u32"]]],
+      ["glFramebufferTexture2D", "void", [["target", "u32"], ["attachment", "u32"], ["textarget", "u32"], ["texture", "u32"], ["level", "i32"]]],
+      ["glFrontFace", "void", [["mode", "u32"]]],
+      ["glGenBuffers", "void", [["n", "i32"], ["buffers", "ptr", "out"]], ["custom_decoder"]],
+      ["glGenerateMipmap", "void", [["target", "u32"]]],
+      ["glGenFramebuffers", "void", [["n", "i32"], ["framebuffers", "ptr", "out"]], ["custom_decoder"]],
+      ["glGenRenderbuffers", "void", [["n", "i32"], ["renderbuffers", "ptr", "out"]], ["custom_decoder"]],
+      ["glGenTextures", "void", [["n", "i32"], ["textures", "ptr", "out"]], ["custom_decoder"]],
+      ["glGetActiveAttrib", "void", [["program", "u32"], ["index", "u32"], ["bufsize", "i32"], ["length", "ptr", "out", ["nullAllowed"]], ["size", "ptr", "out", ["nullAllowed"]], ["type", "ptr", "out", ["nullAllowed"]], ["name", "ptr", "out", ["nullAllowed"]]], ["custom_decoder"]],
+      ["glGetActiveUniform", "void", [["program", "u32"], ["index", "u32"], ["bufsize", "i32"], ["length", "ptr", "out", ["nullAllowed"]], ["size", "ptr", "out", ["nullAllowed"]], ["type", "ptr", "out", ["nullAllowed"]], ["name", "ptr", "out", ["nullAllowed"]]], ["custom_decoder"]],
+      ["glGetAttachedShaders", "void", [["program", "u32"], ["maxcount", "i32"], ["count", "ptr", "out", ["nullAllowed"]], ["shaders", "ptr", "out"]], ["custom_decoder"]],
+      ["glGetAttribLocation", "i32", [["program", "u32"], ["name", "ptr", "in"]], ["custom_decoder"]],
+      ["glGetBooleanv", "void", [["pname", "u32"], ["params", "ptr", "out"]]],
+      ["glGetBufferParameteriv", "void", [["target", "u32"], ["pname", "u32"], ["params", "ptr", "out"]]],
+      ["glGetError", "u32", []],
+      ["glGetFloatv", "void", [["pname", "u32"], ["params", "ptr", "out"]]],
+      ["glGetFramebufferAttachmentParameteriv", "void", [["target", "u32"], ["attachment", "u32"], ["pname", "u32"], ["params", "ptr", "out"]]],
+      ["glGetIntegerv", "void", [["pname", "u32"], ["params", "ptr", "out"]]],
+      ["glGetProgramiv", "void", [["program", "u32"], ["pname", "u32"], ["params", "ptr", "out"]], ["custom_decoder"]],
+      ["glGetProgramInfoLog", "void", [["program", "u32"], ["bufsize", "i32"], ["length", "ptr", "out", ["nullAllowed"]], ["infolog", "ptr", "out"]], ["custom_decoder"]],
+      ["glGetRenderbufferParameteriv", "void", [["target", "u32"], ["pname", "u32"], ["params", "ptr", "out"]]],
+      ["glGetShaderiv", "void", [["shader", "u32"], ["pname", "u32"], ["params", "ptr", "out"]], ["custom_decoder"]],
+      ["glGetShaderInfoLog", "void", [["shader", "u32"], ["bufsize", "i32"], ["length", "ptr", "out", ["nullAllowed"]], ["infolog", "ptr", "out"]], ["custom_decoder"]],
+      ["glGetShaderPrecisionFormat", "void", [["shadertype", "u32"], ["precisiontype", "u32"], ["range", "ptr", "out"], ["precision", "ptr", "out"]]],
+      ["glGetShaderSource", "void", [["shader", "u32"], ["bufsize", "i32"], ["length", "ptr", "out", ["nullAllowed"]], ["source", "ptr", "out"]], ["custom_decoder"]],
+      ["glGetString", "u32", [["name", "u32"]], ["unsupported"]],
+      ["glGetTexParameterfv", "void", [["target", "u32"], ["pname", "u32"], ["params", "ptr", "out"]]],
+      ["glGetTexParameteriv", "void", [["target", "u32"], ["pname", "u32"], ["params", "ptr", "out"]]],
+      ["glGetUniformfv", "void", [["program", "u32"], ["location", "i32"], ["params", "ptr", "out"]], ["custom_decoder"]],
+      ["glGetUniformiv", "void", [["program", "u32"], ["location", "i32"], ["params", "ptr", "out"]], ["custom_decoder"]],
+      ["glGetUniformLocation", "i32", [["program", "u32"], ["name", "ptr", "in"]], ["custom_decoder"]],
+      ["glGetVertexAttribfv", "void", [["index", "u32"], ["pname", "u32"], ["params", "ptr", "out"]]],
+      ["glGetVertexAttribiv", "void", [["index", "u32"], ["pname", "u32"], ["params", "ptr", "out"]]],
+      ["glGetVertexAttribPointerv", "void", [["index", "u32"], ["pname", "u32"], ["pointer", "ptr", "in"]], ["unsupported"]],
+      ["glHint", "void", [["target", "u32"], ["mode", "u32"]]],
+      ["glIsBuffer", "u8", [["buffer", "u32"]]],
+      ["glIsEnabled", "u8", [["cap", "u32"]]],
+      ["glIsFramebuffer", "u8", [["framebuffer", "u32"]]],
+      ["glIsProgram", "u8", [["program", "u32"]], ["custom_decoder"]],
+      ["glIsRenderbuffer", "u8", [["renderbuffer", "u32"]]],
+      ["glIsShader", "u8", [["shader", "u32"]], ["custom_decoder"]],
+      ["glIsTexture", "u8", [["texture", "u32"]]],
+      ["glLineWidth", "void", [["width", "f32"]]],
+      ["glLinkProgram", "void", [["program", "u32"]], ["custom_decoder"]],
+      ["glPixelStorei", "void", [["pname", "u32"], ["param", "i32"]]],
+      ["glPolygonOffset", "void", [["factor", "f32"], ["units", "f32"]]],
+      ["glReadPixels", "void", [["x", "i32"], ["y", "i32"], ["width", "i32"], ["height", "i32"], ["format", "u32"], ["type", "u32"], ["pixels", "ptr", "out"]]],
+      ["glReleaseShaderCompiler", "void", []],
+      ["glRenderbufferStorage", "void", [["target", "u32"], ["internalformat", "u32"], ["width", "i32"], ["height", "i32"]]],
+      ["glSampleCoverage", "void", [["value", "f32"], ["invert", "u8"]]],
+      ["glScissor", "void", [["x", "i32"], ["y", "i32"], ["width", "i32"], ["height", "i32"]]],
+      ["glShaderBinary", "void", [["n", "i32"], ["shaders", "ptr", "in"], ["binaryformat", "u32"], ["binary", "ptr", "in"], ["length", "i32"]], ["unsupported"]],
+      ["glShaderSource", "void", [["shader", "u32"], ["count", "i32"], ["string", "ptr", "in"], ["length", "ptr", "in"]], ["unsupported"]],
+      ["glStencilFunc", "void", [["func", "u32"], ["ref", "i32"], ["mask", "u32"]]],
+      ["glStencilFuncSeparate", "void", [["face", "u32"], ["func", "u32"], ["ref", "i32"], ["mask", "u32"]]],
+      ["glStencilMask", "void", [["mask", "u32"]]],
+      ["glStencilMaskSeparate", "void", [["face", "u32"], ["mask", "u32"]]],
+      ["glStencilOp", "void", [["fail", "u32"], ["zfail", "u32"], ["zpass", "u32"]]],
+      ["glStencilOpSeparate", "void", [["face", "u32"], ["fail", "u32"], ["zfail", "u32"], ["zpass", "u32"]]],
+      ["glTexImage2D", "void", [["target", "u32"], ["level", "i32"], ["internalformat", "i32"], ["width", "i32"], ["height", "i32"], ["border", "i32"], ["format", "u32"], ["type", "u32"], ["pixels", "ptr", "in", ["nullAllowed", "isLarge"]]]],
+      ["glTexParameterf", "void", [["target", "u32"], ["pname", "u32"], ["param", "f32"]]],
+      ["glTexParameterfv", "void", [["target", "u32"], ["pname", "u32"], ["params", "ptr", "in"]]],
+      ["glTexParameteri", "void", [["target", "u32"], ["pname", "u32"], ["param", "i32"]]],
+      ["glTexParameteriv", "void", [["target", "u32"], ["pname", "u32"], ["params", "ptr", "in"]]],
+      ["glTexSubImage2D", "void", [["target", "u32"], ["level", "i32"], ["xoffset", "i32"], ["yoffset", "i32"], ["width", "i32"], ["height", "i32"], ["format", "u32"], ["type", "u32"], ["pixels", "ptr", "in", ["nullAllowed", "isLarge"]]]],
+      ["glUniform1f", "void", [["location", "i32"], ["x", "f32"]]],
+      ["glUniform1fv", "void", [["location", "i32"], ["count", "i32"], ["v", "ptr", "in"]]],
+      ["glUniform1i", "void", [["location", "i32"], ["x", "i32"]]],
+      ["glUniform1iv", "void", [["location", "i32"], ["count", "i32"], ["v", "ptr", "in"]]],
+      ["glUniform2f", "void", [["location", "i32"], ["x", "f32"], ["y", "f32"]]],
+      ["glUniform2fv", "void", [["location", "i32"], ["count", "i32"], ["v", "ptr", "in"]]],
+      ["glUniform2i", "void", [["location", "i32"], ["x", "i32"], ["y", "i32"]]],
+      ["glUniform2iv", "void", [["location", "i32"], ["count", "i32"], ["v", "ptr", "in"]]],
+      ["glUniform3f", "void", [["location", "i32"], ["x", "f32"], ["y", "f32"], ["z", "f32"]]],
+      ["glUniform3fv", "void", [["location", "i32"], ["count", "i32"], ["v", "ptr", "in"]]],
+      ["glUniform3i", "void", [["location", "i32"], ["x", "i32"], ["y", "i32"], ["z", "i32"]]],
+      ["glUniform3iv", "void", [["location", "i32"], ["count", "i32"], ["v", "ptr", "in"]]],
+      ["glUniform4f", "void", [["location", "i32"], ["x", "f32"], ["y", "f32"], ["z", "f32"], ["w", "f32"]]],
+      ["glUniform4fv", "void", [["location", "i32"], ["count", "i32"], ["v", "ptr", "in"]]],
+      ["glUniform4i", "void", [["location", "i32"], ["x", "i32"], ["y", "i32"], ["z", "i32"], ["w", "i32"]]],
+      ["glUniform4iv", "void", [["location", "i32"], ["count", "i32"], ["v", "ptr", "in"]]],
+      ["glUniformMatrix2fv", "void", [["location", "i32"], ["count", "i32"], ["transpose", "u8"], ["value", "ptr", "in"]]],
+      ["glUniformMatrix3fv", "void", [["location", "i32"], ["count", "i32"], ["transpose", "u8"], ["value", "ptr", "in"]]],
+      ["glUniformMatrix4fv", "void", [["location", "i32"], ["count", "i32"], ["transpose", "u8"], ["value", "ptr", "in"]]],
+      ["glUseProgram", "void", [["program", "u32"]], ["custom_decoder"]],
+      ["glValidateProgram", "void", [["program", "u32"]], ["custom_decoder"]],
+      ["glVertexAttrib1f", "void", [["indx", "u32"], ["x", "f32"]]],
+      ["glVertexAttrib1fv", "void", [["indx", "u32"], ["values", "ptr", "in"]]],
+      ["glVertexAttrib2f", "void", [["indx", "u32"], ["x", "f32"], ["y", "f32"]]],
+      ["glVertexAttrib2fv", "void", [["indx", "u32"], ["values", "ptr", "in"]]],
+      ["glVertexAttrib3f", "void", [["indx", "u32"], ["x", "f32"], ["y", "f32"], ["z", "f32"]]],
+      ["glVertexAttrib3fv", "void", [["indx", "u32"], ["values", "ptr", "in"]]],
+      ["glVertexAttrib4f", "void", [["indx", "u32"], ["x", "f32"], ["y", "f32"], ["z", "f32"], ["w", "f32"]]],
+      ["glVertexAttrib4fv", "void", [["indx", "u32"], ["values", "ptr", "in"]]],
+      ["glVertexAttribPointer", "void", [["indx", "u32"], ["size", "i32"], ["type", "u32"], ["normalized", "u8"], ["stride", "i32"], ["ptr", "ptr", "in"]], ["unsupported"]],
+      ["glViewport", "void", [["x", "i32"], ["y", "i32"], ["width", "i32"], ["height", "i32"]]],
+      ["glEGLImageTargetTexture2DOES", "void", [["target", "u32"], ["image", "u32"]]],
+      ["glEGLImageTargetRenderbufferStorageOES", "void", [["target", "u32"], ["image", "u32"]]],
+      ["glGetProgramBinaryOES", "void", [["program", "u32"], ["bufSize", "i32"], ["length", "ptr", "in"], ["binaryFormat", "ptr", "in"], ["binary", "ptr", "in"]], ["unsupported", "custom_decoder"]],
+      ["glProgramBinaryOES", "void", [["program", "u32"], ["binaryFormat", "u32"], ["binary", "ptr", "in"], ["length", "i32"]], ["unsupported", "custom_decoder"]],
+      ["glMapBufferOES", "u32", [["target", "u32"], ["access", "u32"]], ["unsupported"]],
+      ["glUnmapBufferOES", "u8", [["target", "u32"]]],
+      ["glTexImage3DOES", "void", [["target", "u32"], ["level", "i32"], ["internalformat", "u32"], ["width", "i32"], ["height", "i32"], ["depth", "i32"], ["border", "i32"], ["format", "u32"], ["type", "u32"], ["pixels", "ptr", "in", ["nullAllowed", "isLarge"]]]],
+      ["glTexSubImage3DOES", "void", [["target", "u32"], ["level", "i32"], ["xoffset", "i32"], ["yoffset", "i32"], ["zoffset", "i32"], ["width", "i32"], ["height", "i32"], ["depth", "i32"], ["format", "u32"], ["type", "u32"], ["pixels", "ptr", "in", ["nullAllowed", "isLarge"]]]],
+      ["glCopyTexSubImage3DOES", "void", [["target", "u32"], ["level", "i32"], ["xoffset", "i32"], ["yoffset", "i32"], ["zoffset", "i32"], ["x", "i32"], ["y", "i32"], ["width", "i32"], ["height", "i32"]]],
+      ["glCompressedTexImage3DOES", "void", [["target", "u32"], ["level", "i32"], ["internalformat", "u32"], ["width", "i32"], ["height", "i32"], ["depth", "i32"], ["border", "i32"], ["imageSize", "i32"], ["data", "ptr", "in", ["nullAllowed", "isLarge"]]]],
+      ["glCompressedTexSubImage3DOES", "void", [["target", "u32"], ["level", "i32"], ["xoffset", "i32"], ["yoffset", "i32"], ["zoffset", "i32"], ["width", "i32"], ["height", "i32"], ["depth", "i32"], ["format", "u32"], ["imageSize", "i32"], ["data", "ptr", "in", ["nullAllowed", "isLarge"]]]],
+      ["glFramebufferTexture3DOES", "void", [["target", "u32"], ["attachment", "u32"], ["textarget", "u32"], ["texture", "u32"], ["level", "i32"], ["zoffset", "i32"]]],
+      ["glBindVertexArrayOES", "void", [["array", "u32"]]],
+      ["glDeleteVertexArraysOES", "void", [["n", "i32"], ["arrays", "ptr", "in"]], ["custom_decoder"]],
+      ["glGenVertexArraysOES", "void", [["n", "i32"], ["arrays", "ptr", "out"]], ["custom_decoder"]],
+      ["glIsVertexArrayOES", "u8", [["array", "u32"]]],
+      ["glDiscardFramebufferEXT", "void", [["target", "u32"], ["numAttachments", "i32"], ["attachments", "ptr", "in"]]],
+      ["glMultiDrawArraysEXT", "void", [["mode", "u32"], ["first", "ptr", "in"], ["count", "ptr", "in"], ["primcount", "i32"]], ["unsupported"]],
+      ["glMultiDrawElementsEXT", "void", [["mode", "u32"], ["count", "ptr", "in"], ["type", "u32"], ["indices", "ptr", "in"], ["primcount", "i32"]], ["unsupported"]],
+      ["glGetPerfMonitorGroupsAMD", "void", [["numGroups", "ptr", "in"], ["groupsSize", "i32"], ["groups", "ptr", "in"]], ["unsupported"]],
+      ["glGetPerfMonitorCountersAMD", "void", [["group", "u32"], ["numCounters", "ptr", "in"], ["maxActiveCounters", "ptr", "in"], ["counterSize", "i32"], ["counters", "ptr", "in"]], ["unsupported"]],
+      ["glGetPerfMonitorGroupStringAMD", "void", [["group", "u32"], ["bufSize", "i32"], ["length", "ptr", "in"], ["groupString", "ptr", "in"]], ["unsupported"]],
+      ["glGetPerfMonitorCounterStringAMD", "void", [["group", "u32"], ["counter", "u32"], ["bufSize", "i32"], ["length", "ptr", "in"], ["counterString", "ptr", "in"]], ["unsupported"]],
+      ["glGetPerfMonitorCounterInfoAMD", "void", [["group", "u32"], ["counter", "u32"], ["pname", "u32"], ["data", "ptr", "in"]], ["unsupported"]],
+      ["glGenPerfMonitorsAMD", "void", [["n", "i32"], ["monitors", "ptr", "in"]], ["unsupported"]],
+      ["glDeletePerfMonitorsAMD", "void", [["n", "i32"], ["monitors", "ptr", "in"]], ["unsupported"]],
+      ["glSelectPerfMonitorCountersAMD", "void", [["monitor", "u32"], ["enable", "u8"], ["group", "u32"], ["numCounters", "i32"], ["countersList", "ptr", "in"]], ["unsupported"]],
+      ["glBeginPerfMonitorAMD", "void", [["monitor", "u32"]], ["unsupported"]],
+      ["glEndPerfMonitorAMD", "void", [["monitor", "u32"]], ["unsupported"]],
+      ["glGetPerfMonitorCounterDataAMD", "void", [["monitor", "u32"], ["pname", "u32"], ["dataSize", "i32"], ["data", "ptr", "in"], ["bytesWritten", "ptr", "in"]], ["unsupported"]],
+      ["glRenderbufferStorageMultisampleIMG", "void", [["target", "u32"], ["samples", "i32"], ["internalformat", "u32"], ["width", "i32"], ["height", "i32"]], ["unsupported"]],
+      ["glFramebufferTexture2DMultisampleIMG", "void", [["target", "u32"], ["attachment", "u32"], ["textarget", "u32"], ["texture", "u32"], ["level", "i32"], ["samples", "i32"]], ["unsupported"]],
+      ["glDeleteFencesNV", "void", [["n", "i32"], ["fences", "ptr", "in"]], ["unsupported"]],
+      ["glGenFencesNV", "void", [["n", "i32"], ["fences", "ptr", "in"]], ["unsupported"]],
+      ["glIsFenceNV", "u8", [["fence", "u32"]], ["unsupported"]],
+      ["glTestFenceNV", "u8", [["fence", "u32"]], ["unsupported"]],
+      ["glGetFenceivNV", "void", [["fence", "u32"], ["pname", "u32"], ["params", "ptr", "in"]], ["unsupported"]],
+      ["glFinishFenceNV", "void", [["fence", "u32"]], ["unsupported"]],
+      ["glSetFenceNV", "void", [["fence", "u32"], ["condition", "u32"]], ["unsupported"]],
+      ["glCoverageMaskNV", "void", [["mask", "u8"]], ["unsupported"]],
+      ["glCoverageOperationNV", "void", [["operation", "u32"]], ["unsupported"]],
+      ["glGetDriverControlsQCOM", "void", [["num", "ptr", "in"], ["size", "i32"], ["driverControls", "ptr", "in"]], ["unsupported"]],
+      ["glGetDriverControlStringQCOM", "void", [["driverControl", "u32"], ["bufSize", "i32"], ["length", "ptr", "in"], ["driverControlString", "ptr", "in"]], ["unsupported"]],
+      ["glEnableDriverControlQCOM", "void", [["driverControl", "u32"]], ["unsupported"]],
+      ["glDisableDriverControlQCOM", "void", [["driverControl", "u32"]], ["unsupported"]],
+      ["glExtGetTexturesQCOM", "void", [["textures", "ptr", "in"], ["maxTextures", "i32"], ["numTextures", "ptr", "in"]], ["unsupported"]],
+      ["glExtGetBuffersQCOM", "void", [["buffers", "ptr", "in"], ["maxBuffers", "i32"], ["numBuffers", "ptr", "in"]], ["unsupported"]],
+      ["glExtGetRenderbuffersQCOM", "void", [["renderbuffers", "ptr", "in"], ["maxRenderbuffers", "i32"], ["numRenderbuffers", "ptr", "in"]], ["unsupported"]],
+      ["glExtGetFramebuffersQCOM", "void", [["framebuffers", "ptr", "in"], ["maxFramebuffers", "i32"], ["numFramebuffers", "ptr", "in"]], ["unsupported"]],
+      ["glExtGetTexLevelParameterivQCOM", "void", [["texture", "u32"], ["face", "u32"], ["level", "i32"], ["pname", "u32"], ["params", "ptr", "in"]], ["unsupported"]],
+      ["glExtTexObjectStateOverrideiQCOM", "void", [["target", "u32"], ["pname", "u32"], ["param", "i32"]], ["unsupported"]],
+      ["glExtGetTexSubImageQCOM", "void", [["target", "u32"], ["level", "i32"], ["xoffset", "i32"], ["yoffset", "i32"], ["zoffset", "i32"], ["width", "i32"], ["height", "i32"], ["depth", "i32"], ["format", "u32"], ["type", "u32"], ["texels", "ptr", "in"]], ["unsupported"]],
+      ["glExtGetBufferPointervQCOM", "void", [["target", "u32"], ["params", "ptr", "in"]], ["unsupported"]],
+      ["glExtGetShadersQCOM", "void", [["shaders", "ptr", "in"], ["maxShaders", "i32"], ["numShaders", "ptr", "in"]], ["unsupported"]],
+      ["glExtGetProgramsQCOM", "void", [["programs", "ptr", "in"], ["maxPrograms", "i32"], ["numPrograms", "ptr", "in"]], ["unsupported"]],
+      ["glExtIsProgramBinaryQCOM", "u8", [["program", "u32"]], ["unsupported"]],
+      ["glExtGetProgramBinarySourceQCOM", "void", [["program", "u32"], ["shadertype", "u32"], ["source", "ptr", "in"], ["length", "ptr", "in"]], ["unsupported"]],
+      ["glStartTilingQCOM", "void", [["x", "u32"], ["y", "u32"], ["width", "u32"], ["height", "u32"], ["preserveMask", "u32"]], ["unsupported"]],
+      ["glEndTilingQCOM", "void", [["preserveMask", "u32"]], ["unsupported"]],
+      ["glVertexAttribPointerData", "void", [["indx", "u32"], ["size", "i32"], ["type", "u32"], ["normalized", "u8"], ["stride", "i32"], ["data", "ptr", "in"], ["datalen", "u32"]], ["custom_decoder", "not_api"]],
+      ["glVertexAttribPointerOffset", "void", [["indx", "u32"], ["size", "i32"], ["type", "u32"], ["normalized", "u8"], ["stride", "i32"], ["offset", "u32"]], ["custom_decoder", "not_api"]],
+      ["glDrawElementsOffset", "void", [["mode", "u32"], ["count", "i32"], ["type", "u32"], ["offset", "u32"]], ["custom_decoder", "not_api"]],
+      ["glDrawElementsData", "void", [["mode", "u32"], ["count", "i32"], ["type", "u32"], ["data", "ptr", "in"], ["datalen", "u32"]], ["custom_decoder", "not_api"]],
+      ["glGetCompressedTextureFormats", "void", [["count", "i32"], ["formats", "ptr", "out"]], ["custom_decoder", "not_api"]],
+      ["glShaderString", "void", [["shader", "u32"], ["string", "ptr", "in"], ["len", "i32"]], ["custom_decoder", "not_api"]],
+      ["glFinishRoundTrip", "i32", [], ["custom_decoder", "not_api"]],
+      ["glGenVertexArrays", "void", [["n", "i32"], ["arrays", "ptr", "out"]], ["custom_decoder"]],
+      ["glBindVertexArray", "void", [["array", "u32"]]],
+      ["glDeleteVertexArrays", "void", [["n", "i32"], ["arrays", "ptr", "in"]], ["custom_decoder"]],
+      ["glIsVertexArray", "u8", [["array", "u32"]]],
+      ["glMapBufferRange", "u32", [["target", "u32"], ["offset", "i32"], ["length", "i32"], ["access", "u32"]], ["unsupported"]],
+      ["glUnmapBuffer", "u8", [["target", "u32"]], ["unsupported"]],
+      ["glFlushMappedBufferRange", "void", [["target", "u32"], ["offset", "i32"], ["length", "i32"]], ["unsupported"]],
+      ["glMapBufferRangeAEMU", "void", [["target", "u32"], ["offset", "i32"], ["length", "i32"], ["access", "u32"], ["mapped", "ptr", "out", ["nullAllowed"]]], ["custom_decoder", "not_api"]],
+      ["glUnmapBufferAEMU", "void", [["target", "u32"], ["offset", "i32"], ["length", "i32"], ["access", "u32"], ["guest_buffer", "ptr", "in", ["nullAllowed"]], ["out_res", "ptr", "out"]], ["custom_decoder", "not_api"]],
+      ["glFlushMappedBufferRangeAEMU", "void", [["target", "u32"], ["offset", "i32"], ["length", "i32"], ["access", "u32"], ["guest_buffer", "ptr", "in", ["nullAllowed"]]], ["custom_decoder", "not_api"]],
+      ["glReadPixelsOffsetAEMU", "void", [["x", "i32"], ["y", "i32"], ["width", "i32"], ["height", "i32"], ["format", "u32"], ["type", "u32"], ["offset", "u32"]], ["custom_decoder", "not_api", "custom_decoder", "not_api"]],
+      ["glCompressedTexImage2DOffsetAEMU", "void", [["target", "u32"], ["level", "i32"], ["internalformat", "u32"], ["width", "i32"], ["height", "i32"], ["border", "i32"], ["imageSize", "i32"], ["offset", "u32"]], ["custom_decoder", "not_api"]],
+      ["glCompressedTexSubImage2DOffsetAEMU", "void", [["target", "u32"], ["level", "i32"], ["xoffset", "i32"], ["yoffset", "i32"], ["width", "i32"], ["height", "i32"], ["format", "u32"], ["imageSize", "i32"], ["offset", "u32"]], ["custom_decoder", "not_api"]],
+      ["glTexImage2DOffsetAEMU", "void", [["target", "u32"], ["level", "i32"], ["internalformat", "i32"], ["width", "i32"], ["height", "i32"], ["border", "i32"], ["format", "u32"], ["type", "u32"], ["offset", "u32"]], ["custom_decoder", "not_api"]],
+      ["glTexSubImage2DOffsetAEMU", "void", [["target", "u32"], ["level", "i32"], ["xoffset", "i32"], ["yoffset", "i32"], ["width", "i32"], ["height", "i32"], ["format", "u32"], ["type", "u32"], ["offset", "u32"]], ["custom_decoder", "not_api"]],
+      ["glBindBufferRange", "void", [["target", "u32"], ["index", "u32"], ["buffer", "u32"], ["offset", "i32"], ["size", "i32"]]],
+      ["glBindBufferBase", "void", [["target", "u32"], ["index", "u32"], ["buffer", "u32"]]],
+      ["glCopyBufferSubData", "void", [["readtarget", "u32"], ["writetarget", "u32"], ["readoffset", "i32"], ["writeoffset", "i32"], ["size", "i32"]], ["flushOnEncode"]],
+      ["glClearBufferiv", "void", [["buffer", "u32"], ["drawBuffer", "i32"], ["value", "ptr", "in"]]],
+      ["glClearBufferuiv", "void", [["buffer", "u32"], ["drawBuffer", "i32"], ["value", "ptr", "in"]]],
+      ["glClearBufferfv", "void", [["buffer", "u32"], ["drawBuffer", "i32"], ["value", "ptr", "in"]]],
+      ["glClearBufferfi", "void", [["buffer", "u32"], ["drawBuffer", "i32"], ["depth", "f32"], ["stencil", "i32"]]],
+      ["glGetBufferParameteri64v", "void", [["target", "u32"], ["value", "u32"], ["data", "ptr", "in"]], ["unsupported"]],
+      ["glGetBufferPointerv", "void", [["target", "u32"], ["pname", "u32"], ["params", "ptr", "in"]], ["unsupported"]],
+      ["glUniformBlockBinding", "void", [["program", "u32"], ["uniformBlockIndex", "u32"], ["uniformBlockBinding", "u32"]], ["custom_decoder"]],
+      ["glGetUniformBlockIndex", "u32", [["program", "u32"], ["uniformBlockName", "ptr", "in"]], ["custom_decoder"]],
+      ["glGetUniformIndices", "void", [["program", "u32"], ["uniformCount", "i32"], ["uniformNames", "ptr", "in"], ["uniformIndices", "ptr", "in"]], ["unsupported"]],
+      ["glGetUniformIndicesAEMU", "void", [["program", "u32"], ["uniformCount", "i32"], ["packedUniformNames", "ptr", "in"], ["packedLen", "i32"], ["uniformIndices", "ptr", "out"]], ["custom_decoder", "not_api"]],
+      ["glGetActiveUniformBlockiv", "void", [["program", "u32"], ["uniformBlockIndex", "u32"], ["pname", "u32"], ["params", "ptr", "out"]], ["custom_decoder"]],
+      ["glGetActiveUniformBlockName", "void", [["program", "u32"], ["uniformBlockIndex", "u32"], ["bufSize", "i32"], ["length", "ptr", "out", ["nullAllowed"]], ["uniformBlockName", "ptr", "out", ["nullAllowed"]]], ["custom_decoder"]],
+      ["glUniform1ui", "void", [["location", "i32"], ["v0", "u32"]]],
+      ["glUniform2ui", "void", [["location", "i32"], ["v0", "u32"], ["v1", "u32"]]],
+      ["glUniform3ui", "void", [["location", "i32"], ["v0", "u32"], ["v1", "u32"], ["v2", "u32"]]],
+      ["glUniform4ui", "void", [["location", "i32"], ["v0", "i32"], ["v1", "u32"], ["v2", "u32"], ["v3", "u32"]]],
+      ["glUniform1uiv", "void", [["location", "i32"], ["count", "i32"], ["value", "ptr", "in"]]],
+      ["glUniform2uiv", "void", [["location", "i32"], ["count", "i32"], ["value", "ptr", "in"]]],
+      ["glUniform3uiv", "void", [["location", "i32"], ["count", "i32"], ["value", "ptr", "in"]]],
+      ["glUniform4uiv", "void", [["location", "i32"], ["count", "i32"], ["value", "ptr", "in"]]],
+      ["glUniformMatrix2x3fv", "void", [["location", "i32"], ["count", "i32"], ["transpose", "u8"], ["value", "ptr", "in"]]],
+      ["glUniformMatrix3x2fv", "void", [["location", "i32"], ["count", "i32"], ["transpose", "u8"], ["value", "ptr", "in"]]],
+      ["glUniformMatrix2x4fv", "void", [["location", "i32"], ["count", "i32"], ["transpose", "u8"], ["value", "ptr", "in"]]],
+      ["glUniformMatrix4x2fv", "void", [["location", "i32"], ["count", "i32"], ["transpose", "u8"], ["value", "ptr", "in"]]],
+      ["glUniformMatrix3x4fv", "void", [["location", "i32"], ["count", "i32"], ["transpose", "u8"], ["value", "ptr", "in"]]],
+      ["glUniformMatrix4x3fv", "void", [["location", "i32"], ["count", "i32"], ["transpose", "u8"], ["value", "ptr", "in"]]],
+      ["glGetUniformuiv", "void", [["program", "u32"], ["location", "i32"], ["params", "ptr", "out"]], ["custom_decoder"]],
+      ["glGetActiveUniformsiv", "void", [["program", "u32"], ["uniformCount", "i32"], ["uniformIndices", "ptr", "in"], ["pname", "u32"], ["params", "ptr", "out"]], ["custom_decoder"]],
+      ["glVertexAttribI4i", "void", [["index", "u32"], ["v0", "i32"], ["v1", "i32"], ["v2", "i32"], ["v3", "i32"]]],
+      ["glVertexAttribI4ui", "void", [["index", "u32"], ["v0", "u32"], ["v1", "u32"], ["v2", "u32"], ["v3", "u32"]]],
+      ["glVertexAttribI4iv", "void", [["index", "u32"], ["v", "ptr", "in"]]],
+      ["glVertexAttribI4uiv", "void", [["index", "u32"], ["v", "ptr", "in"]]],
+      ["glVertexAttribIPointer", "void", [["index", "u32"], ["size", "i32"], ["type", "u32"], ["stride", "i32"], ["pointer", "ptr", "in"]], ["unsupported"]],
+      ["glVertexAttribIPointerOffsetAEMU", "void", [["index", "u32"], ["size", "i32"], ["type", "u32"], ["stride", "i32"], ["offset", "u32"]], ["custom_decoder", "not_api"]],
+      ["glVertexAttribIPointerDataAEMU", "void", [["index", "u32"], ["size", "i32"], ["type", "u32"], ["stride", "i32"], ["data", "ptr", "in"], ["datalen", "u32"]], ["custom_decoder", "not_api"]],
+      ["glGetVertexAttribIiv", "void", [["index", "u32"], ["pname", "u32"], ["params", "ptr", "out"]]],
+      ["glGetVertexAttribIuiv", "void", [["index", "u32"], ["pname", "u32"], ["params", "ptr", "out"]]],
+      ["glVertexAttribDivisor", "void", [["index", "u32"], ["divisor", "u32"]]],
+      ["glDrawArraysInstanced", "void", [["mode", "u32"], ["first", "i32"], ["count", "i32"], ["primcount", "i32"]]],
+      ["glDrawElementsInstanced", "void", [["mode", "u32"], ["count", "i32"], ["type", "u32"], ["indices", "ptr", "in"], ["primcount", "i32"]], ["unsupported"]],
+      ["glDrawElementsInstancedDataAEMU", "void", [["mode", "u32"], ["count", "i32"], ["type", "u32"], ["indices", "ptr", "in"], ["primcount", "i32"], ["datalen", "i32"]], ["custom_decoder", "not_api"]],
+      ["glDrawElementsInstancedOffsetAEMU", "void", [["mode", "u32"], ["count", "i32"], ["type", "u32"], ["offset", "u32"], ["primcount", "i32"]], ["custom_decoder", "not_api"]],
+      ["glDrawRangeElements", "void", [["mode", "u32"], ["start", "u32"], ["end", "u32"], ["count", "i32"], ["type", "u32"], ["indices", "ptr", "in"]], ["unsupported"]],
+      ["glDrawRangeElementsDataAEMU", "void", [["mode", "u32"], ["start", "u32"], ["end", "u32"], ["count", "i32"], ["type", "u32"], ["indices", "ptr", "in"], ["datalen", "i32"]], ["custom_decoder", "not_api"]],
+      ["glDrawRangeElementsOffsetAEMU", "void", [["mode", "u32"], ["start", "u32"], ["end", "u32"], ["count", "i32"], ["type", "u32"], ["offset", "u32"]], ["custom_decoder", "not_api"]],
+      ["glFenceSync", "u64", [["condition", "u32"], ["flags", "u32"]], ["unsupported"]],
+      ["glClientWaitSync", "u32", [["wait_on", "u64"], ["flags", "u32"], ["timeout", "u64"]], ["unsupported"]],
+      ["glWaitSync", "void", [["wait_on", "u64"], ["flags", "u32"], ["timeout", "u64"]], ["unsupported"]],
+      ["glDeleteSync", "void", [["to_delete", "u64"]], ["unsupported"]],
+      ["glIsSync", "u8", [["sync", "u64"]], ["unsupported"]],
+      ["glGetSynciv", "void", [["sync", "u64"], ["pname", "u32"], ["bufSize", "i32"], ["length", "ptr", "in"], ["values", "ptr", "in"]], ["unsupported"]],
+      ["glFenceSyncAEMU", "u64", [["condition", "u32"], ["flags", "u32"]], ["custom_decoder", "not_api"]],
+      ["glClientWaitSyncAEMU", "u32", [["wait_on", "u64"], ["flags", "u32"], ["timeout", "u64"]], ["custom_decoder", "not_api"]],
+      ["glWaitSyncAEMU", "void", [["wait_on", "u64"], ["flags", "u32"], ["timeout", "u64"]], ["custom_decoder", "not_api"]],
+      ["glDeleteSyncAEMU", "void", [["to_delete", "u64"]], ["custom_decoder", "not_api"]],
+      ["glIsSyncAEMU", "u8", [["sync", "u64"]], ["custom_decoder", "not_api"]],
+      ["glGetSyncivAEMU", "void", [["sync", "u64"], ["pname", "u32"], ["bufSize", "i32"], ["length", "ptr", "out", ["nullAllowed"]], ["values", "ptr", "out"]], ["custom_decoder", "not_api"]],
+      ["glDrawBuffers", "void", [["n", "i32"], ["bufs", "ptr", "in"]]],
+      ["glReadBuffer", "void", [["src", "u32"]]],
+      ["glBlitFramebuffer", "void", [["srcX0", "i32"], ["srcY0", "i32"], ["srcX1", "i32"], ["srcY1", "i32"], ["dstX0", "i32"], ["dstY0", "i32"], ["dstX1", "i32"], ["dstY1", "i32"], ["mask", "u32"], ["filter", "u32"]]],
+      ["glInvalidateFramebuffer", "void", [["target", "u32"], ["numAttachments", "i32"], ["attachments", "ptr", "in"]]],
+      ["glInvalidateSubFramebuffer", "void", [["target", "u32"], ["numAttachments", "i32"], ["attachments", "ptr", "in"], ["x", "i32"], ["y", "i32"], ["width", "i32"], ["height", "i32"]]],
+      ["glFramebufferTextureLayer", "void", [["target", "u32"], ["attachment", "u32"], ["texture", "u32"], ["level", "i32"], ["layer", "i32"]]],
+      ["glRenderbufferStorageMultisample", "void", [["target", "u32"], ["samples", "i32"], ["internalformat", "u32"], ["width", "i32"], ["height", "i32"]]],
+      ["glTexStorage2D", "void", [["target", "u32"], ["levels", "i32"], ["internalformat", "u32"], ["width", "i32"], ["height", "i32"]]],
+      ["glGetInternalformativ", "void", [["target", "u32"], ["internalformat", "u32"], ["pname", "u32"], ["bufSize", "i32"], ["params", "ptr", "out"]]],
+      ["glBeginTransformFeedback", "void", [["primitiveMode", "u32"]]],
+      ["glEndTransformFeedback", "void", []],
+      ["glGenTransformFeedbacks", "void", [["n", "i32"], ["ids", "ptr", "out"]], ["custom_decoder"]],
+      ["glDeleteTransformFeedbacks", "void", [["n", "i32"], ["ids", "ptr", "in"]], ["custom_decoder"]],
+      ["glBindTransformFeedback", "void", [["target", "u32"], ["id", "u32"]]],
+      ["glPauseTransformFeedback", "void", []],
+      ["glResumeTransformFeedback", "void", []],
+      ["glIsTransformFeedback", "u8", [["id", "u32"]]],
+      ["glTransformFeedbackVaryings", "void", [["program", "u32"], ["count", "i32"], ["varyings", "ptr", "in"], ["bufferMode", "u32"]], ["unsupported", "custom_decoder"]],
+      ["glTransformFeedbackVaryingsAEMU", "void", [["program", "u32"], ["count", "i32"], ["packedVaryings", "ptr", "in"], ["packedVaryingsLen", "u32"], ["bufferMode", "u32"]], ["custom_decoder", "not_api"]],
+      ["glGetTransformFeedbackVarying", "void", [["program", "u32"], ["index", "u32"], ["bufSize", "i32"], ["length", "ptr", "out", ["nullAllowed"]], ["size", "ptr", "out"], ["type", "ptr", "out", ["nullAllowed", "nullAllowed"]], ["name", "ptr", "out", ["nullAllowed"]]], ["custom_decoder"]],
+      ["glGenSamplers", "void", [["n", "i32"], ["samplers", "ptr", "out"]], ["custom_decoder"]],
+      ["glDeleteSamplers", "void", [["n", "i32"], ["samplers", "ptr", "in"]], ["custom_decoder"]],
+      ["glBindSampler", "void", [["unit", "u32"], ["sampler", "u32"]]],
+      ["glSamplerParameterf", "void", [["sampler", "u32"], ["pname", "u32"], ["param", "f32"]]],
+      ["glSamplerParameteri", "void", [["sampler", "u32"], ["pname", "u32"], ["param", "i32"]]],
+      ["glSamplerParameterfv", "void", [["sampler", "u32"], ["pname", "u32"], ["params", "ptr", "in"]]],
+      ["glSamplerParameteriv", "void", [["sampler", "u32"], ["pname", "u32"], ["params", "ptr", "in"]]],
+      ["glGetSamplerParameterfv", "void", [["sampler", "u32"], ["pname", "u32"], ["params", "ptr", "out"]]],
+      ["glGetSamplerParameteriv", "void", [["sampler", "u32"], ["pname", "u32"], ["params", "ptr", "out"]]],
+      ["glIsSampler", "u8", [["sampler", "u32"]]],
+      ["glGenQueries", "void", [["n", "i32"], ["queries", "ptr", "out"]], ["custom_decoder"]],
+      ["glDeleteQueries", "void", [["n", "i32"], ["queries", "ptr", "in"]], ["custom_decoder"]],
+      ["glBeginQuery", "void", [["target", "u32"], ["query", "u32"]]],
+      ["glEndQuery", "void", [["target", "u32"]]],
+      ["glGetQueryiv", "void", [["target", "u32"], ["pname", "u32"], ["params", "ptr", "out"]]],
+      ["glGetQueryObjectuiv", "void", [["query", "u32"], ["pname", "u32"], ["params", "ptr", "out"]]],
+      ["glIsQuery", "u8", [["query", "u32"]]],
+      ["glProgramParameteri", "void", [["program", "u32"], ["pname", "u32"], ["value", "i32"]], ["custom_decoder"]],
+      ["glProgramBinary", "void", [["program", "u32"], ["binaryFormat", "u32"], ["binary", "ptr", "in"], ["length", "i32"]], ["custom_decoder"]],
+      ["glGetProgramBinary", "void", [["program", "u32"], ["bufSize", "i32"], ["length", "ptr", "out", ["nullAllowed"]], ["binaryFormat", "ptr", "out"], ["binary", "ptr", "out"]], ["custom_decoder"]],
+      ["glGetFragDataLocation", "i32", [["program", "u32"], ["name", "ptr", "in"]], ["custom_decoder"]],
+      ["glGetInteger64v", "void", [["pname", "u32"], ["data", "ptr", "out"]]],
+      ["glGetIntegeri_v", "void", [["target", "u32"], ["index", "u32"], ["data", "ptr", "out"]]],
+      ["glGetInteger64i_v", "void", [["target", "u32"], ["index", "u32"], ["data", "ptr", "out"]]],
+      ["glTexImage3D", "void", [["target", "u32"], ["level", "i32"], ["internalFormat", "i32"], ["width", "i32"], ["height", "i32"], ["depth", "i32"], ["border", "i32"], ["format", "u32"], ["type", "u32"], ["data", "ptr", "in", ["nullAllowed", "isLarge"]]]],
+      ["glTexImage3DOffsetAEMU", "void", [["target", "u32"], ["level", "i32"], ["internalFormat", "i32"], ["width", "i32"], ["height", "i32"], ["depth", "i32"], ["border", "i32"], ["format", "u32"], ["type", "u32"], ["offset", "u32"]], ["custom_decoder", "not_api"]],
+      ["glTexStorage3D", "void", [["target", "u32"], ["levels", "i32"], ["internalformat", "u32"], ["width", "i32"], ["height", "i32"], ["depth", "i32"]]],
+      ["glTexSubImage3D", "void", [["target", "u32"], ["level", "i32"], ["xoffset", "i32"], ["yoffset", "i32"], ["zoffset", "i32"], ["width", "i32"], ["height", "i32"], ["depth", "i32"], ["format", "u32"], ["type", "u32"], ["data", "ptr", "in", ["nullAllowed", "isLarge"]]]],
+      ["glTexSubImage3DOffsetAEMU", "void", [["target", "u32"], ["level", "i32"], ["xoffset", "i32"], ["yoffset", "i32"], ["zoffset", "i32"], ["width", "i32"], ["height", "i32"], ["depth", "i32"], ["format", "u32"], ["type", "u32"], ["offset", "u32"]], ["custom_decoder", "not_api"]],
+      ["glCompressedTexImage3D", "void", [["target", "u32"], ["level", "i32"], ["internalformat", "u32"], ["width", "i32"], ["height", "i32"], ["depth", "i32"], ["border", "i32"], ["imageSize", "i32"], ["data", "ptr", "in", ["nullAllowed", "isLarge"]]]],
+      ["glCompressedTexImage3DOffsetAEMU", "void", [["target", "u32"], ["level", "i32"], ["internalformat", "u32"], ["width", "i32"], ["height", "i32"], ["depth", "i32"], ["border", "i32"], ["imageSize", "i32"], ["offset", "u32"]], ["custom_decoder", "not_api"]],
+      ["glCompressedTexSubImage3D", "void", [["target", "u32"], ["level", "i32"], ["xoffset", "i32"], ["yoffset", "i32"], ["zoffset", "i32"], ["width", "i32"], ["height", "i32"], ["depth", "i32"], ["format", "u32"], ["imageSize", "i32"], ["data", "ptr", "in", ["nullAllowed", "isLarge"]]]],
+      ["glCompressedTexSubImage3DOffsetAEMU", "void", [["target", "u32"], ["level", "i32"], ["xoffset", "i32"], ["yoffset", "i32"], ["zoffset", "i32"], ["width", "i32"], ["height", "i32"], ["depth", "i32"], ["format", "u32"], ["imageSize", "i32"], ["data", "u32"]], ["custom_decoder", "not_api"]],
+      ["glCopyTexSubImage3D", "void", [["target", "u32"], ["level", "i32"], ["xoffset", "i32"], ["yoffset", "i32"], ["zoffset", "i32"], ["x", "i32"], ["y", "i32"], ["width", "i32"], ["height", "i32"]]],
+      ["glGetStringi", "u32", [["name", "u32"], ["index", "u32"]], ["unsupported"]],
+      ["glGetBooleani_v", "void", [["target", "u32"], ["index", "u32"], ["data", "ptr", "out"]]],
+      ["glMemoryBarrier", "void", [["barriers", "u32"]]],
+      ["glMemoryBarrierByRegion", "void", [["barriers", "u32"]]],
+      ["glGenProgramPipelines", "void", [["n", "i32"], ["pipelines", "ptr", "out"]], ["custom_decoder"]],
+      ["glDeleteProgramPipelines", "void", [["n", "i32"], ["pipelines", "ptr", "in"]], ["custom_decoder"]],
+      ["glBindProgramPipeline", "void", [["pipeline", "u32"]]],
+      ["glGetProgramPipelineiv", "void", [["pipeline", "u32"], ["pname", "u32"], ["params", "ptr", "out"]]],
+      ["glGetProgramPipelineInfoLog", "void", [["pipeline", "u32"], ["bufSize", "i32"], ["length", "ptr", "out", ["nullAllowed"]], ["infoLog", "ptr", "out"]]],
+      ["glValidateProgramPipeline", "void", [["pipeline", "u32"]]],
+      ["glIsProgramPipeline", "u8", [["pipeline", "u32"]]],
+      ["glUseProgramStages", "void", [["pipeline", "u32"], ["stages", "u32"], ["program", "u32"]], ["custom_decoder"]],
+      ["glActiveShaderProgram", "void", [["pipeline", "u32"], ["program", "u32"]], ["custom_decoder"]],
+      ["glCreateShaderProgramv", "u32", [["type", "u32"], ["count", "i32"], ["strings", "ptr", "in"]], ["unsupported"]],
+      ["glCreateShaderProgramvAEMU", "u32", [["type", "u32"], ["count", "i32"], ["packedStrings", "ptr", "in"], ["packedLen", "u32"]], ["custom_decoder", "not_api"]],
+      ["glProgramUniform1f", "void", [["program", "u32"], ["location", "i32"], ["v0", "f32"]], ["custom_decoder"]],
+      ["glProgramUniform2f", "void", [["program", "u32"], ["location", "i32"], ["v0", "f32"], ["v1", "f32"]], ["custom_decoder"]],
+      ["glProgramUniform3f", "void", [["program", "u32"], ["location", "i32"], ["v0", "f32"], ["v1", "f32"], ["v2", "f32"]], ["custom_decoder"]],
+      ["glProgramUniform4f", "void", [["program", "u32"], ["location", "i32"], ["v0", "f32"], ["v1", "f32"], ["v2", "f32"], ["v3", "f32"]], ["custom_decoder"]],
+      ["glProgramUniform1i", "void", [["program", "u32"], ["location", "i32"], ["v0", "i32"]], ["custom_decoder"]],
+      ["glProgramUniform2i", "void", [["program", "u32"], ["location", "i32"], ["v0", "i32"], ["v1", "i32"]], ["custom_decoder"]],
+      ["glProgramUniform3i", "void", [["program", "u32"], ["location", "i32"], ["v0", "i32"], ["v1", "i32"], ["v2", "i32"]], ["custom_decoder"]],
+      ["glProgramUniform4i", "void", [["program", "u32"], ["location", "i32"], ["v0", "i32"], ["v1", "i32"], ["v2", "i32"], ["v3", "i32"]], ["custom_decoder"]],
+      ["glProgramUniform1ui", "void", [["program", "u32"], ["location", "i32"], ["v0", "u32"]], ["custom_decoder"]],
+      ["glProgramUniform2ui", "void", [["program", "u32"], ["location", "i32"], ["v0", "i32"], ["v1", "u32"]], ["custom_decoder"]],
+      ["glProgramUniform3ui", "void", [["program", "u32"], ["location", "i32"], ["v0", "i32"], ["v1", "i32"], ["v2", "u32"]], ["custom_decoder"]],
+      ["glProgramUniform4ui", "void", [["program", "u32"], ["location", "i32"], ["v0", "i32"], ["v1", "i32"], ["v2", "i32"], ["v3", "u32"]], ["custom_decoder"]],
+      ["glProgramUniform1fv", "void", [["program", "u32"], ["location", "i32"], ["count", "i32"], ["value", "ptr", "in"]], ["custom_decoder"]],
+      ["glProgramUniform2fv", "void", [["program", "u32"], ["location", "i32"], ["count", "i32"], ["value", "ptr", "in"]], ["custom_decoder"]],
+      ["glProgramUniform3fv", "void", [["program", "u32"], ["location", "i32"], ["count", "i32"], ["value", "ptr", "in"]], ["custom_decoder"]],
+      ["glProgramUniform4fv", "void", [["program", "u32"], ["location", "i32"], ["count", "i32"], ["value", "ptr", "in"]], ["custom_decoder"]],
+      ["glProgramUniform1iv", "void", [["program", "u32"], ["location", "i32"], ["count", "i32"], ["value", "ptr", "in"]], ["custom_decoder"]],
+      ["glProgramUniform2iv", "void", [["program", "u32"], ["location", "i32"], ["count", "i32"], ["value", "ptr", "in"]], ["custom_decoder"]],
+      ["glProgramUniform3iv", "void", [["program", "u32"], ["location", "i32"], ["count", "i32"], ["value", "ptr", "in"]], ["custom_decoder"]],
+      ["glProgramUniform4iv", "void", [["program", "u32"], ["location", "i32"], ["count", "i32"], ["value", "ptr", "in"]], ["custom_decoder"]],
+      ["glProgramUniform1uiv", "void", [["program", "u32"], ["location", "i32"], ["count", "i32"], ["value", "ptr", "in"]], ["custom_decoder"]],
+      ["glProgramUniform2uiv", "void", [["program", "u32"], ["location", "i32"], ["count", "i32"], ["value", "ptr", "in"]], ["custom_decoder"]],
+      ["glProgramUniform3uiv", "void", [["program", "u32"], ["location", "i32"], ["count", "i32"], ["value", "ptr", "in"]], ["custom_decoder"]],
+      ["glProgramUniform4uiv", "void", [["program", "u32"], ["location", "i32"], ["count", "i32"], ["value", "ptr", "in"]], ["custom_decoder"]],
+      ["glProgramUniformMatrix2fv", "void", [["program", "u32"], ["location", "i32"], ["count", "i32"], ["transpose", "u8"], ["value", "ptr", "in"]], ["custom_decoder"]],
+      ["glProgramUniformMatrix3fv", "void", [["program", "u32"], ["location", "i32"], ["count", "i32"], ["transpose", "u8"], ["value", "ptr", "in"]], ["custom_decoder"]],
+      ["glProgramUniformMatrix4fv", "void", [["program", "u32"], ["location", "i32"], ["count", "i32"], ["transpose", "u8"], ["value", "ptr", "in"]], ["custom_decoder"]],
+      ["glProgramUniformMatrix2x3fv", "void", [["program", "u32"], ["location", "i32"], ["count", "i32"], ["transpose", "u8"], ["value", "ptr", "in"]], ["custom_decoder"]],
+      ["glProgramUniformMatrix3x2fv", "void", [["program", "u32"], ["location", "i32"], ["count", "i32"], ["transpose", "u8"], ["value", "ptr", "in"]], ["custom_decoder"]],
+      ["glProgramUniformMatrix2x4fv", "void", [["program", "u32"], ["location", "i32"], ["count", "i32"], ["transpose", "u8"], ["value", "ptr", "in"]], ["custom_decoder"]],
+      ["glProgramUniformMatrix4x2fv", "void", [["program", "u32"], ["location", "i32"], ["count", "i32"], ["transpose", "u8"], ["value", "ptr", "in"]], ["custom_decoder"]],
+      ["glProgramUniformMatrix3x4fv", "void", [["program", "u32"], ["location", "i32"], ["count", "i32"], ["transpose", "u8"], ["value", "ptr", "in"]], ["custom_decoder"]],
+      ["glProgramUniformMatrix4x3fv", "void", [["program", "u32"], ["location", "i32"], ["count", "i32"], ["transpose", "u8"], ["value", "ptr", "in"]], ["custom_decoder"]],
+      ["glGetProgramInterfaceiv", "void", [["program", "u32"], ["programInterface", "u32"], ["pname", "u32"], ["params", "ptr", "out"]], ["custom_decoder"]],
+      ["glGetProgramResourceiv", "void", [["program", "u32"], ["programInterface", "u32"], ["index", "u32"], ["propCount", "i32"], ["props", "ptr", "in"], ["bufSize", "i32"], ["length", "ptr", "out", ["nullAllowed"]], ["params", "ptr", "out"]], ["custom_decoder"]],
+      ["glGetProgramResourceIndex", "u32", [["program", "u32"], ["programInterface", "u32"], ["name", "ptr", "in"]], ["custom_decoder"]],
+      ["glGetProgramResourceLocation", "i32", [["program", "u32"], ["programInterface", "u32"], ["name", "ptr", "in"]], ["custom_decoder"]],
+      ["glGetProgramResourceName", "void", [["program", "u32"], ["programInterface", "u32"], ["index", "u32"], ["bufSize", "i32"], ["length", "ptr", "out", ["nullAllowed"]], ["name", "ptr", "out"]], ["custom_decoder"]],
+      ["glBindImageTexture", "void", [["unit", "u32"], ["texture", "u32"], ["level", "i32"], ["layered", "u8"], ["layer", "i32"], ["access", "u32"], ["format", "u32"]]],
+      ["glDispatchCompute", "void", [["num_groups_x", "u32"], ["num_groups_y", "u32"], ["num_groups_z", "u32"]]],
+      ["glDispatchComputeIndirect", "void", [["indirect", "i32"]]],
+      ["glBindVertexBuffer", "void", [["bindingindex", "u32"], ["buffer", "u32"], ["offset", "i32"], ["stride", "i32"]]],
+      ["glVertexAttribBinding", "void", [["attribindex", "u32"], ["bindingindex", "u32"]]],
+      ["glVertexAttribFormat", "void", [["attribindex", "u32"], ["size", "i32"], ["type", "u32"], ["normalized", "u8"], ["relativeoffset", "u32"]]],
+      ["glVertexAttribIFormat", "void", [["attribindex", "u32"], ["size", "i32"], ["type", "u32"], ["relativeoffset", "u32"]]],
+      ["glVertexBindingDivisor", "void", [["bindingindex", "u32"], ["divisor", "u32"]]],
+      ["glDrawArraysIndirect", "void", [["mode", "u32"], ["indirect", "ptr", "in"]], ["unsupported"]],
+      ["glDrawArraysIndirectDataAEMU", "void", [["mode", "u32"], ["indirect", "ptr", "in"], ["datalen", "u32"]], ["custom_decoder", "not_api"]],
+      ["glDrawArraysIndirectOffsetAEMU", "void", [["mode", "u32"], ["offset", "u32"]], ["custom_decoder", "not_api"]],
+      ["glDrawElementsIndirect", "void", [["mode", "u32"], ["type", "u32"], ["indirect", "ptr", "in"]], ["unsupported"]],
+      ["glDrawElementsIndirectDataAEMU", "void", [["mode", "u32"], ["type", "u32"], ["indirect", "ptr", "in"], ["datalen", "u32"]], ["custom_decoder", "not_api"]],
+      ["glDrawElementsIndirectOffsetAEMU", "void", [["mode", "u32"], ["type", "u32"], ["offset", "u32"]], ["custom_decoder", "not_api"]],
+      ["glTexStorage2DMultisample", "void", [["target", "u32"], ["samples", "i32"], ["internalformat", "u32"], ["width", "i32"], ["height", "i32"], ["fixedsamplelocations", "u8"]]],
+      ["glSampleMaski", "void", [["maskNumber", "u32"], ["mask", "u32"]]],
+      ["glGetMultisamplefv", "void", [["pname", "u32"], ["index", "u32"], ["val", "ptr", "out"]]],
+      ["glFramebufferParameteri", "void", [["target", "u32"], ["pname", "u32"], ["param", "i32"]]],
+      ["glGetFramebufferParameteriv", "void", [["target", "u32"], ["pname", "u32"], ["params", "ptr", "out"]]],
+      ["glGetTexLevelParameterfv", "void", [["target", "u32"], ["level", "i32"], ["pname", "u32"], ["params", "ptr", "out"]]],
+      ["glGetTexLevelParameteriv", "void", [["target", "u32"], ["level", "i32"], ["pname", "u32"], ["params", "ptr", "out"]]],
+      ["glMapBufferRangeDMA", "void", [["target", "u32"], ["offset", "i32"], ["length", "i32"], ["access", "u32"], ["paddr", "u64"]], ["custom_decoder", "not_api"]],
+      ["glUnmapBufferDMA", "void", [["target", "u32"], ["offset", "i32"], ["length", "i32"], ["access", "u32"], ["paddr", "u64"], ["out_res", "ptr", "out"]], ["custom_decoder", "not_api"]],
+      ["glMapBufferRangeDirect", "u64", [["target", "u32"], ["offset", "i32"], ["length", "i32"], ["access", "u32"], ["paddr", "u64"]], ["custom_decoder", "not_api"]],
+      ["glUnmapBufferDirect", "void", [["target", "u32"], ["offset", "i32"], ["length", "i32"], ["access", "u32"], ["paddr", "u64"], ["guest_ptr", "u64"], ["out_res", "ptr", "out"]], ["custom_decoder", "not_api"]],
+      ["glFlushMappedBufferRangeDirect", "void", [["target", "u32"], ["offset", "i32"], ["length", "i32"], ["access", "u32"]], ["custom_decoder", "not_api"]],
+      ["glGetGraphicsResetStatusEXT", "u32", []],
+      ["glReadnPixelsEXT", "void", [["x", "i32"], ["y", "i32"], ["width", "i32"], ["height", "i32"], ["format", "u32"], ["type", "u32"], ["bufSize", "i32"], ["data", "ptr", "out"]]],
+      ["glGetnUniformfvEXT", "void", [["program", "u32"], ["location", "i32"], ["bufSize", "i32"], ["params", "ptr", "out"]]],
+      ["glGetnUniformivEXT", "void", [["program", "u32"], ["location", "i32"], ["bufSize", "i32"], ["params", "ptr", "out"]]],
+      ["glDrawArraysNullAEMU", "void", [["mode", "u32"], ["first", "i32"], ["count", "i32"]]],
+      ["glDrawElementsNullAEMU", "void", [["mode", "u32"], ["count", "i32"], ["type", "u32"], ["indices", "ptr", "in"]], ["unsupported"]],
+      ["glDrawElementsOffsetNullAEMU", "void", [["mode", "u32"], ["count", "i32"], ["type", "u32"], ["offset", "u32"]], ["custom_decoder", "not_api"]],
+      ["glDrawElementsDataNullAEMU", "void", [["mode", "u32"], ["count", "i32"], ["type", "u32"], ["data", "ptr", "in"], ["datalen", "u32"]], ["custom_decoder", "not_api"]],
+      ["glUnmapBufferAsyncAEMU", "void", [["target", "u32"], ["offset", "i32"], ["length", "i32"], ["access", "u32"], ["guest_buffer", "ptr", "in", ["nullAllowed", "isLarge"]], ["out_res", "ptr", "in"]], ["custom_decoder", "not_api"]],
+      ["glFlushMappedBufferRangeAEMU2", "void", [["target", "u32"], ["offset", "i32"], ["length", "i32"], ["access", "u32"], ["guest_buffer", "ptr", "in", ["nullAllowed", "isLarge"]]], ["custom_decoder", "not_api"]],
+      ["glBufferDataSyncAEMU", "u8", [["target", "u32"], ["size", "i32"], ["data", "ptr", "in", ["nullAllowed"]], ["usage", "u32"]], ["not_api", "custom_decoder"]],
+      ["glTexBufferOES", "void", [["target", "u32"], ["internalFormat", "u32"], ["buffer", "u32"]], ["custom_decoder"]],
+      ["glTexBufferRangeOES", "void", [["target", "u32"], ["internalFormat", "u32"], ["buffer", "u32"], ["offset", "i32"], ["size", "i32"]], ["custom_decoder"]],
+      ["glTexBufferEXT", "void", [["target", "u32"], ["internalFormat", "u32"], ["buffer", "u32"]], ["custom_decoder"]],
+      ["glTexBufferRangeEXT", "void", [["target", "u32"], ["internalFormat", "u32"], ["buffer", "u32"], ["offset", "i32"], ["size", "i32"]], ["custom_decoder"]],
+      ["glEnableiEXT", "void", [["cap", "u32"], ["index", "u32"]], ["custom_decoder"]],
+      ["glDisableiEXT", "void", [["cap", "u32"], ["index", "u32"]], ["custom_decoder"]],
+      ["glBlendEquationiEXT", "void", [["index", "u32"], ["mode", "u32"]], ["custom_decoder"]],
+      ["glBlendEquationSeparateiEXT", "void", [["index", "u32"], ["modeRGB", "u32"], ["modeAlpha", "u32"]], ["custom_decoder"]],
+      ["glBlendFunciEXT", "void", [["index", "u32"], ["sfactor", "u32"], ["dfactor", "u32"]], ["custom_decoder"]],
+      ["glBlendFuncSeparateiEXT", "void", [["index", "u32"], ["srcRGB", "u32"], ["dstRGB", "u32"], ["srcAlpha", "u32"], ["dstAlpha", "u32"]], ["custom_decoder"]],
+      ["glColorMaskiEXT", "void", [["index", "u32"], ["red", "u8"], ["green", "u8"], ["blue", "u8"], ["alpha", "u8"]], ["custom_decoder"]],
+      ["glIsEnablediEXT", "u8", [["cap", "u32"], ["index", "u32"]], ["custom_decoder"]]
+    ] }
+  };
+
+  // src/gles/gles_wire.js
+  var KIND_BYTES = { "void": 0, "u8": 1, "i16": 2, "u16": 2, "i32": 4, "u32": 4, "f32": 4, "u64": 8, "i64": 8 };
+  var BY_OPCODE = /* @__PURE__ */ new Map();
+  var BY_NAME = /* @__PURE__ */ new Map();
+  var GLES_RANGES = [];
+  for (const [api, { base, commands }] of Object.entries(GLES_APIS)) {
+    commands.forEach(([name, ret, params, flags], i) => {
+      const command = { api, opcode: base + i, name, ret, params, flags: flags || [] };
+      BY_OPCODE.set(base + i, command);
+      BY_NAME.set(api + ":" + name, command);
+      if (!BY_NAME.has(name)) BY_NAME.set(name, command);
+    });
+    GLES_RANGES.push({ api, first: base, last: base + commands.length - 1 });
+  }
+  function command_of_opcode(opcode) {
+    return BY_OPCODE.get(opcode) || null;
+  }
+  function OutBuffer(size, input) {
+    this.size = size;
+    this.data = new Uint8Array(size);
+    if (input) this.data.set(input.subarray(0, size));
+    this.view = new DataView(this.data.buffer);
+  }
+  function read_value(view, at, kind) {
+    switch (kind) {
+      case "u8":
+        return view.getUint8(at);
+      case "i16":
+        return view.getInt16(at, true);
+      case "u16":
+        return view.getUint16(at, true);
+      case "i32":
+        return view.getInt32(at, true);
+      case "u32":
+        return view.getUint32(at, true);
+      case "f32":
+        return view.getFloat32(at, true);
+      case "u64":
+        return view.getUint32(at, true) + view.getUint32(at + 4, true) * 4294967296;
+      case "i64":
+        return view.getUint32(at, true) + view.getInt32(at + 4, true) * 4294967296;
+    }
+    return 0;
+  }
+  function decode_arguments(command, bytes) {
+    const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+    const args = [];
+    let at = 8;
+    for (const [name, kind, dir, flags] of command.params) {
+      if (kind !== "ptr") {
+        const n = KIND_BYTES[kind];
+        if (at + n > bytes.length) throw new Error(`${command.name}: ${name} is beyond the command's ${bytes.length} bytes`);
+        args.push(read_value(view, at, kind));
+        at += n;
+        continue;
+      }
+      if (flags && flags.includes("DMA")) {
+        if (at + 8 > bytes.length) throw new Error(`${command.name}: ${name} is beyond the command's ${bytes.length} bytes`);
+        args.push({ dma: read_value(view, at, "u64") });
+        at += 8;
+        continue;
+      }
+      if (at + 4 > bytes.length) throw new Error(`${command.name}: ${name}'s length is beyond the command's ${bytes.length} bytes`);
+      const size = view.getUint32(at, true);
+      at += 4;
+      if (dir === "out") {
+        args.push(new OutBuffer(size, null));
+        continue;
+      }
+      if (at + size > bytes.length) throw new Error(`${command.name}: ${name}'s ${size} bytes are beyond the command's ${bytes.length}`);
+      const data = bytes.subarray(at, at + size);
+      at += size;
+      if (dir === "inout") args.push(new OutBuffer(size, data));
+      else args.push(size === 0 && flags && flags.includes("nullAllowed") ? null : data);
+    }
+    if (at !== bytes.length) throw new Error(`${command.name}: the parameters take ${at} bytes, the command has ${bytes.length}`);
+    return args;
+  }
+
+  // src/gles/gles_batch.js
+  var GLES_FIELDS = {
+    COMMAND: ["conn", "ret", "length"],
+    CONTEXT_CREATE: ["context", "config", "share", "api"],
+    CONTEXT_DESTROY: ["context"],
+    SURFACE_CREATE: ["surface", "config", "width", "height"],
+    SURFACE_DESTROY: ["surface"],
+    SURFACE_COLOR_BUFFER: ["surface", "color_buffer"],
+    MAKE_CURRENT: ["conn", "context", "draw", "read"],
+    COLOR_BUFFER_CREATE: ["color_buffer", "width", "height", "format"],
+    COLOR_BUFFER_DESTROY: ["color_buffer"],
+    COLOR_BUFFER_UPDATE: ["color_buffer", "x", "y", "width", "height", "format", "type", "length"],
+    COLOR_BUFFER_READ: ["color_buffer", "x", "y", "width", "height", "format", "type", "request"],
+    COLOR_BUFFER_BIND: ["conn", "color_buffer", "texture"],
+    IMAGE_CREATE: ["image", "context", "target", "buffer"],
+    IMAGE_DESTROY: ["image"],
+    POST: ["color_buffer"],
+    FLUSH_SURFACE: ["surface"],
+    READ_PIXELS: ["conn", "request", "x", "y", "width", "height", "format", "type"],
+    CONNECTION_CLOSE: ["conn"],
+    PROGRAM_LINK: ["conn", "program", "length"],
+    BUFFER_READ: ["conn", "request", "buffer", "offset", "length"],
+    QUERY_READ: ["conn", "request", "query"]
+  };
+  var GLES_RECORD_NAMES = Object.fromEntries(Object.entries(GLES).map(([name, op]) => [op, name]));
+  function read_gles_batch(bytes, decode) {
+    if (bytes.length < 16 || bytes.length % 4) throw new Error(`GLES batch: ${bytes.length} bytes`);
+    const words = new Uint32Array(bytes.buffer, bytes.byteOffset, bytes.length >> 2);
+    if (words[0] !== GLES_MAGIC) throw new Error("GLES batch: magic " + words[0].toString(16));
+    if (words[2] !== words.length) throw new Error(`GLES batch: ${words[2]} dwords in the header, ${words.length} sent`);
+    const records = [];
+    let at = 4;
+    for (let i = 0; i < words[3]; i++) {
+      if (at + 2 > words.length) throw new Error("GLES batch: record " + i + " is beyond its end");
+      const op = words[at], body = words[at + 1];
+      const name = GLES_RECORD_NAMES[op];
+      const fields = GLES_FIELDS[name];
+      if (!fields || at + 2 + body > words.length || body < fields.length) throw new Error(`GLES batch: record ${i}: op ${op}, ${body} dwords`);
+      const record = { op, name };
+      fields.forEach((field, j) => {
+        record[field] = words[at + 2 + j];
+      });
+      const length = name === "COMMAND" || name === "COLOR_BUFFER_UPDATE" || name === "PROGRAM_LINK" ? record.length : 0;
+      if (length) {
+        const start = (at + 2 + fields.length) * 4;
+        if (start + length > (at + 2 + body) * 4) throw new Error(`GLES batch: record ${i}: ${length} bytes in ${body} dwords`);
+        record.bytes = bytes.subarray(start, start + length);
+        if (name === "COMMAND" && decode) {
+          const view = new DataView(record.bytes.buffer, record.bytes.byteOffset, record.bytes.length);
+          record.command = command_of_opcode(view.getUint32(0, true));
+          if (!record.command) throw new Error(`GLES batch: record ${i}: opcode ${view.getUint32(0, true)}`);
+          record.args = decode_arguments(record.command, record.bytes);
+        }
+      }
+      records.push(record);
+      at += 2 + body;
+    }
+    if (at !== words.length) throw new Error(`GLES batch: the records end at ${at} of ${words.length} dwords`);
+    return records;
+  }
+
+  // src/gles/page/gles_textures.js
+  function source_bytes(format, type) {
+    if (type !== GL.UNSIGNED_BYTE) return 2;
+    switch (format) {
+      case GL.RGBA:
+      case GL.BGRA_EXT:
+        return 4;
+      case GL.RGB:
+        return 3;
+      case GL.LUMINANCE_ALPHA:
+        return 2;
+    }
+    return 1;
+  }
+  function to_rgba8(format, type, width, height, alignment, bytes) {
+    const out = new Uint8Array(width * height * 4);
+    if (!bytes) return out;
+    const texel = source_bytes(format, type);
+    const stride = Math.ceil(width * texel / alignment) * alignment;
+    if (format === GL.RGBA && type === GL.UNSIGNED_BYTE && stride === width * 4) {
+      out.set(bytes.subarray(0, Math.min(bytes.length, out.length)));
+      return out;
+    }
+    const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+    for (let y = 0; y < height; y++) {
+      let src = y * stride, dst = y * width * 4;
+      if (src + width * texel > bytes.length) break;
+      for (let x = 0; x < width; x++, src += texel, dst += 4) {
+        let r, g, b, a;
+        if (type === GL.UNSIGNED_SHORT_4_4_4_4) {
+          const p = view.getUint16(src, true);
+          r = (p >> 12) * 17;
+          g = (p >> 8 & 15) * 17;
+          b = (p >> 4 & 15) * 17;
+          a = (p & 15) * 17;
+        } else if (type === GL.UNSIGNED_SHORT_5_5_5_1) {
+          const p = view.getUint16(src, true);
+          r = (p >> 11) * 255 / 31 + 0.5 | 0;
+          g = (p >> 6 & 31) * 255 / 31 + 0.5 | 0;
+          b = (p >> 1 & 31) * 255 / 31 + 0.5 | 0;
+          a = p & 1 ? 255 : 0;
+        } else if (type === GL.UNSIGNED_SHORT_5_6_5) {
+          const p = view.getUint16(src, true);
+          r = (p >> 11) * 255 / 31 + 0.5 | 0;
+          g = (p >> 5 & 63) * 255 / 63 + 0.5 | 0;
+          b = (p & 31) * 255 / 31 + 0.5 | 0;
+          a = 255;
+        } else switch (format) {
+          case GL.RGBA:
+            r = bytes[src];
+            g = bytes[src + 1];
+            b = bytes[src + 2];
+            a = bytes[src + 3];
+            break;
+          case GL.BGRA_EXT:
+            b = bytes[src];
+            g = bytes[src + 1];
+            r = bytes[src + 2];
+            a = bytes[src + 3];
+            break;
+          case GL.RGB:
+            r = bytes[src];
+            g = bytes[src + 1];
+            b = bytes[src + 2];
+            a = 255;
+            break;
+          case GL.LUMINANCE_ALPHA:
+            r = g = b = bytes[src];
+            a = bytes[src + 1];
+            break;
+          case GL.LUMINANCE:
+            r = g = b = bytes[src];
+            a = 255;
+            break;
+          case GL.ALPHA:
+            r = g = b = 0;
+            a = bytes[src];
+            break;
+          default:
+            r = g = b = 0;
+            a = 255;
+        }
+        out[dst] = r;
+        out[dst + 1] = g;
+        out[dst + 2] = b;
+        out[dst + 3] = a;
+      }
+    }
+    return out;
+  }
+  var ETC1_MODIFIERS = [[2, 8], [5, 17], [9, 29], [13, 42], [18, 60], [24, 80], [33, 106], [47, 183]];
+  function decode_etc1(width, height, bytes) {
+    const out = new Uint8Array(width * height * 4);
+    const blocks_x = Math.ceil(width / 4), blocks_y = Math.ceil(height / 4);
+    const clamp = (v) => v < 0 ? 0 : v > 255 ? 255 : v;
+    for (let by = 0; by < blocks_y; by++) {
+      for (let bx = 0; bx < blocks_x; bx++) {
+        const at = (by * blocks_x + bx) * 8;
+        if (at + 8 > bytes.length) return out;
+        const hi = (bytes[at] << 24 | bytes[at + 1] << 16 | bytes[at + 2] << 8 | bytes[at + 3]) >>> 0;
+        const lo = (bytes[at + 4] << 24 | bytes[at + 5] << 16 | bytes[at + 6] << 8 | bytes[at + 7]) >>> 0;
+        const diff = hi >>> 1 & 1, flip = hi & 1;
+        const table = [hi >>> 5 & 7, hi >>> 2 & 7];
+        let base;
+        if (diff) {
+          const five = (shift) => hi >>> shift & 31;
+          const delta = (shift) => {
+            const d = hi >>> shift & 7;
+            return d >= 4 ? d - 8 : d;
+          };
+          const expand5 = (v) => v << 3 | v >> 2;
+          const c1 = [five(27), five(19), five(11)];
+          const c2 = [c1[0] + delta(24), c1[1] + delta(16), c1[2] + delta(8)];
+          base = [c1.map(expand5), c2.map((v) => expand5(v & 31))];
+        } else {
+          const four = (shift) => (hi >>> shift & 15) * 17;
+          base = [[four(28), four(20), four(12)], [four(24), four(16), four(8)]];
+        }
+        for (let i = 0; i < 16; i++) {
+          const x = i >> 2, y = i & 3;
+          const sub = flip ? y >= 2 ? 1 : 0 : x >= 2 ? 1 : 0;
+          const msb = lo >>> i + 16 & 1, lsb = lo >>> i & 1;
+          const modifier = ETC1_MODIFIERS[table[sub]][lsb];
+          const delta = msb ? -modifier : modifier;
+          const px = bx * 4 + x, py = by * 4 + y;
+          if (px >= width || py >= height) continue;
+          const o = (py * width + px) * 4;
+          out[o] = clamp(base[sub][0] + delta);
+          out[o + 1] = clamp(base[sub][1] + delta);
+          out[o + 2] = clamp(base[sub][2] + delta);
+          out[o + 3] = 255;
+        }
+      }
+    }
+    return out;
+  }
+  function pack_rgba8(rgba, width, height, alignment) {
+    const row = width * 4, stride = Math.ceil(row / alignment) * alignment;
+    if (stride === row) return rgba;
+    const out = new Uint8Array(stride * (height - 1) + row);
+    for (let y = 0; y < height; y++) out.set(rgba.subarray(y * row, y * row + row), y * stride);
+    return out;
+  }
+
+  // src/gles/page/gles1_draw.js
+  var IDENTITY2 = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
+  var ENV_MODES = { 8448: "MODULATE", 8449: "DECAL", 3042: "BLEND", 260: "ADD", 7681: "REPLACE", 34160: "COMBINE" };
+  var COMBINE = {
+    7681: "REPLACE",
+    8448: "MODULATE",
+    260: "ADD",
+    34164: "ADD_SIGNED",
+    34165: "INTERPOLATE",
+    34023: "SUBTRACT",
+    34478: "DOT3_RGB",
+    34479: "DOT3_RGBA"
+  };
+  var SOURCES2 = { 5890: "TEXTURE", 34166: "CONSTANT", 34167: "PRIMARY_COLOR", 34168: "PREVIOUS" };
+  var OPERANDS = { 768: "SRC_COLOR", 769: "ONE_MINUS_SRC_COLOR", 770: "SRC_ALPHA", 771: "ONE_MINUS_SRC_ALPHA" };
+  var ALPHA_FUNCS = {
+    512: "never",
+    513: "less",
+    514: "equal",
+    515: "lequal",
+    516: "greater",
+    517: "notequal",
+    518: "gequal",
+    519: "always"
+  };
+  var FORMATS2 = {
+    [GL.RGBA]: "RGBA",
+    [GL.BGRA_EXT]: "RGBA",
+    [GL.RGB]: "RGB",
+    [GL.ETC1_RGB8_OES]: "RGB",
+    [GL.ALPHA]: "ALPHA",
+    [GL.LUMINANCE]: "LUMINANCE",
+    [GL.LUMINANCE_ALPHA]: "LUMINANCE_ALPHA"
+  };
+  var is_identity = (m) => m.every((v, i) => v === IDENTITY2[i]);
+  function unit_texture(c, unit) {
+    const enabled = c.ff.texture_enabled[unit];
+    const target = enabled[GL.TEXTURE_EXTERNAL_OES] ? GL.TEXTURE_EXTERNAL_OES : enabled[GL.TEXTURE_2D] ? GL.TEXTURE_2D : 0;
+    if (!target) return null;
+    const name = c.textures[unit][target === GL.TEXTURE_2D ? 0 : 2];
+    const texture = name ? c.group.textures.get(name) : c.defaults && c.defaults.get(target);
+    return texture && texture.images.get(0) ? texture : null;
+  }
+  function ff_signature(c, points, textures) {
+    const ff = c.ff;
+    const on = (cap) => c.enabled.has(cap);
+    const lighting = on(2896);
+    const signature = {
+      attributes: {
+        position: { components: ff.arrays.vertex.enabled ? ff.arrays.vertex.size : 4 },
+        normal: lighting,
+        color: true,
+        secondaryColor: false,
+        fogCoord: false,
+        texCoord: textures.map((t) => t ? { components: 4 } : null)
+      },
+      lighting: {
+        enabled: lighting,
+        twoSide: !!ff.light_model.two_side,
+        localViewer: false,
+        separateSpecular: false,
+        normalMode: on(2977) ? "normalize" : on(32826) ? "rescale" : "none",
+        colorMaterial: on(2903) ? { enabled: true, face: "FRONT_AND_BACK", mode: "AMBIENT_AND_DIFFUSE" } : { enabled: false },
+        lights: ff.lights.map((l, i) => ({ enabled: on(16384 + i), positional: l.position[3] !== 0, spot: l.spot_cutoff !== 180 }))
+      },
+      fog: on(2912) ? { enabled: true, mode: { 9729: "linear", 2048: "exp", 2049: "exp2" }[ff.fog.mode], coordSource: "depth" } : { enabled: false },
+      texture: textures.map((t, i) => {
+        if (!t) return { enabled: false };
+        const e = ff.env[i];
+        const env = { mode: ENV_MODES[e.mode], coordReplace: !!e.coord_replace };
+        if (e.mode === 34160) {
+          Object.assign(env, {
+            combineRGB: COMBINE[e.combine_rgb],
+            combineAlpha: COMBINE[e.combine_alpha],
+            srcRGB: e.src_rgb.map((s) => SOURCES2[s]),
+            operandRGB: e.operand_rgb.map((o) => OPERANDS[o]),
+            srcAlpha: e.src_alpha.map((s) => SOURCES2[s]),
+            operandAlpha: e.operand_alpha.map((o) => OPERANDS[o]),
+            rgbScale: e.rgb_scale,
+            alphaScale: e.alpha_scale
+          });
+        }
+        const base = t.images.get(0);
+        return {
+          enabled: true,
+          target: "2D",
+          shadow: false,
+          format: FORMATS2[base.format] || "RGBA",
+          matrix: !is_identity(ff.stacks[5890][i].at(-1)),
+          texGen: [null, null, null, null],
+          env
+        };
+      }),
+      alphaTest: on(3008) ? ALPHA_FUNCS[ff.alpha_func] : "always",
+      clipPlaneCount: ff.clip_planes.reduce((n, p, i) => on(12288 + i) ? i + 1 : n, 0),
+      pointSprite: points && on(34913),
+      flatShading: ff.shade_model === 7424,
+      colorTargets: 1
+    };
+    return signature;
+  }
+  function ff_snapshot(c, viewport) {
+    const ff = c.ff;
+    const modelview2 = ff.stacks[5888].at(-1), projection = ff.stacks[5889].at(-1);
+    const mv_inverse = mat_inverse(modelview2);
+    const normal = [mv_inverse[0], mv_inverse[4], mv_inverse[8], mv_inverse[1], mv_inverse[5], mv_inverse[9], mv_inverse[2], mv_inverse[6], mv_inverse[10]];
+    const textures = Array.from({ length: 8 }, (_, i) => i < UNITS ? ff.stacks[5890][i].at(-1) : IDENTITY2);
+    const material2 = {
+      emission: ff.material.emission,
+      ambient: ff.material.ambient,
+      diffuse: ff.material.diffuse,
+      specular: ff.material.specular,
+      shininess: ff.material.shininess
+    };
+    const lights = ff.lights.map((l) => {
+      const [px, py, pz] = l.position;
+      const length = Math.hypot(px, py, pz) || 1;
+      const h = [px / length, py / length, pz / length + 1];
+      const hl = Math.hypot(...h) || 1;
+      return {
+        ambient: l.ambient,
+        diffuse: l.diffuse,
+        specular: l.specular,
+        position: l.position,
+        halfVector: [h[0] / hl, h[1] / hl, h[2] / hl, 0],
+        spotDirection: l.spot_direction,
+        spotExponent: l.spot_exponent,
+        spotCutoff: l.spot_cutoff,
+        spotCosCutoff: l.spot_cutoff === 180 ? -1 : Math.cos(l.spot_cutoff * Math.PI / 180),
+        constantAttenuation: l.attenuation[0],
+        linearAttenuation: l.attenuation[1],
+        quadraticAttenuation: l.attenuation[2]
+      };
+    });
+    const scene = [0, 1, 2].map((i) => material2.emission[i] + material2.ambient[i] * ff.light_model.ambient[i]).concat([material2.diffuse[3]]);
+    const products = ff.lights.map((l) => ({
+      ambient: material2.ambient.map((v, i) => v * l.ambient[i]),
+      diffuse: material2.diffuse.map((v, i) => v * l.diffuse[i]),
+      specular: material2.specular.map((v, i) => v * l.specular[i])
+    }));
+    const zero = () => [0, 0, 0, 0];
+    return {
+      matrices: {
+        modelview: modelview2,
+        projection,
+        mvp: mat_mul(projection, modelview2),
+        normal,
+        modelviewInverse: mv_inverse,
+        texture: textures,
+        textureInverse: textures,
+        textureTranspose: textures,
+        textureInverseTranspose: textures,
+        modelviewTranspose: IDENTITY2,
+        modelviewInverseTranspose: IDENTITY2,
+        projectionInverse: IDENTITY2,
+        projectionTranspose: IDENTITY2,
+        projectionInverseTranspose: IDENTITY2,
+        mvpInverse: IDENTITY2,
+        mvpTranspose: IDENTITY2,
+        mvpInverseTranspose: IDENTITY2
+      },
+      lights,
+      material: { front: material2, back: material2 },
+      lightModel: { ambient: ff.light_model.ambient },
+      derived: { frontSceneColor: scene, backSceneColor: scene, frontLightProduct: products, backLightProduct: products },
+      fog: { color: ff.fog.color, density: ff.fog.density, start: ff.fog.start, end: ff.fog.end },
+      texEnvColor: Array.from({ length: 8 }, (_, i) => i < UNITS ? ff.env[i].color : zero()),
+      texGen: Array.from({ length: 8 }, () => Array.from({ length: 4 }, () => ({ objectPlane: zero(), eyePlane: zero() }))),
+      clipPlanes: ff.clip_planes.map((p, i) => c.enabled.has(12288 + i) ? p : zero()),
+      depthRange: { near: c.depth_range[0], far: c.depth_range[1] },
+      point: {
+        size: ff.point.size,
+        sizeMin: ff.point.min,
+        sizeMax: Math.max(ff.point.min, Math.min(ff.point.max, 256)),
+        fadeThreshold: ff.point.fade,
+        attenuation: ff.point.attenuation
+      },
+      alphaRef: ff.alpha_ref,
+      viewport: { x: viewport[0], y: viewport[1], width: viewport[2], height: viewport[3] },
+      lineWidth: c.line_width,
+      lineStipple: { pattern: 65535, factor: 1 },
+      polygonStippleEnabled: false,
+      polygonStipple: new Uint8Array(128)
+    };
+  }
+  function ff_inputs(c, attributes) {
+    const ff = c.ff;
+    return attributes.map((a) => {
+      if (a.name === "position") return { location: a.location, components: a.components, array: ff.arrays.vertex, normalized: false, current: [0, 0, 0, 1] };
+      if (a.name === "normal") return { location: a.location, components: 3, array: ff.arrays.normal, normalized: true, current: ff.normal };
+      if (a.name === "color") return { location: a.location, components: 4, array: ff.arrays.color, normalized: true, current: ff.color };
+      const unit = +a.name.replace("texCoord", "");
+      return { location: a.location, components: a.components, array: ff.arrays.texcoord[unit], normalized: false, current: ff.texcoord[unit] };
+    });
+  }
+
+  // src/gles/page/gles_gpu_tables.js
+  var U = globalThis.GPUTextureUsage || { COPY_SRC: 1, COPY_DST: 2, TEXTURE_BINDING: 4, STORAGE_BINDING: 8, RENDER_ATTACHMENT: 16 };
+  var B = globalThis.GPUBufferUsage || {
+    MAP_READ: 1,
+    MAP_WRITE: 2,
+    COPY_SRC: 4,
+    COPY_DST: 8,
+    INDEX: 16,
+    VERTEX: 32,
+    UNIFORM: 64,
+    STORAGE: 128,
+    INDIRECT: 256,
+    QUERY_RESOLVE: 512
+  };
+  var COLOR_FORMAT = "rgba8unorm";
+  var BLEND_FACTORS2 = {
+    0: "zero",
+    1: "one",
+    768: "src",
+    769: "one-minus-src",
+    770: "src-alpha",
+    771: "one-minus-src-alpha",
+    772: "dst-alpha",
+    773: "one-minus-dst-alpha",
+    774: "dst",
+    775: "one-minus-dst",
+    776: "src-alpha-saturated",
+    32769: "constant",
+    32770: "one-minus-constant",
+    32771: "constant",
+    32772: "one-minus-constant"
+  };
+  var BLEND_OPS = { 32774: "add", 32778: "subtract", 32779: "reverse-subtract", 32775: "min", 32776: "max" };
+  var COMPARE = {
+    512: "never",
+    513: "less",
+    514: "equal",
+    515: "less-equal",
+    516: "greater",
+    517: "not-equal",
+    518: "greater-equal",
+    519: "always"
+  };
+  var STENCIL_OPS2 = {
+    0: "zero",
+    7680: "keep",
+    7681: "replace",
+    7682: "increment-clamp",
+    7683: "decrement-clamp",
+    5386: "invert",
+    34055: "increment-wrap",
+    34056: "decrement-wrap"
+  };
+  var WRAPS3 = { 10497: "repeat", 33071: "clamp-to-edge", 33648: "mirror-repeat", 33069: "clamp-to-edge" };
+  var align4 = (n) => n + 3 & ~3;
+  function blend_component(equation, src, dst) {
+    const operation = BLEND_OPS[equation] || "add";
+    if (operation === "min" || operation === "max") return { operation, srcFactor: "one", dstFactor: "one" };
+    return { operation, srcFactor: BLEND_FACTORS2[src], dstFactor: BLEND_FACTORS2[dst] };
+  }
+
+  // src/gles/page/gles3_pixels.js
+  var TEXEL_BYTES = {
+    "r8unorm": 1,
+    "r8snorm": 1,
+    "r8uint": 1,
+    "r8sint": 1,
+    "stencil8": 1,
+    "r16uint": 2,
+    "r16sint": 2,
+    "r16float": 2,
+    "rg8unorm": 2,
+    "rg8snorm": 2,
+    "rg8uint": 2,
+    "rg8sint": 2,
+    "depth16unorm": 2,
+    "r32uint": 4,
+    "r32sint": 4,
+    "r32float": 4,
+    "rg16uint": 4,
+    "rg16sint": 4,
+    "rg16float": 4,
+    "rgba8unorm": 4,
+    "rgba8unorm-srgb": 4,
+    "rgba8snorm": 4,
+    "rgba8uint": 4,
+    "rgba8sint": 4,
+    "rgb10a2unorm": 4,
+    "rgb10a2uint": 4,
+    "rg11b10ufloat": 4,
+    "rgb9e5ufloat": 4,
+    "depth24plus": 4,
+    "depth32float": 4,
+    "depth24plus-stencil8": 4,
+    "rg32uint": 8,
+    "rg32sint": 8,
+    "rg32float": 8,
+    "rgba16uint": 8,
+    "rgba16sint": 8,
+    "rgba16float": 8,
+    "depth32float-stencil8": 8,
+    "rgba32uint": 16,
+    "rgba32sint": 16,
+    "rgba32float": 16
+  };
+  var RENDERABLE = /* @__PURE__ */ new Set([
+    "r8unorm",
+    "r8uint",
+    "r8sint",
+    "rg8unorm",
+    "rg8uint",
+    "rg8sint",
+    "rgba8unorm",
+    "rgba8unorm-srgb",
+    "rgba8uint",
+    "rgba8sint",
+    "r16uint",
+    "r16sint",
+    "r16float",
+    "rg16uint",
+    "rg16sint",
+    "rg16float",
+    "rgba16uint",
+    "rgba16sint",
+    "rgba16float",
+    "r32uint",
+    "r32sint",
+    "r32float",
+    "rg32uint",
+    "rg32sint",
+    "rg32float",
+    "rgba32uint",
+    "rgba32sint",
+    "rgba32float",
+    "rgb10a2unorm",
+    "rgb10a2uint",
+    "depth16unorm",
+    "depth24plus",
+    "depth32float",
+    "depth24plus-stencil8",
+    "depth32float-stencil8",
+    "stencil8"
+  ]);
+  var DRAWN_DEPTH = /* @__PURE__ */ new Set(["depth24plus", "depth32float", "depth24plus-stencil8", "depth32float-stencil8"]);
+  var PACKED = /* @__PURE__ */ new Set([
+    F.UNSIGNED_SHORT_4_4_4_4,
+    F.UNSIGNED_SHORT_5_5_5_1,
+    F.UNSIGNED_SHORT_5_6_5,
+    F.UNSIGNED_INT_2_10_10_10_REV,
+    F.UNSIGNED_INT_10F_11F_11F_REV,
+    F.UNSIGNED_INT_5_9_9_9_REV,
+    F.UNSIGNED_INT_24_8,
+    F.FLOAT_32_UNSIGNED_INT_24_8_REV
+  ]);
+  var SAME_PACKING = {
+    [F.UNSIGNED_INT_2_10_10_10_REV]: ["rgb10a2unorm", "rgb10a2uint"],
+    [F.UNSIGNED_INT_10F_11F_11F_REV]: ["rg11b10ufloat"],
+    [F.UNSIGNED_INT_5_9_9_9_REV]: ["rgb9e5ufloat"]
+  };
+  function unpack_image(data, width, height, depth, format, type, store, three) {
+    const pixel = pixel_bytes(format, type);
+    const tight = width * pixel;
+    const row = Math.ceil((store.row_length > 0 ? store.row_length : width) * pixel / store.alignment) * store.alignment;
+    const image = row * (three && store.image_height > 0 ? store.image_height : height);
+    const start = (three ? store.skip_images * image : 0) + store.skip_rows * row + store.skip_pixels * pixel;
+    if (start === 0 && row === tight && image === tight * height && data.length >= tight * height * depth) {
+      return data.subarray(0, tight * height * depth);
+    }
+    const out = new Uint8Array(tight * height * depth);
+    for (let z = 0; z < depth; z++) {
+      for (let y = 0; y < height; y++) {
+        const from = start + z * image + y * row;
+        if (from >= data.length) return out;
+        out.set(data.subarray(from, Math.min(data.length, from + tight)), (z * height + y) * tight);
+      }
+    }
+    return out;
+  }
+  var f32 = new Float32Array(1);
+  var u32 = new Uint32Array(f32.buffer);
+  function to_half(value) {
+    f32[0] = value;
+    const x = u32[0];
+    const sign = x >>> 16 & 32768;
+    const exponent = x >>> 23 & 255, mantissa = x & 8388607;
+    if (exponent === 255) return sign | 31744 | (mantissa ? 512 : 0);
+    const e = exponent - 127 + 15;
+    if (e >= 31) return sign | 31744;
+    if (e <= 0) {
+      if (e < -10) return sign;
+      const m = (mantissa | 8388608) >> 1 - e;
+      return sign | m + 4096 >> 13;
+    }
+    const half = sign | e << 10 | mantissa >> 13;
+    return half + (mantissa >> 12 & 1);
+  }
+  function from_half(h) {
+    const s = h & 32768 ? -1 : 1, e = h >> 10 & 31, m = h & 1023;
+    if (e === 0) return s * m * 2 ** -24;
+    if (e === 31) return m ? NaN : s * Infinity;
+    return s * (1 + m / 1024) * 2 ** (e - 15);
+  }
+  function to_ufloat(value, mantissa_bits) {
+    if (!(value > 0)) return 0;
+    const max_exponent = 30;
+    if (value >= 2 ** 15 * (2 - 2 ** -mantissa_bits)) return max_exponent << mantissa_bits | (1 << mantissa_bits) - 1;
+    let e = Math.floor(Math.log2(value));
+    if (e < -14) return Math.round(value / 2 ** -14 * (1 << mantissa_bits)) & (1 << mantissa_bits) - 1;
+    let m = Math.round((value / 2 ** e - 1) * (1 << mantissa_bits));
+    if (m === 1 << mantissa_bits) {
+      m = 0;
+      e++;
+    }
+    return e + 15 << mantissa_bits | m;
+  }
+  function to_rgb9e5(r, g, b) {
+    const max = 65408;
+    const clamp = (v) => Math.min(max, Math.max(0, v || 0));
+    r = clamp(r);
+    g = clamp(g);
+    b = clamp(b);
+    const largest = Math.max(r, g, b);
+    let e = Math.max(-16, Math.floor(Math.log2(largest || 2 ** -16))) + 1 + 15;
+    let scale2 = 2 ** (e - 15 - 9);
+    if (Math.round(largest / scale2) === 512) {
+      e++;
+      scale2 *= 2;
+    }
+    return (Math.round(b / scale2) << 18 | Math.round(g / scale2) << 9 | Math.round(r / scale2) | e << 27) >>> 0;
+  }
+  function to_texels(tight, count, format, type, info) {
+    const target = info.webgpu;
+    if (!info.sized) return to_rgba8(format, type, count, 1, 1, tight);
+    if (DRAWN_DEPTH.has(target)) return null;
+    const texel = TEXEL_BYTES[target];
+    const pixel = pixel_bytes(format, type);
+    if (PACKED.has(type) ? (SAME_PACKING[type] || []).includes(target) : pixel === texel) return tight;
+    const view = new DataView(tight.buffer, tight.byteOffset, tight.byteLength);
+    const out = new Uint8Array(count * texel);
+    const o = new DataView(out.buffer);
+    const channels = {
+      [F.RED]: 1,
+      [F.RED_INTEGER]: 1,
+      [F.RG]: 2,
+      [F.RG_INTEGER]: 2,
+      [F.RGB]: 3,
+      [F.RGB_INTEGER]: 3,
+      [F.RGBA]: 4,
+      [F.RGBA_INTEGER]: 4,
+      [F.DEPTH_COMPONENT]: 1
+    }[format] || 4;
+    const out_channels = target.startsWith("rgba") ? 4 : target.startsWith("rg") && !target.startsWith("rgb") ? 2 : target.startsWith("r") ? 1 : 4;
+    switch (type) {
+      case F.UNSIGNED_SHORT_5_6_5:
+      case F.UNSIGNED_SHORT_4_4_4_4:
+      case F.UNSIGNED_SHORT_5_5_5_1:
+      case F.UNSIGNED_INT_2_10_10_10_REV: {
+        const rgba = type === F.UNSIGNED_INT_2_10_10_10_REV ? null : to_rgba8(F.RGBA, type, count, 1, 1, tight);
+        if (rgba) return rgba;
+        for (let i = 0; i < count; i++) {
+          const v = view.getUint32(4 * i, true);
+          out.set([
+            Math.round((v & 1023) * 255 / 1023),
+            Math.round((v >> 10 & 1023) * 255 / 1023),
+            Math.round((v >> 20 & 1023) * 255 / 1023),
+            (v >>> 30) * 85
+          ], 4 * i);
+        }
+        return out;
+      }
+    }
+    if (format === F.DEPTH_COMPONENT && target === "depth16unorm") {
+      for (let i = 0; i < count; i++) o.setUint16(2 * i, view.getUint32(4 * i, true) >>> 16, true);
+      return out;
+    }
+    if (target === "rg11b10ufloat" || target === "rgb9e5ufloat") {
+      const read = type === F.FLOAT ? (i, k) => view.getFloat32(12 * i + 4 * k, true) : (i, k) => from_half(view.getUint16(6 * i + 2 * k, true));
+      for (let i = 0; i < count; i++) {
+        const [r, g, b] = [read(i, 0), read(i, 1), read(i, 2)];
+        o.setUint32(4 * i, target === "rgb9e5ufloat" ? to_rgb9e5(r, g, b) : (to_ufloat(r, 6) | to_ufloat(g, 6) << 11 | to_ufloat(b, 5) << 22) >>> 0, true);
+      }
+      return out;
+    }
+    const half = target.includes("16float");
+    const size = type === F.FLOAT ? 4 : type === F.HALF_FLOAT || type === F.HALF_FLOAT_OES || type === F.SHORT || type === F.UNSIGNED_SHORT ? 2 : type === F.INT || type === F.UNSIGNED_INT ? 4 : 1;
+    const out_size = texel / out_channels;
+    const one = info.kind === "float" ? half ? [0, 60] : [0, 0, 128, 63] : info.kind === "unorm" ? [255] : info.kind === "snorm" ? [127] : [1, 0, 0, 0].slice(0, out_size);
+    for (let i = 0; i < count; i++) {
+      for (let k = 0; k < out_channels; k++) {
+        const at = (i * out_channels + k) * out_size;
+        if (k >= channels) {
+          if (k === 3) out.set(one, at);
+          continue;
+        }
+        const from = (i * channels + k) * size;
+        if (half && size === 4) o.setUint16(at, to_half(view.getFloat32(from, true)), true);
+        else out.set(tight.subarray(from, from + out_size), at);
+      }
+    }
+    return out;
+  }
+  function depth_values(tight, count, format, type) {
+    const view = new DataView(tight.buffer, tight.byteOffset, tight.byteLength);
+    const depth = new Float32Array(count);
+    const stencil = format === F.DEPTH_STENCIL ? new Uint8Array(count) : null;
+    for (let i = 0; i < count; i++) {
+      switch (type) {
+        case F.UNSIGNED_SHORT:
+          depth[i] = view.getUint16(2 * i, true) / 65535;
+          break;
+        case F.UNSIGNED_INT:
+          depth[i] = view.getUint32(4 * i, true) / 4294967295;
+          break;
+        case F.FLOAT:
+          depth[i] = Math.min(1, Math.max(0, view.getFloat32(4 * i, true)));
+          break;
+        case F.UNSIGNED_INT_24_8: {
+          const v = view.getUint32(4 * i, true);
+          depth[i] = (v >>> 8) / 16777215;
+          stencil[i] = v & 255;
+          break;
+        }
+        case F.FLOAT_32_UNSIGNED_INT_24_8_REV:
+          depth[i] = Math.min(1, Math.max(0, view.getFloat32(8 * i, true)));
+          stencil[i] = view.getUint32(8 * i + 4, true) & 255;
+          break;
+      }
+    }
+    return { depth, stencil };
+  }
+  function from_ufloat(v, bits) {
+    const e = v >> bits & 31, m = v & (1 << bits) - 1;
+    if (e === 0) return m * 2 ** -14 / (1 << bits);
+    if (e === 31) return m ? NaN : Infinity;
+    return (1 + m / (1 << bits)) * 2 ** (e - 15);
+  }
+  function decode_texels(raw, count, format) {
+    const view = new DataView(raw.buffer, raw.byteOffset, raw.byteLength);
+    const out = new Float64Array(count * 4);
+    const texel = TEXEL_BYTES[format];
+    const channels = format.startsWith("rgba") ? 4 : format.startsWith("rg") && !format.startsWith("rgb") ? 2 : 1;
+    const size = texel / channels;
+    const kind = format.includes("uint") ? "u" : format.includes("sint") ? "i" : format.includes("float") ? "f" : format.includes("snorm") ? "s" : "n";
+    for (let i = 0; i < count; i++) {
+      const at = i * texel, o = i * 4;
+      out[o + 3] = 1;
+      if (format === "rgb10a2unorm" || format === "rgb10a2uint") {
+        const v = view.getUint32(at, true);
+        const parts = [v & 1023, v >>> 10 & 1023, v >>> 20 & 1023, v >>> 30];
+        for (let k = 0; k < 4; k++) out[o + k] = format === "rgb10a2uint" ? parts[k] : parts[k] / (k === 3 ? 3 : 1023);
+        continue;
+      }
+      if (format === "rg11b10ufloat") {
+        const v = view.getUint32(at, true);
+        out[o] = from_ufloat(v & 2047, 6);
+        out[o + 1] = from_ufloat(v >>> 11 & 2047, 6);
+        out[o + 2] = from_ufloat(v >>> 22, 5);
+        continue;
+      }
+      if (format === "rgb9e5ufloat") {
+        const v = view.getUint32(at, true);
+        const scale2 = 2 ** ((v >>> 27) - 15 - 9);
+        out[o] = (v & 511) * scale2;
+        out[o + 1] = (v >>> 9 & 511) * scale2;
+        out[o + 2] = (v >>> 18 & 511) * scale2;
+        continue;
+      }
+      for (let k = 0; k < channels; k++) {
+        const p = at + k * size;
+        let value;
+        if (kind === "f") value = size === 2 ? from_half(view.getUint16(p, true)) : view.getFloat32(p, true);
+        else if (size === 1) value = kind === "i" || kind === "s" ? view.getInt8(p) : view.getUint8(p);
+        else if (size === 2) value = kind === "i" || kind === "s" ? view.getInt16(p, true) : view.getUint16(p, true);
+        else value = kind === "i" ? view.getInt32(p, true) : view.getUint32(p, true);
+        if (kind === "n") value /= 2 ** (8 * size) - 1;
+        else if (kind === "s") value = Math.max(-1, value / (2 ** (8 * size - 1) - 1));
+        out[o + k] = value;
+      }
+    }
+    return out;
+  }
+  function pack_pixels(values, width, height, format, type, store) {
+    const pixel = pixel_bytes(format, type);
+    const row = Math.ceil((store.row_length > 0 ? store.row_length : width) * pixel / store.alignment) * store.alignment;
+    const start = store.skip_rows * row + store.skip_pixels * pixel;
+    const out = new Uint8Array(width && height ? start + (height - 1) * row + width * pixel : 0);
+    const view = new DataView(out.buffer);
+    const order = {
+      [F.RED]: [0],
+      [F.RED_INTEGER]: [0],
+      [F.RG]: [0, 1],
+      [F.RG_INTEGER]: [0, 1],
+      [F.RGB]: [0, 1, 2],
+      [F.RGB_INTEGER]: [0, 1, 2],
+      [F.RGBA]: [0, 1, 2, 3],
+      [F.RGBA_INTEGER]: [0, 1, 2, 3],
+      [F.ALPHA]: [3],
+      [F.LUMINANCE]: [0],
+      [F.LUMINANCE_ALPHA]: [0, 3],
+      [F.BGRA_EXT]: [2, 1, 0, 3]
+    }[format] || [0, 1, 2, 3];
+    const integer = format === F.RED_INTEGER || format === F.RG_INTEGER || format === F.RGB_INTEGER || format === F.RGBA_INTEGER;
+    const clamp = (v, low) => Math.min(1, Math.max(low, v));
+    const unorm = (v, bits) => Math.round(clamp(v, 0) * (2 ** bits - 1));
+    for (let y = 0; y < height; y++) {
+      for (let x = 0; x < width; x++) {
+        const v = values.subarray((y * width + x) * 4, (y * width + x) * 4 + 4);
+        const at = start + y * row + x * pixel;
+        switch (type) {
+          case F.UNSIGNED_SHORT_5_6_5:
+            view.setUint16(at, unorm(v[0], 5) << 11 | unorm(v[1], 6) << 5 | unorm(v[2], 5), true);
+            continue;
+          case F.UNSIGNED_SHORT_4_4_4_4:
+            view.setUint16(at, unorm(v[0], 4) << 12 | unorm(v[1], 4) << 8 | unorm(v[2], 4) << 4 | unorm(v[3], 4), true);
+            continue;
+          case F.UNSIGNED_SHORT_5_5_5_1:
+            view.setUint16(at, unorm(v[0], 5) << 11 | unorm(v[1], 5) << 6 | unorm(v[2], 5) << 1 | unorm(v[3], 1), true);
+            continue;
+          case F.UNSIGNED_INT_2_10_10_10_REV: {
+            const p = integer ? v.map((c, k) => Math.min(k === 3 ? 3 : 1023, Math.max(0, c))) : v.map((c, k) => unorm(c, k === 3 ? 2 : 10));
+            view.setUint32(at, (p[0] | p[1] << 10 | p[2] << 20 | p[3] << 30) >>> 0, true);
+            continue;
+          }
+          case F.UNSIGNED_INT_10F_11F_11F_REV:
+            view.setUint32(at, (to_ufloat(v[0], 6) | to_ufloat(v[1], 6) << 11 | to_ufloat(v[2], 5) << 22) >>> 0, true);
+            continue;
+          case F.UNSIGNED_INT_5_9_9_9_REV:
+            view.setUint32(at, to_rgb9e5(v[0], v[1], v[2]), true);
+            continue;
+        }
+        order.forEach((channel, k) => {
+          const c = v[channel];
+          switch (type) {
+            case F.UNSIGNED_BYTE:
+              view.setUint8(at + k, integer ? c : unorm(c, 8));
+              break;
+            case F.BYTE:
+              view.setInt8(at + k, integer ? c : Math.round(clamp(c, -1) * 127));
+              break;
+            case F.UNSIGNED_SHORT:
+              view.setUint16(at + 2 * k, integer ? c : unorm(c, 16), true);
+              break;
+            case F.SHORT:
+              view.setInt16(at + 2 * k, integer ? c : Math.round(clamp(c, -1) * 32767), true);
+              break;
+            case F.UNSIGNED_INT:
+              view.setUint32(at + 4 * k, integer ? c >>> 0 : unorm(c, 32), true);
+              break;
+            case F.INT:
+              view.setInt32(at + 4 * k, integer ? c | 0 : Math.round(clamp(c, -1) * 2147483647), true);
+              break;
+            case F.HALF_FLOAT:
+            case F.HALF_FLOAT_OES:
+              view.setUint16(at + 2 * k, to_half(c), true);
+              break;
+            case F.FLOAT:
+              view.setFloat32(at + 4 * k, c, true);
+              break;
+          }
+        });
+      }
+    }
+    return out;
+  }
+
+  // src/gles/page/gles3_executor.js
+  var SCRIPT = typeof document !== "undefined" && document.currentScript ? document.currentScript.src : null;
+  var NAGA_URL = SCRIPT ? new URL("vx_naga.wasm", SCRIPT).href : "vx_naga.wasm";
+  var NO_DEPTH = 2;
+  var GL_DEPTH = 8;
+  var ELEMENTS = 300;
+  var ELEMENTS_END = 960;
+  var NEAREST = 9728;
+  var LINEAR = 9729;
+  var NEAREST_MIPMAP_NEAREST = 9984;
+  var RESTART = 36201;
+  var CULL_FACE = 2884;
+  var BLEND = 3042;
+  var DEPTH_TEST = 2929;
+  var STENCIL_TEST = 2960;
+  var SCISSOR_TEST = 3089;
+  var POLYGON_OFFSET_FILL = 32823;
+  var COMPARE_REF_TO_TEXTURE = 34894;
+  var decoded_format = (compressed) => compressed.webgpu.endsWith("-srgb") ? "rgba8unorm-srgb" : compressed.webgpu.startsWith("eac-") ? "rgba16float" : "rgba8unorm";
+  var alpha_less = (internal, webgpu) => {
+    const info = format_info(internal);
+    return !!info && info.bits[3] === 0 && info.bits[0] > 0 && info.kind !== "depth" && info.kind !== "depth_stencil" && /^(rgba|bgra)/.test(webgpu);
+  };
+  var STENCIL_INDEX = 6401;
+  var TOPOLOGY = ["point-list", "line-list", "line-list", "line-strip", "triangle-list", "triangle-strip", "triangle-list"];
+  var INDEX_BYTES = { 5121: 1, 5123: 2, 5125: 4 };
+  var STRIP_END = 4294967295;
+  var SAMPLER_SLOT = /* @__PURE__ */ new Map([
+    [35678, 0],
+    [35682, 0],
+    [36298, 0],
+    [36306, 0],
+    [35680, 1],
+    [36293, 1],
+    [36300, 1],
+    [36308, 1],
+    [36198, 2],
+    [35679, 3],
+    [36299, 3],
+    [36307, 3],
+    [36289, 4],
+    [36292, 4],
+    [36303, 4],
+    [36311, 4],
+    [37128, 5],
+    [37129, 5],
+    [37130, 5],
+    [36876, 6],
+    [36877, 6],
+    [36878, 6],
+    [36879, 6]
+  ]);
+  var SLOT_TARGET = [GL3.TEXTURE_2D, GL3.TEXTURE_CUBE_MAP, GL3.TEXTURE_EXTERNAL_OES, GL3.TEXTURE_3D, GL3.TEXTURE_2D_ARRAY, 37120, 36873];
+  var NO_SAMPLER = { min_filter: NEAREST, mag_filter: NEAREST, wrap_s: 33071, wrap_t: 33071, wrap_r: 33071, compare_func: 515 };
+  var VK_WRAP = { 10497: 0, 33648: 1, 33071: 2, 33069: 3 };
+  var ADVANCED_INDEX = new Map(ADVANCED_BLEND.map(([e], i) => [e, i]));
+  var advanced_blend = (c) => c.version >= 32 && c.enabled.has(BLEND) && ADVANCED_INDEX.has(c.blend_equation[0]) ? ADVANCED_INDEX.get(c.blend_equation[0]) : -1;
+  var BORDER_COLOR = 2147483648;
+  var STORAGE_FORMATS = /* @__PURE__ */ new Set([
+    "rgba8unorm",
+    "rgba8snorm",
+    "rgba8uint",
+    "rgba8sint",
+    "rgba16uint",
+    "rgba16sint",
+    "rgba16float",
+    "r32uint",
+    "r32sint",
+    "r32float",
+    "rg32uint",
+    "rg32sint",
+    "rg32float",
+    "rgba32uint",
+    "rgba32sint",
+    "rgba32float"
+  ]);
+  var RENDERBUFFER_WEBGPU = { 36168: "stencil8", 33191: "depth32float" };
+  var VK_FORMAT = {
+    "float32": 100,
+    "float32x2": 103,
+    "float32x3": 106,
+    "float32x4": 109,
+    "sint32": 99,
+    "sint32x2": 102,
+    "sint32x3": 105,
+    "sint32x4": 108,
+    "uint32": 98,
+    "uint32x2": 101,
+    "uint32x3": 104,
+    "uint32x4": 107,
+    "unorm8x2": 16,
+    "snorm8x2": 17,
+    "uint8x2": 20,
+    "sint8x2": 21,
+    "unorm8x4": 37,
+    "snorm8x4": 38,
+    "uint8x4": 41,
+    "sint8x4": 42,
+    "unorm16x2": 77,
+    "snorm16x2": 78,
+    "uint16x2": 81,
+    "sint16x2": 82,
+    "float16x2": 83,
+    "unorm16x4": 91,
+    "snorm16x4": 92,
+    "uint16x4": 95,
+    "sint16x4": 96,
+    "float16x4": 97
+  };
+  var TYPE_BYTES = {
+    5120: 1,
+    5121: 1,
+    5122: 2,
+    5123: 2,
+    5124: 4,
+    5125: 4,
+    5126: 4,
+    5132: 4,
+    5131: 2,
+    36193: 2,
+    36255: 4,
+    33640: 4
+  };
+  var INT_2_10_10_10_REV = 36255;
+  var UNSIGNED_INT_2_10_10_10_REV = 33640;
+  var packed_attribute = (type) => type === INT_2_10_10_10_REV || type === UNSIGNED_INT_2_10_10_10_REV;
+  var CPU_FORMAT = { f: "float32", i: "sint32", u: "uint32" };
+  var UNSIZED_EXTENSIONS = {
+    [F.RGBA]: { [F.FLOAT]: 34836, [F.HALF_FLOAT_OES]: 34842 },
+    [F.RGB]: { [F.FLOAT]: 34837, [F.HALF_FLOAT_OES]: 34843 },
+    [F.DEPTH_COMPONENT]: { [F.UNSIGNED_SHORT]: 33189, [F.UNSIGNED_INT]: 33190 },
+    [F.DEPTH_STENCIL]: { [F.UNSIGNED_INT_24_8]: 35056 }
+  };
+  function image_internal(image) {
+    if (image.internal) return image.internal;
+    const own = UNSIZED_EXTENSIONS[image.format] && UNSIZED_EXTENSIONS[image.format][image.type];
+    if (own) return own;
+    const sized = tex_image_format(image.format, image.format, image.type);
+    return sized.error ? image.format : sized.internal;
+  }
+  var UNUSED_INPUT = { enabled: false, current: [0, 0, 0, 1] };
+  var NO_STORE = { row_length: 0, image_height: 0, skip_pixels: 0, skip_rows: 0, skip_images: 0 };
+  var cpu_bytes = (buffer) => buffer.bytes || buffer.data || null;
+  function direct_format(a, kind) {
+    const n = a.size, t = a.type;
+    if (kind === "f") {
+      if (a.integer) return null;
+      if (t === 5126) return n === 1 ? "float32" : "float32x" + n;
+      if (t === 5131 || t === 36193) return n === 2 || n === 4 ? "float16x" + n : null;
+      if (!a.normalized) return null;
+      const name = { 5121: "unorm8", 5120: "snorm8", 5123: "unorm16", 5122: "snorm16" }[t];
+      return name && (n === 2 || n === 4) ? name + "x" + n : null;
+    }
+    if (!a.integer) return null;
+    const signed = t === 5120 || t === 5122 || t === 5124;
+    if (signed !== (kind === "i")) return null;
+    const prefix = signed ? "sint" : "uint";
+    if (t === 5124 || t === 5125) return n === 1 ? prefix + "32" : prefix + "32x" + n;
+    return n === 2 || n === 4 ? prefix + (t === 5120 || t === 5121 ? "8x" : "16x") + n : null;
+  }
+  function read_component(view, p, type, normalized) {
+    switch (type) {
+      case 5126:
+        return view.getFloat32(p, true);
+      case 5132:
+        return view.getInt32(p, true) / 65536;
+      case 5131:
+      case 36193:
+        return from_half(view.getUint16(p, true));
+      case 5121:
+        return normalized ? view.getUint8(p) / 255 : view.getUint8(p);
+      case 5120:
+        return normalized ? Math.max(-1, view.getInt8(p) / 127) : view.getInt8(p);
+      case 5123:
+        return normalized ? view.getUint16(p, true) / 65535 : view.getUint16(p, true);
+      case 5122:
+        return normalized ? Math.max(-1, view.getInt16(p, true) / 32767) : view.getInt16(p, true);
+      case 5125:
+        return normalized ? view.getUint32(p, true) / 4294967295 : view.getUint32(p, true);
+      case 5124:
+        return normalized ? Math.max(-1, view.getInt32(p, true) / 2147483647) : view.getInt32(p, true);
+    }
+    return 0;
+  }
+  function read_packed(view, p, type, normalized) {
+    const v = view.getUint32(p, true);
+    const parts = [v & 1023, v >>> 10 & 1023, v >>> 20 & 1023, v >>> 30];
+    if (type === UNSIGNED_INT_2_10_10_10_REV) return normalized ? parts.map((x, i) => x / (i === 3 ? 3 : 1023)) : parts;
+    const signed = parts.map((x, i) => i === 3 ? x >= 2 ? x - 4 : x : x >= 512 ? x - 1024 : x);
+    return normalized ? signed.map((x, i) => Math.max(-1, x / (i === 3 ? 1 : 511))) : signed;
+  }
+  function texture_type(type) {
+    const m = /^texture_(depth_)?(multisampled_)?(1d|2d_array|2d|3d|cube_array|cube)(?:<(\w+)>)?/.exec(type || "");
+    if (!m) return { dimension: "2d", sample: "float", multisampled: false };
+    return { dimension: m[3].replace("_", "-"), multisampled: !!m[2], sample: m[1] ? "depth" : m[4] === "i32" ? "sint" : m[4] === "u32" ? "uint" : "float" };
+  }
+  function wgsl_declarations(wgsl) {
+    const declarations = /* @__PURE__ */ new Map();
+    for (const m of wgsl.matchAll(/@group\((\d+)\)\s*@binding\((\d+)\)\s*var(?:<[^>]*>)?\s+\w+\s*:\s*([^;]+);/g)) {
+      declarations.set(m[1] + ":" + m[2], m[3].trim());
+    }
+    return declarations;
+  }
+  function fragment_outputs(wgsl) {
+    const outputs = /* @__PURE__ */ new Map();
+    const at = wgsl.indexOf("@fragment");
+    const signature = at < 0 ? null : /->\s*([^{]+)\{/.exec(wgsl.slice(at));
+    if (!signature) return outputs;
+    const result = signature[1].trim();
+    const single = /^@location\((\d+)\)\s*(?:@\w+(?:\([^)]*\))?\s*)*([\w<>]+)/.exec(result);
+    if (single) {
+      outputs.set(+single[1], single[2]);
+      return outputs;
+    }
+    const body = new RegExp("struct\\s+" + result + "\\s*\\{([^}]*)\\}").exec(wgsl);
+    for (const m of body ? body[1].matchAll(/@location\((\d+)\)\s*(?:@\w+(?:\([^)]*\))?\s*)*\w+\s*:\s*([\w<>]+)/g) : []) {
+      outputs.set(+m[1], m[2]);
+    }
+    return outputs;
+  }
+  function spirv_binding(binding) {
+    if (binding >= ELEMENTS && binding < ELEMENTS_END) return { b: binding - ELEMENTS >> 5, e: binding - ELEMENTS >> 1 & 15 };
+    return { b: binding >> 1, e: 0 };
+  }
+  function writable_aliases(group) {
+    const ranges = [], views = [];
+    for (const g of group.groups) {
+      g.entries.forEach((entry, i) => {
+        const resource = g.resources[i].resource;
+        if (entry.buffer && entry.buffer.type !== "uniform") ranges.push({ resource, writable: entry.buffer.type === "storage" });
+        if (entry.storageTexture) views.push({ resource, writable: entry.storageTexture.access !== "read-only" });
+      });
+    }
+    const overlap = (a, b) => a.resource.buffer === b.resource.buffer && a.resource.offset < b.resource.offset + b.resource.size && b.resource.offset < a.resource.offset + a.resource.size;
+    return ranges.some((a, i) => ranges.some((b, k) => k > i && (a.writable || b.writable) && overlap(a, b))) || views.some((a, i) => views.some((b, k) => k > i && (a.writable || b.writable) && a.resource === b.resource));
+  }
+  var read_framebuffer = (c) => c.read_framebuffer === void 0 ? c.framebuffer : c.read_framebuffer;
+  function format_kind(format) {
+    if (format.startsWith("depth") || format.startsWith("stencil")) return "depth";
+    return format.includes("uint") ? "u" : format.includes("sint") ? "i" : "f";
+  }
+  var blendable = (format) => format_kind(format) === "f" && !format.includes("32float");
+  function copy_map(info) {
+    const [r, , , a] = info.bits;
+    if (info.value === F.LUMINANCE) return { m: [1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], b: [0, 0, 0, 1] };
+    if (info.value === F.ALPHA) return { m: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], b: [0, 0, 0, 0] };
+    if (info.value === F.LUMINANCE_ALPHA) return { m: [1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], b: [0, 0, 0, 0] };
+    if (r && !a && info.kind !== "int" && info.kind !== "uint") return { m: [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0], b: [0, 0, 0, 1] };
+    return null;
+  }
+  function index_list(indices, mode, restart) {
+    let low = Infinity, high = -1;
+    for (const v of indices) if (v !== restart) {
+      if (v < low) low = v;
+      if (v > high) high = v;
+    }
+    if (high < 0) return null;
+    const strip = mode === 3 || mode === 5;
+    const out = [];
+    const piece = (from, to) => {
+      const n = to - from;
+      const at = (i) => indices[from + i] - low;
+      switch (mode) {
+        case 0:
+        case 1:
+        case 4: {
+          const per = mode === 0 ? 1 : mode === 1 ? 2 : 3;
+          for (let i = 0; i < n - n % per; i++) out.push(at(i));
+          break;
+        }
+        case 3:
+        case 5:
+          if (n < (mode === 3 ? 2 : 3)) break;
+          if (out.length) out.push(STRIP_END);
+          for (let i = 0; i < n; i++) out.push(at(i));
+          break;
+        case 2:
+          if (n < 2) break;
+          for (let i = 0; i < n; i++) out.push(at(i), at((i + 1) % n));
+          break;
+        case 6:
+          for (let i = 1; i + 1 < n; i++) out.push(at(0), at(i), at(i + 1));
+          break;
+      }
+    };
+    let start = 0;
+    for (let i = 0; i <= indices.length; i++) {
+      if (i === indices.length || indices[i] === restart) {
+        piece(start, i);
+        start = i + 1;
+      }
+    }
+    return { list: new Uint32Array(out), low, high, topology: TOPOLOGY[mode], strip };
+  }
+  var PATCHES2 = 14;
+  var PATCH_VERTICES = 3;
+  var PRIMITIVE_VERTICES = { 0: 1, 1: 2, 2: 2, 3: 2, 4: 3, 5: 3, 6: 3, 10: 4, 11: 4, 12: 6, 13: 6 };
+  function primitives_of(indices, mode, restart) {
+    const per = PRIMITIVE_VERTICES[mode];
+    const out = [];
+    const piece = (v) => {
+      const n = v.length;
+      switch (mode) {
+        case 0:
+        case 1:
+        case 4:
+        case 10:
+        case 12:
+          for (let i = 0; i + per <= n; i += per) for (let k = 0; k < per; k++) out.push(v[i + k]);
+          break;
+        case 3:
+          for (let i = 0; i + 1 < n; i++) out.push(v[i], v[i + 1]);
+          break;
+        case 2:
+          if (n >= 2) for (let i = 0; i < n; i++) out.push(v[i], v[(i + 1) % n]);
+          break;
+        case 5:
+          for (let i = 0; i + 2 < n; i++) i % 2 ? out.push(v[i + 1], v[i], v[i + 2]) : out.push(v[i], v[i + 1], v[i + 2]);
+          break;
+        case 6:
+          for (let i = 1; i + 1 < n; i++) out.push(v[0], v[i], v[i + 1]);
+          break;
+        case 11:
+          for (let i = 1; i + 2 < n; i++) out.push(v[i - 1], v[i], v[i + 1], v[i + 2]);
+          break;
+        case 13: {
+          const m = n >= 6 ? n - 4 >> 1 : 0;
+          const at = (k) => v[k - 1];
+          for (let i = 0; i < m; i++) {
+            const last = i === m - 1, even = i % 2 === 0;
+            const [a, b, c] = even ? [2 * i + 1, 2 * i + 3, 2 * i + 5] : [2 * i + 3, 2 * i + 1, 2 * i + 5];
+            const ab = i === 0 ? 2 : 2 * i - 1;
+            const bc = even ? last ? 2 * i + 6 : 2 * i + 7 : 2 * i + 4;
+            const ca = even ? 2 * i + 4 : last ? 2 * i + 6 : 2 * i + 7;
+            out.push(at(a), at(ab), at(b), at(bc), at(c), at(ca));
+          }
+          break;
+        }
+      }
+    };
+    let start = 0;
+    for (let i = 0; i <= indices.length; i++) {
+      if (i === indices.length || indices[i] === restart) {
+        piece(Array.prototype.slice.call(indices, start, i));
+        start = i + 1;
+      }
+    }
+    return { vertices: new Uint32Array(out), per };
+  }
+  function matched_interpolation(vertex_wgsl, inputs) {
+    return vertex_wgsl.replace(
+      /^(\s+@location\((\d+)\)\s*)(?:@interpolate\([^)]*\)\s*)?/gm,
+      (all, head, location) => inputs.has(+location) ? head + (inputs.get(+location) ? inputs.get(+location) + " " : "") : all
+    );
+  }
+  function fragment_inputs(wgsl) {
+    const inputs = /* @__PURE__ */ new Map();
+    const at = wgsl.indexOf("@fragment");
+    const signature = at < 0 ? null : /\(([^{]*)\)\s*(?:->[^{]*)?\{/.exec(wgsl.slice(at));
+    for (const m of signature ? signature[1].matchAll(/@location\((\d+)\)\s*((?:@\w+(?:\([^)]*\))?\s*)*)\w+\s*:/g) : []) {
+      inputs.set(+m[1], m[2].trim());
+    }
+    return inputs;
+  }
+  var GLES3 = {
+    // ---- vx_naga
+    /** vx_naga.wasm, fetched once (a batch with a program link waits for it) */
+    async load_naga() {
+      if (this.naga) return this.naga;
+      this.naga_loading = this.naga_loading || (async () => {
+        const response = await fetch(this.naga_url || globalThis["V86VenusNagaUrl"] || NAGA_URL);
+        if (!response.ok) throw new Error("vx_naga.wasm: " + response.status);
+        const { instance } = await WebAssembly.instantiate(await response.arrayBuffer(), {});
+        this.naga = instance.exports;
+      })();
+      await this.naga_loading;
+      return this.naga;
+    },
+    /** SPIR-V words as vx_naga's answer: {wgsl, entries, intsamples} or {error} */
+    translate_spirv(words, flags, wraps) {
+      const naga = this.naga;
+      const bytes = new Uint8Array(words.buffer, words.byteOffset, words.byteLength);
+      const input = naga.vx_alloc(bytes.length);
+      new Uint8Array(naga.memory.buffer, input, bytes.length).set(bytes);
+      const list = wraps.length ? naga.vx_alloc(wraps.length * 8) : 0;
+      if (list) new Uint32Array(naga.memory.buffer, list, wraps.length * 2).set(wraps.flat());
+      let out;
+      try {
+        out = naga.vx_translate(input, bytes.length, 1, 0, flags, 0, 0, list, wraps.length);
+      } finally {
+        naga.vx_free(input, bytes.length);
+        if (list) naga.vx_free(list, wraps.length * 8);
+      }
+      const length = new DataView(naga.memory.buffer).getUint32(out, true);
+      const json = new TextDecoder().decode(new Uint8Array(naga.memory.buffer, out + 4, length));
+      naga.vx_free(out, length + 4);
+      return JSON.parse(json);
+    },
+    /** A note of what a draw could not do (the stats' `gles3`: each kind counted) */
+    note3(what) {
+      const notes = this.stats.gles3 = this.stats.gles3 || {};
+      notes[what] = (notes[what] || 0) + 1;
+      return null;
+    },
+    /** The program's GPU side (its `gpu`, which snapshots leave out): made again after each link */
+    program_gpu(program) {
+      if (!program.gpu || program.gpu.info !== program.info) {
+        program.gpu = { info: program.info, translations: /* @__PURE__ */ new Map(), shaders: /* @__PURE__ */ new Map(), inputs: null, uniforms: null };
+      }
+      return program.gpu;
+    },
+    translation3(program, index, flags, wraps) {
+      const gpu = this.program_gpu(program);
+      const key = index + ":" + flags + ":" + wraps.flat().join(",");
+      let t = gpu.translations.get(key);
+      if (!t) {
+        const start = performance.now();
+        t = this.translate_spirv(program.info.spirv[index].words, flags, wraps);
+        this.stats.translations = (this.stats.translations || 0) + 1;
+        this.stats.translate_ms = (this.stats.translate_ms || 0) + performance.now() - start;
+        gpu.translations.set(key, t);
+      }
+      return t;
+    },
+    /** A shader module of WGSL (cached by its code) */
+    module3(code) {
+      let m = this.shaders.get(code);
+      if (!m) this.shaders.set(code, m = this.device.createShaderModule({ label: "GLES 3 program", code: "diagnostic(off, derivative_uniformity);\n" + code }));
+      return m;
+    },
+    /**
+     * The programs of a draw's stages: the current program for both, or the
+     * bound pipeline's (GLES 3.1's separable programs), or null
+     * @return {?{vertex: !Object, fragment: !Object}}
+     */
+    stages3(c) {
+      const ok = (p) => p && p.kind === "program" && p.info && p.info.ok && p.info.spirv ? p : null;
+      if (c.program) return ok(c.group.objects.get(c.program)) && { vertex: c.group.objects.get(c.program), fragment: c.group.objects.get(c.program) };
+      const pipeline = c.program_pipelines && c.program_pipelines.get(c.program_pipeline);
+      if (!pipeline) return null;
+      const vertex = ok(c.group.objects.get(pipeline.stages[1])), fragment = ok(c.group.objects.get(pipeline.stages[2]));
+      return vertex && fragment ? { vertex, fragment } : null;
+    },
+    /**
+     * The bindings translations use: by group and binding, with their WGSL
+     * types, the stages that see them (`visibility`) and the program whose
+     * state they bind
+     * @param {!Array<!Array<*>>} list [translation, visibility, program]
+     */
+    bindings3(list) {
+      const bindings = /* @__PURE__ */ new Map();
+      for (const [t, visibility, program] of list) {
+        const declarations = wgsl_declarations(t.wgsl);
+        for (const [group, binding, kind, size] of t.entries[0].bindings) {
+          const key = group + ":" + binding;
+          const b = bindings.get(key) || { group, binding, kind, size: 0, visibility: 0, type: declarations.get(key), program };
+          b.size = Math.max(b.size, size);
+          b.visibility |= visibility;
+          bindings.set(key, b);
+        }
+      }
+      return [...bindings.values()].sort((a, b) => a.group - b.group || a.binding - b.binding);
+    },
+    /**
+     * The shader modules of a draw's stages (one program's, or a pipeline's):
+     * the fragment depth output kept only with a depth attachment, integer
+     * textures fetched by their samplers' wraps
+     * @param {{vertex: !Object, fragment: !Object}} stages stages3's
+     * @return {?{vertex: !Object, fragment: !Object, bindings: !Array<!Object>, outputs: !Map<number, string>, id: string}}
+     */
+    program3(c, stages, target) {
+      if (!this.naga) return this.note3("vx_naga not loaded");
+      const v = stages.vertex.info.spirv.findIndex((m) => m.stage === "vertex"), f = stages.fragment.info.spirv.findIndex((m) => m.stage === "fragment");
+      if (v < 0 || f < 0) return this.note3("a program without a vertex or fragment shader");
+      const fragment_flags = target.depth ? 0 : NO_DEPTH;
+      const translate2 = (vw, fw) => [this.translation3(stages.vertex, v, GL_DEPTH, vw), this.translation3(stages.fragment, f, fragment_flags, fw)];
+      const borders = [this.border_wraps3(c, stages.vertex, 0), this.border_wraps3(c, stages.fragment, stages.fragment.separable ? 1 : 0)];
+      let ts = translate2(borders[0], borders[1]);
+      const failed = ts.find((t) => t.error);
+      if (failed) return this.note3("vx_naga: " + failed.error.slice(0, 160));
+      const wraps = ts.map((t, i) => t.intsamples && t.intsamples.length ? this.int_wraps3(c, i ? stages.fragment : stages.vertex, t.intsamples) : []);
+      const gpu = this.program_gpu(stages.vertex);
+      const key = this.id_of(stages.fragment) + ":" + fragment_flags + ":" + wraps.concat(borders).map((w) => w.flat().join(",")).join("/");
+      let shaders = gpu.shaders.get(key);
+      if (shaders) return shaders;
+      if (wraps.some((w) => w.length)) ts = translate2(wraps[0].concat(borders[0]), wraps[1].concat(borders[1]));
+      if (ts.some((t) => t.error)) return this.note3("vx_naga: " + ts.find((t) => t.error).error.slice(0, 160));
+      shaders = {
+        vertex: { module: this.module3(matched_interpolation(ts[0].wgsl, fragment_inputs(ts[1].wgsl))), entry: ts[0].entries[0].name },
+        // (flat inputs: draws reorder their primitives for GL's provoking vertex, draw3)
+        flat: [...fragment_inputs(ts[1].wgsl).values()].some((i) => /\bflat\b/.test(i)),
+        fragment: {
+          module: this.module3(ts[1].wgsl),
+          entry: ts[1].entries[0].name,
+          wgsl: ts[1].wgsl,
+          // (the sample count, specialization constant 71: glsl_es_rewrite.js's sample functions)
+          samples_constant: (ts[1].overrides || []).some((o) => o[0] === SAMPLES_CONSTANT),
+          blend_constant: (ts[1].overrides || []).some((o) => o[0] === BLEND_CONSTANT)
+        },
+        bindings: this.bindings3([[ts[0], 1, stages.vertex], [ts[1], 2, stages.fragment]]),
+        outputs: fragment_outputs(ts[1].wgsl)
+      };
+      shaders.id = this.id_of(shaders.vertex.module) + ":" + this.id_of(shaders.fragment.module);
+      gpu.shaders.set(key, shaders);
+      return shaders;
+    },
+    /** The vertex shader's inputs: location, kind ("f", "i", "u") and components, matrices by column */
+    inputs3(program) {
+      const gpu = this.program_gpu(program);
+      if (gpu.inputs) return gpu.inputs;
+      const inputs = [];
+      for (const a of program.info.attributes) {
+        if (a.location < 0) continue;
+        const t = gl_type(a.type);
+        const kind = t.base === "int" ? "i" : t.base === "uint" ? "u" : "f";
+        const columns = t.columns || 1, components = t.columns ? t.rows : t.components;
+        for (let e = 0; e < a.size; e++) {
+          for (let k = 0; k < columns; k++) inputs.push({ location: a.location + e * columns + k, kind, components });
+        }
+      }
+      for (const u of program.info.unused_inputs || []) inputs.push(Object.assign({ unused: true }, u));
+      return gpu.inputs = inputs;
+    },
+    // ---- buffers
+    /**
+     * A GL buffer's GPU buffer, the CPU side's changes copied in first
+     * @param {number=} minimum the bytes it holds at least (a binding's
+     *     least size past the GL buffer's end)
+     */
+    gpu_buffer(buffer, minimum = 0) {
+      const size = Math.max(16, Math.ceil(Math.max(buffer.size, minimum) / 16) * 16);
+      let gpu = buffer.gpu;
+      if (!gpu || gpu.size < size) {
+        const created = this.device.createBuffer({
+          label: "GL buffer",
+          size,
+          usage: B.VERTEX | B.INDEX | B.UNIFORM | B.STORAGE | B.COPY_SRC | B.COPY_DST | B.INDIRECT
+        });
+        if (gpu) {
+          if (buffer.gpu_newer) {
+            this.end_pass();
+            this.encoder.copyBufferToBuffer(gpu.buffer, 0, created, 0, gpu.size);
+          }
+          this.staging.push(gpu.buffer);
+        }
+        if (!gpu || !buffer.gpu_newer) buffer.dirty = [0, buffer.size];
+        buffer.gpu = gpu = { buffer: created, size, destroy: () => created.destroy() };
+      }
+      if (buffer.dirty) {
+        const [low, high] = buffer.dirty;
+        buffer.dirty = null;
+        const bytes = cpu_bytes(buffer);
+        if (bytes && high > low) this.write_gpu_buffer(gpu.buffer, low, high - low, bytes, low, buffer.size);
+      }
+      return gpu;
+    },
+    /**
+     * Bytes into a GPU buffer, in order with the draws (a staging buffer
+     * copied in the encoder); the range widened to whole words from
+     * `source`, and past the GL buffer's end (a size not a whole number of
+     * words: a 6-byte index buffer) with zeros
+     * @param {!Uint8Array} source holds the bytes, `at` the first's index
+     * @param {number} end the GL buffer's size
+     */
+    write_gpu_buffer(target, offset, length, source, at, end) {
+      const low = offset & ~3, high = align4(offset + length);
+      const before = offset - low, after = offset + length >= end ? 0 : high - offset - length;
+      if (at - before < 0 || at + length + after > source.length) return this.note3("an unaligned buffer write");
+      this.end_pass();
+      const staging = this.device.createBuffer({ label: "GLES buffer upload", size: Math.max(4, high - low), usage: B.COPY_SRC, mappedAtCreation: true });
+      new Uint8Array(staging.getMappedRange()).set(source.subarray(at - before, at + length + after));
+      staging.unmap();
+      this.encoder.copyBufferToBuffer(staging, 0, target, low, high - low);
+      this.staging.push(staging);
+      return void 0;
+    },
+    /**
+     * The guest wrote `length` bytes of a buffer at `offset` (`data`: them):
+     * the CPU side's copy has them, the GPU buffer gets them before its next
+     * use, or now if the GPU's copy is the newer one
+     */
+    buffer_written(buffer, offset, length, data) {
+      if (!buffer || length <= 0) return;
+      if (buffer.gpu_newer) {
+        const gpu = this.gpu_buffer(buffer);
+        if (data) this.write_gpu_buffer(gpu.buffer, offset, length, data, 0, buffer.size);
+        return;
+      }
+      if (!buffer.gpu) return;
+      buffer.dirty = buffer.dirty ? [Math.min(buffer.dirty[0], offset), Math.max(buffer.dirty[1], offset + length)] : [offset, offset + length];
+    },
+    /** The buffer bound to a target (GLES 3.0's targets and 3.1's) */
+    buffer_of3(c, target) {
+      const which = {
+        34962: "array",
+        34963: "element",
+        36662: "copy_read",
+        36663: "copy_write",
+        35051: "pixel_pack",
+        35052: "pixel_unpack",
+        35982: "transform_feedback",
+        35345: "uniform",
+        37074: "shader_storage",
+        37568: "atomic_counter",
+        37102: "dispatch_indirect",
+        36671: "draw_indirect"
+      }[target];
+      const name = which === "array" ? c.array_buffer : which === "element" ? c.element_array_buffer : which ? c.buffers[which] : 0;
+      return name ? c.group.buffers.get(name) || null : null;
+    },
+    /** A zero buffer of at least `size` bytes (what an unbound uniform block reads) */
+    zeros3(size) {
+      size = Math.max(256, Math.ceil(size / 256) * 256);
+      if (!this.zero_buffer || this.zero_buffer.size < size) {
+        if (this.zero_buffer) this.staging.push(this.zero_buffer);
+        this.zero_buffer = this.device.createBuffer({ label: "GLES zeros", size, usage: B.UNIFORM | B.STORAGE | B.VERTEX });
+      }
+      return this.zero_buffer;
+    },
+    /**
+     * A buffer of at least `size` bytes that writes go to and nothing reads
+     * (an unbound storage block's or atomic counters'), one of its own each:
+     * WebGPU refuses two writable bindings of one buffer's range
+     */
+    discard3(size) {
+      const buffer = this.device.createBuffer({ label: "GLES discarded writes", size: Math.max(16, align4(size)), usage: B.STORAGE });
+      this.staging.push(buffer);
+      return buffer;
+    },
+    // ---- textures
+    /**
+     * A texture's GPU texture: its format's, as large as the lowest level
+     * given (GPU level 0 is that GL level, `first`) with a full chain (an
+     * immutable texture's levels); made again when those change, the levels
+     * that still fit copied over
+     */
+    gpu_texture3(texture) {
+      const cube = texture.target === GL3.TEXTURE_CUBE_MAP, three = texture.target === GL3.TEXTURE_3D;
+      const array = texture.target === GL3.TEXTURE_2D_ARRAY || texture.target === 36873;
+      let first = -1, base = null;
+      for (let level = 0; level < 32 && !base; level++) {
+        for (let face = 0; face < (cube ? 6 : 1) && !base; face++) {
+          const image = texture.images.get(face * 32 + level);
+          if (image && image.width && image.height) {
+            first = level;
+            base = image;
+          }
+        }
+      }
+      if (!base) return null;
+      const internal = image_internal(base);
+      const compressed = COMPRESSED_FORMATS.get(internal);
+      const info = format_info(internal);
+      const width = base.width, height = base.height;
+      const feature = compressed && this.device.features && this.device.features.has(compressed.astc ? "texture-compression-astc" : "texture-compression-etc2");
+      const whole = compressed && width % compressed.block_width === 0 && height % compressed.block_height === 0;
+      const native = feature && whole;
+      const decoded = feature && !whole ? decoded_format(compressed) : null;
+      const format = compressed ? native ? compressed.webgpu : decoded || COLOR_FORMAT : info ? info.webgpu : COLOR_FORMAT;
+      const depth = three || array ? Math.max(1, base.depth || 1) : cube ? 6 : 1;
+      const largest = Math.max(width, height, three ? depth : 1);
+      const levels = texture.immutable ? Math.max(1, texture.immutable_levels - first) : Math.floor(Math.log2(largest)) + 1;
+      const samples = base.samples > 1 ? 4 : 1;
+      const storage = samples === 1 && !!texture.immutable && STORAGE_FORMATS.has(format);
+      const old = texture.gpu;
+      if (old && old.es3 && old.format === format && old.width === width && old.height === height && old.depth === depth && old.first === first && old.levels >= levels && old.samples === samples && old.storage === storage) {
+        return old;
+      }
+      const usage = U.TEXTURE_BINDING | (samples > 1 ? 0 : U.COPY_DST | U.COPY_SRC) | (RENDERABLE.has(format) ? U.RENDER_ATTACHMENT : 0) | (storage ? U.STORAGE_BINDING : 0);
+      const created = this.device.createTexture({
+        label: "GL texture",
+        size: [width, height, depth],
+        dimension: three ? "3d" : "2d",
+        format,
+        mipLevelCount: samples > 1 ? 1 : levels,
+        sampleCount: samples,
+        usage
+      });
+      if (RENDERABLE.has(format) && alpha_less(internal, format)) this.alpha_one3(created, samples > 1 ? 1 : levels, depth, three);
+      const gpu = {
+        es3: true,
+        texture: created,
+        format,
+        width,
+        height,
+        depth,
+        first,
+        levels: samples > 1 ? 1 : levels,
+        three,
+        cube,
+        array,
+        samples,
+        storage,
+        views: /* @__PURE__ */ new Map(),
+        block: native ? compressed.block_width : 1,
+        block_height: native ? compressed.block_height : 1,
+        block_bytes: native ? compressed.block_bytes : 0,
+        decode: decoded ? compressed : null,
+        proxies: null,
+        destroy: () => {
+          created.destroy();
+          for (const proxy of gpu.proxies ? gpu.proxies.values() : []) proxy.texture.destroy();
+        }
+      };
+      if (old && old.texture) {
+        if (old.es3 && old.format === format && !DRAWN_DEPTH.has(format) && format !== "stencil8" && samples === 1 && old.samples === 1) {
+          this.end_pass();
+          for (let mip = 0; mip < old.levels; mip++) {
+            const to = mip + old.first - first;
+            const w = Math.max(1, old.width >> mip), h = Math.max(1, old.height >> mip);
+            if (to < 0 || to >= levels || Math.max(1, width >> to) !== w || Math.max(1, height >> to) !== h) continue;
+            const d = old.three ? Math.max(1, old.depth >> mip) : old.depth;
+            if (d !== (three ? Math.max(1, depth >> to) : depth)) continue;
+            if (gpu.block > 1 && (w % gpu.block || h % gpu.block_height)) continue;
+            this.encoder.copyTextureToTexture({ texture: old.texture, mipLevel: mip }, { texture: created, mipLevel: to }, [w, h, d]);
+          }
+        }
+        this.staging.push(old.texture);
+      }
+      texture.gpu = gpu;
+      return gpu;
+    },
+    /**
+     * Texels into a level of a GPU texture, in order with the draws:
+     * `origin` and `size` in texels (x, y, and the layer, face or slice)
+     * @return {boolean} whether the level is there to write
+     */
+    upload3(gpu, level, origin, size, texels) {
+      const mip = level - gpu.first;
+      if (mip < 0 || mip >= gpu.levels) return false;
+      const mip_width = Math.max(1, gpu.width >> mip), mip_height = Math.max(1, gpu.height >> mip);
+      const mip_depth = gpu.three ? Math.max(1, gpu.depth >> mip) : gpu.depth;
+      const [x, y, z] = origin, [w, h, d] = size;
+      if (x + w > mip_width || y + h > mip_height || z + d > mip_depth || !w || !h || !d) return false;
+      const block = gpu.block, block_height = gpu.block_height || 1;
+      const texel = block > 1 ? gpu.block_bytes : TEXEL_BYTES[gpu.format];
+      const columns = Math.ceil(w / block), rows = Math.ceil(h / block_height);
+      const row = columns * texel, stride = Math.ceil(row / 256) * 256;
+      this.end_pass();
+      const staging = this.device.createBuffer({ label: "GLES upload", size: Math.max(4, stride * rows * d), usage: B.COPY_SRC, mappedAtCreation: true });
+      const mapped = new Uint8Array(staging.getMappedRange());
+      for (let k = 0; k < rows * d; k++) {
+        const from = k * row;
+        if (from >= texels.length) break;
+        mapped.set(texels.subarray(from, Math.min(texels.length, from + row)), k * stride);
+      }
+      staging.unmap();
+      this.encoder.copyBufferToTexture(
+        { buffer: staging, bytesPerRow: stride, rowsPerImage: rows },
+        { texture: gpu.texture, mipLevel: mip, origin: [x, y, z] },
+        [columns * block, rows * block_height, d]
+      );
+      this.staging.push(staging);
+      this.stats.uploads++;
+      return true;
+    },
+    /** The texture bound to a target of the active unit, the face of a cube face's target */
+    bound3(c, target) {
+      const face = target >= 34069 && target <= 34074 ? target - 34069 : 0;
+      const slot_target = face || target === 34069 ? GL3.TEXTURE_CUBE_MAP : target;
+      const slot = SLOT_TARGET.indexOf(slot_target);
+      if (slot < 0) return { texture: null, face };
+      const name = c.textures[c.active_texture][slot];
+      return { texture: name ? c.group.textures.get(name) : c.defaults && c.defaults.get(slot_target), face };
+    },
+    /** glTexImage2D/3D, glTexSubImage2D/3D and their Offset forms (the data from the pixel unpack buffer) */
+    tex_image3(c, name, args) {
+      const three = name.includes("3D"), sub = name.includes("Sub");
+      let target, level, x = 0, y = 0, z = 0, width, height, depth = 1, format, type, data;
+      if (sub && three) [target, level, x, y, z, width, height, depth, format, type, data] = args;
+      else if (sub) [target, level, x, y, width, height, format, type, data] = args;
+      else if (three) [target, level, , width, height, depth, , format, type, data] = args;
+      else [target, level, , width, height, , format, type, data] = args;
+      const { texture, face } = this.bound3(c, target);
+      if (!texture || !width || !height || !depth) return;
+      const image = texture.images.get((three ? 0 : face) * 32 + level);
+      if (!image) return;
+      const base = texture.images.get(0);
+      if (!three && base && (base.image || base.color_buffer)) {
+        if (typeof data !== "number") this.tex_image(c, args, sub);
+        return;
+      }
+      const gpu = this.gpu_texture3(texture);
+      if (!gpu) return;
+      if (typeof data === "number") {
+        const pbo = c.group.buffers.get(c.buffers.pixel_unpack);
+        if (!pbo || pbo.gpu_newer) return void this.note3("an unpack buffer the GPU wrote");
+        data = cpu_bytes(pbo) && cpu_bytes(pbo).subarray(data);
+      }
+      if (!data) return;
+      const info = format_info(image_internal(image));
+      if (!info) return;
+      const unpack2 = c.unpack || NO_STORE;
+      const store = {
+        alignment: c.unpack_alignment,
+        row_length: unpack2.row_length,
+        image_height: unpack2.image_height,
+        skip_pixels: unpack2.skip_pixels,
+        skip_rows: unpack2.skip_rows,
+        skip_images: unpack2.skip_images
+      };
+      const tight = unpack_image(data, width, height, depth, format, type, store, three);
+      const texels = to_texels(tight, width * height * depth, format, type, info);
+      if (!texels) return void this.depth_image3(
+        gpu,
+        level,
+        [x, y, three ? z : face],
+        [width, height, depth],
+        depth_values(tight, width * height * depth, format, type)
+      );
+      if (!this.upload3(gpu, level, [x, y, three ? z : face], [width, height, depth], texels)) this.note3("an image of a level the texture lacks");
+    },
+    /** glCompressedTexImage2D/3D, glCompressedTexSubImage2D/3D (and Offset forms) */
+    compressed_image3(c, name, args) {
+      const three = name.includes("3D"), sub = name.includes("Sub");
+      let target, level, x = 0, y = 0, z = 0, width, height, depth = 1, data;
+      if (sub && three) [target, level, x, y, z, width, height, depth, , , data] = args;
+      else if (sub) [target, level, x, y, width, height, , , data] = args;
+      else if (three) [target, level, , width, height, depth, , , data] = args;
+      else [target, level, , width, height, , , data] = args;
+      const { texture, face } = this.bound3(c, target);
+      const gpu = texture && this.gpu_texture3(texture);
+      if (!gpu) return;
+      if (typeof data === "number") {
+        const pbo = c.group.buffers.get(c.buffers.pixel_unpack);
+        data = pbo && !pbo.gpu_newer && cpu_bytes(pbo) ? cpu_bytes(pbo).subarray(data) : null;
+      }
+      if (!data) return;
+      const image = texture.images.get((three ? 0 : face) * 32 + level);
+      const internal = image ? image_internal(image) : 0;
+      const layer = three ? z : face;
+      if (gpu.block > 1) {
+        this.upload3(gpu, level, [x, y, layer], [width, height, depth], data);
+        return;
+      }
+      if (gpu.decode) {
+        const blocks2 = Math.ceil(width / gpu.decode.block_width) * Math.ceil(height / gpu.decode.block_height) * gpu.decode.block_bytes;
+        for (let k = 0; k < depth; k++) this.decode_compressed3(gpu, level, [x, y, layer + k], [width, height], data.subarray(k * blocks2, (k + 1) * blocks2));
+        return;
+      }
+      if (internal !== 36196 && internal !== 37492) return void this.note3("ETC2/EAC or ASTC without WebGPU's compression feature");
+      const blocks = Math.ceil(width / 4) * Math.ceil(height / 4) * 8;
+      for (let k = 0; k < depth; k++) {
+        this.upload3(gpu, level, [x, y, layer + k], [width, height, 1], decode_etc1(width, height, data.subarray(k * blocks, (k + 1) * blocks)));
+      }
+    },
+    /** glCopyTexImage2D, glCopyTexSubImage2D/3D: from the read framebuffer's read buffer, of the same format */
+    copy_tex_image3(c, name, args) {
+      let target, level, xoffset = 0, yoffset = 0, zoffset = 0, x, y, width, height;
+      if (name === "glCopyTexImage2D") [target, level, , x, y, width, height] = args;
+      else if (name === "glCopyTexSubImage2D") [target, level, xoffset, yoffset, x, y, width, height] = args;
+      else [target, level, xoffset, yoffset, zoffset, x, y, width, height] = args;
+      const { texture, face } = this.bound3(c, target);
+      const gpu = texture && this.gpu_texture3(texture);
+      const source = this.read_target3(c);
+      if (!gpu || !source || source.texture === gpu.texture) return;
+      const mip = level - gpu.first;
+      if (mip < 0 || mip >= gpu.levels || source.samples > 1) return;
+      const sx = Math.max(0, x), sy = Math.max(0, y);
+      const w = Math.min(width - (sx - x), source.width - sx), h = Math.min(height - (sy - y), source.height - sy);
+      if (w <= 0 || h <= 0) return;
+      const layer = gpu.three || gpu.array ? zoffset : face;
+      const [dx, dy] = [xoffset + sx - x, yoffset + sy - y];
+      const image = texture.images.get((gpu.three || gpu.array ? 0 : face) * 32 + level);
+      const info = image && format_info(image_internal(image));
+      const map = info && copy_map(info);
+      const no_alpha = !!image && alpha_less(image_internal(image), gpu.format);
+      if (!map && source.format === gpu.format && (!no_alpha || source.no_alpha)) {
+        this.end_pass();
+        this.encoder.copyTextureToTexture(
+          { texture: source.texture, mipLevel: source.mip, origin: [sx, sy, source.layer] },
+          { texture: gpu.texture, mipLevel: mip, origin: [dx, dy, layer] },
+          [w, h, 1]
+        );
+        return;
+      }
+      if (!RENDERABLE.has(gpu.format)) return void this.note3("a copy into a texture WebGPU draws no " + gpu.format + " to");
+      const view = gpu.three ? gpu.texture.createView({ dimension: "3d", baseMipLevel: mip, mipLevelCount: 1 }) : gpu.texture.createView({ dimension: "2d", baseMipLevel: mip, mipLevelCount: 1, baseArrayLayer: layer, arrayLayerCount: 1 });
+      const dest = { texture: gpu.texture, view, format: gpu.format, mip, layer, depth_slice: gpu.three ? layer : void 0, no_alpha };
+      this.blit3(source, dest, { src: [sx, sy, sx + w, sy + h], dst: [dx, dy, dx + w, dy + h], rect: [dx, dy, w, h], linear: false, map }, false);
+    },
+    /** glGenerateMipmap: each level drawn from the one before (2D, cube and array textures) */
+    generate_mipmap3(c, target) {
+      const { texture } = this.bound3(c, target);
+      const gpu = texture && this.gpu_texture3(texture);
+      if (!gpu) return;
+      if (!RENDERABLE.has(gpu.format) || format_kind(gpu.format) !== "f" || gpu.format.includes("32float")) return void this.note3("glGenerateMipmap of that format");
+      const base = Math.max(0, (texture.base_level || 0) - gpu.first);
+      if (gpu.three) {
+        for (let mip = base + 1; mip < gpu.levels; mip++) this.downsample3d(gpu, mip);
+        return;
+      }
+      for (let layer = 0; layer < gpu.depth; layer++) {
+        for (let mip = base + 1; mip < gpu.levels; mip++) {
+          const view = (m) => gpu.texture.createView({ dimension: "2d", baseMipLevel: m, mipLevelCount: 1, baseArrayLayer: layer, arrayLayerCount: 1 });
+          this.downsample3(view(mip - 1), view(mip), gpu.format);
+        }
+      }
+    },
+    /** A full-size draw of one view into another of the format (filtered linearly) */
+    downsample3(source, target, format) {
+      this.blits3 = this.blits3 || /* @__PURE__ */ new Map();
+      let blit = this.blits3.get(format);
+      if (!blit) {
+        const module = this.device.createShaderModule({ code: `
+                struct VOut { @builtin(position) p : vec4<f32>, @location(0) uv : vec2<f32> };
+                @group(0) @binding(0) var t : texture_2d<f32>;
+                @group(0) @binding(1) var s : sampler;
+                @vertex fn vs(@builtin(vertex_index) i : u32) -> VOut {
+                    let p = array<vec2<f32>, 3>(vec2<f32>(-1.0, -1.0), vec2<f32>(3.0, -1.0), vec2<f32>(-1.0, 3.0));
+                    var o : VOut;
+                    o.p = vec4<f32>(p[i], 0.0, 1.0);
+                    o.uv = vec2<f32>(p[i].x * 0.5 + 0.5, 0.5 - p[i].y * 0.5);
+                    return o;
+                }
+                @fragment fn fs(i : VOut) -> @location(0) vec4<f32> { return textureSampleLevel(t, s, i.uv, 0.0); }` });
+        blit = {
+          pipeline: this.device.createRenderPipeline({
+            label: "GLES 3 blit",
+            layout: "auto",
+            vertex: { module, entryPoint: "vs" },
+            fragment: { module, entryPoint: "fs", targets: [{ format }] },
+            primitive: { topology: "triangle-list" }
+          }),
+          sampler: this.device.createSampler({ magFilter: "linear", minFilter: "linear" })
+        };
+        this.blits3.set(format, blit);
+      }
+      this.end_pass();
+      const pass = this.encoder.beginRenderPass({ colorAttachments: [{ view: target, loadOp: "clear", clearValue: { r: 0, g: 0, b: 0, a: 0 }, storeOp: "store" }] });
+      pass.setPipeline(blit.pipeline);
+      pass.setBindGroup(0, this.device.createBindGroup({ layout: blit.pipeline.getBindGroupLayout(0), entries: [
+        { binding: 0, resource: source },
+        { binding: 1, resource: blit.sampler }
+      ] }));
+      pass.draw(3);
+      pass.end();
+    },
+    /** A 3D texture's level drawn from the one before, a slice at a time (linear filtering: each texel the mean of eight) */
+    downsample3d(gpu, mip) {
+      const key = "downsample3d:" + gpu.format;
+      this.blits3 = this.blits3 || /* @__PURE__ */ new Map();
+      let blit = this.blits3.get(key);
+      if (!blit) {
+        const module = this.device.createShaderModule({ code: `
+                @group(0) @binding(0) var t : texture_3d<f32>;
+                @group(0) @binding(1) var s : sampler;
+                @group(0) @binding(2) var<uniform> p : vec4<f32>;
+                @vertex fn vs(@builtin(vertex_index) i : u32) -> @builtin(position) vec4<f32> {
+                    let v = array<vec2<f32>, 3>(vec2<f32>(-1.0, -1.0), vec2<f32>(3.0, -1.0), vec2<f32>(-1.0, 3.0));
+                    return vec4<f32>(v[i], 0.0, 1.0);
+                }
+                @fragment fn fs(@builtin(position) q : vec4<f32>) -> @location(0) vec4<f32> {
+                    return textureSampleLevel(t, s, vec3<f32>(q.xy / p.xy, p.z), 0.0);
+                }` });
+        blit = {
+          pipeline: this.device.createRenderPipeline({
+            label: "GLES 3 3D mipmap",
+            layout: "auto",
+            vertex: { module, entryPoint: "vs" },
+            fragment: { module, entryPoint: "fs", targets: [{ format: gpu.format }] },
+            primitive: { topology: "triangle-list" }
+          }),
+          sampler: this.device.createSampler({ magFilter: "linear", minFilter: "linear" })
+        };
+        this.blits3.set(key, blit);
+      }
+      const w = Math.max(1, gpu.width >> mip), h = Math.max(1, gpu.height >> mip), d = Math.max(1, gpu.depth >> mip);
+      const source = gpu.texture.createView({ dimension: "3d", baseMipLevel: mip - 1, mipLevelCount: 1 });
+      const target = gpu.texture.createView({ dimension: "3d", baseMipLevel: mip, mipLevelCount: 1 });
+      this.end_pass();
+      for (let z = 0; z < d; z++) {
+        const pass = this.encoder.beginRenderPass({ colorAttachments: [{
+          view: target,
+          depthSlice: z,
+          loadOp: "clear",
+          clearValue: { r: 0, g: 0, b: 0, a: 0 },
+          storeOp: "store"
+        }] });
+        pass.setPipeline(blit.pipeline);
+        pass.setBindGroup(0, this.device.createBindGroup({ layout: blit.pipeline.getBindGroupLayout(0), entries: [
+          { binding: 0, resource: source },
+          { binding: 1, resource: blit.sampler },
+          { binding: 2, resource: { buffer: this.uniform_buffer(new Float32Array([w, h, (z + 0.5) / d, 0]).buffer) } }
+        ] }));
+        pass.draw(3);
+        pass.end();
+      }
+    },
+    /**
+     * A depth image's values written by a draw (WebGPU copies no buffer into
+     * depth24plus or depth32float): the depths as an r32float texture, each
+     * layer drawn with frag_depth; the stencil values copied into the
+     * stencil aspect (WebGPU copies into stencil8's)
+     */
+    depth_image3(gpu, level, origin, size, values) {
+      const mip = level - gpu.first;
+      if (mip < 0 || mip >= gpu.levels) return;
+      const [x, y, z] = origin, [w, h, d] = size;
+      const source = this.device.createTexture({ label: "GLES depth image", size: [w, h, d], format: "r32float", usage: U.TEXTURE_BINDING | U.COPY_DST });
+      this.device.queue.writeTexture({ texture: source }, values.depth, { bytesPerRow: w * 4, rowsPerImage: h }, [w, h, d]);
+      this.staging.push(source);
+      const key = "depth_image:" + gpu.format;
+      this.blits3 = this.blits3 || /* @__PURE__ */ new Map();
+      let blit = this.blits3.get(key);
+      if (!blit) {
+        const module = this.device.createShaderModule({ code: `
+                @group(0) @binding(0) var t : texture_2d_array<f32>;
+                @group(0) @binding(1) var<uniform> p : vec4<i32>;
+                @vertex fn vs(@builtin(vertex_index) i : u32) -> @builtin(position) vec4<f32> {
+                    let v = array<vec2<f32>, 3>(vec2<f32>(-1.0, -1.0), vec2<f32>(3.0, -1.0), vec2<f32>(-1.0, 3.0));
+                    return vec4<f32>(v[i], 0.0, 1.0);
+                }
+                @fragment fn fs(@builtin(position) q : vec4<f32>) -> @builtin(frag_depth) f32 {
+                    return textureLoad(t, vec2<i32>(q.xy) - p.xy, p.z, 0).x;
+                }` });
+        const group = this.device.createBindGroupLayout({ entries: [
+          { binding: 0, visibility: 2, texture: { sampleType: "unfilterable-float", viewDimension: "2d-array" } },
+          { binding: 1, visibility: 2, buffer: { type: "uniform" } }
+        ] });
+        blit = { group, pipeline: this.device.createRenderPipeline({
+          label: "GLES 3 depth image",
+          layout: this.device.createPipelineLayout({ bindGroupLayouts: [group] }),
+          vertex: { module, entryPoint: "vs" },
+          fragment: { module, entryPoint: "fs", targets: [] },
+          primitive: { topology: "triangle-list" },
+          depthStencil: { format: gpu.format, depthWriteEnabled: true, depthCompare: "always" }
+        }) };
+        this.blits3.set(key, blit);
+      }
+      const stencil = gpu.format.includes("stencil");
+      this.end_pass();
+      for (let k = 0; k < d; k++) {
+        const view = gpu.texture.createView({ dimension: "2d", baseMipLevel: mip, mipLevelCount: 1, baseArrayLayer: z + k, arrayLayerCount: 1 });
+        const pass = this.encoder.beginRenderPass({ colorAttachments: [], depthStencilAttachment: Object.assign(
+          { view, depthLoadOp: "load", depthStoreOp: "store" },
+          stencil ? { stencilLoadOp: "load", stencilStoreOp: "store" } : {}
+        ) });
+        pass.setPipeline(blit.pipeline);
+        pass.setBindGroup(0, this.device.createBindGroup({ layout: blit.group, entries: [
+          { binding: 0, resource: source.createView({ dimension: "2d-array" }) },
+          { binding: 1, resource: { buffer: this.uniform_buffer(new Int32Array([x, y, k, 0]).buffer) } }
+        ] }));
+        pass.setScissorRect(x, y, w, h);
+        pass.draw(3);
+        pass.end();
+      }
+      if (stencil && values.stencil) this.stencil_image3(gpu, mip, origin, size, values.stencil);
+    },
+    /**
+     * Stencil values into a rectangle of a depth stencil texture's level:
+     * WebGPU copies the stencil aspect of whole levels (layers) only, so a
+     * rectangle of less goes through a buffer of the levels' stencil, the
+     * rectangle's bytes set in it by a compute pass, copied back whole
+     */
+    stencil_image3(gpu, mip, origin, size, stencil) {
+      const [x, y, z] = origin, [w, h, d] = size;
+      const width = Math.max(1, gpu.width >> mip), height = Math.max(1, gpu.height >> mip);
+      const whole = x === 0 && y === 0 && w === width && h === height;
+      const stride = Math.ceil((whole ? w : width) / 256) * 256;
+      const rows = whole ? h : height;
+      const level = { texture: gpu.texture, mipLevel: mip, origin: [0, 0, z], aspect: "stencil-only" };
+      if (whole) {
+        const staging = this.device.createBuffer({ label: "GLES stencil upload", size: stride * h * d, usage: B.COPY_SRC, mappedAtCreation: true });
+        const mapped = new Uint8Array(staging.getMappedRange());
+        for (let k = 0; k < h * d; k++) mapped.set(stencil.subarray(k * w, k * w + w), k * stride);
+        staging.unmap();
+        this.staging.push(staging);
+        this.encoder.copyBufferToTexture({ buffer: staging, bytesPerRow: stride, rowsPerImage: h }, level, [w, h, d]);
+        return;
+      }
+      const levels = this.device.createBuffer({ label: "GLES stencil levels", size: stride * rows * d, usage: B.STORAGE | B.COPY_SRC | B.COPY_DST });
+      const values = this.device.createBuffer({ label: "GLES stencil values", size: Math.max(16, align4(w * h * d)), usage: B.STORAGE, mappedAtCreation: true });
+      new Uint8Array(values.getMappedRange()).set(stencil.subarray(0, w * h * d));
+      values.unmap();
+      this.staging.push(levels, values);
+      if (!this.stencil_patch3) {
+        const module = this.device.createShaderModule({ code: `
+                @group(0) @binding(0) var<storage, read_write> levels : array<u32>;
+                @group(0) @binding(1) var<storage, read> values : array<u32>;
+                @group(0) @binding(2) var<uniform> p : array<vec4<u32>, 2>;
+                @compute @workgroup_size(64) fn main(@builtin(global_invocation_id) id : vec3<u32>) {
+                    // p[0]: x, y, w, h; p[1]: stride, rows, the words
+                    if(id.x >= p[1].z) { return; }
+                    var word = levels[id.x];
+                    for(var b = 0u; b < 4u; b++) {
+                        let at = id.x * 4u + b;
+                        let layer = at / (p[1].x * p[1].y);
+                        let row = at % (p[1].x * p[1].y) / p[1].x;
+                        let column = at % p[1].x;
+                        if(column >= p[0].x && column < p[0].x + p[0].z && row >= p[0].y && row < p[0].y + p[0].w) {
+                            let i = (layer * p[0].w + row - p[0].y) * p[0].z + column - p[0].x;
+                            let value = (values[i / 4u] >> (i % 4u * 8u)) & 0xFFu;
+                            word = (word & ~(0xFFu << (b * 8u))) | (value << (b * 8u));
+                        }
+                    }
+                    levels[id.x] = word;
+                }` });
+        this.stencil_patch3 = this.device.createComputePipeline({ label: "GLES stencil patch", layout: "auto", compute: { module, entryPoint: "main" } });
+      }
+      const words = stride * rows * d / 4;
+      const parameters = this.uniform_buffer(new Uint32Array([x, y, w, h, stride, rows, words, 0]).buffer);
+      this.end_pass();
+      this.encoder.copyTextureToBuffer(level, { buffer: levels, bytesPerRow: stride, rowsPerImage: rows }, [width, height, d]);
+      const pass = this.encoder.beginComputePass({ label: "GLES stencil patch" });
+      pass.setPipeline(this.stencil_patch3);
+      pass.setBindGroup(0, this.device.createBindGroup({ layout: this.stencil_patch3.getBindGroupLayout(0), entries: [
+        { binding: 0, resource: { buffer: levels } },
+        { binding: 1, resource: { buffer: values } },
+        { binding: 2, resource: { buffer: parameters } }
+      ] }));
+      pass.dispatchWorkgroups(Math.ceil(words / 64));
+      pass.end();
+      this.encoder.copyBufferToTexture({ buffer: levels, bytesPerRow: stride, rowsPerImage: rows }, level, [width, height, d]);
+    },
+    /**
+     * A compressed image's blocks into a texture of their decoded format
+     * (WebGPU makes compressed textures of whole blocks alone): the blocks
+     * into a compressed texture of whole blocks, its texels drawn into the
+     * level's rectangle by textureLoad
+     * @param {!Array<number>} origin x, y and the layer, face or slice
+     * @param {!Array<number>} size width and height
+     */
+    decode_compressed3(gpu, level, origin, size, data) {
+      const mip = level - gpu.first;
+      if (mip < 0 || mip >= gpu.levels) return;
+      const c = gpu.decode, [x, y, layer] = origin, [w, h] = size;
+      if (!w || !h) return;
+      const columns = Math.ceil(w / c.block_width), rows = Math.ceil(h / c.block_height);
+      const row = columns * c.block_bytes, stride = Math.ceil(row / 256) * 256;
+      const blocks = this.device.createTexture({
+        label: "GLES compressed blocks",
+        size: [columns * c.block_width, rows * c.block_height],
+        format: c.webgpu,
+        usage: U.TEXTURE_BINDING | U.COPY_DST
+      });
+      this.staging.push(blocks);
+      this.end_pass();
+      const staging = this.device.createBuffer({ label: "GLES compressed upload", size: Math.max(4, stride * rows), usage: B.COPY_SRC, mappedAtCreation: true });
+      const mapped = new Uint8Array(staging.getMappedRange());
+      for (let k = 0; k < rows && k * row < data.length; k++) mapped.set(data.subarray(k * row, Math.min(data.length, (k + 1) * row)), k * stride);
+      staging.unmap();
+      this.staging.push(staging);
+      this.encoder.copyBufferToTexture({ buffer: staging, bytesPerRow: stride, rowsPerImage: rows }, { texture: blocks }, [columns * c.block_width, rows * c.block_height, 1]);
+      this.blits3 = this.blits3 || /* @__PURE__ */ new Map();
+      const key = "decode:" + gpu.format;
+      let decode = this.blits3.get(key);
+      if (!decode) {
+        const module = this.device.createShaderModule({ code: `
+                @group(0) @binding(0) var t : texture_2d<f32>;
+                @group(0) @binding(1) var<uniform> p : vec4<i32>;
+                @vertex fn vs(@builtin(vertex_index) i : u32) -> @builtin(position) vec4<f32> {
+                    let v = array<vec2<f32>, 3>(vec2<f32>(-1.0, -1.0), vec2<f32>(3.0, -1.0), vec2<f32>(-1.0, 3.0));
+                    return vec4<f32>(v[i], 0.0, 1.0);
+                }
+                @fragment fn fs(@builtin(position) q : vec4<f32>) -> @location(0) vec4<f32> {
+                    return textureLoad(t, vec2<i32>(q.xy) - p.xy, 0);
+                }` });
+        const group = this.device.createBindGroupLayout({ entries: [
+          { binding: 0, visibility: 2, texture: { sampleType: "unfilterable-float" } },
+          { binding: 1, visibility: 2, buffer: { type: "uniform" } }
+        ] });
+        decode = { group, pipeline: this.device.createRenderPipeline({
+          label: "GLES 3 compressed decode",
+          layout: this.device.createPipelineLayout({ bindGroupLayouts: [group] }),
+          vertex: { module, entryPoint: "vs" },
+          fragment: { module, entryPoint: "fs", targets: [{ format: gpu.format }] },
+          primitive: { topology: "triangle-list" }
+        }) };
+        this.blits3.set(key, decode);
+      }
+      const view = gpu.texture.createView({ dimension: "2d", baseMipLevel: mip, mipLevelCount: 1, baseArrayLayer: layer, arrayLayerCount: 1 });
+      const pass = this.encoder.beginRenderPass({ colorAttachments: [{ view, loadOp: "load", storeOp: "store" }] });
+      pass.setPipeline(decode.pipeline);
+      pass.setBindGroup(0, this.device.createBindGroup({ layout: decode.group, entries: [
+        { binding: 0, resource: blocks.createView() },
+        { binding: 1, resource: { buffer: this.uniform_buffer(new Int32Array([x, y, 0, 0]).buffer) } }
+      ] }));
+      pass.setScissorRect(x, y, w, h);
+      pass.draw(3);
+      pass.end();
+      this.stats.uploads++;
+    },
+    /** glRenderbufferStorage(Multisample): a texture of the format (4 samples for any multisampled one) */
+    renderbuffer_storage3(c) {
+      const rb = c.group.renderbuffers.get(c.renderbuffer);
+      if (!rb) return;
+      if (rb.gpu) this.staging.push(rb.gpu);
+      rb.gpu = null;
+      this.make_renderbuffer3(rb);
+    },
+    /** A renderbuffer's texture, of its format and samples */
+    make_renderbuffer3(rb) {
+      if (!rb.width || !rb.height || rb.image) return;
+      const info = format_info(rb.format);
+      const format = info ? info.webgpu : RENDERBUFFER_WEBGPU[rb.format] || COLOR_FORMAT;
+      if (!RENDERABLE.has(format)) return void this.note3("a renderbuffer of a format WebGPU draws no " + format);
+      const samples = rb.samples > 1 ? 4 : 1;
+      const texture = this.device.createTexture({
+        label: "GL renderbuffer",
+        size: [rb.width, rb.height],
+        format,
+        sampleCount: samples,
+        usage: U.RENDER_ATTACHMENT | U.TEXTURE_BINDING | (samples === 1 ? U.COPY_SRC | U.COPY_DST : 0)
+      });
+      rb.gpu = { es3: true, texture, format, samples, view: texture.createView(), destroy: () => texture.destroy() };
+      if (alpha_less(rb.format, format)) this.alpha_one3(texture, 1, 1, false);
+    },
+    /**
+     * A new texture of a format GL reads with alpha 1 (alpha_less): every
+     * level and layer cleared to (0, 0, 0, 1), draws leaving alpha alone after
+     */
+    alpha_one3(texture, levels, layers, three) {
+      this.end_pass();
+      for (let mip = 0; mip < levels; mip++) {
+        const count = three ? Math.max(1, layers >> mip) : layers;
+        for (let layer = 0; layer < count; layer++) {
+          const view = three ? texture.createView({ dimension: "3d", baseMipLevel: mip, mipLevelCount: 1 }) : texture.createView({ dimension: "2d", baseMipLevel: mip, mipLevelCount: 1, baseArrayLayer: layer, arrayLayerCount: 1 });
+          this.encoder.beginRenderPass({ colorAttachments: [Object.assign(
+            { view, loadOp: "clear", clearValue: { r: 0, g: 0, b: 0, a: 1 }, storeOp: "store" },
+            three ? { depthSlice: layer } : {}
+          )] }).end();
+        }
+      }
+    },
+    // ---- snapshots (L7's; the textures' and renderbuffers' contents)
+    /**
+     * A texture's levels and layers as save() reads them: rows of texels
+     * (of blocks for a compressed format); the depth formats WebGPU copies
+     * nothing out of, and multisampled textures (nothing copies them), are
+     * left out (they read as undefined after a restore)
+     */
+    save_texture3(t, reads) {
+      const gpu = t.gpu;
+      if (gpu.samples > 1 || DRAWN_DEPTH.has(gpu.format) || gpu.format === "stencil8") return;
+      t.saved = [];
+      t.saved3 = true;
+      const texel = gpu.block > 1 ? gpu.block_bytes : TEXEL_BYTES[gpu.format];
+      for (let mip = 0; mip < gpu.levels; mip++) {
+        const width = Math.max(1, gpu.width >> mip), height = Math.max(1, gpu.height >> mip);
+        const layers = gpu.three ? Math.max(1, gpu.depth >> mip) : gpu.depth;
+        const columns = Math.ceil(width / gpu.block), rows = Math.ceil(height / (gpu.block_height || 1));
+        for (let layer = 0; layer < layers; layer++) {
+          reads.push({
+            owner: t,
+            texture: gpu.texture,
+            level: mip,
+            gl_level: mip + gpu.first,
+            layer,
+            width,
+            height,
+            row: columns * texel,
+            rows,
+            extent: [columns * gpu.block, rows * (gpu.block_height || 1), 1]
+          });
+        }
+      }
+    },
+    /** A texture's saved levels and layers put back (save_texture3's) */
+    restore_texture3(t) {
+      const gpu = this.gpu_texture3(t);
+      for (const [level, layer, width, height, bytes] of gpu ? t.saved : []) this.upload3(gpu, level, [0, 0, layer], [width, height, 1], bytes);
+    },
+    /** A renderbuffer of one sample and a color or depth16 format: its texels */
+    save_renderbuffer3(rb, reads) {
+      rb.saved3 = true;
+      const texel = TEXEL_BYTES[rb.gpu.format];
+      if (rb.gpu.samples > 1 || !texel || DRAWN_DEPTH.has(rb.gpu.format) || rb.gpu.format === "stencil8") return;
+      rb.saved = [];
+      reads.push({ owner: rb, texture: rb.gpu.texture, level: 0, layer: 0, width: rb.width, height: rb.height, row: rb.width * texel, rows: rb.height });
+    },
+    restore_renderbuffer3(rb) {
+      this.make_renderbuffer3(rb);
+      for (const [, , width, height, bytes] of rb.gpu ? rb.saved || [] : []) {
+        this.upload3(
+          { texture: rb.gpu.texture, format: rb.gpu.format, first: 0, levels: 1, width, height, depth: 1, three: false, block: 1 },
+          0,
+          [0, 0, 0],
+          [width, height, 1],
+          bytes
+        );
+      }
+      delete rb.saved;
+      delete rb.saved3;
+    },
+    /**
+     * The buffers the GPU wrote (`gpu_newer`: storage writes, transform
+     * feedback, copies, pack buffers) copied out in save's encoder: their
+     * bytes become the shadow's, which a restore's GPU buffer starts from
+     * (gpu_buffer)
+     * @return {!Array<!Object>} the reads, for saved_buffers3 once submitted
+     */
+    save_buffers3(encoder) {
+      const reads = [];
+      for (const group of this.shadow.groups.values()) {
+        for (const buffer of group.buffers.values()) {
+          if (!buffer.gpu || !buffer.gpu_newer || !buffer.size) continue;
+          const size = Math.min(buffer.gpu.size, align4(buffer.size));
+          const read = this.device.createBuffer({ label: "GLES buffer save", size, usage: B.COPY_DST | B.MAP_READ });
+          encoder.copyBufferToBuffer(buffer.gpu.buffer, 0, read, 0, size);
+          reads.push({ buffer, read, size });
+        }
+      }
+      return reads;
+    },
+    /** save_buffers3's reads, once submitted: the buffers' bytes */
+    async saved_buffers3(reads) {
+      for (const { buffer, read, size } of reads) {
+        await read.mapAsync(globalThis.GPUMapMode ? globalThis.GPUMapMode.READ : 1);
+        const bytes = new Uint8Array(buffer.size);
+        bytes.set(new Uint8Array(read.getMappedRange()).subarray(0, Math.min(size, buffer.size)));
+        buffer.bytes = bytes;
+        read.unmap();
+        read.destroy();
+      }
+    },
+    // ---- what is drawn to and read from
+    /** An attachment as a pass's: texture, view, format, level and layer, size, samples */
+    attachment3(c, a) {
+      if (!a) return null;
+      const color_buffer = (t) => t && {
+        texture: t.texture,
+        view: t.texture.createView(),
+        format: COLOR_FORMAT,
+        mip: 0,
+        layer: 0,
+        samples: 1,
+        width: t.texture.width,
+        height: t.texture.height
+      };
+      if (a.type === GL3.RENDERBUFFER) {
+        const rb = c.group.renderbuffers.get(a.name);
+        if (rb && rb.image) return color_buffer(this.image_texture(rb.image));
+        if (!rb || !rb.gpu) return null;
+        return {
+          texture: rb.gpu.texture,
+          view: rb.gpu.view,
+          format: rb.gpu.format,
+          mip: 0,
+          layer: 0,
+          samples: rb.gpu.samples,
+          width: rb.width,
+          height: rb.height,
+          no_alpha: alpha_less(rb.format, rb.gpu.format)
+        };
+      }
+      const texture = c.group.textures.get(a.name);
+      const image = texture && texture.images.get(a.face * 32 + a.level);
+      if (image && image.image) return color_buffer(this.image_texture(image.image));
+      if (image && image.color_buffer) return color_buffer(this.color_buffer_texture(image.color_buffer));
+      const gpu = texture && this.gpu_texture3(texture);
+      if (!gpu || !RENDERABLE.has(gpu.format)) return null;
+      const mip = a.level - gpu.first;
+      if (mip < 0 || mip >= gpu.levels) return null;
+      const layer = gpu.cube ? a.face : gpu.three || gpu.array ? a.layer || 0 : 0;
+      const key = "attachment" + mip + ":" + (gpu.three ? 0 : layer);
+      let view = gpu.views.get(key);
+      if (!view) {
+        view = gpu.three ? gpu.texture.createView({ dimension: "3d", baseMipLevel: mip, mipLevelCount: 1 }) : gpu.texture.createView({ dimension: "2d", baseMipLevel: mip, mipLevelCount: 1, baseArrayLayer: layer, arrayLayerCount: 1 });
+        gpu.views.set(key, view);
+      }
+      return {
+        texture: gpu.texture,
+        view,
+        format: gpu.format,
+        mip,
+        layer,
+        depth_slice: gpu.three ? layer : void 0,
+        samples: gpu.samples || 1,
+        width: Math.max(1, gpu.width >> mip),
+        height: Math.max(1, gpu.height >> mip),
+        no_alpha: !!image && alpha_less(image_internal(image), gpu.format)
+      };
+    },
+    /**
+     * The draw framebuffer as a pass's attachments: a color attachment each
+     * draw buffer (null for none), the depth-stencil one; null when there is
+     * nothing to draw to or WebGPU cannot (sizes or samples differ)
+     */
+    target3(c) {
+      if (!c.framebuffer) {
+        const t = this.surface_target(c);
+        if (!t) return null;
+        const color = c.default_draw_buffer === GL3.NONE ? null : { texture: t.color, view: t.color_view, format: COLOR_FORMAT, mip: 0, layer: 0, samples: 1, width: t.width, height: t.height };
+        return {
+          colors: color ? [color] : [],
+          depth: t.depth ? {
+            view: t.depth,
+            format: t.depth_format,
+            texture: t.depth_texture,
+            mip: 0,
+            layer: 0,
+            samples: 1,
+            width: t.width,
+            height: t.height
+          } : null,
+          width: t.width,
+          height: t.height,
+          samples: 1,
+          alpha: t.alpha,
+          key: t.key + (color ? "" : "n"),
+          textures: /* @__PURE__ */ new Set([t.color])
+        };
+      }
+      const fbo = c.framebuffers.get(c.framebuffer);
+      if (!fbo) return null;
+      const colors = (fbo.draw_buffers || [GL3.COLOR_ATTACHMENT0]).map((b) => b === GL3.NONE ? null : this.attachment3(c, fbo.attachments.get(b)));
+      while (colors.length && !colors[colors.length - 1]) colors.pop();
+      const depth = this.attachment3(c, fbo.attachments.get(GL3.DEPTH_ATTACHMENT)) || this.attachment3(c, fbo.attachments.get(GL3.STENCIL_ATTACHMENT));
+      if (depth) Object.assign(depth, { gl_depth: !!fbo.attachments.get(GL3.DEPTH_ATTACHMENT), gl_stencil: !!fbo.attachments.get(GL3.STENCIL_ATTACHMENT) });
+      const all = [...colors.filter(Boolean), ...depth ? [depth] : []];
+      if (!all.length) {
+        if (!(fbo.default_width > 0 && fbo.default_height > 0)) return null;
+        const samples2 = fbo.default_samples > 0 ? 4 : 1;
+        const size = fbo.default_width + "x" + fbo.default_height + "x" + samples2;
+        this.empty_targets3 = this.empty_targets3 || /* @__PURE__ */ new Map();
+        let empty = this.empty_targets3.get(size);
+        if (!empty) {
+          const texture = this.device.createTexture({
+            label: "GLES no attachments",
+            size: [fbo.default_width, fbo.default_height],
+            format: "r8unorm",
+            sampleCount: samples2,
+            usage: U.RENDER_ATTACHMENT
+          });
+          empty = {
+            texture,
+            view: texture.createView(),
+            format: "r8unorm",
+            mip: 0,
+            layer: 0,
+            samples: samples2,
+            width: fbo.default_width,
+            height: fbo.default_height,
+            unwritten: true
+          };
+          this.empty_targets3.set(size, empty);
+        }
+        return { colors: [empty], depth: null, width: empty.width, height: empty.height, samples: samples2, alpha: true, key: "3:empty:" + size, textures: /* @__PURE__ */ new Set() };
+      }
+      const { width, height, samples } = all[0];
+      if (all.some((a) => a.width !== width || a.height !== height)) return this.note3("attachments of different sizes");
+      if (all.some((a) => a.samples !== samples)) return this.note3("attachments of different samples");
+      const key = "3:" + colors.map((a) => a ? this.id_of(a.texture) + "." + a.mip + "." + a.layer : "-").join(",") + "/" + (depth ? this.id_of(depth.texture) + "." + depth.mip + "." + depth.layer : "-");
+      return { colors, depth, width, height, samples, alpha: true, key, textures: new Set(all.map((a) => a.texture)) };
+    },
+    /** What glReadPixels and the copies read: the read framebuffer's read buffer, or null */
+    read_target3(c) {
+      if (!read_framebuffer(c)) {
+        if (c.default_read_buffer === GL3.NONE) return null;
+        const t = this.surface_target(c);
+        return t && t.color ? { texture: t.color, format: COLOR_FORMAT, mip: 0, layer: 0, samples: 1, width: t.width, height: t.height, no_alpha: t.alpha === false } : null;
+      }
+      const fbo = c.framebuffers.get(read_framebuffer(c));
+      if (!fbo || fbo.read_buffer === GL3.NONE) return null;
+      return this.attachment3(c, fbo.attachments.get(fbo.read_buffer === void 0 ? GL3.COLOR_ATTACHMENT0 : fbo.read_buffer));
+    },
+    /** The read framebuffer's depth (or depth and stencil) attachment */
+    read_depth3(c) {
+      if (!read_framebuffer(c)) {
+        const t = this.surface_target(c);
+        return t && t.depth ? {
+          texture: t.depth_texture,
+          view: t.depth,
+          format: t.depth_format,
+          mip: 0,
+          layer: 0,
+          samples: 1,
+          width: t.width,
+          height: t.height
+        } : null;
+      }
+      const fbo = c.framebuffers.get(read_framebuffer(c));
+      return fbo ? this.attachment3(c, fbo.attachments.get(GL3.DEPTH_ATTACHMENT)) || this.attachment3(c, fbo.attachments.get(GL3.STENCIL_ATTACHMENT)) : null;
+    },
+    /**
+     * glBlitFramebuffer: the read buffer into each draw buffer, the depth
+     * buffer into the depth buffer (frag_depth); a multisampled source
+     * resolved first; what keeps size, format and place a copy. The stencil
+     * buffer is not copied (WebGPU writes no stencil values, gpu-deviations.md).
+     */
+    blit_framebuffer3(c, [sx0, sy0, sx1, sy1, dx0, dy0, dx1, dy1, mask, filter]) {
+      const target = this.target3(c);
+      if (!target) return;
+      let [x0, y0, x1, y1] = [Math.min(dx0, dx1), Math.min(dy0, dy1), Math.max(dx0, dx1), Math.max(dy0, dy1)];
+      if (c.enabled.has(SCISSOR_TEST)) {
+        const [x, y, w, h] = c.scissor;
+        [x0, y0, x1, y1] = [Math.max(x0, x), Math.max(y0, y), Math.min(x1, x + w), Math.min(y1, y + h)];
+      }
+      [x0, y0, x1, y1] = [Math.max(0, x0), Math.max(0, y0), Math.min(target.width, x1), Math.min(target.height, y1)];
+      if (x1 <= x0 || y1 <= y0 || sx0 === sx1 || sy0 === sy1 || dx0 === dx1 || dy0 === dy1) return;
+      const blit = { src: [sx0, sy0, sx1, sy1], dst: [dx0, dy0, dx1, dy1], rect: [x0, y0, x1 - x0, y1 - y0], linear: filter === LINEAR };
+      if (mask & 16384) {
+        let source = this.read_target3(c);
+        if (source && source.samples > 1) source = this.resolve3(source);
+        for (const a of source ? target.colors : []) if (a) this.blit3(source, a, blit, false);
+      }
+      if (mask & 256 && target.depth && target.depth.format !== "stencil8") {
+        const source = this.read_depth3(c);
+        if (source && source.format !== "stencil8") this.blit3(source, target.depth, Object.assign({}, blit, { linear: false }), true);
+      }
+      if (mask & 1024) this.note3("glBlitFramebuffer's stencil (not copied)");
+    },
+    /** A multisampled color attachment resolved into a texture of its own (gone after the batch) */
+    resolve3(source) {
+      if (format_kind(source.format) !== "f") return this.note3("a multisampled integer read buffer resolved");
+      this.end_pass();
+      const texture = this.device.createTexture({
+        label: "GLES resolve",
+        size: [source.width, source.height],
+        format: source.format,
+        usage: U.RENDER_ATTACHMENT | U.TEXTURE_BINDING | U.COPY_SRC
+      });
+      const pass = this.encoder.beginRenderPass({ colorAttachments: [{ view: source.view, resolveTarget: texture.createView(), loadOp: "load", storeOp: "store" }] });
+      pass.end();
+      this.staging.push(texture);
+      return { texture, view: texture.createView(), format: source.format, mip: 0, layer: 0, samples: 1, width: source.width, height: source.height };
+    },
+    /**
+     * One blit of a source image into a destination attachment: a copy when
+     * nothing scales, flips, clips or converts, else a draw sampling the
+     * source (GL's mapping of destination pixel centers into the source)
+     * @param {{src: !Array<number>, dst: !Array<number>, rect: !Array<number>, linear: boolean}} blit
+     */
+    blit3(source, dest, blit, depth) {
+      const [sx0, sy0, sx1, sy1] = blit.src, [dx0, dy0, dx1, dy1] = blit.dst, [x, y, w, h] = blit.rect;
+      const three = source.texture.dimension === "3d";
+      if (!depth && !blit.map && source.format === dest.format && source.samples === 1 && (!dest.no_alpha || source.no_alpha) && sx1 - sx0 === dx1 - dx0 && sy1 - sy0 === dy1 - dy0 && sx1 > sx0 && sy1 > sy0 && x === dx0 && y === dy0 && w === dx1 - dx0 && h === dy1 - dy0 && sx0 >= 0 && sy0 >= 0 && sx1 <= source.width && sy1 <= source.height && dest.texture) {
+        this.end_pass();
+        this.encoder.copyTextureToTexture(
+          { texture: source.texture, mipLevel: source.mip, origin: [sx0, sy0, source.layer] },
+          { texture: dest.texture, mipLevel: dest.mip, origin: [dx0, dy0, dest.layer] },
+          [w, h, 1]
+        );
+        return;
+      }
+      const kind = format_kind(source.format);
+      const out_kind = depth ? "depth" : format_kind(dest.format);
+      if (!depth && kind === "depth") return;
+      const scalar = { f: "f32", i: "i32", u: "u32" }[kind] || "f32";
+      const ms = source.samples > 1;
+      const linear = blit.linear && kind === "f" && !source.format.includes("32float") && !ms;
+      const key = [
+        "blit3",
+        source.format,
+        three ? 3 : 2,
+        ms ? "m" : "",
+        linear ? "l" : "n",
+        depth ? dest.format : dest.format + ":" + out_kind,
+        dest.no_alpha ? "~" : ""
+      ].join("|");
+      this.blit_pipelines3 = this.blit_pipelines3 || /* @__PURE__ */ new Map();
+      let entry = this.blit_pipelines3.get(key);
+      if (!entry) {
+        const texture = kind === "depth" ? ms ? "texture_depth_multisampled_2d" : "texture_depth_2d" : (three ? "texture_3d<" : "texture_2d<") + scalar + ">";
+        const at = three ? "vec3<i32>(k, i32(p.layer))" : "k";
+        const fetch2 = ms ? "textureLoad(t, k, 0)" : "textureLoad(t, " + at + ", 0)";
+        const sample = three ? "textureSampleLevel(t, s, vec3<f32>(c / p.size, (p.layer + 0.5) / p.depth), 0.0)" : "textureSampleLevel(t, s, c / p.size, 0.0)";
+        const out_type = { f: "vec4<f32>", i: "vec4<i32>", u: "vec4<u32>" }[out_kind];
+        const value = kind === "depth" ? fetch2 : linear ? sample : fetch2;
+        const code = `
+                struct P { src0 : vec2<f32>, scale : vec2<f32>, dst0 : vec2<f32>, size : vec2<f32>, layer : f32, depth : f32,
+                    m : mat4x4<f32>, b : vec4<f32> };
+                @group(0) @binding(0) var<uniform> p : P;
+                @group(0) @binding(1) var t : ${texture};
+                ${linear ? "@group(0) @binding(2) var s : sampler;" : ""}
+                @vertex fn vs(@builtin(vertex_index) i : u32) -> @builtin(position) vec4<f32> {
+                    let v = array<vec2<f32>, 3>(vec2<f32>(-1.0, -1.0), vec2<f32>(3.0, -1.0), vec2<f32>(-1.0, 3.0));
+                    return vec4<f32>(v[i], 0.0, 1.0);
+                }
+                @fragment fn fs(@builtin(position) q : vec4<f32>) -> ${depth ? "@builtin(frag_depth) f32" : "@location(0) " + out_type} {
+                    let c = p.src0 + (q.xy - p.dst0) * p.scale;
+                    // (a destination pixel whose source is outside the source rectangle's image: left as it is)
+                    if(any(c < vec2<f32>(0.0)) || any(c >= p.size)) { discard; }
+                    let k = clamp(vec2<i32>(floor(c)), vec2<i32>(0), vec2<i32>(p.size) - vec2<i32>(1));
+                    ${depth ? "return " + value + ";" : out_kind === "f" ? "return p.m * vec4<f32>(" + value + ") + p.b;" : "return " + out_type + "(" + value + ");"}
+                }`;
+        const module = this.device.createShaderModule({ label: "GLES 3 blit", code });
+        const group = this.device.createBindGroupLayout({ entries: [
+          { binding: 0, visibility: 2, buffer: { type: "uniform" } },
+          { binding: 1, visibility: 2, texture: { sampleType: kind === "depth" ? "depth" : kind === "i" ? "sint" : kind === "u" ? "uint" : linear ? "float" : "unfilterable-float", viewDimension: three ? "3d" : "2d", multisampled: ms } },
+          ...linear ? [{ binding: 2, visibility: 2, sampler: { type: "filtering" } }] : []
+        ] });
+        const descriptor = {
+          label: "GLES 3 blit",
+          layout: this.device.createPipelineLayout({ bindGroupLayouts: [group] }),
+          vertex: { module, entryPoint: "vs" },
+          fragment: { module, entryPoint: "fs", targets: depth ? [] : [{ format: dest.format, writeMask: dest.no_alpha ? 7 : 15 }] },
+          primitive: { topology: "triangle-list" }
+        };
+        if (depth) descriptor.depthStencil = { format: dest.format, depthWriteEnabled: true, depthCompare: "always" };
+        entry = {
+          pipeline: this.device.createRenderPipeline(descriptor),
+          group,
+          sampler: linear ? this.device.createSampler({ magFilter: "linear", minFilter: "linear" }) : null
+        };
+        this.blit_pipelines3.set(key, entry);
+      }
+      const uniforms = new Float32Array(36);
+      uniforms.set([
+        sx0,
+        sy0,
+        (sx1 - sx0) / (dx1 - dx0),
+        (sy1 - sy0) / (dy1 - dy0),
+        dx0,
+        dy0,
+        source.width,
+        source.height,
+        source.layer || 0,
+        three ? Math.max(1, source.texture.depthOrArrayLayers >> source.mip) : 1
+      ]);
+      uniforms.set(blit.map ? blit.map.m : [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1], 12);
+      uniforms.set(blit.map ? blit.map.b : [0, 0, 0, 0], 28);
+      const view = three ? source.texture.createView({ dimension: "3d", baseMipLevel: source.mip, mipLevelCount: 1 }) : source.texture.createView({
+        dimension: "2d",
+        baseMipLevel: source.mip,
+        mipLevelCount: 1,
+        baseArrayLayer: source.layer,
+        arrayLayerCount: 1,
+        aspect: kind === "depth" && source.format.includes("stencil") ? "depth-only" : "all"
+      });
+      this.end_pass();
+      const pass = this.encoder.beginRenderPass(depth ? { colorAttachments: [], depthStencilAttachment: Object.assign({
+        view: dest.view,
+        depthLoadOp: "load",
+        depthStoreOp: "store"
+      }, dest.format.includes("stencil") ? { stencilLoadOp: "load", stencilStoreOp: "store" } : {}) } : { colorAttachments: [Object.assign({ view: dest.view, loadOp: "load", storeOp: "store" }, dest.depth_slice !== void 0 ? { depthSlice: dest.depth_slice } : {})] });
+      pass.setPipeline(entry.pipeline);
+      pass.setBindGroup(0, this.device.createBindGroup({ layout: entry.group, entries: [
+        { binding: 0, resource: { buffer: this.uniform_buffer(uniforms.buffer) } },
+        { binding: 1, resource: view },
+        ...entry.sampler ? [{ binding: 2, resource: entry.sampler }] : []
+      ] }));
+      pass.setScissorRect(x, y, w, h);
+      pass.draw(3);
+      pass.end();
+    },
+    /**
+     * glReadPixels of a GLES 3.x context: the read buffer's texels, decoded
+     * and packed by the call's format and type and the pack state (taken
+     * now: later commands of the batch may change it)
+     */
+    read_pixels3(c, record) {
+      if (!this.read_region3(c, record, (bytes, sink) => this.answer(sink, record.request, bytes))) this.answer_failed(record.request);
+    },
+    /**
+     * glReadPixelsOffsetAEMU: the pixels into the pixel pack buffer, once the
+     * batch's reads are back (the CPU side asks for them later, a map:
+     * BUFFER_READ comes in a batch after this one)
+     */
+    read_pixels_pack3(c, [x, y, width, height, format, type, offset]) {
+      const buffer = c.group.buffers.get(c.buffers.pixel_pack);
+      if (!buffer) return;
+      const gpu = this.gpu_buffer(buffer);
+      this.read_region3(c, { x, y, width, height, format, type }, (bytes) => {
+        const n = Math.min(bytes.length, buffer.size - offset);
+        const copy = cpu_bytes(buffer);
+        if (n <= 0 || !copy) return;
+        copy.set(bytes.subarray(0, n), offset);
+        (buffer.packed = buffer.packed || []).push([offset, n]);
+        this.packed3 = this.packed3 || /* @__PURE__ */ new Set();
+        this.packed3.add(buffer);
+        const low = offset & ~3, high = Math.min(gpu.size, align4(offset + n));
+        this.device.queue.writeBuffer(gpu.buffer, low, copy.buffer, copy.byteOffset + low, high - low);
+      });
+    },
+    /**
+     * A rectangle of the read buffer, decoded and packed by a format and
+     * type and the pack state (taken now: later commands of the batch may
+     * change it), handed to `done` once read
+     * @return {boolean} whether there is a read buffer to read
+     */
+    read_region3(c, record, done) {
+      const source = this.read_target3(c);
+      if (!source || source.samples > 1 || !TEXEL_BYTES[source.format] || format_kind(source.format) === "depth") return false;
+      const pack3 = c.pack || NO_STORE;
+      const store = { alignment: c.pack_alignment, row_length: pack3.row_length, skip_pixels: pack3.skip_pixels, skip_rows: pack3.skip_rows };
+      const x0 = Math.max(0, record.x), y0 = Math.max(0, record.y);
+      const x1 = Math.min(source.width, record.x + record.width), y1 = Math.min(source.height, record.y + record.height);
+      const packed = (values) => pack_pixels(values, record.width, record.height, record.format, record.type, store);
+      if (x1 <= x0 || y1 <= y0) {
+        this.reads.push({ buffer: null, done: (_, sink) => done(packed(new Float64Array(record.width * record.height * 4)), sink) });
+        return true;
+      }
+      this.read_texture(source.texture, x0, y0, x1 - x0, y1 - y0, false, (raw, sink) => {
+        const w = x1 - x0;
+        const decoded = decode_texels(raw, w * (y1 - y0), source.format);
+        const values = new Float64Array(record.width * record.height * 4);
+        for (let y = 0; y < y1 - y0; y++) {
+          values.set(decoded.subarray(y * w * 4, (y + 1) * w * 4), ((y + y0 - record.y) * record.width + (x0 - record.x)) * 4);
+        }
+        done(packed(values), sink);
+      }, source.mip, source.layer, TEXEL_BYTES[source.format]);
+      return true;
+    },
+    /**
+     * The render pass on a target (the open one if it is the same);
+     * `clear`: {colors (values by draw buffer), depth, stencil};
+     * `occlusion`: the pass counts samples (the batch's occlusion queries)
+     */
+    begin_pass3(target, clear, occlusion) {
+      if (this.pass && this.pass_target === target.key && !clear && (!occlusion || this.pass_occlusion)) return this.pass;
+      this.end_pass();
+      const colors = target.colors.map((a, i) => {
+        if (!a) return null;
+        const value = clear && clear.colors && clear.colors[i];
+        return Object.assign(
+          { view: a.view, storeOp: "store", loadOp: value ? "clear" : "load" },
+          value ? { clearValue: { r: value[0], g: value[1], b: value[2], a: a.no_alpha ? 1 : value[3] } } : {},
+          a.depth_slice !== void 0 ? { depthSlice: a.depth_slice } : {}
+        );
+      });
+      const descriptor = { label: "GLES 3 pass", colorAttachments: colors };
+      if (target.depth) {
+        const format = target.depth.format;
+        const has_depth = format !== "stencil8", has_stencil = format.includes("stencil");
+        descriptor.depthStencilAttachment = Object.assign(
+          { view: target.depth.view },
+          has_depth ? {
+            depthLoadOp: clear && clear.depth !== void 0 ? "clear" : "load",
+            depthStoreOp: "store",
+            depthClearValue: clear && clear.depth !== void 0 ? clear.depth : 1
+          } : {},
+          has_stencil ? {
+            stencilLoadOp: clear && clear.stencil !== void 0 ? "clear" : "load",
+            stencilStoreOp: "store",
+            stencilClearValue: clear && clear.stencil !== void 0 ? clear.stencil : 0
+          } : {}
+        );
+      }
+      if (occlusion) descriptor.occlusionQuerySet = this.occlusion3().set;
+      this.pass = this.encoder.beginRenderPass(descriptor);
+      this.pass_target = target.key;
+      this.pass_occlusion = !!occlusion;
+      return this.pass;
+    },
+    // ---- occlusion queries
+    /**
+     * The batch's occlusion queries: a WebGPU query a draw while a GL one is
+     * active (`owners`: the GL query each, the shadow's object), summed at
+     * the batch's end into the GL query's `passed` (whether any sample did;
+     * a snapshot keeps it with the shadow)
+     */
+    occlusion3() {
+      if (!this.occlusion) this.occlusion = {
+        set: this.device.createQuerySet({ label: "GLES occlusion", type: "occlusion", count: 4096 }),
+        owners: [],
+        answers: []
+      };
+      return this.occlusion;
+    },
+    /** The context's occlusion query in progress (the shadow's object; begun again, a new one), or null */
+    occlusion_query3(c) {
+      if (!c.active_queries) return null;
+      const name = c.active_queries.get(GL3.ANY_SAMPLES_PASSED) || c.active_queries.get(GL3.ANY_SAMPLES_PASSED_CONSERVATIVE);
+      return name && c.queries.get(name) || null;
+    },
+    /** The batch's end: the occlusion queries resolved and summed, then the results asked for answered */
+    batch_end3() {
+      for (const buffer of this.packed3 || []) buffer.packed = null;
+      if (this.packed3) this.packed3.clear();
+      const o = this.occlusion;
+      if (!o || !o.owners.length && !o.answers.length) return;
+      const owners = o.owners;
+      o.owners = [];
+      if (owners.length) {
+        this.end_pass();
+        const resolved = this.device.createBuffer({ label: "GLES occlusion", size: 8 * owners.length, usage: B.QUERY_RESOLVE | B.COPY_SRC });
+        const read = this.device.createBuffer({ label: "GLES occlusion read", size: 8 * owners.length, usage: B.COPY_DST | B.MAP_READ });
+        this.encoder.resolveQuerySet(o.set, 0, owners.length, resolved, 0);
+        this.encoder.copyBufferToBuffer(resolved, 0, read, 0, 8 * owners.length);
+        this.staging.push(resolved);
+        this.reads.push({ buffer: read, bytes: 8 * owners.length, done: (bytes) => {
+          owners.forEach((query2, i) => {
+            if (bytes.subarray(8 * i, 8 * i + 8).some(Boolean)) query2.passed = 1;
+          });
+        } });
+      }
+      for (const { request, query: query2 } of o.answers) {
+        this.reads.push({ buffer: null, done: (_, sink) => this.answer(sink, request, new Uint8Array(new Uint32Array([query2 && query2.passed || 0]).buffer)) });
+      }
+      o.answers = [];
+    },
+    /** QUERY_READ: an occlusion query's result, after the batch's own draws are counted */
+    query_read3(record) {
+      const conn = this.conns.get(record.conn);
+      const c = conn && this.shadow.context(conn.context);
+      if (!c) return this.answer_failed(record.request);
+      this.occlusion3().answers.push({ request: record.request, query: c.queries ? c.queries.get(record.query) : null });
+      return void 0;
+    },
+    // ---- clears
+    /** glClear: every draw buffer, the depth and stencil buffers (none while RASTERIZER_DISCARD is on) */
+    clear3(c, mask) {
+      if (c.enabled.has(GL3.RASTERIZER_DISCARD)) return;
+      const target = this.target3(c);
+      if (!target) return;
+      const color = c.clear_color.slice();
+      this.clear_target3(c, target, {
+        colors: mask & 16384 ? target.colors.map((a) => a ? color : null) : [],
+        depth: mask & 256 ? c.clear_depth : void 0,
+        stencil: mask & 1024 ? c.clear_stencil : void 0
+      });
+    },
+    /** glClearBuffer{iv,uiv,fv,fi} (none while RASTERIZER_DISCARD is on) */
+    clear_buffer3(c, name, args) {
+      if (c.enabled.has(GL3.RASTERIZER_DISCARD)) return;
+      const target = this.target3(c);
+      if (!target) return;
+      const [buffer, drawbuffer, value] = args;
+      const bytes = value instanceof Uint8Array ? value.slice() : null;
+      const words = bytes ? bytes.buffer : null;
+      if (buffer === 6144) {
+        if (!words || words.byteLength < 16 || !target.colors[drawbuffer]) return;
+        const values = Array.from(name === "glClearBufferfv" ? new Float32Array(words, 0, 4) : name === "glClearBufferuiv" ? new Uint32Array(words, 0, 4) : new Int32Array(words, 0, 4));
+        const colors = [];
+        colors[drawbuffer] = values;
+        this.clear_target3(c, target, { colors, typed: true });
+      } else if (buffer === 6145 && words) this.clear_target3(c, target, { colors: [], depth: new Float32Array(words, 0, 1)[0] });
+      else if (buffer === 6146 && words) this.clear_target3(c, target, { colors: [], stencil: new Int32Array(words, 0, 1)[0] });
+      else if (buffer === 34041) this.clear_target3(c, target, { colors: [], depth: args[2], stencil: args[3] });
+    },
+    /**
+     * Clear what `want` says (colors by draw buffer, depth, stencil) by the
+     * masks and the scissor: the pass's clears when nothing limits them,
+     * else a quad
+     */
+    clear_target3(c, target, want) {
+      const has = (format) => target.depth && (format === "depth" ? target.depth.format !== "stencil8" && target.depth.gl_depth !== false : target.depth.format.includes("stencil") && target.depth.gl_stencil !== false);
+      const depth = want.depth !== void 0 && c.depth_mask && has("depth") ? Math.min(1, Math.max(0, want.depth)) : void 0;
+      const stencil = want.stencil !== void 0 && has("stencil") ? want.stencil & 255 : void 0;
+      const colors = want.colors.map((v, i) => v && target.colors[i] ? target.alpha ? v : [v[0], v[1], v[2], 1] : null);
+      const any_color = colors.some(Boolean);
+      if (!any_color && depth === void 0 && stencil === void 0) return;
+      const scissor = c.enabled.has(SCISSOR_TEST) && !(c.scissor[0] <= 0 && c.scissor[1] <= 0 && c.scissor[0] + c.scissor[2] >= target.width && c.scissor[1] + c.scissor[3] >= target.height);
+      const simple = !scissor && (!any_color || c.color_mask.every(Boolean)) && (stencil === void 0 || (c.stencil_writemask[0] & 255) === 255);
+      if (simple) {
+        this.begin_pass3(target, { colors, depth, stencil });
+        return;
+      }
+      this.clear_quad3(c, target, colors, depth, stencil);
+    },
+    clear_quad3(c, target, colors, depth, stencil) {
+      const types = target.colors.map((a) => a ? { f: "f32", i: "i32", u: "u32" }[format_kind(a.format)] : null);
+      const mask = (c.color_mask[0] ? 1 : 0) | (c.color_mask[1] ? 2 : 0) | (c.color_mask[2] ? 4 : 0) | (c.color_mask[3] && target.alpha ? 8 : 0);
+      const key = [
+        "clear3",
+        target.colors.map((a, i) => a ? a.format + (colors[i] ? mask : 0) : "-").join(","),
+        target.depth ? target.depth.format : "",
+        depth !== void 0 ? 1 : 0,
+        stencil !== void 0 ? c.stencil_writemask[0] & 255 : 0,
+        target.samples
+      ].join("|");
+      let pipeline = this.pipelines.get(key);
+      if (!pipeline) {
+        const outputs = types.map((t, i) => t ? `@location(${i}) c${i} : vec4<${t}>,` : "").join("\n");
+        const writes = types.map((t, i) => t ? `o.c${i} = bitcast<vec4<${t}>>(u[${i}]);` : "").join("\n");
+        const code = `
+                struct Out { ${outputs || "@location(0) unused : vec4<f32>,"} };
+                @group(0) @binding(0) var<uniform> u : array<vec4<u32>, 5>;
+                @vertex fn vs(@builtin(vertex_index) i : u32) -> @builtin(position) vec4<f32> {
+                    let p = array<vec2<f32>, 3>(vec2<f32>(-1.0, -1.0), vec2<f32>(3.0, -1.0), vec2<f32>(-1.0, 3.0));
+                    return vec4<f32>(p[i], bitcast<f32>(u[4].x), 1.0);
+                }
+                @fragment fn fs() -> Out { var o : Out; ${writes} return o; }`;
+        const module = this.device.createShaderModule({ label: "GLES 3 clear", code });
+        const descriptor = {
+          label: "GLES 3 clear",
+          layout: "auto",
+          vertex: { module, entryPoint: "vs" },
+          fragment: { module, entryPoint: "fs", targets: target.colors.map((a, i) => a ? { format: a.format, writeMask: colors[i] ? mask & (a.no_alpha ? 7 : 15) : 0 } : null) },
+          primitive: { topology: "triangle-list" },
+          multisample: { count: target.samples }
+        };
+        if (target.depth) {
+          const format = target.depth.format;
+          descriptor.depthStencil = Object.assign(
+            { format },
+            format !== "stencil8" ? { depthWriteEnabled: depth !== void 0, depthCompare: "always" } : {},
+            format.includes("stencil") ? {
+              stencilFront: { compare: "always", passOp: "replace" },
+              stencilBack: { compare: "always", passOp: "replace" },
+              stencilWriteMask: stencil !== void 0 ? c.stencil_writemask[0] & 255 : 0
+            } : {}
+          );
+        }
+        pipeline = this.device.createRenderPipeline(descriptor);
+        this.pipelines.set(key, pipeline);
+      }
+      const values = new ArrayBuffer(80);
+      target.colors.forEach((a, i) => {
+        if (!a || !colors[i]) return;
+        const kind = format_kind(a.format);
+        (kind === "f" ? new Float32Array(values, i * 16, 4) : kind === "u" ? new Uint32Array(values, i * 16, 4) : new Int32Array(values, i * 16, 4)).set(colors[i]);
+      });
+      new Float32Array(values, 64, 1)[0] = depth === void 0 ? 0 : depth;
+      const pass = this.begin_pass3(target, null);
+      pass.setPipeline(pipeline);
+      pass.setBindGroup(0, this.device.createBindGroup({
+        layout: pipeline.getBindGroupLayout(0),
+        entries: [{ binding: 0, resource: { buffer: this.uniform_buffer(values) } }]
+      }));
+      this.apply_scissor(pass, c, target);
+      pass.setViewport(0, 0, target.width, target.height, 0, 1);
+      if (stencil !== void 0) pass.setStencilReference(stencil);
+      pass.draw(3);
+    },
+    // ---- draws
+    /**
+     * A draw of a GLES 3.x context
+     * @param {?{type: number, bytes: (Uint8Array|undefined), offset: (number|undefined), provoking: (boolean|undefined)}} elements
+     *     (provoking: a list already ordered for GL's provoking vertex)
+     * @param {number=} base_vertex added to each index (GLES 3.1's indirect draws of elements)
+     * @param {?{buffer: !Object, offset: number}=} indirect the draw's parameters in a buffer the GPU wrote (GLES 3.1):
+     *     the GPU reads them, where the draw's arrays and indices can be bound as they are
+     */
+    draw3(c, mode, first, count, elements, instances, base_vertex = 0, indirect = null) {
+      if (!indirect && (count <= 0 || instances <= 0)) return;
+      const stages = this.stages3(c);
+      if (!stages) return;
+      if (c.enabled.has(CULL_FACE) && c.cull_face === 1032 && mode >= 4) return;
+      const target = this.target3(c);
+      if (!target) return;
+      this.blend_destination3(c, target);
+      const shaders = this.program3(c, stages, target);
+      if (!shaders) return;
+      if (mode === PATCHES2) {
+        if (indirect) return void this.note3("an indirect draw of patches");
+        if (stages.vertex !== stages.fragment) return void this.note3("a pipeline's tessellation shaders");
+        return void this.tessellation_draw3(c, stages.vertex, shaders, target, first, count, elements, instances, base_vertex);
+      }
+      if (stages.vertex.info.geometry && stages.vertex === stages.fragment) {
+        if (indirect) return void this.note3("an indirect draw of a geometry shader");
+        return void this.geometry_draw3(c, stages.vertex, shaders, target, mode, first, count, elements, instances, base_vertex);
+      }
+      if (mode >= 10) {
+        const drawn = !indirect && this.draw_vertices3(c, first, count, elements, base_vertex);
+        if (!drawn) return void (indirect && this.note3("an indirect draw with adjacency"));
+        const { vertices, per } = primitives_of(drawn.indices, mode, drawn.restart);
+        const keep = per === 4 ? [1, 2] : [0, 2, 4];
+        const list2 = new Uint32Array(vertices.length / per * keep.length);
+        for (let p = 0, k = 0; p < vertices.length; p += per) for (const i of keep) list2[k++] = vertices[p + i];
+        return void this.draw3(c, per === 4 ? 1 : 4, 0, list2.length, { type: 5125, bytes: new Uint8Array(list2.buffer) }, instances);
+      }
+      const tf = c.tfs && c.tfs.get(c.tf);
+      if (!indirect && !(elements && elements.provoking) && mode >= 1 && mode <= 6 && shaders.flat && !this.capture_only3) {
+        if (tf && tf.active && !tf.paused && !elements) {
+          this.capture_only3 = true;
+          try {
+            this.draw3(c, mode, first, count, elements, instances, base_vertex, indirect);
+          } finally {
+            this.capture_only3 = false;
+          }
+        }
+        const drawn = this.draw_vertices3(c, first, count, elements, base_vertex);
+        if (drawn) {
+          const { vertices, per } = primitives_of(drawn.indices, mode, drawn.restart);
+          if (!vertices.length) return;
+          const list2 = new Uint32Array(vertices.length);
+          for (let p = 0; p < vertices.length; p += per) {
+            list2[p] = vertices[p + per - 1];
+            for (let k = 0; k + 1 < per; k++) list2[p + 1 + k] = vertices[p + k];
+          }
+          return void this.draw3(c, per === 2 ? 1 : 4, 0, list2.length, { type: 5125, bytes: new Uint8Array(list2.buffer), provoking: true }, instances);
+        }
+      }
+      const plan = this.vertex_plan3(c, this.inputs3(stages.vertex), indirect ? 1 : instances);
+      if (!plan) return;
+      if (indirect && (plan.cpu.length || mode === 2 || mode === 6 || elements && INDEX_BYTES[elements.type] < 2)) {
+        return void this.note3("an indirect draw whose arrays or indices are converted");
+      }
+      let list = null, low = 0, high = -1, rebase = false, topology = TOPOLOGY[mode], strip = mode === 3 || mode === 5, direct = null;
+      const fan_or_loop = mode === 2 || mode === 6;
+      if (elements) {
+        const size = INDEX_BYTES[elements.type];
+        const buffer = elements.bytes ? null : c.group.buffers.get(c.element_array_buffer);
+        if (!size || !elements.bytes && !buffer) return;
+        if (buffer && !fan_or_loop && !plan.cpu_vertex && size > 1 && (indirect || elements.offset % size === 0)) {
+          direct = { buffer: this.gpu_buffer(buffer).buffer, format: size === 2 ? "uint16" : "uint32", offset: indirect ? 0 : elements.offset };
+        } else {
+          const source = elements.bytes || (buffer.gpu_newer ? null : cpu_bytes(buffer));
+          if (!source) return void this.note3("indices the GPU wrote, converted");
+          const offset = elements.bytes ? 0 : elements.offset;
+          if (offset + count * size > source.length) return;
+          const view = new DataView(source.buffer, source.byteOffset + offset, count * size);
+          const indices = new Uint32Array(count);
+          for (let i = 0; i < count; i++) indices[i] = size === 1 ? view.getUint8(i) : size === 2 ? view.getUint16(2 * i, true) : view.getUint32(4 * i, true);
+          const restart_index = size === 1 ? 255 : size === 2 ? 65535 : 4294967295;
+          if (base_vertex) {
+            for (let i = 0; i < count; i++) if (!c.enabled.has(RESTART) || indices[i] !== restart_index) indices[i] += base_vertex;
+          }
+          const r = index_list(indices, mode, c.enabled.has(RESTART) ? size === 1 ? 255 : size === 2 ? 65535 : 4294967295 : -1);
+          this.stats.index_lists = (this.stats.index_lists || 0) + 1;
+          if (!r || !r.list.length) return;
+          ({ list, low, high, topology, strip } = r);
+          rebase = true;
+        }
+      } else if (fan_or_loop) {
+        const r = index_list(Uint32Array.from({ length: count }, (_, i) => first + i), mode, -1);
+        this.stats.index_lists = (this.stats.index_lists || 0) + 1;
+        if (!r || !r.list.length) return;
+        ({ list, low, high, topology, strip } = r);
+        rebase = true;
+      } else if (plan.cpu_vertex) {
+        low = first;
+        high = first + count - 1;
+        rebase = true;
+      }
+      if (rebase && high - low >= 1 << 24) return void this.note3("a vertex range past 2^24");
+      const vertex = this.vertex_buffers3(c, plan, {
+        low,
+        high,
+        rebase,
+        instances: indirect ? 0 : instances,
+        indexed: !!(list || direct || indirect),
+        first,
+        count
+      });
+      if (!vertex) return;
+      const group = this.bind_groups3(c, shaders.bindings, target);
+      if (!group) return;
+      if (!elements && !indirect) this.capture3(c, stages.vertex, group, vertex, mode, first, count, instances, rebase);
+      if (c.enabled.has(GL3.RASTERIZER_DISCARD) || this.capture_only3) return;
+      if (c.viewport[2] <= 0 || c.viewport[3] <= 0) return;
+      let index_buffer = null;
+      if (list) {
+        index_buffer = this.device.createBuffer({ label: "GLES indices", size: align4(Math.max(4, list.byteLength)), usage: B.INDEX, mappedAtCreation: true });
+        new Uint32Array(index_buffer.getMappedRange()).set(list);
+        index_buffer.unmap();
+        this.staging.push(index_buffer);
+      }
+      const strip_format = strip && (list || direct) ? direct ? direct.format : "uint32" : void 0;
+      const parameters = indirect && this.gpu_buffer(indirect.buffer).buffer;
+      this.render3(c, target, shaders, vertex, group, topology, strip_format, mode, (pass) => {
+        if (indirect) {
+          if (direct) {
+            pass.setIndexBuffer(direct.buffer, direct.format, 0);
+            pass.drawIndexedIndirect(parameters, indirect.offset);
+          } else pass.drawIndirect(parameters, indirect.offset);
+        } else if (index_buffer) {
+          pass.setIndexBuffer(index_buffer, "uint32");
+          pass.drawIndexed(list.length, instances);
+        } else if (direct) {
+          pass.setIndexBuffer(direct.buffer, direct.format, direct.offset);
+          pass.drawIndexed(count, instances, 0, base_vertex);
+        } else pass.draw(count, instances, rebase ? 0 : first, 0);
+      });
+    },
+    /**
+     * A draw's render passes (one a stencil face where they differ): the
+     * pipeline, the resources, vertex buffers, viewport, scissor, the blend
+     * and stencil references, the occlusion query; `draw` draws in the pass
+     * @param {function(!GPURenderPassEncoder)} draw
+     */
+    render3(c, target, shaders, vertex, group, topology, strip_format, mode, draw) {
+      const [vx, vy, vw, vh] = c.viewport;
+      const occlusion = this.occlusion_query3(c);
+      for (const face of this.stencil_faces3(c, target, mode)) {
+        const pipeline = this.pipeline3(c, shaders, vertex, group, topology, strip_format, target, face);
+        if (!pipeline) return;
+        const pass = this.begin_pass3(target, null, !!occlusion);
+        pass.setPipeline(pipeline);
+        for (const g of group.groups) pass.setBindGroup(g.index, this.device.createBindGroup({ layout: g.layout, entries: g.resources }));
+        vertex.slots.forEach((s, i) => pass.setVertexBuffer(i, s.gpu, s.offset));
+        pass.setViewport(vx, vy, vw, vh, Math.min(c.depth_range[0], c.depth_range[1]), Math.max(c.depth_range[0], c.depth_range[1]));
+        if (!this.apply_scissor(pass, c, target)) return;
+        pass.setBlendConstant(c.blend_func.some((f) => f === 32771 || f === 32772) ? { r: c.blend_color[3], g: c.blend_color[3], b: c.blend_color[3], a: c.blend_color[3] } : { r: c.blend_color[0], g: c.blend_color[1], b: c.blend_color[2], a: c.blend_color[3] });
+        if (c.enabled.has(STENCIL_TEST)) pass.setStencilReference(c.stencil_func[face === void 0 ? 0 : face][1] & 255);
+        const o = occlusion && this.occlusion3();
+        const query2 = o && o.owners.length < 4096 ? o.owners.push(occlusion) - 1 : -1;
+        if (query2 >= 0) pass.beginOcclusionQuery(query2);
+        draw(pass);
+        if (query2 >= 0) pass.endOcclusionQuery();
+      }
+      this.stats.draws++;
+    },
+    /**
+     * An advanced blend's destination (GLES 3.2): the draw's color target
+     * copied before it, which the fragment shader reads and blends with
+     * (glsl_es_rewrite.js), in `blend_dst3`; null for a draw that does not
+     * blend so
+     */
+    blend_destination3(c, target) {
+      this.blend_dst3 = null;
+      if (advanced_blend(c) < 0) return;
+      const color = target.colors[0];
+      if (!color || color.unwritten) return;
+      if (color.samples > 1) return void this.note3("an advanced blend into a multisampled target");
+      const copy = this.device.createTexture({
+        label: "GLES blend destination",
+        size: [target.width, target.height],
+        format: color.format,
+        usage: U.TEXTURE_BINDING | U.COPY_DST
+      });
+      this.end_pass();
+      this.encoder.copyTextureToTexture(
+        { texture: color.texture, mipLevel: color.mip, origin: [0, 0, color.layer || 0] },
+        { texture: copy },
+        [target.width, target.height, 1]
+      );
+      this.staging.push(copy);
+      this.blend_dst3 = { view: copy.createView(), format: color.format };
+    },
+    /**
+     * A draw's vertices in order (its indices, a base vertex added but not to
+     * the restart index), from client memory or the element buffer's bytes
+     * @return {?{indices: !Uint32Array, restart: number}} (restart: the restart index, -1 for none)
+     */
+    draw_vertices3(c, first, count, elements, base_vertex) {
+      if (!elements) return { indices: Uint32Array.from({ length: count }, (_, i) => first + i), restart: -1 };
+      const size = INDEX_BYTES[elements.type];
+      const buffer = elements.bytes ? null : c.group.buffers.get(c.element_array_buffer);
+      const source = elements.bytes || buffer && (buffer.gpu_newer ? null : cpu_bytes(buffer));
+      if (!size || !source) return this.note3("indices the GPU wrote, converted");
+      const offset = elements.bytes ? 0 : elements.offset;
+      if (offset + count * size > source.length) return null;
+      const view = new DataView(source.buffer, source.byteOffset + offset, count * size);
+      const restart = c.enabled.has(RESTART) ? size === 1 ? 255 : size === 2 ? 65535 : 4294967295 : -1;
+      const indices = new Uint32Array(count);
+      for (let i = 0; i < count; i++) {
+        const v = size === 1 ? view.getUint8(i) : size === 2 ? view.getUint16(2 * i, true) : view.getUint32(4 * i, true);
+        indices[i] = v === restart ? v : v + base_vertex;
+      }
+      return { indices, restart };
+    },
+    // ---- geometry shaders (GLES 3.2; vx_naga's geometry.rs)
+    /** vx_naga's JSON answer of `call` (input, its length) with the SPIR-V words in its memory */
+    naga_json3(words, call) {
+      const naga = this.naga;
+      const bytes = new Uint8Array(words.buffer, words.byteOffset, words.byteLength);
+      const input = naga.vx_alloc(bytes.length);
+      new Uint8Array(naga.memory.buffer, input, bytes.length).set(bytes);
+      let out;
+      try {
+        out = call(input, bytes.length);
+      } finally {
+        naga.vx_free(input, bytes.length);
+      }
+      const length = new DataView(naga.memory.buffer).getUint32(out, true);
+      const t = JSON.parse(new TextDecoder().decode(new Uint8Array(naga.memory.buffer, out + 4, length)));
+      naga.vx_free(out, length + 4);
+      return t;
+    },
+    /** A program's geometry shader through vx_naga (cached with the program's GPU side), or null (noted) */
+    geometry3(program) {
+      const gpu = this.program_gpu(program);
+      if (gpu.geometry !== void 0) return gpu.geometry;
+      gpu.geometry = null;
+      const m = program.info.spirv.find((x) => x.stage === "geometry");
+      if (!m || !this.naga.vx_translate_geometry) return this.note3("a geometry shader vx_naga cannot translate");
+      const t = this.naga_json3(m.words, (input, length) => this.naga.vx_translate_geometry(input, length, 1, 0, 0));
+      if (t.error) return this.note3("vx_naga's geometry shader: " + t.error.slice(0, 160));
+      gpu.geometry = {
+        translation: t,
+        layout: t.geometry,
+        passes: /* @__PURE__ */ new Map(),
+        pipelines: /* @__PURE__ */ new Map(),
+        module: this.device.createShaderModule({ label: "GLES 3 geometry", code: "diagnostic(off, derivative_uniformity);\n" + t.wgsl })
+      };
+      return gpu.geometry;
+    },
+    /**
+     * The vertex shader that passes a geometry shader's list on to the
+     * fragment shader: the record's position in WebGPU's clip space (GL's
+     * depth halved, Y flipped as vx_naga's), each output the fragment shader
+     * reads at its location with the fragment input's interpolation; the
+     * list's vertex attributes
+     */
+    pass_shader3(g, shaders) {
+      const key = this.id_of(shaders.fragment.module);
+      let pass = g.passes.get(key);
+      if (pass) return pass;
+      const inputs = fragment_inputs(shaders.fragment.wgsl);
+      const scalar = { f: "f32", i: "i32", u: "u32" };
+      const outputs = g.layout.outputs.filter((o) => inputs.has(o[0]));
+      const type = (o) => o[2] === 1 ? scalar[o[1]] : "vec" + o[2] + "<" + scalar[o[1]] + ">";
+      const code = "struct VxPassOut {\n    @builtin(position) position: vec4<f32>,\n" + outputs.map((o, i) => `    @location(${o[0]}) ${inputs.get(o[0])} o${i}: ${type(o)},
+`).join("") + "}\n@vertex fn vx_pass(@location(0) p: vec4<f32>" + outputs.map((o, i) => `, @location(${i + 1}) a${i}: ${type(o)}`).join("") + ") -> VxPassOut {\n    var o: VxPassOut;\n    o.position = vec4<f32>(p.x, -p.y, (p.z + p.w) * 0.5, p.w);\n" + outputs.map((o, i) => `    o.o${i} = a${i};
+`).join("") + "    return o;\n}\n";
+      const format = (o) => ({ f: "float32", i: "sint32", u: "uint32" })[o[1]] + (o[2] > 1 ? "x" + o[2] : "");
+      pass = { module: this.device.createShaderModule({ label: "GLES 3 geometry pass", code }), attributes: [
+        { shaderLocation: 0, offset: 0, format: "float32x4" },
+        ...outputs.map((o, i) => ({ shaderLocation: i + 1, offset: 4 * (8 + 4 * o[0]), format: format(o) }))
+      ] };
+      g.passes.set(key, pass);
+      return pass;
+    },
+    /** The largest buffer a compute pass binds */
+    most3() {
+      return this.device.limits ? Math.min(this.device.limits.maxStorageBufferBindingSize, this.device.limits.maxBufferSize) : 1 << 27;
+    },
+    /**
+     * The resources of a draw whose stages run as compute shaders too (a
+     * geometry or tessellation shader's): the fragment shader's, the vertex
+     * shader's seen by compute shaders as well, and the translations'
+     */
+    stages_group3(c, program, shaders, translations, target) {
+      const merged = new Map(shaders.bindings.map((b) => [b.group + ":" + b.binding, Object.assign({}, b, { visibility: b.visibility | (b.visibility & 1 ? 4 : 0) })]));
+      for (const b of this.bindings3(translations.map((t) => [t, 4, program]))) {
+        const key = b.group + ":" + b.binding;
+        if (merged.has(key)) merged.get(key).visibility |= 4;
+        else merged.set(key, b);
+      }
+      return this.bind_groups3(c, [...merged.values()].sort((a, b) => a.group - b.group || a.binding - b.binding), target);
+    },
+    /**
+     * The vertex shader run as a compute shader over the vertices a draw's
+     * primitives or patches use, every output captured (xfb3's `all`): the
+     * records, a record's bytes, and each primitive's vertices' record
+     * indices (each instance's after the last's), in a buffer
+     * @param {!Uint32Array} vertices the primitives' vertices in order
+     * @return {?{records: !GPUBuffer, record: number, ids_buffer: !GPUBuffer}}
+     */
+    vertex_records3(c, program, group, vertices, instances) {
+      let low = Infinity, high = -1;
+      for (const v of vertices) {
+        if (v < low) low = v;
+        if (v > high) high = v;
+      }
+      if (high - low >= 1 << 24) return this.note3("a vertex range past 2^24");
+      const plan = this.vertex_plan3(c, this.inputs3(program), instances);
+      if (!plan) return null;
+      const vcount = high - low + 1, rebase = plan.cpu_vertex;
+      const vertex = this.vertex_buffers3(c, plan, { low, high, rebase, instances, indexed: false, first: low, count: vcount });
+      if (!vertex) return null;
+      const capture = this.xfb3(program, vertex, true);
+      if (!capture) return null;
+      const record = capture.xfb.strides[0];
+      if (vcount * instances * record > this.most3()) return this.note3("a draw's vertex records too large");
+      const records = this.device.createBuffer({ label: "GLES vertex records", size: Math.max(16, align4(vcount * instances * record)), usage: B.STORAGE });
+      this.staging.push(records);
+      this.capture_pass3(capture, group, vertex, rebase ? 0 : low, vcount, instances, [records]);
+      const ids = new Uint32Array(Math.max(4, vertices.length * instances));
+      for (let i = 0; i < instances; i++) for (let k = 0; k < vertices.length; k++) ids[i * vertices.length + k] = i * vcount + vertices[k] - low;
+      const ids_buffer = this.device.createBuffer({ label: "GLES primitives' vertices", size: ids.byteLength, usage: B.STORAGE, mappedAtCreation: true });
+      new Uint32Array(ids_buffer.getMappedRange()).set(ids);
+      ids_buffer.unmap();
+      this.staging.push(ids_buffer);
+      return { records, record, ids_buffer };
+    },
+    /** A program's tessellation shaders through vx_naga (cached with the program's GPU side), or null (noted) */
+    tessellation3(program) {
+      const gpu = this.program_gpu(program);
+      if (gpu.tessellation !== void 0) return gpu.tessellation;
+      gpu.tessellation = null;
+      const stage = (name) => program.info.spirv.find((x) => x.stage === name);
+      const control = stage("tess_control"), evaluation = stage("tess_evaluation");
+      if (!control || !evaluation) return this.note3("patches without tessellation shaders");
+      if (!this.naga.vx_translate_tessellation) return this.note3("tessellation shaders vx_naga cannot translate");
+      const [tc, te] = [[control, 1], [evaluation, 0]].map(([m, is_control]) => this.naga_json3(m.words, (input, length) => this.naga.vx_translate_tessellation(input, length, is_control, 1)));
+      const failed = [tc, te].find((t) => t.error);
+      if (failed) return this.note3("vx_naga's tessellation shader: " + failed.error.slice(0, 160));
+      const module = (t) => this.device.createShaderModule({ label: "GLES 3 tessellation", code: "diagnostic(off, derivative_uniformity);\n" + t.wgsl });
+      gpu.tessellation = {
+        tc,
+        te,
+        control: module(tc),
+        evaluation: module(te),
+        pipelines: /* @__PURE__ */ new Map(),
+        // (pass_shader3's: the evaluation shader's outputs as a geometry shader's)
+        pass: { layout: te.tessellation, passes: /* @__PURE__ */ new Map() }
+      };
+      return gpu.tessellation;
+    },
+    /** GX's tessellator (tessellator_wgsl.js): its count, scan and generate pipelines, made once */
+    tessellator3() {
+      if (this.tessellator) return this.tessellator;
+      const module = this.device.createShaderModule({ label: "GLES tessellator", code: globalThis["V86TessellatorWGSL"].TESSELLATOR_WGSL });
+      const layout = this.device.createBindGroupLayout({ entries: [
+        { binding: 0, visibility: 4, buffer: { type: "uniform" } },
+        { binding: 1, visibility: 4, buffer: { type: "read-only-storage" } },
+        ...[2, 3, 4, 5, 6].map((binding) => ({ binding, visibility: 4, buffer: { type: "storage" } }))
+      ] });
+      const pipeline_layout = this.device.createPipelineLayout({ bindGroupLayouts: [layout] });
+      const make = (entryPoint) => this.device.createComputePipeline({
+        label: "GLES tessellator " + entryPoint,
+        layout: pipeline_layout,
+        compute: { module, entryPoint }
+      });
+      this.tessellator = { layout, count: make("count"), scan: make("scan"), generate: make("generate") };
+      return this.tessellator;
+    },
+    /** A compute pipeline of a stage's module and entry point: the draw's resources in group 0, its own in group 1 (`own`'s entries) */
+    stage_pipeline3(cache, group, module, entry, own) {
+      const key = entry + ":" + group.key;
+      let p = cache.get(key);
+      if (!p) {
+        const layouts = [group.groups[0].layout, this.device.createBindGroupLayout({ entries: own })];
+        p = { layouts, pipeline: this.device.createComputePipeline({
+          label: "GLES 3 " + entry,
+          layout: this.device.createPipelineLayout({ bindGroupLayouts: layouts }),
+          compute: { module, entryPoint: entry }
+        }) };
+        cache.set(key, p);
+      }
+      return p;
+    },
+    /**
+     * A draw of patches (GLES 3.2's tessellation; the guest's wire has no
+     * glPatchParameteri: 3 vertices a patch): the vertex shader as a
+     * compute shader over the patches' vertices; the control shader a
+     * workgroup a patch (vx_naga's tessellation.rs); GX's tessellator (its
+     * counts, their sums and the indirect arguments, the points and
+     * indices); the evaluation shader an invocation a point (an indirect
+     * dispatch); the points drawn by the indices (an indirect draw) through
+     * the pass shader with the fragment shader
+     */
+    tessellation_draw3(c, program, shaders, target, first, count, elements, instances, base_vertex) {
+      if (count <= 0 || instances <= 0) return;
+      const t = this.tessellation3(program);
+      if (!t) return;
+      const tf = c.tfs && c.tfs.get(c.tf);
+      if (tf && tf.active && !tf.paused) this.note3("transform feedback of tessellation's output");
+      if (program.info.geometry) this.note3("a geometry shader after tessellation: left out");
+      const drawn = this.draw_vertices3(c, first, count, elements, base_vertex);
+      if (!drawn) return;
+      const per = PATCH_VERTICES;
+      const per_instance = Math.floor(drawn.indices.length / per);
+      if (!per_instance) return;
+      const vertices = drawn.indices.subarray(0, per_instance * per);
+      const group = this.stages_group3(c, program, shaders, [t.tc, t.te], target);
+      if (!group) return;
+      const control = t.tc.tessellation, evaluation = t.te.tessellation;
+      const total = per_instance * instances;
+      const points_most = Math.min(total * 65 * 66, 1 << 18), indices_most = Math.min(total * (6 * 64 * 64 + 12 * 64), 3 << 19);
+      const sizes = [
+        total * control.vertices * control.cp_stride * 4,
+        total * control.patch_stride * 4,
+        points_most * evaluation.stride * 4,
+        points_most * 16,
+        indices_most * 4
+      ];
+      if (sizes.some((n) => n > this.most3()) || total > 65535 * 65535) return void this.note3("a draw of patches too large");
+      const captured = this.vertex_records3(c, program, group, vertices, instances);
+      if (!captured) return;
+      const buffer = (size, usage) => {
+        const b = this.device.createBuffer({ label: "GLES tessellation", size: Math.max(32, align4(size)), usage });
+        this.staging.push(b);
+        return b;
+      };
+      const control_points = buffer(sizes[0], B.STORAGE), patches = buffer(sizes[1], B.STORAGE), vertices_out = buffer(sizes[2], B.STORAGE | B.VERTEX);
+      const points = buffer(sizes[3], B.STORAGE), indices = buffer(sizes[4], B.STORAGE | B.INDEX);
+      const counts = buffer(total * 8, B.STORAGE), offsets = buffer(total * 8, B.STORAGE);
+      const args = buffer(32, B.STORAGE | B.INDIRECT | B.COPY_SRC), draw_args = buffer(32, B.INDIRECT | B.COPY_DST);
+      const read = { buffer: { type: "read-only-storage" } }, write = { buffer: { type: "storage" } }, uniform2 = { buffer: { type: "uniform" } };
+      const entries = (list) => list.map((resource, i) => ({ binding: 960 + i, resource: resource.buffer ? resource : { buffer: resource } }));
+      const layout_of = (list) => list.map((type, i) => Object.assign({ binding: 960 + i, visibility: 4 }, type));
+      const tc = this.stage_pipeline3(t.pipelines, group, t.control, "vx_tess_control", layout_of([uniform2, read, read, write, write]));
+      const te = this.stage_pipeline3(t.pipelines, group, t.evaluation, "vx_tess_eval", layout_of([uniform2, read, read, read, read, write]));
+      const tess = this.tessellator3();
+      const group0 = (layout) => this.device.createBindGroup({ layout, entries: group.groups[0].resources });
+      this.end_pass();
+      const pass = this.encoder.beginComputePass({ label: "GLES 3 tessellation" });
+      pass.setPipeline(tc.pipeline);
+      pass.setBindGroup(0, group0(tc.layouts[0]));
+      pass.setBindGroup(1, this.device.createBindGroup({ layout: tc.layouts[1], entries: entries([
+        { buffer: this.uniform_buffer(new Uint32Array([total, captured.record / 4, per, per_instance, evaluation.domain, 0, 0, 0]).buffer) },
+        captured.records,
+        captured.ids_buffer,
+        control_points,
+        patches
+      ]) }));
+      pass.dispatchWorkgroups(Math.min(total, 65535), Math.ceil(total / 65535));
+      const groups = Math.ceil(total / 64);
+      pass.setBindGroup(0, this.device.createBindGroup({ layout: tess.layout, entries: [
+        { buffer: this.uniform_buffer(new Uint32Array([
+          total,
+          evaluation.domain,
+          evaluation.spacing,
+          evaluation.primitive,
+          control.patch_stride / 4,
+          0,
+          points_most,
+          indices_most
+        ]).buffer) },
+        { buffer: patches },
+        { buffer: counts },
+        { buffer: offsets },
+        { buffer: points },
+        { buffer: indices },
+        { buffer: args }
+      ].map((resource, binding) => ({ binding, resource })) }));
+      for (const [pipeline, n] of [[tess.count, groups], [tess.scan, 1], [tess.generate, groups]]) {
+        pass.setPipeline(pipeline);
+        pass.dispatchWorkgroups(Math.min(n, 65535), Math.ceil(n / 65535));
+      }
+      pass.end();
+      const evaluate = this.encoder.beginComputePass({ label: "GLES 3 tessellation evaluation" });
+      evaluate.setPipeline(te.pipeline);
+      evaluate.setBindGroup(0, group0(te.layouts[0]));
+      evaluate.setBindGroup(1, this.device.createBindGroup({ layout: te.layouts[1], entries: entries([
+        { buffer: this.uniform_buffer(new Uint32Array([per_instance, control.cp_stride, control.patch_stride, control.vertices, evaluation.domain, 0, 0, 0]).buffer) },
+        control_points,
+        patches,
+        points,
+        args,
+        vertices_out
+      ]) }));
+      evaluate.dispatchWorkgroupsIndirect(args, 0);
+      evaluate.end();
+      this.encoder.copyBufferToBuffer(args, 12, draw_args, 0, 16);
+      this.stats.tessellation = (this.stats.tessellation || 0) + 1;
+      if (c.enabled.has(GL3.RASTERIZER_DISCARD) || c.viewport[2] <= 0 || c.viewport[3] <= 0) return;
+      const through = this.pass_shader3(t.pass, shaders);
+      const pass_shaders = {
+        vertex: { module: through.module, entry: "vx_pass" },
+        fragment: shaders.fragment,
+        outputs: shaders.outputs,
+        id: this.id_of(through.module) + ":" + this.id_of(shaders.fragment.module)
+      };
+      const stride = 4 * evaluation.stride;
+      const list_vertex = {
+        slots: [{ gpu: vertices_out, offset: 0, stride, step: "vertex", attributes: through.attributes }],
+        key: "t" + stride + ":" + JSON.stringify(through.attributes)
+      };
+      const topology = ["point-list", "point-list", "line-list", "triangle-list", "triangle-list"][evaluation.primitive];
+      this.render3(c, target, pass_shaders, list_vertex, group, topology, void 0, [0, 0, 1, 4, 4][evaluation.primitive], (render) => {
+        render.setIndexBuffer(indices, "uint32");
+        render.drawIndexedIndirect(draw_args, 0);
+      });
+    },
+    /**
+     * A draw of a program with a geometry shader: the draw's primitives
+     * assembled on the CPU; the vertex shader run as a compute shader over
+     * the vertices they use, every output captured (xfb3's `all`); the
+     * geometry shader as one, an invocation an input primitive and
+     * invocation, into a list of primitives; the list drawn through the pass
+     * shader with the fragment shader
+     */
+    geometry_draw3(c, program, shaders, target, mode, first, count, elements, instances, base_vertex) {
+      if (count <= 0 || instances <= 0) return;
+      const g = this.geometry3(program);
+      if (!g) return;
+      const tf = c.tfs && c.tfs.get(c.tf);
+      if (tf && tf.active && !tf.paused) this.note3("transform feedback of a geometry shader's output");
+      const drawn = this.draw_vertices3(c, first, count, elements, base_vertex);
+      if (!drawn) return;
+      const { vertices, per } = primitives_of(drawn.indices, mode, drawn.restart);
+      if (per !== g.layout.input || !vertices.length) return;
+      const group = this.stages_group3(c, program, shaders, [g.translation], target);
+      if (!group) return;
+      const layout = g.layout;
+      const prims = vertices.length / per, total = prims * instances, invocations = total * layout.invocations;
+      const out_record = 4 * layout.stride;
+      const sizes = [invocations * layout.max_vertices * out_record, invocations * layout.list * out_record];
+      if (sizes.some((n) => n > this.most3()) || Math.ceil(invocations / 64) > 65535) return void this.note3("a geometry shader's draw too large");
+      const captured = this.vertex_records3(c, program, group, vertices, instances);
+      if (!captured) return;
+      const { records, record, ids_buffer } = captured;
+      const [emitted, list] = sizes.map((n, i) => this.device.createBuffer({
+        label: "GLES geometry",
+        size: Math.max(16, align4(n)),
+        usage: B.STORAGE | (i === 1 ? B.VERTEX : 0)
+      }));
+      this.staging.push(emitted, list);
+      const own = [
+        { binding: 960, visibility: 4, buffer: { type: "uniform" } },
+        { binding: 961, visibility: 4, buffer: { type: "read-only-storage" } },
+        { binding: 962, visibility: 4, buffer: { type: "read-only-storage" } },
+        { binding: 963, visibility: 4, buffer: { type: "storage" } },
+        { binding: 964, visibility: 4, buffer: { type: "storage" } }
+      ];
+      const key = group.key;
+      let p = g.pipelines.get(key);
+      if (!p) {
+        const layouts = [group.groups[0].layout, this.device.createBindGroupLayout({ entries: own })];
+        p = { layouts, pipeline: this.device.createComputePipeline({
+          label: "GLES 3 geometry",
+          layout: this.device.createPipelineLayout({ bindGroupLayouts: layouts }),
+          compute: { module: g.module, entryPoint: "vx_geometry" }
+        }) };
+        g.pipelines.set(key, p);
+      }
+      const params = new Uint32Array([total, record / 4, prims, 0]);
+      this.end_pass();
+      const pass = this.encoder.beginComputePass({ label: "GLES 3 geometry" });
+      pass.setPipeline(p.pipeline);
+      pass.setBindGroup(0, this.device.createBindGroup({ layout: p.layouts[0], entries: group.groups[0].resources }));
+      pass.setBindGroup(1, this.device.createBindGroup({ layout: p.layouts[1], entries: [
+        { binding: 960, resource: { buffer: this.uniform_buffer(params.buffer) } },
+        ...[records, ids_buffer, emitted, list].map((buffer, i) => ({ binding: 961 + i, resource: { buffer } }))
+      ] }));
+      pass.dispatchWorkgroups(Math.ceil(invocations / 64));
+      pass.end();
+      this.stats.geometry = (this.stats.geometry || 0) + 1;
+      if (c.enabled.has(GL3.RASTERIZER_DISCARD)) return;
+      if (c.viewport[2] <= 0 || c.viewport[3] <= 0) return;
+      const through = this.pass_shader3(g, shaders);
+      const pass_shaders = {
+        vertex: { module: through.module, entry: "vx_pass" },
+        fragment: shaders.fragment,
+        outputs: shaders.outputs,
+        id: this.id_of(through.module) + ":" + this.id_of(shaders.fragment.module)
+      };
+      const list_vertex = {
+        slots: [{ gpu: list, offset: 0, stride: out_record, step: "vertex", attributes: through.attributes }],
+        key: "g" + out_record + ":" + JSON.stringify(through.attributes)
+      };
+      const topology = ["point-list", "line-list", "triangle-list"][layout.output];
+      this.render3(c, target, pass_shaders, list_vertex, group, topology, void 0, [0, 1, 4][layout.output], (pass2) => pass2.draw(invocations * layout.list));
+    },
+    /** The stencil faces a draw is made of (gles_executor.js's stencil_faces, with the target's depth format) */
+    stencil_faces3(c, target, mode) {
+      const format = target.depth ? target.depth.format : "";
+      return this.stencil_faces(c, { depth: !!target.depth, depth_format: format }, mode);
+    },
+    /**
+     * How each vertex input is read: from its buffer directly, assembled on
+     * the CPU, or its current value
+     * @return {?{direct: !Array<!Object>, cpu: !Array<!Object>, constants: !Array<!Object>, cpu_vertex: boolean}}
+     */
+    vertex_plan3(c, inputs, instances) {
+      const direct = [], cpu = [], constants = [];
+      for (const input of inputs) {
+        const a = input.unused ? UNUSED_INPUT : c.attribs[input.location];
+        if (!a) return this.note3("an input past the attributes");
+        if (!a.enabled) {
+          const current = !input.unused && c.current_values && c.current_values[input.location];
+          constants.push({ input, a: current ? { current: current.values } : a });
+          continue;
+        }
+        const step = a.divisor ? "instance" : "vertex";
+        const buffer = !a.data && a.buffer ? c.group.buffers.get(a.buffer) : null;
+        const format = buffer && buffer.size && !(a.divisor > 1 && instances > 1) ? direct_format(a, input.kind) : null;
+        if (format) {
+          const component = packed_attribute(a.type) ? 4 : TYPE_BYTES[a.type];
+          const element = packed_attribute(a.type) ? 4 : a.size * component;
+          const stride = a.stride || element;
+          if (stride % 4 === 0 && stride <= 2048 && a.offset % Math.min(4, component) === 0 && (a.offset & 3) + element <= stride) {
+            direct.push({ input, a, buffer, format, stride, step, element });
+            continue;
+          }
+        }
+        if (buffer && buffer.gpu_newer) return this.note3("a vertex array the GPU wrote, converted");
+        cpu.push({ input, a, step });
+      }
+      return { direct, cpu, constants, cpu_vertex: cpu.some((x) => x.step === "vertex") };
+    },
+    /**
+     * The draw's vertex buffers by the plan: direct arrays sharing a slot
+     * where their buffer, stride and step agree and their offsets fit in one
+     * vertex; the CPU's in one buffer a step; the current values in one
+     * @param {{low: number, high: number, rebase: boolean, instances: number, indexed: boolean, first: number, count: number}} range
+     * @return {?{slots: !Array<!Object>, key: string}}
+     */
+    vertex_buffers3(c, plan, range) {
+      const slots = [];
+      const groups = /* @__PURE__ */ new Map();
+      for (const d of plan.direct) {
+        const key2 = d.a.buffer + ":" + d.stride + ":" + d.step;
+        if (!groups.has(key2)) groups.set(key2, []);
+        groups.get(key2).push(d);
+      }
+      for (const list of groups.values()) {
+        list.sort((x, y) => x.a.offset - y.a.offset);
+        let slot = null;
+        for (const d of list) {
+          if (!slot || d.a.offset - slot.base + d.element > d.stride) {
+            slot = { buffer: d.buffer, base: d.a.offset & ~3, stride: d.stride, step: d.step, attributes: [], end: 0 };
+            slots.push(slot);
+          }
+          slot.attributes.push({ shaderLocation: d.input.location, offset: d.a.offset - slot.base, format: d.format });
+          slot.end = Math.max(slot.end, d.a.offset - slot.base + d.element);
+        }
+      }
+      for (const slot of slots) {
+        const gpu = this.gpu_buffer(slot.buffer);
+        slot.gpu = gpu.buffer;
+        slot.offset = slot.base + (slot.step === "vertex" && range.rebase ? range.low * slot.stride : 0);
+        const last = slot.step === "instance" ? range.instances - 1 : range.indexed ? -1 : range.rebase ? range.count - 1 : range.first + range.count - 1;
+        if (slot.offset > slot.buffer.size || last >= 0 && slot.offset + last * slot.stride + slot.end > slot.buffer.size) {
+          return this.note3("a vertex array past its buffer");
+        }
+      }
+      for (const step of ["vertex", "instance"]) {
+        const list = plan.cpu.filter((x) => x.step === step);
+        if (!list.length) continue;
+        const n = step === "vertex" ? range.high - range.low + 1 : range.instances;
+        if (n <= 0) return null;
+        const stride = list.reduce((s, x) => s + x.input.components * 4, 0);
+        const words = new Uint32Array(n * stride / 4);
+        const attributes = [];
+        let offset = 0;
+        for (const x of list) {
+          const components = x.input.components;
+          const values = this.values3(
+            c,
+            x.a,
+            step === "vertex" ? range.low : 0,
+            n,
+            components,
+            x.input.kind,
+            step === "vertex" ? 0 : Math.max(1, x.a.divisor)
+          );
+          if (!values) return this.note3("a vertex array with no data");
+          const raw = new Uint32Array(values.buffer);
+          for (let v = 0; v < n; v++) for (let k = 0; k < components; k++) words[(v * stride + offset) / 4 + k] = raw[v * components + k];
+          attributes.push({ shaderLocation: x.input.location, offset, format: CPU_FORMAT[x.input.kind] + (components > 1 ? "x" + components : "") });
+          offset += components * 4;
+        }
+        slots.push({ gpu: this.vertex_data3(words), offset: 0, stride, step, attributes });
+        this.stats.cpu_arrays = (this.stats.cpu_arrays || 0) + list.length;
+      }
+      if (plan.constants.length) {
+        const values = new ArrayBuffer(plan.constants.length * 16);
+        const attributes = plan.constants.map(({ input, a }, i) => {
+          const current = [0, 1, 2, 3].map((k) => a.current[k] === void 0 ? k === 3 ? 1 : 0 : a.current[k]);
+          (input.kind === "f" ? new Float32Array(values, 16 * i, 4) : input.kind === "u" ? new Uint32Array(values, 16 * i, 4) : new Int32Array(values, 16 * i, 4)).set(current);
+          return { shaderLocation: input.location, offset: 16 * i, format: CPU_FORMAT[input.kind] + (input.components > 1 ? "x" + input.components : "") };
+        });
+        slots.push({ gpu: this.vertex_data3(new Uint32Array(values)), offset: 0, stride: 0, step: "instance", attributes });
+      }
+      if (slots.length > (this.device.limits ? this.device.limits.maxVertexBuffers : 8)) return this.note3("more vertex buffers than WebGPU binds");
+      const key = slots.map((s) => s.stride + s.step[0] + s.attributes.map((x) => x.shaderLocation + "@" + x.offset + x.format).join(".")).join("/");
+      return { slots, key };
+    },
+    /** A vertex buffer holding the words */
+    vertex_data3(words) {
+      const buffer = this.device.createBuffer({
+        label: "GLES vertices",
+        size: Math.max(16, words.byteLength),
+        usage: B.VERTEX | B.STORAGE,
+        mappedAtCreation: true
+      });
+      new Uint32Array(buffer.getMappedRange(), 0, words.length).set(words);
+      buffer.unmap();
+      this.staging.push(buffer);
+      return buffer;
+    },
+    /**
+     * An enabled array's values, `components` each (missing ones 0, w 1) as
+     * the input's kind: vertices from `first` (absolute; a client array's
+     * element 0 is vertex 0), or instances by the divisor
+     * @return {?(Float32Array|Int32Array|Uint32Array)}
+     */
+    values3(c, a, first, n, components, kind, divisor) {
+      const packed = packed_attribute(a.type);
+      const type_bytes = TYPE_BYTES[a.type] || 4;
+      const element = packed ? 4 : a.size * type_bytes;
+      let source, base, stride;
+      if (a.data) {
+        source = a.data;
+        stride = element;
+        base = 0;
+      } else {
+        const buffer = c.group.buffers.get(a.buffer);
+        source = buffer && cpu_bytes(buffer);
+        if (!source) return null;
+        stride = a.stride || element;
+        base = a.offset;
+      }
+      const out = kind === "f" ? new Float32Array(n * components) : kind === "i" ? new Int32Array(n * components) : new Uint32Array(n * components);
+      const view = new DataView(source.buffer, source.byteOffset, source.byteLength);
+      const convert = kind === "f" ? (v) => v : (v) => Math.trunc(v);
+      for (let k = 0; k < n; k++) {
+        const at = base + (divisor ? Math.floor(k / divisor) : first + k) * stride;
+        const fits = at + element <= source.length;
+        const parts = fits && packed ? read_packed(view, at, a.type, a.normalized) : null;
+        for (let i = 0; i < components; i++) {
+          let value = i === 3 ? 1 : 0;
+          if (fits && i < (packed ? 4 : a.size)) value = packed ? parts[i] : read_component(view, at + i * type_bytes, a.type, a.normalized && !a.integer);
+          out[k * components + i] = convert(value);
+        }
+      }
+      return out;
+    },
+    // ---- compute (GLES 3.1)
+    /**
+     * glDispatchCompute(Indirect): the compute program's shader through
+     * vx_naga, its resources, a compute pass (between render passes: what it
+     * writes is there for the draws after it)
+     * @param {?Array<number>} groups the work groups, or null for `indirect`'s
+     * @param {?{buffer: !Object, offset: number}} indirect the dispatch indirect buffer's parameters
+     */
+    dispatch3(c, groups, indirect) {
+      const pipeline_object = !c.program && c.program_pipelines && c.program_pipelines.get(c.program_pipeline);
+      const program = c.group.objects.get(c.program || pipeline_object && pipeline_object.stages[32]);
+      if (!program || !program.info || !program.info.ok || !program.info.spirv) return;
+      if (!this.naga) return void this.note3("vx_naga not loaded");
+      const index = program.info.spirv.findIndex((m) => m.stage === "compute");
+      if (index < 0) return;
+      let t = this.translation3(program, index, 0, []);
+      if (!t.error && t.intsamples && t.intsamples.length) {
+        const wraps = this.int_wraps3(c, program, t.intsamples);
+        if (wraps.length) t = this.translation3(program, index, 0, wraps);
+      }
+      if (t.error) return void this.note3("vx_naga: " + t.error.slice(0, 160));
+      const module = this.module3(t.wgsl);
+      const image_writes = this.image_writes3 = [];
+      const group = this.bind_groups3(c, this.bindings3([[t, 4, program]]), { textures: /* @__PURE__ */ new Set() });
+      this.image_writes3 = null;
+      if (!group) return;
+      if (writable_aliases(group)) return void this.note3("a dispatch writing a buffer range or an image two bindings name");
+      this.computes3 = this.computes3 || /* @__PURE__ */ new Map();
+      const key = this.id_of(module) + "|" + group.key;
+      let pipeline = this.computes3.get(key);
+      if (!pipeline) {
+        try {
+          pipeline = this.device.createComputePipeline({
+            label: "GLES 3 compute",
+            layout: group.pipeline_layout,
+            compute: { module, entryPoint: t.entries[0].name }
+          });
+        } catch (error) {
+          if (this.stats.errors.length < 20) this.stats.errors.push("compute pipeline: " + error.message);
+          return;
+        }
+        this.computes3.set(key, pipeline);
+      }
+      const parameters = indirect && this.gpu_buffer(indirect.buffer);
+      this.end_pass();
+      const pass = this.encoder.beginComputePass({ label: "GLES 3 dispatch" });
+      pass.setPipeline(pipeline);
+      for (const g of group.groups) pass.setBindGroup(g.index, this.device.createBindGroup({ layout: g.layout, entries: g.resources }));
+      if (parameters) pass.dispatchWorkgroupsIndirect(parameters.buffer, indirect.offset);
+      else pass.dispatchWorkgroups(groups[0], groups[1], groups[2]);
+      pass.end();
+      for (const write of image_writes) write();
+      this.stats.dispatches = (this.stats.dispatches || 0) + 1;
+    },
+    /**
+     * An indirect draw (GLES 3.1): its parameters with the command, or in the
+     * draw indirect buffer: read there where the CPU side has them, else the
+     * GPU's (a buffer a dispatch wrote)
+     * @param {?Uint8Array} data the parameters, the Data forms'
+     */
+    draw_indirect3(c, mode, type, data, offset) {
+      const elements = type !== 0;
+      const words = 4 + (elements ? 1 : 0);
+      let parameters = null;
+      if (data && data.length >= 4 * words) parameters = new DataView(data.buffer, data.byteOffset, 4 * words);
+      const buffer = !data ? c.group.buffers.get(c.buffers.draw_indirect) : null;
+      if (buffer && !buffer.gpu_newer && cpu_bytes(buffer) && offset + 4 * words <= cpu_bytes(buffer).length) {
+        const bytes = cpu_bytes(buffer);
+        parameters = new DataView(bytes.buffer, bytes.byteOffset + offset, 4 * words);
+      }
+      if (!parameters) {
+        if (!buffer) return;
+        if (elements) this.draw3(c, mode, 0, 0, { type, offset: 0 }, 0, 0, { buffer, offset });
+        else this.draw3(c, mode, 0, 0, null, 0, 0, { buffer, offset });
+        return;
+      }
+      const count = parameters.getUint32(0, true), instances = parameters.getUint32(4, true);
+      if (elements) {
+        const first_index = parameters.getUint32(8, true), base_vertex = parameters.getInt32(12, true);
+        this.draw3(c, mode, 0, count, { type, offset: first_index * INDEX_BYTES[type] }, instances, base_vertex);
+      } else this.draw3(c, mode, parameters.getUint32(8, true), count, null, instances);
+    },
+    // ---- transform feedback
+    /** vx_naga's capture translation of SPIR-V words (vx_translate_xfb) for a vertex layout's words */
+    translate_xfb_spirv(words, desc) {
+      const naga = this.naga;
+      const bytes = new Uint8Array(words.buffer, words.byteOffset, words.byteLength);
+      const input = naga.vx_alloc(bytes.length);
+      new Uint8Array(naga.memory.buffer, input, bytes.length).set(bytes);
+      const list = naga.vx_alloc(desc.length * 4);
+      new Uint32Array(naga.memory.buffer, list, desc.length).set(desc);
+      let out;
+      try {
+        out = naga.vx_translate_xfb(input, bytes.length, 1, 0, 0, 0, list, desc.length);
+      } finally {
+        naga.vx_free(input, bytes.length);
+        naga.vx_free(list, desc.length * 4);
+      }
+      const length = new DataView(naga.memory.buffer).getUint32(out, true);
+      const json = new TextDecoder().decode(new Uint8Array(naga.memory.buffer, out + 4, length));
+      naga.vx_free(out, length + 4);
+      return JSON.parse(json);
+    },
+    /**
+     * The compute shader of a capturing draw (vx_naga's xfb.rs: the vertex
+     * shader run a vertex an invocation, reading the vertex buffers as
+     * storage) for the program and the draw's vertex buffers, or null
+     */
+    xfb3(program, vertex, all = false) {
+      const gpu = this.program_gpu(program);
+      gpu.xfb = gpu.xfb || /* @__PURE__ */ new Map();
+      const key = (all ? "all:" : "") + vertex.key;
+      if (gpu.xfb.has(key)) return gpu.xfb.get(key);
+      let entry = null;
+      const desc = [all ? 2147483649 : 1, 0];
+      vertex.slots.forEach((s, slot) => {
+        for (const a of s.attributes) {
+          desc.push(a.shaderLocation, slot, VK_FORMAT[a.format] || 0, a.offset);
+          desc[1]++;
+        }
+      });
+      desc.push(vertex.slots.length);
+      vertex.slots.forEach((s, slot) => desc.push(slot, s.stride, s.step === "instance" ? 1 : 0));
+      const v = program.info.spirv.find((m) => m.stage === "vertex");
+      if (vertex.slots.some((s) => s.attributes.some((a) => !VK_FORMAT[a.format]))) this.note3("a captured vertex array of a packed type");
+      else {
+        const t = this.translate_xfb_spirv(v.words, desc);
+        if (t.error) this.note3("vx_naga's capture: " + t.error.slice(0, 160));
+        else if (!t.xfb) this.note3("a capture of no varying");
+        else {
+          entry = {
+            module: this.device.createShaderModule({ label: "GLES 3 capture", code: "diagnostic(off, derivative_uniformity);\n" + t.wgsl }),
+            bindings: new Set(t.entries[0].bindings.filter((b) => b[0] === 0).map((b) => b[1])),
+            xfb: t.xfb,
+            pipelines: /* @__PURE__ */ new Map()
+          };
+        }
+      }
+      gpu.xfb.set(key, entry);
+      return entry;
+    },
+    /**
+     * A capture's compute pass (xfb3's entry): `vertex_count` vertices from
+     * `first_vertex` of each of the instances into the scratch buffers
+     * (one a transform feedback buffer the shader writes)
+     */
+    capture_pass3(entry, group, vertex, first_vertex, vertex_count, instances, scratch) {
+      const { buffers, slots } = entry.xfb;
+      const own = group.groups[0].entries.filter((e) => entry.bindings.has(e.binding)).map((e) => Object.assign({}, e, { visibility: 4 }));
+      const capture = [
+        { binding: 960, visibility: 4, buffer: { type: "uniform" } },
+        ...slots.map((s) => ({ binding: 961 + s, visibility: 4, buffer: { type: "read-only-storage" } })),
+        ...buffers.map((b) => ({ binding: 970 + b, visibility: 4, buffer: { type: "storage" } }))
+      ];
+      const key = JSON.stringify(own) + JSON.stringify(capture);
+      let p = entry.pipelines.get(key);
+      if (!p) {
+        const layouts = [this.device.createBindGroupLayout({ entries: own }), this.device.createBindGroupLayout({ entries: capture })];
+        p = { layouts, pipeline: this.device.createComputePipeline({
+          label: "GLES 3 capture",
+          layout: this.device.createPipelineLayout({ bindGroupLayouts: layouts }),
+          compute: { module: entry.module, entryPoint: "vx_xfb" }
+        }) };
+        entry.pipelines.set(key, p);
+      }
+      const total = vertex_count * instances;
+      const params = new Uint32Array(20);
+      params.set([first_vertex, vertex_count, 0, instances, 0, total]);
+      vertex.slots.forEach((s, slot) => {
+        params[12 + slot] = s.offset;
+      });
+      const resources2 = [
+        { binding: 960, resource: { buffer: this.uniform_buffer(params.buffer) } },
+        ...slots.map((s) => ({ binding: 961 + s, resource: { buffer: vertex.slots[s].gpu } })),
+        ...buffers.map((b, i) => ({ binding: 970 + b, resource: { buffer: scratch[i] } }))
+      ];
+      this.end_pass();
+      const pass = this.encoder.beginComputePass({ label: "GLES 3 capture" });
+      pass.setPipeline(p.pipeline);
+      pass.setBindGroup(0, this.device.createBindGroup({ layout: p.layouts[0], entries: group.groups[0].resources.filter((r) => entry.bindings.has(r.binding)) }));
+      pass.setBindGroup(1, this.device.createBindGroup({ layout: p.layouts[1], entries: resources2 }));
+      pass.dispatchWorkgroups(Math.ceil(total / 64));
+      pass.end();
+    },
+    /**
+     * A draw's vertices captured while transform feedback is active (not
+     * paused): the vertex shader run as a compute shader into scratch
+     * buffers, copied after what the bound buffers hold already (the
+     * shadow counted the draw's vertices into the feedback's)
+     */
+    capture3(c, program, group, vertex, mode, first, count, instances, rebase) {
+      const tf = c.tfs && c.tfs.get(c.tf);
+      if (!tf || !tf.active || tf.paused) return;
+      const per = mode === 0 ? 1 : mode === 1 ? 2 : 3;
+      const each = Math.floor(count / per) * per, total = each * instances;
+      if (!total) return;
+      const entry = this.xfb3(program, vertex);
+      if (!entry) return;
+      const { buffers, strides } = entry.xfb;
+      const scratch = buffers.map((b) => this.device.createBuffer({
+        label: "GLES capture",
+        size: Math.max(16, align4(total * strides[b])),
+        usage: B.STORAGE | B.COPY_SRC
+      }));
+      this.staging.push(...scratch);
+      this.capture_pass3(entry, group, vertex, rebase ? 0 : first, each, instances, scratch);
+      buffers.forEach((b, i) => {
+        const binding = tf.bindings[b];
+        const buffer = binding && c.group.buffers.get(binding.buffer);
+        if (!buffer) return;
+        const gpu = this.gpu_buffer(buffer);
+        const at = binding.offset + (tf.vertices[b] - total) * strides[b];
+        const bytes = Math.min(total * strides[b], gpu.size - at);
+        if (at >= 0 && bytes > 0) this.encoder.copyBufferToBuffer(scratch[i], 0, gpu.buffer, at, bytes);
+      });
+      this.stats.captures = (this.stats.captures || 0) + 1;
+    },
+    /** BUFFER_READ: a buffer's bytes (a map of one the GPU wrote) read back for the CPU side */
+    buffer_read3(record) {
+      const conn = this.conns.get(record.conn);
+      const c = conn && this.shadow.context(conn.context);
+      const buffer = c && c.group.buffers.get(record.buffer);
+      if (!buffer || record.offset + record.length > buffer.size) return this.answer_failed(record.request);
+      const gpu = this.gpu_buffer(buffer);
+      const low = record.offset & ~3, high = align4(record.offset + record.length);
+      this.end_pass();
+      const read = this.device.createBuffer({ label: "GLES buffer read", size: Math.max(4, high - low), usage: B.COPY_DST | B.MAP_READ });
+      if (high > low) this.encoder.copyBufferToBuffer(gpu.buffer, low, read, 0, high - low);
+      this.reads.push({ buffer: read, bytes: record.length, skip: record.offset - low, done: (bytes, sink) => {
+        const copy = cpu_bytes(buffer);
+        for (const [offset, n] of copy ? buffer.packed || [] : []) {
+          const from = Math.max(offset, record.offset), to = Math.min(offset + n, record.offset + record.length);
+          if (to > from) bytes.set(copy.subarray(from, to), from - record.offset);
+        }
+        this.answer(sink, record.request, bytes);
+      } });
+      return void 0;
+    },
+    // ---- bind groups
+    /** The texture unit a sampler's element samples: the texture bound to its type's target, the sampler state */
+    texture_unit3(c, program, b, e) {
+      const binding = program.info.bindings.find((x) => x.binding === b && x.kind === "sampler");
+      const values = binding && binding.location >= 0 ? program.values.get(binding.location + e) : null;
+      const unit = Math.max(0, Math.min(c.textures.length - 1, values ? values[0] : 0));
+      const slot = binding && SAMPLER_SLOT.has(binding.type) ? SAMPLER_SLOT.get(binding.type) : 0;
+      const name = c.textures[unit][slot];
+      const texture = name ? c.group.textures.get(name) : c.defaults ? c.defaults.get(SLOT_TARGET[slot]) : null;
+      const sampler = c.samplers && c.samplers[unit] ? c.group.samplers.get(c.samplers[unit]) : null;
+      return { texture: texture || null, state: sampler || texture || NO_SAMPLER };
+    },
+    /**
+     * The program's samplers that clamp to the border (GLES 3.2), as
+     * vx_naga's border.rs takes them in the wraps list: [image key, address
+     * modes], and each border color component [BORDER_COLOR | k << 24 | key, its bits]
+     */
+    border_wraps3(c, program, group) {
+      const entries = [];
+      if (c.version < 32) return entries;
+      const mode = (w) => w in VK_WRAP ? VK_WRAP[w] : 0;
+      for (const binding of program.info.bindings) {
+        if (binding.kind !== "sampler") continue;
+        for (let e = 0; e < Math.max(1, binding.size); e++) {
+          const { state } = this.texture_unit3(c, program, binding.binding, e);
+          if (state.wrap_s !== 33069 && state.wrap_t !== 33069 && state.wrap_r !== 33069) continue;
+          const key = group << 16 | (e ? ELEMENTS + 2 * (16 * binding.binding + e) : 2 * binding.binding);
+          entries.push([key, mode(state.wrap_s) | mode(state.wrap_t) << 4 | mode(state.wrap_r || 10497) << 8]);
+          const bits = new Uint32Array(new Float32Array(state.border_color || [0, 0, 0, 0]).buffer);
+          bits.forEach((b, k) => entries.push([(BORDER_COLOR | k << 24 | key) >>> 0, b]));
+        }
+      }
+      return entries;
+    },
+    /** The wraps of the samplers of a program's integer textures (vx_naga's int_wraps: [group << 16 | binding, modes]) */
+    int_wraps3(c, program, fetched) {
+      const wraps = [];
+      for (const key of fetched) {
+        const { b, e } = spirv_binding(key & 65535);
+        const { state } = this.texture_unit3(c, program, b, e);
+        const mode = (w) => w in VK_WRAP ? VK_WRAP[w] : 0;
+        const modes = mode(state.wrap_s) | mode(state.wrap_t) << 4 | mode(state.wrap_r || 10497) << 8;
+        if (modes !== 546) wraps.push([key, modes]);
+      }
+      return wraps.sort((x, y) => x[0] - y[0]);
+    },
+    /**
+     * A draw's or a dispatch's bind groups: each binding's resource by its
+     * kind and its program's state (the default uniform block, samplers'
+     * textures and samplers, uniform blocks, storage blocks, atomic counter
+     * buffers, image units), the layouts by the resources' types
+     * @param {!Array<!Object>} bindings bindings3's
+     * @return {?{groups: !Array<{index: number, layout: !GPUBindGroupLayout, entries: !Array<!Object>, resources: !Array<!Object>}>,
+     *     pipeline_layout: !GPUPipelineLayout, key: string}}
+     */
+    bind_groups3(c, bindings, target) {
+      const by_group = /* @__PURE__ */ new Map();
+      const samplings = /* @__PURE__ */ new Map();
+      const declarations = new Map(bindings.map((b) => [b.group + ":" + b.binding, b.type]));
+      for (const b of bindings) {
+        if (!by_group.has(b.group)) by_group.set(b.group, { entries: [], resources: [] });
+        const got = this.binding3(c, b, target, samplings, declarations);
+        if (!got) return null;
+        by_group.get(b.group).entries.push(Object.assign({ binding: b.binding, visibility: b.visibility }, got.entry));
+        by_group.get(b.group).resources.push({ binding: b.binding, resource: got.resource });
+      }
+      const count = by_group.size ? Math.max(...by_group.keys()) + 1 : 1;
+      this.layouts3 = this.layouts3 || /* @__PURE__ */ new Map();
+      const layout_of = (entries) => {
+        const key2 = JSON.stringify(entries);
+        let layout = this.layouts3.get(key2);
+        if (!layout) this.layouts3.set(key2, layout = {
+          group: this.device.createBindGroupLayout({ label: "GLES 3 resources", entries }),
+          id: this.layouts3.size + 1
+        });
+        return layout;
+      };
+      const groups = [];
+      for (let index = 0; index < count; index++) {
+        const g = by_group.get(index) || { entries: [], resources: [] };
+        const layout = layout_of(g.entries);
+        groups.push({ index, layout: layout.group, entries: g.entries, resources: g.resources, id: layout.id });
+      }
+      const key = groups.map((g) => g.id).join(".");
+      this.pipeline_layouts3 = this.pipeline_layouts3 || /* @__PURE__ */ new Map();
+      let pipeline_layout = this.pipeline_layouts3.get(key);
+      if (!pipeline_layout) this.pipeline_layouts3.set(key, pipeline_layout = this.device.createPipelineLayout({ bindGroupLayouts: groups.map((g) => g.layout) }));
+      return { groups, pipeline_layout, key };
+    },
+    /** One binding's layout entry (without its binding and visibility) and resource, or null (noted) */
+    binding3(c, b, target, samplings, declarations) {
+      const { binding, kind, program } = b;
+      const buffer_type = kind === "uniform" ? "uniform" : kind === "storage" ? "read-only-storage" : "storage";
+      if (binding === 0) return { entry: { buffer: { type: buffer_type } }, resource: { buffer: this.default_block3(program, b.size) } };
+      const { b: spirv, e } = spirv_binding(binding);
+      if (spirv >= BINDING.SAMPLERS && spirv < BINDING.UNIFORM_BLOCKS) {
+        const key = this.id_of(program) + ":" + b.group + ":" + spirv + ":" + e;
+        let sampling = samplings.get(key);
+        const destination = !sampling && program.info.bindings.some((x) => x.binding === spirv && x.kind === "sampler" && x.blend_destination);
+        if (destination) {
+          const tex = texture_type(declarations.get(b.group + ":" + (binding & ~1)));
+          const view = this.blend_dst3 ? this.blend_dst3.view : this.fallback3(tex).view;
+          sampling = { view, sample_type: "float", filtering: false, state: NO_SAMPLER, tex };
+          samplings.set(key, sampling);
+        }
+        if (!sampling) {
+          const unit = this.texture_unit3(c, program, spirv, e);
+          const tex = texture_type(declarations.get(b.group + ":" + (binding & ~1)));
+          sampling = Object.assign(this.texture_view3(unit.texture, unit.state, tex, target), { state: unit.state, tex });
+          samplings.set(key, sampling);
+        }
+        if (kind.startsWith("texture")) {
+          return {
+            entry: { texture: { sampleType: sampling.sample_type, viewDimension: sampling.tex.dimension, multisampled: sampling.tex.multisampled } },
+            resource: sampling.view
+          };
+        }
+        const comparison = kind === "sampler-comparison";
+        return {
+          entry: { sampler: { type: comparison ? "comparison" : sampling.filtering ? "filtering" : "non-filtering" } },
+          resource: this.sampler3(sampling.state, sampling.filtering, comparison)
+        };
+      }
+      if (spirv >= BINDING.UNIFORM_BLOCKS && spirv < BINDING.STORAGE_BLOCKS && kind !== "storage-rw") {
+        return { entry: { buffer: { type: buffer_type } }, resource: this.block3(c, program, spirv - BINDING.UNIFORM_BLOCKS + e, b.size) };
+      }
+      if (spirv >= BINDING.STORAGE_BLOCKS && spirv < BINDING.ATOMIC_COUNTERS) {
+        const block = (program.info.storage_blocks || [])[spirv - BINDING.STORAGE_BLOCKS + e];
+        return { entry: { buffer: { type: buffer_type } }, resource: this.storage3(c, c.storage_bindings, block ? block.binding : 0, b.size, buffer_type === "storage") };
+      }
+      if (spirv >= BINDING.ATOMIC_COUNTERS && spirv < BINDING.IMAGES) {
+        return { entry: { buffer: { type: "storage" } }, resource: this.storage3(c, c.atomic_bindings, spirv - BINDING.ATOMIC_COUNTERS, b.size, true) };
+      }
+      if (spirv >= BINDING.IMAGES && kind === "storage-texture") {
+        const image = program.info.bindings.find((x) => x.binding === spirv && x.kind === "image");
+        return this.image3(c, (image && image.unit || 0) + e, declarations.get(b.group + ":" + binding));
+      }
+      return this.note3("a binding of " + kind);
+    },
+    /**
+     * A storage block's or an atomic counter buffer's range: what its binding
+     * point holds (for nothing: zeros to read, or a buffer nothing reads to
+     * write); a range shorter than the binding's least size (its WGSL
+     * type's: an unsized array of no elements, the padding after the last)
+     * is that size, of the buffer's memory after it (G-81)
+     * @param {!Array<{buffer: number, offset: number, size: number}>} points the context's binding points of the kind
+     */
+    storage3(c, points, point, size, writable) {
+      const zeros = () => ({ buffer: writable ? this.discard3(size) : this.zeros3(size), offset: 0, size: Math.max(16, align4(size)) });
+      const b = points ? points[point] : null;
+      const buffer = b && b.buffer ? c.group.buffers.get(b.buffer) : null;
+      if (!buffer || !buffer.size || b.offset % 256 || b.offset >= buffer.size) return zeros();
+      let length = b.size ? Math.min(b.size, buffer.size - b.offset) : buffer.size - b.offset;
+      length = align4(Math.max(length, size));
+      const gpu = this.gpu_buffer(buffer, b.offset + length);
+      return { buffer: gpu.buffer, offset: b.offset, size: length };
+    },
+    /**
+     * An image unit's texture as a storage texture of the WGSL type's
+     * format, access and dimension: the unit's level, its layer unless it is
+     * bound layered; a texture of another format binds a texture of nothing
+     */
+    image3(c, unit, type) {
+      const m = /^texture_storage_(2d_array|2d|3d)<(\w+),\s*(\w+)>/.exec(type || "");
+      if (!m) return this.note3("an image of a WGSL type " + type);
+      const dimension = m[1].replace("_", "-"), format = m[2];
+      const access = { read: "read-only", write: "write-only", read_write: "read-write" }[m[3]];
+      const entry = { storageTexture: { access, format, viewDimension: dimension } };
+      const u = c.image_units && c.image_units[unit];
+      const texture = u && u.texture ? c.group.textures.get(u.texture) : null;
+      const gpu = texture && this.gpu_texture3(texture);
+      const proxy = gpu && (gpu.format !== format || !gpu.storage || gpu.three && dimension === "2d") ? this.image_proxy3(gpu, u, format, dimension, access) : null;
+      if (proxy) return { entry, resource: proxy };
+      if (!gpu || gpu.format !== format || !gpu.storage || gpu.three && dimension === "2d") {
+        if (gpu) this.note3("an image unit's texture of a format or size the image cannot take");
+        this.empty_images3 = this.empty_images3 || /* @__PURE__ */ new Map();
+        const key2 = format + ":" + dimension;
+        let view2 = access === "read-only" ? this.empty_images3.get(key2) : null;
+        if (!view2) {
+          const empty = this.device.createTexture({
+            label: "GLES empty image",
+            size: [1, 1, 1],
+            dimension: dimension === "3d" ? "3d" : "2d",
+            format,
+            usage: U.STORAGE_BINDING
+          });
+          view2 = empty.createView({ dimension });
+          if (access === "read-only") this.empty_images3.set(key2, view2);
+          else this.staging.push(empty);
+        }
+        return { entry, resource: view2 };
+      }
+      const mip = Math.max(0, u.level - gpu.first);
+      const key = "image:" + dimension + ":" + mip + ":" + (u.layered ? "all" : u.layer);
+      let view = gpu.views.get(key);
+      if (!view) {
+        view = gpu.texture.createView({
+          dimension,
+          baseMipLevel: mip,
+          mipLevelCount: 1,
+          ...dimension === "2d" ? { baseArrayLayer: gpu.three ? 0 : u.layer, arrayLayerCount: 1 } : {}
+        });
+        gpu.views.set(key, view);
+      }
+      return { entry, resource: view };
+    },
+    /**
+     * An image unit's level (its layer, or all of them for a layered unit)
+     * where the texture cannot be the image itself: another format of the
+     * same texel size (GL reinterprets the bits, WebGPU views no other
+     * format), a 3D texture's layer as a 2D image (WebGPU views no 2D
+     * slice), a format WebGPU stores no texels of. A texture of the image's
+     * format and size gets the texels (through a buffer: the bits as they
+     * are) before the pass, and gives them back after it unless the image
+     * is read-only (image_writes3, dispatch3's)
+     * @return {?GPUTextureView} null where the sizes differ
+     */
+    image_proxy3(gpu, u, format, dimension, access) {
+      const texel = TEXEL_BYTES[format];
+      const mip = u.level - gpu.first;
+      if (!texel || TEXEL_BYTES[gpu.format] !== texel || gpu.samples > 1 || gpu.block > 1 || mip < 0 || mip >= gpu.levels) return null;
+      const width = Math.max(1, gpu.width >> mip), height = Math.max(1, gpu.height >> mip);
+      const layers = gpu.three ? Math.max(1, gpu.depth >> mip) : gpu.depth;
+      const first = dimension === "2d" ? u.layer : 0, count = dimension === "2d" ? 1 : layers;
+      if (first + count > layers) return null;
+      gpu.proxies = gpu.proxies || /* @__PURE__ */ new Map();
+      const key = format + ":" + dimension + ":" + mip + ":" + first;
+      let proxy = gpu.proxies.get(key);
+      if (!proxy) {
+        const created = this.device.createTexture({
+          label: "GLES image proxy",
+          size: [width, height, count],
+          dimension: dimension === "3d" ? "3d" : "2d",
+          format,
+          usage: U.STORAGE_BINDING | U.COPY_SRC | U.COPY_DST
+        });
+        proxy = { texture: created, view: created.createView({ dimension }) };
+        gpu.proxies.set(key, proxy);
+      }
+      const bytes_per_row = Math.ceil(width * texel / 256) * 256;
+      const buffer = this.device.createBuffer({ label: "GLES image proxy copy", size: bytes_per_row * height * count, usage: B.COPY_SRC | B.COPY_DST });
+      this.staging.push(buffer);
+      const layout = { buffer, bytesPerRow: bytes_per_row, rowsPerImage: height };
+      const size = [width, height, count];
+      const own = { texture: gpu.texture, mipLevel: mip, origin: [0, 0, first] };
+      this.end_pass();
+      this.encoder.copyTextureToBuffer(own, layout, size);
+      this.encoder.copyBufferToTexture(layout, { texture: proxy.texture }, size);
+      if (access !== "read-only" && this.image_writes3) {
+        this.image_writes3.push(() => {
+          this.encoder.copyTextureToBuffer({ texture: proxy.texture }, layout, size);
+          this.encoder.copyBufferToTexture(layout, own, size);
+        });
+      }
+      return proxy.view;
+    },
+    /** The default uniform block's buffer: the program's values by their offsets (made again when they change) */
+    default_block3(program, size) {
+      const gpu = this.program_gpu(program);
+      const version = program.values_version || 0;
+      if (gpu.uniforms && gpu.uniforms.version === version && gpu.uniforms.size >= size) return gpu.uniforms.buffer;
+      const info = program.info;
+      const bytes = new ArrayBuffer(Math.ceil(Math.max(16, size, info.default_block_size || 0) / 16) * 16);
+      const view = new DataView(bytes);
+      for (const u of info.uniforms) {
+        if (u.block_index >= 0 || u.opaque || u.location < 0 || u.offset < 0) continue;
+        for (let e = 0; e < u.size; e++) {
+          const values = program.values.get(u.location + e);
+          if (!values) continue;
+          const base = u.offset + e * (u.array_stride || 0);
+          if (u.columns) {
+            for (let col = 0; col < u.columns; col++) {
+              for (let row = 0; row < u.rows; row++) {
+                const at = base + (u.row_major ? row * u.matrix_stride + col * 4 : col * u.matrix_stride + row * 4);
+                if (at + 4 <= bytes.byteLength) view.setFloat32(at, values[col * u.rows + row] || 0, true);
+              }
+            }
+            continue;
+          }
+          for (let i = 0; i < u.components && base + 4 * i + 4 <= bytes.byteLength; i++) {
+            const v = values[i] || 0;
+            if (!u.int) view.setFloat32(base + 4 * i, v, true);
+            else if (u.uint || u.bool) view.setUint32(base + 4 * i, v >>> 0, true);
+            else view.setInt32(base + 4 * i, v | 0, true);
+          }
+        }
+      }
+      const buffer = this.device.createBuffer({ label: "GLES default uniforms", size: bytes.byteLength, usage: B.UNIFORM | B.STORAGE, mappedAtCreation: true });
+      new Uint8Array(buffer.getMappedRange()).set(new Uint8Array(bytes));
+      buffer.unmap();
+      if (gpu.uniforms) this.staging.push(gpu.uniforms.buffer);
+      gpu.uniforms = { version, size: bytes.byteLength, buffer };
+      return buffer;
+    },
+    /** A uniform block's buffer range: what its binding point holds (zeros for nothing; at least the block's WGSL size) */
+    block3(c, program, index, size) {
+      const block = program.info.blocks[index];
+      const point = program.block_bindings ? program.block_bindings[index] : block ? block.binding : 0;
+      const b = c.uniform_bindings[point];
+      const buffer = b && b.buffer ? c.group.buffers.get(b.buffer) : null;
+      const zeros = () => ({ buffer: this.zeros3(size), offset: 0, size: Math.max(16, align4(size)) });
+      const offset = b ? b.offset : 0;
+      if (!buffer || !buffer.size || offset % 256 || offset >= buffer.size) return zeros();
+      let length = b.size ? Math.min(b.size, buffer.size - offset) : buffer.size - offset;
+      length = align4(Math.max(length, size));
+      const gpu = this.gpu_buffer(buffer, offset + length);
+      return { buffer: gpu.buffer, offset, size: length };
+    },
+    /**
+     * A texture's view as a sampler of the WGSL type samples it, by GLES
+     * 3.0's completeness (3.8.13: levels base to max, cube faces, filters of
+     * formats that filter no texels), or the fallback's
+     * @return {{view: !GPUTextureView, sample_type: string, filtering: boolean}}
+     */
+    texture_view3(texture, state, tex, target) {
+      const fallback = () => this.fallback3(tex);
+      if (!texture) return fallback();
+      const level0 = texture.images.get(0);
+      if (level0 && (level0.image || level0.color_buffer)) {
+        const t = level0.image ? this.image_texture(level0.image) : this.color_buffer_texture(level0.color_buffer);
+        if (!t || tex.sample !== "float" || tex.dimension !== "2d" || target.textures.has(t.texture)) return fallback();
+        return { view: t.texture.createView(), sample_type: "float", filtering: true };
+      }
+      const gpu = this.gpu_texture3(texture);
+      if (!gpu || target.textures.has(gpu.texture)) return fallback();
+      if (tex.multisampled !== gpu.samples > 1) return fallback();
+      if (tex.multisampled) {
+        const kind2 = format_kind(gpu.format);
+        const sample_type2 = kind2 === "depth" ? tex.sample === "depth" ? "depth" : "unfilterable-float" : kind2 === "i" ? "sint" : kind2 === "u" ? "uint" : "unfilterable-float";
+        if (tex.sample === "sint" !== (kind2 === "i") || tex.sample === "uint" !== (kind2 === "u")) return fallback();
+        let view2 = gpu.views.get("ms");
+        if (!view2) gpu.views.set("ms", view2 = gpu.texture.createView({ dimension: "2d", aspect: gpu.format.includes("stencil") ? "depth-only" : "all" }));
+        return { view: view2, sample_type: sample_type2, filtering: false };
+      }
+      const three = gpu.three, cube = gpu.cube;
+      let base = texture.base_level || 0;
+      if (texture.immutable) base = Math.min(base, texture.immutable_levels - 1);
+      const first = texture.images.get(base);
+      if (!first || !first.width || !first.height) return fallback();
+      const internal = image_internal(first);
+      const info = format_info(internal);
+      const kind = info ? info.kind : "unorm";
+      const stencil = kind === "depth_stencil" && texture.depth_stencil_mode === STENCIL_INDEX;
+      const depth = !stencil && (kind === "depth" || kind === "depth_stencil");
+      const mipmapped = state.min_filter !== NEAREST && state.min_filter !== LINEAR;
+      const max_level = texture.max_level === void 0 ? 1e3 : texture.max_level;
+      const chain = base + Math.floor(Math.log2(Math.max(first.width, first.height, three ? first.depth || 1 : 1)));
+      const top = !mipmapped ? base : Math.min(max_level, texture.immutable ? texture.immutable_levels - 1 : chain);
+      if (top < base) return fallback();
+      if (cube && first.width !== first.height) return fallback();
+      for (let level = base; level <= top; level++) {
+        const w = Math.max(1, first.width >> level - base), h = Math.max(1, first.height >> level - base);
+        const d = three ? Math.max(1, (first.depth || 1) >> level - base) : first.depth || 1;
+        for (let face = 0; face < (cube ? 6 : 1); face++) {
+          const image = texture.images.get(face * 32 + level);
+          if (!image || image.width !== w || image.height !== h || (image.depth || 1) !== d || image_internal(image) !== internal) return fallback();
+        }
+      }
+      const compare = depth && state.compare_mode === COMPARE_REF_TO_TEXTURE;
+      const filterable = !stencil && (!info || info.filterable || compare);
+      const linear = state.mag_filter !== NEAREST || state.min_filter !== NEAREST && state.min_filter !== NEAREST_MIPMAP_NEAREST;
+      if (!filterable && linear) return fallback();
+      let sample_type;
+      if (tex.sample === "depth") sample_type = depth ? "depth" : null;
+      else if (tex.sample === "sint") sample_type = kind === "int" ? "sint" : null;
+      else if (tex.sample === "uint") sample_type = kind === "uint" || stencil ? "uint" : null;
+      else sample_type = kind === "int" || kind === "uint" ? null : depth || !filterable || info && !info.filterable ? "unfilterable-float" : "float";
+      if (!sample_type) return fallback();
+      const mip = base - gpu.first, count = top - base + 1;
+      if (mip < 0 || mip + count > gpu.levels) return fallback();
+      const aspect = stencil ? "stencil-only" : gpu.format.includes("stencil") && gpu.format !== "stencil8" ? "depth-only" : "all";
+      const dimension = tex.dimension;
+      if (dimension === "3d" !== three || dimension === "cube" && !cube || dimension === "cube-array" && !(gpu.array && gpu.depth % 6 === 0)) return fallback();
+      let swizzle = (texture.swizzle || [6403, 6404, 6405, 6406]).map((v) => ({ 6403: "r", 6404: "g", 6405: "b", 6406: "a", 0: "0", 1: "1" })[v]).join("");
+      if (swizzle !== "rgba" && !this.device.features.has("texture-component-swizzle")) {
+        this.note3("TEXTURE_SWIZZLE without WebGPU's texture-component-swizzle");
+        swizzle = "rgba";
+      }
+      const key = dimension + ":" + mip + ":" + count + ":" + aspect + ":" + swizzle;
+      let view = gpu.views.get(key);
+      if (!view) {
+        view = gpu.texture.createView({
+          dimension,
+          baseMipLevel: mip,
+          mipLevelCount: count,
+          aspect,
+          ...dimension === "2d" ? { arrayLayerCount: 1 } : {},
+          ...swizzle !== "rgba" ? { swizzle } : {}
+        });
+        gpu.views.set(key, view);
+      }
+      return { view, sample_type, filtering: sample_type === "float" };
+    },
+    /** What an incomplete texture samples as, of the WGSL type's dimension and kind: (0, 0, 0, 1) */
+    fallback3(tex) {
+      const key = tex.dimension + ":" + tex.sample + (tex.multisampled ? ":ms" : "");
+      this.fallbacks3 = this.fallbacks3 || /* @__PURE__ */ new Map();
+      let fallback = this.fallbacks3.get(key);
+      if (fallback) return fallback;
+      if (tex.multisampled) {
+        const depth = tex.sample === "depth";
+        const format2 = depth ? "depth16unorm" : tex.sample === "sint" ? "rgba8sint" : tex.sample === "uint" ? "rgba8uint" : COLOR_FORMAT;
+        const texture2 = this.device.createTexture({
+          label: "GLES incomplete texture",
+          size: [1, 1],
+          format: format2,
+          sampleCount: 4,
+          usage: U.TEXTURE_BINDING | U.RENDER_ATTACHMENT
+        });
+        const view = texture2.createView();
+        const encoder = this.device.createCommandEncoder();
+        encoder.beginRenderPass(depth ? { colorAttachments: [], depthStencilAttachment: { view, depthLoadOp: "clear", depthClearValue: 0, depthStoreOp: "store" } } : { colorAttachments: [{ view, loadOp: "clear", clearValue: { r: 0, g: 0, b: 0, a: 1 }, storeOp: "store" }] }).end();
+        this.device.queue.submit([encoder.finish()]);
+        fallback = { view, sample_type: tex.sample === "float" ? "unfilterable-float" : tex.sample, filtering: false };
+        this.fallbacks3.set(key, fallback);
+        return fallback;
+      }
+      const format = tex.sample === "depth" ? "depth16unorm" : tex.sample === "sint" ? "rgba8sint" : tex.sample === "uint" ? "rgba8uint" : COLOR_FORMAT;
+      const layers = tex.dimension === "cube" ? 6 : 1;
+      const texture = this.device.createTexture({
+        label: "GLES incomplete texture",
+        size: [1, 1, layers],
+        dimension: tex.dimension === "3d" ? "3d" : "2d",
+        format,
+        usage: U.TEXTURE_BINDING | U.COPY_DST
+      });
+      const texel = format === "depth16unorm" ? [0, 0] : format === COLOR_FORMAT ? [0, 0, 0, 255] : [0, 0, 0, 1];
+      const data = new Uint8Array(texel.length * layers);
+      for (let i = 0; i < layers; i++) data.set(texel, i * texel.length);
+      this.device.queue.writeTexture({ texture }, data, { bytesPerRow: texel.length, rowsPerImage: 1 }, [1, 1, layers]);
+      fallback = {
+        view: texture.createView({ dimension: tex.dimension }),
+        sample_type: tex.sample === "float" ? "float" : tex.sample,
+        filtering: tex.sample === "float"
+      };
+      this.fallbacks3.set(key, fallback);
+      return fallback;
+    },
+    /** A sampler of a sampler object's (or texture's) state; nearest only for a texture that filters no texels */
+    sampler3(state, filtering, comparison) {
+      const min = state.min_filter, mag = state.mag_filter;
+      const lod_min = Math.min(32, Math.max(0, state.min_lod === void 0 ? -1e3 : state.min_lod));
+      const lod_max = Math.min(32, Math.max(lod_min, state.max_lod === void 0 ? 1e3 : state.max_lod));
+      const compare = comparison ? COMPARE[state.compare_func || 515] : void 0;
+      const key = [min, mag, state.wrap_s, state.wrap_t, state.wrap_r, lod_min, lod_max, filtering, compare].join("|");
+      let sampler = this.samplers.get(key);
+      if (!sampler) {
+        const linear = (f) => filtering && (f === LINEAR || f === 9985 || f === 9987);
+        sampler = this.device.createSampler(Object.assign({
+          addressModeU: WRAPS3[state.wrap_s] || "repeat",
+          addressModeV: WRAPS3[state.wrap_t] || "repeat",
+          addressModeW: WRAPS3[state.wrap_r] || "repeat",
+          magFilter: filtering && mag === LINEAR ? "linear" : "nearest",
+          minFilter: linear(min) ? "linear" : "nearest",
+          mipmapFilter: filtering && (min === 9986 || min === 9987) ? "linear" : "nearest",
+          lodMinClamp: lod_min,
+          lodMaxClamp: lod_max
+        }, compare ? { compare } : {}));
+        this.samplers.set(key, sampler);
+      }
+      return sampler;
+    },
+    /** The pipeline for the program, the vertex buffers, the resources, the state and the target */
+    pipeline3(c, shaders, vertex, group, topology, strip_format, target, face) {
+      const advanced = shaders.fragment.blend_constant ? advanced_blend(c) : -1;
+      const blend = c.enabled.has(BLEND) && advanced < 0;
+      const depth_test = c.enabled.has(DEPTH_TEST) && !(target.depth && target.depth.gl_depth === false);
+      const stencil_test = c.enabled.has(STENCIL_TEST) && !(target.depth && target.depth.gl_stencil === false);
+      const cull = face === 0 ? "back" : face === 1 ? "front" : c.enabled.has(CULL_FACE) ? c.cull_face === 1028 ? "front" : "back" : "none";
+      const masks = face === void 0 ? 0 : face;
+      const depth_format = target.depth ? target.depth.format : "";
+      const key = [
+        "3",
+        shaders.id,
+        vertex.key,
+        group.key,
+        topology,
+        strip_format || "",
+        c.front_face,
+        cull,
+        masks,
+        target.colors.map((a) => a ? a.format + (a.unwritten ? "!" : "") + (a.no_alpha ? "~" : "") : "-").join(","),
+        target.alpha ? "a" : "x",
+        depth_format,
+        target.samples,
+        c.enabled.has(36433) ? c.sample_mask : "-",
+        c.enabled.has(32926) ? "c" : "-",
+        blend ? c.blend_func.join(",") + "/" + c.blend_equation.join(",") : advanced >= 0 ? "advanced" + advanced : "-",
+        c.color_mask.join(""),
+        depth_test ? c.depth_func + ":" + c.depth_mask : "-",
+        stencil_test ? JSON.stringify([c.stencil_func, c.stencil_op, c.stencil_writemask]) : "-",
+        c.enabled.has(POLYGON_OFFSET_FILL) ? c.polygon_offset.join(",") : "-"
+      ].join("|");
+      let pipeline = this.pipelines.get(key);
+      if (pipeline) return pipeline;
+      const write_mask = (c.color_mask[0] ? 1 : 0) | (c.color_mask[1] ? 2 : 0) | (c.color_mask[2] ? 4 : 0) | (c.color_mask[3] && target.alpha ? 8 : 0);
+      const targets = target.colors.map((a, i) => {
+        if (!a) return null;
+        const output = shaders.outputs.get(i);
+        const kind = format_kind(a.format);
+        const fits = !a.unwritten && output && (kind === "f" ? !/[iu]32/.test(output) : output.includes(kind === "i" ? "i32" : "u32"));
+        return { format: a.format, writeMask: fits ? write_mask & (a.no_alpha ? 7 : 15) : 0, blend: blend && fits && blendable(a.format) ? {
+          color: blend_component(c.blend_equation[0], c.blend_func[0], c.blend_func[1]),
+          alpha: blend_component(c.blend_equation[1], c.blend_func[2], c.blend_func[3])
+        } : void 0 };
+      });
+      const descriptor = {
+        label: "GLES 3 pipeline",
+        layout: group.pipeline_layout,
+        vertex: {
+          module: shaders.vertex.module,
+          entryPoint: shaders.vertex.entry,
+          buffers: vertex.slots.map((s) => ({ arrayStride: s.stride, stepMode: s.step, attributes: s.attributes }))
+        },
+        fragment: {
+          module: shaders.fragment.module,
+          entryPoint: shaders.fragment.entry,
+          targets,
+          constants: Object.assign(
+            {},
+            shaders.fragment.samples_constant ? { [SAMPLES_CONSTANT]: target.samples } : {},
+            shaders.fragment.blend_constant ? { [BLEND_CONSTANT]: Math.max(0, advanced) } : {}
+          )
+        },
+        // (the Y flip reverses the winding: GL's CCW is WebGPU's CW)
+        primitive: { topology, frontFace: c.front_face === 2305 ? "cw" : "ccw", cullMode: cull, ...strip_format ? { stripIndexFormat: strip_format } : {} },
+        // (the sample mask, GLES 3.1's; alpha to coverage, of multisampled targets)
+        multisample: {
+          count: target.samples,
+          mask: c.enabled.has(36433) ? c.sample_mask >>> 0 : 4294967295,
+          alphaToCoverageEnabled: c.enabled.has(32926) && target.samples > 1 && shaders.outputs.has(0)
+        }
+      };
+      if (target.depth) {
+        const stencil = depth_format.includes("stencil");
+        const face_state = (i) => ({
+          compare: COMPARE[c.stencil_func[i][0]],
+          failOp: STENCIL_OPS2[c.stencil_op[i][0]],
+          depthFailOp: STENCIL_OPS2[c.stencil_op[i][1]],
+          passOp: STENCIL_OPS2[c.stencil_op[i][2]]
+        });
+        descriptor.depthStencil = Object.assign(
+          { format: depth_format },
+          depth_format !== "stencil8" ? { depthWriteEnabled: depth_test && !!c.depth_mask, depthCompare: depth_test ? COMPARE[c.depth_func] : "always" } : {},
+          stencil && stencil_test ? {
+            stencilFront: face_state(0),
+            stencilBack: face_state(1),
+            stencilReadMask: c.stencil_func[masks][2] & 255,
+            stencilWriteMask: c.stencil_writemask[masks] & 255
+          } : {},
+          c.enabled.has(POLYGON_OFFSET_FILL) && depth_format !== "stencil8" ? {
+            depthBias: Math.round(c.polygon_offset[1]),
+            depthBiasSlopeScale: c.polygon_offset[0]
+          } : {}
+        );
+      }
+      try {
+        pipeline = this.device.createRenderPipeline(descriptor);
+      } catch (error) {
+        if (this.stats.errors.length < 20) this.stats.errors.push("pipeline: " + error.message);
+        return null;
+      }
+      this.stats.pipelines++;
+      this.pipelines.set(key, pipeline);
+      return pipeline;
+    },
+    // ---- commands
+    /**
+     * A command of a GLES 3.x context after the shadow took it: what the GPU
+     * does of it
+     * @return {boolean} whether it was this one's (else GLES 2.0's handles it)
+     */
+    command3(c, name, args) {
+      switch (name) {
+        case "glTexImage2D":
+        case "glTexImage2DOffsetAEMU":
+        case "glTexImage3D":
+        case "glTexImage3DOffsetAEMU":
+        case "glTexSubImage2D":
+        case "glTexSubImage2DOffsetAEMU":
+        case "glTexSubImage3D":
+        case "glTexSubImage3DOffsetAEMU":
+          this.tex_image3(c, name, args);
+          return true;
+        case "glTexStorage2D":
+        case "glTexStorage3D": {
+          const { texture } = this.bound3(c, args[0]);
+          if (texture) this.gpu_texture3(texture);
+          return true;
+        }
+        case "glCompressedTexImage2D":
+        case "glCompressedTexImage2DOffsetAEMU":
+        case "glCompressedTexImage3D":
+        case "glCompressedTexImage3DOffsetAEMU":
+        case "glCompressedTexSubImage2D":
+        case "glCompressedTexSubImage2DOffsetAEMU":
+        case "glCompressedTexSubImage3D":
+        case "glCompressedTexSubImage3DOffsetAEMU":
+          this.compressed_image3(c, name, args);
+          return true;
+        case "glCopyTexImage2D":
+        case "glCopyTexSubImage2D":
+        case "glCopyTexSubImage3D":
+          this.copy_tex_image3(c, name, args);
+          return true;
+        case "glGenerateMipmap":
+          this.generate_mipmap3(c, args[0]);
+          return true;
+        case "glBufferData": {
+          if (c.api === 2) this.buffer_data(c, args, false);
+          const buffer = this.buffer_of3(c, args[0]);
+          if (buffer) buffer.dirty = [0, buffer.size];
+          return true;
+        }
+        case "glBufferSubData":
+          if (c.api === 2) this.buffer_data(c, args, true);
+          this.buffer_written(this.buffer_of3(c, args[0]), args[1], args[2], args[3]);
+          return true;
+        case "glUnmapBufferAEMU": {
+          const [target, offset, length, access, data] = args;
+          if (access & GL3.MAP_WRITE_BIT && !(access & GL3.MAP_FLUSH_EXPLICIT_BIT)) this.buffer_written(this.buffer_of3(c, target), offset, length, data);
+          return true;
+        }
+        case "glFlushMappedBufferRangeAEMU":
+          this.buffer_written(this.buffer_of3(c, args[0]), args[1], args[2], args[4]);
+          return true;
+        case "glCopyBufferSubData": {
+          const [read_target, write_target, read_offset, write_offset, size] = args;
+          const from = this.buffer_of3(c, read_target), to = this.buffer_of3(c, write_target);
+          if (!from || !to || size <= 0) return true;
+          if (!from.gpu_newer) {
+            const bytes = cpu_bytes(to);
+            this.buffer_written(to, write_offset, size, bytes && bytes.subarray(write_offset, write_offset + size));
+            return true;
+          }
+          if (read_offset % 4 || write_offset % 4 || size % 4) {
+            this.note3("an unaligned copy of a buffer the GPU wrote");
+            return true;
+          }
+          const a = this.gpu_buffer(from), b = this.gpu_buffer(to);
+          this.end_pass();
+          this.encoder.copyBufferToBuffer(a.buffer, read_offset, b.buffer, write_offset, size);
+          return true;
+        }
+        case "glRenderbufferStorage":
+        case "glRenderbufferStorageMultisample":
+          this.renderbuffer_storage3(c);
+          return true;
+        case "glEGLImageTargetRenderbufferStorage": {
+          const rb = c.group.renderbuffers.get(c.renderbuffer);
+          if (rb && rb.gpu) this.staging.push(rb.gpu);
+          if (rb) rb.gpu = null;
+          return true;
+        }
+        case "glVertexAttribPointerData":
+          c.attribs[args[0]].data = args[5];
+          return true;
+        case "glVertexAttribIPointerDataAEMU":
+          c.attribs[args[0]].data = args[4];
+          return true;
+        case "glVertexAttribPointerOffset":
+        case "glVertexAttribIPointerOffsetAEMU":
+          c.attribs[args[0]].data = null;
+          return true;
+        case "glClear":
+          this.clear3(c, args[0]);
+          return true;
+        case "glBlitFramebuffer":
+          this.blit_framebuffer3(c, args);
+          return true;
+        case "glReadPixelsOffsetAEMU":
+          this.read_pixels_pack3(c, args);
+          return true;
+        case "glClearBufferiv":
+        case "glClearBufferuiv":
+        case "glClearBufferfv":
+        case "glClearBufferfi":
+          this.clear_buffer3(c, name, args);
+          return true;
+        case "glDrawArrays":
+          this.draw3(c, args[0], args[1], args[2], null, 1);
+          return true;
+        case "glDrawArraysInstanced":
+          this.draw3(c, args[0], args[1], args[2], null, args[3]);
+          return true;
+        case "glDrawElementsData":
+          this.draw3(c, args[0], 0, args[1], { type: args[2], bytes: args[3] }, 1);
+          return true;
+        case "glDrawElementsOffset":
+          this.draw3(c, args[0], 0, args[1], { type: args[2], offset: args[3] }, 1);
+          return true;
+        case "glDrawElementsInstancedDataAEMU":
+          this.draw3(c, args[0], 0, args[1], { type: args[2], bytes: args[3] }, args[4]);
+          return true;
+        case "glDrawElementsInstancedOffsetAEMU":
+          this.draw3(c, args[0], 0, args[1], { type: args[2], offset: args[3] }, args[4]);
+          return true;
+        case "glDrawRangeElementsDataAEMU":
+          this.draw3(c, args[0], 0, args[3], { type: args[4], bytes: args[5] }, 1);
+          return true;
+        case "glDrawRangeElementsOffsetAEMU":
+          this.draw3(c, args[0], 0, args[3], { type: args[4], offset: args[5] }, 1);
+          return true;
+        // (GLES 3.1)
+        case "glDispatchCompute":
+          this.dispatch3(c, args, null);
+          return true;
+        case "glDispatchComputeIndirect":
+          this.dispatch3(c, null, { buffer: c.group.buffers.get(c.buffers.dispatch_indirect), offset: args[0] });
+          return true;
+        case "glMemoryBarrier":
+        case "glMemoryBarrierByRegion":
+          this.end_pass();
+          return true;
+        case "glDrawArraysIndirectDataAEMU":
+          this.draw_indirect3(c, args[0], 0, args[1], 0);
+          return true;
+        case "glDrawArraysIndirectOffsetAEMU":
+          this.draw_indirect3(c, args[0], 0, null, args[1]);
+          return true;
+        case "glDrawElementsIndirectDataAEMU":
+          this.draw_indirect3(c, args[0], args[1], args[2], 0);
+          return true;
+        case "glDrawElementsIndirectOffsetAEMU":
+          this.draw_indirect3(c, args[0], args[1], null, args[2]);
+          return true;
+      }
+      if (/^gl(Program)?Uniform(?!BlockBinding)/.test(name)) {
+        const pipeline = !c.program && c.program_pipelines && c.program_pipelines.get(c.program_pipeline);
+        const program = c.group.objects.get(name.startsWith("glProgram") ? args[0] : c.program || pipeline && pipeline.active);
+        if (program) program.values_version = (program.values_version || 0) + 1;
+        return true;
+      }
+      return false;
+    }
+  };
+
+  // src/gles/page/gles_executor.js
+  var TEXTURE_USAGE = U.TEXTURE_BINDING | U.COPY_DST | U.COPY_SRC | U.RENDER_ATTACHMENT;
+  var READBACK_HEADER = 16;
+  var DEPTH_FORMATS = {
+    [GL.DEPTH_COMPONENT16]: "depth16unorm",
+    [GL.DEPTH_COMPONENT24_OES]: "depth24plus",
+    [GL.STENCIL_INDEX8]: "stencil8",
+    [GL.DEPTH24_STENCIL8_OES]: "depth24plus-stencil8"
+  };
+  var TYPE_BYTES2 = { [GL.BYTE]: 1, [GL.UNSIGNED_BYTE]: 1, [GL.SHORT]: 2, [GL.UNSIGNED_SHORT]: 2, [GL.FLOAT]: 4, [GL.FIXED]: 4, [GL.HALF_FLOAT_OES]: 2 };
+  function half_to_float(h) {
+    const s = h & 32768 ? -1 : 1, e = h >> 10 & 31, m = h & 1023;
+    if (e === 0) return s * m * 2 ** -24;
+    if (e === 31) return m ? NaN : s * Infinity;
+    return s * (1 + m / 1024) * 2 ** (e - 15);
+  }
+  function reachable_bindings(source, entry, result) {
+    const text = source.replace(/\/\*[\s\S]*?\*\//g, "").replace(/\/\/[^\r\n]*/g, "");
+    const bindings = /* @__PURE__ */ new Map();
+    for (const m of text.matchAll(/@group\s*\(\s*(\d+)\s*\)\s*@binding\s*\(\s*(\d+)\s*\)\s*var(?:\s*<[^>]*>)?\s+([A-Za-z_][A-Za-z0-9_]*)\s*:/g)) {
+      bindings.set(m[3], m[1] + ":" + m[2]);
+    }
+    const functions = /* @__PURE__ */ new Map();
+    const pattern = /\bfn\s+([A-Za-z_][A-Za-z0-9_]*)\s*\(/g;
+    for (let m; m = pattern.exec(text); ) {
+      const open = text.indexOf("{", pattern.lastIndex);
+      if (open < 0) break;
+      let depth = 1, end = open + 1;
+      while (end < text.length && depth) {
+        if (text[end] === "{") depth++;
+        else if (text[end] === "}") depth--;
+        end++;
+      }
+      functions.set(m[1], text.slice(open + 1, end - 1));
+      pattern.lastIndex = end;
+    }
+    const pending = [entry], visited = /* @__PURE__ */ new Set();
+    while (pending.length) {
+      const name = pending.pop();
+      if (visited.has(name)) continue;
+      visited.add(name);
+      const body = functions.get(name);
+      if (body === void 0) continue;
+      for (const [variable, key] of bindings) if (new RegExp("\\b" + variable + "\\b").test(body)) result.add(key);
+      for (const call of body.matchAll(/\b([A-Za-z_][A-Za-z0-9_]*)\s*\(/g)) if (functions.has(call[1]) && !visited.has(call[1])) pending.push(call[1]);
+    }
+  }
+  function GLESExecutor(options) {
+    this.device = options.device;
+    this.layer = options.layer || null;
+    this.reset();
+  }
+  GLESExecutor.prototype.reset = function() {
+    this.rc = { images: /* @__PURE__ */ new Map(), color_buffers: /* @__PURE__ */ new Map() };
+    this.shadow = new GLESShadow(this.rc);
+    this.shadow.keep_bytes = true;
+    this.shadow.trusted = true;
+    this.conns = /* @__PURE__ */ new Map();
+    this.surfaces = /* @__PURE__ */ new Map();
+    this.shaders = /* @__PURE__ */ new Map();
+    this.pipelines = /* @__PURE__ */ new Map();
+    this.samplers = /* @__PURE__ */ new Map();
+    this.fallback = null;
+    this.blit = null;
+    this.posted = 0;
+    this.stats = { batches: 0, records: 0, draws: 0, refused: 0, pipelines: 0, uploads: 0, posts: 0, errors: [] };
+    this.pass = null;
+    this.pass_target = null;
+  };
+  GLESExecutor.prototype.submit = async function(bytes, sink) {
+    const records = read_gles_batch(bytes, true);
+    this.stats.batches++;
+    if (!this.naga && (records.some((r) => r.name === "PROGRAM_LINK") || [...this.shadow.contexts.values()].some((c) => c.glslang))) {
+      try {
+        await this.load_naga();
+      } catch (error) {
+        if (this.stats.errors.length < 20) this.stats.errors.push("vx_naga: " + (error && error.message || error));
+      }
+    }
+    this.encoder = this.device.createCommandEncoder({ label: "GLES batch" });
+    this.reads = [];
+    this.staging = [];
+    for (const record of records) {
+      this.stats.records++;
+      try {
+        this.run(record);
+      } catch (error) {
+        if (this.stats.errors.length < 20) this.stats.errors.push((record.command ? record.command.name : record.name) + ": " + (error && error.message || error));
+      }
+    }
+    this.batch_end3();
+    this.end_pass();
+    this.device.queue.submit([this.encoder.finish()]);
+    this.encoder = null;
+    for (const object of this.staging) object.destroy();
+    this.staging = [];
+    const reads = this.reads;
+    this.reads = [];
+    for (const read of reads) {
+      if (!read.buffer) {
+        read.done(null, sink);
+        continue;
+      }
+      await read.buffer.mapAsync(globalThis.GPUMapMode ? globalThis.GPUMapMode.READ : 1);
+      const mapped = new Uint8Array(read.buffer.getMappedRange());
+      const row = read.bytes || read.width * (read.texel || 4);
+      const rows = new Uint8Array(row * (read.bytes ? 1 : read.height));
+      if (read.bytes) rows.set(mapped.subarray(read.skip || 0, (read.skip || 0) + read.bytes));
+      else for (let y = 0; y < read.height; y++) {
+        const from = read.flip ? read.height - 1 - y : y;
+        rows.set(mapped.subarray(from * read.stride, from * read.stride + row), y * row);
+      }
+      read.buffer.unmap();
+      read.buffer.destroy();
+      read.done(rows, sink);
+    }
+  };
+  GLESExecutor.prototype.run = function(record) {
+    switch (record.name) {
+      case "COMMAND":
+        return this.command(record);
+      case "CONTEXT_CREATE":
+        return this.shadow.create_context(record.context, record.api, record.share);
+      case "CONTEXT_DESTROY":
+        return this.shadow.destroy_context(record.context);
+      case "SURFACE_CREATE":
+        this.surfaces.set(record.surface, {
+          config: record.config,
+          width: record.width,
+          height: record.height,
+          color_buffer: 0,
+          texture: null,
+          depth: null,
+          depth_format: ""
+        });
+        return void 0;
+      case "SURFACE_DESTROY": {
+        const s = this.surfaces.get(record.surface);
+        if (s && s.texture) this.staging.push(s.texture);
+        if (s && s.depth) this.staging.push(s.depth);
+        this.surfaces.delete(record.surface);
+        return void 0;
+      }
+      case "SURFACE_COLOR_BUFFER": {
+        const s = this.surfaces.get(record.surface);
+        if (s) s.color_buffer = record.color_buffer;
+        return void 0;
+      }
+      case "MAKE_CURRENT": {
+        this.conns.set(record.conn, { context: record.context, draw: record.draw, read: record.read });
+        const s = this.surfaces.get(record.draw);
+        this.shadow.make_current(record.context, s ? { width: s.width, height: s.height, config: CONFIGS[s.config] } : null);
+        return void 0;
+      }
+      case "CONNECTION_CLOSE":
+        this.conns.delete(record.conn);
+        return void 0;
+      case "PROGRAM_LINK": {
+        const conn = this.conns.get(record.conn);
+        const c = conn && this.shadow.context(conn.context);
+        const program = c && c.group.objects.get(record.program);
+        if (program && program.kind === "program") program.provided = unpack_program(record.bytes);
+        else if (c) (this.shadow.pending_links = this.shadow.pending_links || /* @__PURE__ */ new Map()).set(record.program, unpack_program(record.bytes));
+        return void 0;
+      }
+      case "COLOR_BUFFER_CREATE": {
+        const texture = this.device.createTexture({
+          label: "color buffer " + record.color_buffer,
+          size: [record.width, record.height],
+          format: COLOR_FORMAT,
+          usage: TEXTURE_USAGE
+        });
+        this.rc.color_buffers.set(record.color_buffer, { width: record.width, height: record.height, format: record.format, texture });
+        if (record.format === GL.RGB) this.clear_texture(texture, [0, 0, 0, 1]);
+        return void 0;
+      }
+      case "COLOR_BUFFER_DESTROY": {
+        const cb = this.rc.color_buffers.get(record.color_buffer);
+        if (cb) this.staging.push(cb.texture);
+        this.rc.color_buffers.delete(record.color_buffer);
+        return void 0;
+      }
+      case "COLOR_BUFFER_UPDATE": {
+        const cb = this.rc.color_buffers.get(record.color_buffer);
+        if (!cb || !record.width || !record.height) return void 0;
+        const rgba = to_rgba8(record.format, record.type, record.width, record.height, 1, record.bytes);
+        this.upload(cb.texture, 0, 0, record.x, record.y, record.width, record.height, rgba);
+        return void 0;
+      }
+      case "COLOR_BUFFER_READ": {
+        const cb = this.rc.color_buffers.get(record.color_buffer);
+        if (!cb) return this.answer_failed(record.request);
+        return this.read_texture(
+          cb.texture,
+          record.x,
+          record.y,
+          record.width,
+          record.height,
+          false,
+          (rgba, sink) => this.answer(sink, record.request, rgba)
+        );
+      }
+      case "COLOR_BUFFER_BIND": {
+        const conn = this.conns.get(record.conn);
+        if (conn) this.shadow.bind_color_buffer(conn.context, record.color_buffer, !!record.texture);
+        return void 0;
+      }
+      case "IMAGE_CREATE":
+        this.rc.images.set(record.image, { context: record.context, target: record.target, buffer: record.buffer });
+        return void 0;
+      case "IMAGE_DESTROY":
+        this.rc.images.delete(record.image);
+        return void 0;
+      case "FLUSH_SURFACE":
+        return this.flush_surface(record.surface);
+      case "POST":
+        return this.post(record.color_buffer);
+      case "READ_PIXELS":
+        return this.read_pixels(record);
+      case "BUFFER_READ":
+        return this.buffer_read3(record);
+      case "QUERY_READ":
+        return this.query_read3(record);
+    }
+    return void 0;
+  };
+  GLESExecutor.prototype.command = function(record) {
+    const conn = this.conns.get(record.conn);
+    const context = conn ? conn.context : 0;
+    const c = this.shadow.context(context);
+    if (!c) return;
+    const name = record.command.name.replace(/OES$/, "");
+    const args = record.args;
+    const before = name === "glDeleteTextures" || name === "glDeleteRenderbuffers" || name === "glDeleteBuffers" ? new Int32Array(args[1].buffer.slice(args[1].byteOffset, args[1].byteOffset + args[1].length)) : null;
+    const objects = name === "glDeleteTextures" ? c.group.textures : name === "glDeleteRenderbuffers" ? c.group.renderbuffers : name === "glDeleteBuffers" ? c.group.buffers : null;
+    const gone = before ? [...before].map((n) => objects.get(n)).filter(Boolean) : [];
+    this.shadow.given_name = name === "glCreateShader" || name === "glCreateProgram" || name === "glCreateShaderProgramvAEMU" ? record.ret : 0;
+    const { keep } = this.shadow.call(context, record.command, args);
+    this.shadow.given_name = 0;
+    if (!keep) {
+      this.stats.refused++;
+      const by = this.stats.refused_by = this.stats.refused_by || {};
+      const key = name + ":0x" + c.error.toString(16);
+      if (key in by || Object.keys(by).length < 20) by[key] = (by[key] || 0) + 1;
+      return;
+    }
+    for (const object of gone) if (object.gpu && object.gpu.destroy && ![...objects.values()].includes(object)) this.staging.push(object.gpu);
+    if (c.glslang && this.command3(c, name, args)) return void 0;
+    switch (name) {
+      case "glTexImage2D":
+        return this.tex_image(c, args, false);
+      case "glTexSubImage2D":
+        return this.tex_image(c, args, true);
+      case "glCompressedTexImage2D":
+        return this.compressed_tex_image(c, args);
+      case "glCopyTexImage2D":
+        return this.copy_tex_image(c, args, false);
+      case "glCopyTexSubImage2D":
+        return this.copy_tex_image(c, args, true);
+      case "glGenerateMipmap":
+        return this.generate_mipmap(c, args[0]);
+      case "glEGLImageTargetTexture2D":
+        return this.invalidate_texture(c, args[0]);
+      case "glBufferData":
+        return this.buffer_data(c, args, false);
+      case "glBufferSubData":
+        return this.buffer_data(c, args, true);
+      case "glRenderbufferStorage":
+      case "glEGLImageTargetRenderbufferStorage":
+        return this.renderbuffer_storage(c);
+      case "glVertexAttribPointerData":
+        c.attribs[args[0]].data = args[5];
+        return void 0;
+      case "glVertexAttribPointerOffset":
+        c.attribs[args[0]].data = null;
+        return void 0;
+      case "glClear":
+        return this.clear(c, args[0]);
+      case "glDrawArrays":
+        return this.draw(c, args[0], args[1], args[2], null);
+      case "glDrawElementsData":
+        return this.draw(c, args[0], 0, args[1], { type: args[2], bytes: args[3] });
+      case "glDrawElementsOffset":
+        return this.draw(c, args[0], 0, args[1], { type: args[2], offset: args[3] });
+      case "glDrawTexs":
+      case "glDrawTexi":
+      case "glDrawTexf":
+        return this.draw_tex(c, args);
+      case "glDrawTexx":
+        return this.draw_tex(c, args.map((v) => v / 65536));
+      case "glDrawTexsv":
+        return this.draw_tex(c, Array.from(new Int16Array(args[0].slice().buffer)));
+      case "glDrawTexiv":
+        return this.draw_tex(c, Array.from(new Int32Array(args[0].slice().buffer)));
+      case "glDrawTexfv":
+        return this.draw_tex(c, Array.from(new Float32Array(args[0].slice().buffer)));
+      case "glDrawTexxv":
+        return this.draw_tex(c, Array.from(new Int32Array(args[0].slice().buffer), (v) => v / 65536));
+    }
+    return void 0;
+  };
+  function bound(c, target) {
+    const face = target === GL.TEXTURE_2D ? 0 : target - GL.TEXTURE_CUBE_MAP_POSITIVE_X;
+    const slot = target === GL.TEXTURE_2D ? 0 : target === GL.TEXTURE_EXTERNAL_OES ? 2 : 1;
+    const name = c.textures[c.active_texture][slot];
+    const texture = name ? c.group.textures.get(name) : c.defaults && c.defaults.get(slot === 0 ? GL.TEXTURE_2D : slot === 2 ? GL.TEXTURE_EXTERNAL_OES : GL.TEXTURE_CUBE_MAP);
+    return { texture, face: face >= 0 && face < 6 ? face : 0 };
+  }
+  GLESExecutor.prototype.gpu_texture = function(texture) {
+    const cube = texture.target === GL.TEXTURE_CUBE_MAP;
+    const base = cube ? [0, 1, 2, 3, 4, 5].map((face) => texture.images.get(face * 32)).find((image) => image && image.width) : texture.images.get(0);
+    if (!base || !base.width || !base.height) return null;
+    const levels = Math.floor(Math.log2(Math.max(base.width, base.height))) + 1;
+    const gpu = texture.gpu;
+    if (gpu && gpu.width === base.width && gpu.height === base.height && gpu.cube === cube) return gpu;
+    const created = this.device.createTexture({
+      label: "GL texture",
+      size: [base.width, base.height, cube ? 6 : 1],
+      format: COLOR_FORMAT,
+      usage: TEXTURE_USAGE,
+      mipLevelCount: levels
+    });
+    if (gpu && gpu.texture) this.staging.push(gpu.texture);
+    texture.gpu = {
+      texture: created,
+      width: base.width,
+      height: base.height,
+      cube,
+      levels,
+      views: /* @__PURE__ */ new Map(),
+      destroy: () => created.destroy()
+    };
+    return texture.gpu;
+  };
+  GLESExecutor.prototype.write_target = function(texture, level) {
+    const base = texture.images.get(0);
+    if (base && (base.image || base.color_buffer)) {
+      if (level) return null;
+      const t = base.image ? this.image_texture(base.image) : this.color_buffer_texture(base.color_buffer);
+      return t ? { texture: t.texture, levels: 1 } : null;
+    }
+    const gpu = this.gpu_texture(texture);
+    return gpu ? { texture: gpu.texture, levels: gpu.levels } : null;
+  };
+  GLESExecutor.prototype.invalidate_texture = function(c, target) {
+    const { texture } = bound(c, target);
+    if (texture && texture.gpu && texture.gpu.texture) this.staging.push(texture.gpu.texture);
+    if (texture) texture.gpu = null;
+  };
+  GLESExecutor.prototype.tex_image = function(c, args, sub) {
+    const [target, level] = args;
+    const { texture, face } = bound(c, target);
+    if (!texture) return;
+    const image = texture.images.get(face * 32 + level);
+    let x = 0, y = 0, width, height, format, type, pixels;
+    if (sub) [, , x, y, width, height, format, type, pixels] = args;
+    else [, , , width, height, , format, type, pixels] = args;
+    if (!width || !height) return;
+    const target_texture = this.write_target(texture, level);
+    if (!target_texture || level >= target_texture.levels || (target_texture.texture.width >> level || 1) < x + width) return;
+    void image;
+    const rgba = to_rgba8(format, type, width, height, c.unpack_alignment, pixels);
+    this.upload(target_texture.texture, level, face, x, y, width, height, rgba);
+  };
+  GLESExecutor.prototype.compressed_tex_image = function(c, args) {
+    const [target, level, , width, height, , , data] = args;
+    const { texture, face } = bound(c, target);
+    const t = texture && this.write_target(texture, level);
+    if (!t || level >= t.levels) return;
+    this.upload(t.texture, level, face, 0, 0, width, height, decode_etc1(width, height, data));
+  };
+  GLESExecutor.prototype.copy_tex_image = function(c, args, sub) {
+    const [target, level] = args;
+    let xoffset = 0, yoffset = 0, x, y, width, height;
+    if (sub) [, , xoffset, yoffset, x, y, width, height] = args;
+    else [, , , x, y, width, height] = args;
+    const { texture, face } = bound(c, target);
+    const gpu = texture && this.write_target(texture, level);
+    const source = this.target_of(c);
+    if (!gpu || !source || !source.color || level >= gpu.levels || gpu.texture === source.color) return;
+    const sx = Math.max(0, x), sy = Math.max(0, y);
+    const w = Math.min(width - (sx - x), source.width - sx), h = Math.min(height - (sy - y), source.height - sy);
+    if (w <= 0 || h <= 0) return;
+    this.end_pass();
+    this.encoder.copyTextureToTexture(
+      { texture: source.color, origin: [sx, sy, 0] },
+      { texture: gpu.texture, mipLevel: level, origin: [xoffset + sx - x, yoffset + sy - y, face] },
+      [w, h, 1]
+    );
+  };
+  GLESExecutor.prototype.generate_mipmap = function(c, target) {
+    const { texture } = bound(c, target === GL.TEXTURE_2D ? GL.TEXTURE_2D : GL.TEXTURE_CUBE_MAP);
+    const gpu = texture && this.gpu_texture(texture);
+    if (!gpu) return;
+    this.end_pass();
+    for (let face = 0; face < (gpu.cube ? 6 : 1); face++) {
+      for (let level = 1; level < gpu.levels; level++) {
+        const view = (l) => gpu.texture.createView({ dimension: "2d", baseMipLevel: l, mipLevelCount: 1, baseArrayLayer: face, arrayLayerCount: 1 });
+        this.blit_into(view(level - 1), view(level), false, true);
+      }
+    }
+  };
+  GLESExecutor.prototype.upload = function(texture, level, layer, x, y, width, height, rgba) {
+    this.end_pass();
+    const stride = Math.ceil(width * 4 / 256) * 256;
+    const staging = this.device.createBuffer({ label: "GLES upload", size: stride * height, usage: B.COPY_SRC, mappedAtCreation: true });
+    const mapped = new Uint8Array(staging.getMappedRange());
+    for (let row = 0; row < height; row++) mapped.set(rgba.subarray(row * width * 4, (row + 1) * width * 4), row * stride);
+    staging.unmap();
+    this.encoder.copyBufferToTexture(
+      { buffer: staging, bytesPerRow: stride, rowsPerImage: height },
+      { texture, mipLevel: level, origin: [x, y, layer] },
+      [width, height, 1]
+    );
+    this.staging.push(staging);
+    this.stats.uploads++;
+  };
+  GLESExecutor.prototype.clear_texture = function(texture, rgba) {
+    this.end_pass();
+    const pass = this.encoder.beginRenderPass({ colorAttachments: [{
+      view: texture.createView(),
+      loadOp: "clear",
+      clearValue: { r: rgba[0], g: rgba[1], b: rgba[2], a: rgba[3] },
+      storeOp: "store"
+    }] });
+    pass.end();
+  };
+  GLESExecutor.prototype.buffer_data = function(c, args, sub) {
+    const target = args[0];
+    const name = target === GL.ARRAY_BUFFER ? c.array_buffer : c.element_array_buffer;
+    const buffer = c.group.buffers.get(name);
+    if (!buffer) return;
+    if (!sub) {
+      const [, size2, data2] = args;
+      buffer.data = new Uint8Array(size2);
+      if (data2) buffer.data.set(data2.subarray(0, size2));
+      return;
+    }
+    const [, offset, size, data] = args;
+    if (!buffer.data) buffer.data = new Uint8Array(buffer.size);
+    if (data) buffer.data.set(data.subarray(0, size), offset);
+  };
+  GLESExecutor.prototype.renderbuffer_storage = function(c) {
+    const rb = c.group.renderbuffers.get(c.renderbuffer);
+    if (!rb) return;
+    if (rb.gpu) this.staging.push(rb.gpu);
+    rb.gpu = null;
+    if (!rb.width || !rb.height) return;
+    const format = DEPTH_FORMATS[rb.format] || COLOR_FORMAT;
+    const texture = this.device.createTexture({
+      label: "GL renderbuffer",
+      size: [rb.width, rb.height],
+      format,
+      usage: U.RENDER_ATTACHMENT | U.COPY_SRC | U.COPY_DST | (format === COLOR_FORMAT ? U.TEXTURE_BINDING : 0)
+    });
+    rb.gpu = { texture, format, destroy: () => texture.destroy() };
+  };
+  GLESExecutor.prototype.target_of = function(c) {
+    if (!c.framebuffer) return this.surface_target(c);
+    const fbo = c.framebuffers.get(c.framebuffer);
+    const view_of = (a) => {
+      if (!a) return null;
+      if (a.type === GL.RENDERBUFFER) {
+        const rb = c.group.renderbuffers.get(a.name);
+        if (rb && rb.image) return this.image_texture(rb.image);
+        return rb && rb.gpu ? { texture: rb.gpu.texture, format: rb.gpu.format, layer: 0, level: 0 } : null;
+      }
+      const texture = c.group.textures.get(a.name);
+      const image = texture && texture.images.get(a.face * 32 + a.level);
+      if (image && image.image) return this.image_texture(image.image);
+      if (image && image.color_buffer) return this.color_buffer_texture(image.color_buffer);
+      const gpu = texture && this.gpu_texture(texture);
+      return gpu ? { texture: gpu.texture, format: COLOR_FORMAT, layer: a.face, level: a.level } : null;
+    };
+    const color = view_of(fbo.attachments.get(GL.COLOR_ATTACHMENT0));
+    const depth = view_of(fbo.attachments.get(GL.DEPTH_ATTACHMENT)) || view_of(fbo.attachments.get(GL.STENCIL_ATTACHMENT));
+    const any = color || depth;
+    if (!any) return null;
+    const view = (t) => t.texture.createView({ dimension: "2d", baseMipLevel: t.level, mipLevelCount: 1, baseArrayLayer: t.layer, arrayLayerCount: 1 });
+    const width = Math.max(1, any.texture.width >> any.level), height = Math.max(1, any.texture.height >> any.level);
+    return {
+      color: color ? color.texture : null,
+      color_view: color ? view(color) : null,
+      depth: depth ? view(depth) : null,
+      depth_format: depth ? depth.format : "",
+      width,
+      height,
+      alpha: true,
+      key: "f" + (color ? this.id_of(color.texture) + ":" + color.level + ":" + color.layer : "-") + "/" + (depth ? this.id_of(depth.texture) : "-")
+    };
+  };
+  GLESExecutor.prototype.surface_target = function(c) {
+    const surface = c.surface && [...this.surfaces.values()].find((s2) => s2.width === c.surface.width && s2.height === c.surface.height && CONFIGS[s2.config] === c.surface.config && this.current_surface_of(c) === s2);
+    const s = surface || this.current_surface_of(c);
+    if (!s) return null;
+    this.surface_textures(s);
+    return {
+      color: s.texture,
+      color_view: s.view,
+      depth: s.depth_view,
+      depth_format: s.depth_format,
+      depth_texture: s.depth,
+      width: s.width,
+      height: s.height,
+      key: "s" + s.id,
+      alpha: CONFIGS[s.config][CONFIG_ATTRIBUTES.indexOf(EGL.ALPHA_SIZE)] > 0
+    };
+  };
+  GLESExecutor.prototype.id_of = function(object) {
+    this.ids = this.ids || /* @__PURE__ */ new WeakMap();
+    let id = this.ids.get(object);
+    if (!id) this.ids.set(object, id = this.next_id = (this.next_id || 0) + 1);
+    return id;
+  };
+  GLESExecutor.prototype.current_surface_of = function(c) {
+    for (const conn of this.conns.values()) {
+      if (this.shadow.context(conn.context) === c) return this.surfaces.get(conn.draw) || null;
+    }
+    return null;
+  };
+  GLESExecutor.prototype.surface_textures = function(s) {
+    if (s.texture) return;
+    const config = CONFIGS[s.config];
+    s.id = s.id || this.id_of(s);
+    s.texture = this.device.createTexture({ label: "window surface", size: [s.width, s.height], format: COLOR_FORMAT, usage: TEXTURE_USAGE });
+    s.view = s.texture.createView();
+    const depth = config[CONFIG_ATTRIBUTES.indexOf(EGL.DEPTH_SIZE)], stencil = config[CONFIG_ATTRIBUTES.indexOf(EGL.STENCIL_SIZE)];
+    s.depth_format = stencil ? "depth24plus-stencil8" : depth ? "depth24plus" : "";
+    if (s.depth_format) {
+      s.depth = this.device.createTexture({ label: "window depth", size: [s.width, s.height], format: s.depth_format, usage: U.RENDER_ATTACHMENT });
+      s.depth_view = s.depth.createView();
+    }
+    this.clear_texture(s.texture, [0, 0, 0, config[CONFIG_ATTRIBUTES.indexOf(EGL.ALPHA_SIZE)] ? 0 : 1]);
+  };
+  GLESExecutor.prototype.image_texture = function(image) {
+    const object = this.rc.images.get(image);
+    return object ? this.color_buffer_texture(object.buffer) : null;
+  };
+  GLESExecutor.prototype.color_buffer_texture = function(handle) {
+    const cb = this.rc.color_buffers.get(handle);
+    return cb ? { texture: cb.texture, format: COLOR_FORMAT, layer: 0, level: 0 } : null;
+  };
+  GLESExecutor.prototype.begin_pass = function(target, clear) {
+    if (this.pass && this.pass_target === target.key && !clear) return this.pass;
+    this.end_pass();
+    const color = target.color_view ? [{
+      view: target.color_view,
+      loadOp: clear && clear.color ? "clear" : "load",
+      storeOp: "store",
+      clearValue: clear && clear.color ? { r: clear.color[0], g: clear.color[1], b: clear.color[2], a: clear.color[3] } : void 0
+    }] : [];
+    const descriptor = { label: "GLES pass", colorAttachments: color };
+    if (target.depth) {
+      const has_depth = target.depth_format !== "stencil8", has_stencil = target.depth_format.includes("stencil");
+      descriptor.depthStencilAttachment = Object.assign(
+        { view: target.depth },
+        has_depth ? { depthLoadOp: clear && clear.depth !== void 0 ? "clear" : "load", depthStoreOp: "store", depthClearValue: clear ? clear.depth : 1 } : {},
+        has_stencil ? { stencilLoadOp: clear && clear.stencil !== void 0 ? "clear" : "load", stencilStoreOp: "store", stencilClearValue: clear ? clear.stencil : 0 } : {}
+      );
+    }
+    this.pass = this.encoder.beginRenderPass(descriptor);
+    this.pass_target = target.key;
+    return this.pass;
+  };
+  GLESExecutor.prototype.end_pass = function() {
+    if (!this.pass) return;
+    this.pass.end();
+    this.pass = null;
+    this.pass_target = null;
+  };
+  GLESExecutor.prototype.clear = function(c, mask) {
+    const target = this.target_of(c);
+    if (!target) return;
+    const scissor = c.enabled.has(3089) && !(c.scissor[0] <= 0 && c.scissor[1] <= 0 && c.scissor[0] + c.scissor[2] >= target.width && c.scissor[1] + c.scissor[3] >= target.height);
+    const full_color = c.color_mask.every(Boolean) && (target.alpha || true);
+    const want = {
+      color: mask & 16384 && target.color_view,
+      depth: mask & 256 && target.depth && target.depth_format !== "stencil8",
+      stencil: mask & 1024 && target.depth && target.depth_format.includes("stencil")
+    };
+    const simple = !scissor && (!want.color || full_color) && (!want.depth || c.depth_mask) && (!want.stencil || (c.stencil_writemask[0] & 255) === 255);
+    if (simple) {
+      const color = c.clear_color.slice();
+      if (!target.alpha) color[3] = 1;
+      this.begin_pass(target, { color: want.color ? color : null, depth: want.depth ? c.clear_depth : void 0, stencil: want.stencil ? c.clear_stencil & 255 : void 0 });
+      return;
+    }
+    this.clear_quad(c, target, want);
+  };
+  GLESExecutor.prototype.clear_quad = function(c, target, want) {
+    const key = [
+      "clear",
+      target.color_view ? COLOR_FORMAT : "-",
+      target.depth_format,
+      want.color ? c.color_mask.join("") : "0000",
+      want.depth ? 1 : 0,
+      want.stencil ? c.stencil_writemask[0] & 255 : 0
+    ].join("|");
+    let pipeline = this.pipelines.get(key);
+    if (!pipeline) {
+      const module = this.device.createShaderModule({ code: `
+            @group(0) @binding(0) var<uniform> u : vec4<f32>;
+            @group(0) @binding(1) var<uniform> d : vec4<f32>;
+            @vertex fn vs(@builtin(vertex_index) i : u32) -> @builtin(position) vec4<f32> {
+                let p = array<vec2<f32>, 3>(vec2<f32>(-1.0, -1.0), vec2<f32>(3.0, -1.0), vec2<f32>(-1.0, 3.0));
+                return vec4<f32>(p[i], d.x, 1.0);
+            }
+            @fragment fn fs() -> @location(0) vec4<f32> { return u; }` });
+      const descriptor = {
+        label: "GLES clear",
+        layout: "auto",
+        vertex: { module, entryPoint: "vs" },
+        fragment: { module, entryPoint: "fs", targets: target.color_view ? [{
+          format: COLOR_FORMAT,
+          writeMask: want.color ? (c.color_mask[0] ? 1 : 0) | (c.color_mask[1] ? 2 : 0) | (c.color_mask[2] ? 4 : 0) | (c.color_mask[3] ? 8 : 0) : 0
+        }] : [] },
+        primitive: { topology: "triangle-list" }
+      };
+      if (target.depth) {
+        const stencil = target.depth_format.includes("stencil");
+        descriptor.depthStencil = Object.assign(
+          { format: target.depth_format },
+          target.depth_format !== "stencil8" ? { depthWriteEnabled: !!want.depth, depthCompare: "always" } : {},
+          stencil ? {
+            stencilFront: { compare: "always", passOp: "replace" },
+            stencilBack: { compare: "always", passOp: "replace" },
+            stencilWriteMask: want.stencil ? c.stencil_writemask[0] & 255 : 0
+          } : {}
+        );
+      }
+      pipeline = this.device.createRenderPipeline(descriptor);
+      this.pipelines.set(key, pipeline);
+    }
+    const pass = this.begin_pass(target, null);
+    const uniforms = new Float32Array([...c.clear_color, c.clear_depth * 2 - 1, 0, 0, 0]);
+    if (!target.alpha) uniforms[3] = 1;
+    const buffer = this.device.createBuffer({ size: 256 + 16, usage: B.UNIFORM, mappedAtCreation: true });
+    const mapped = new Float32Array(buffer.getMappedRange());
+    mapped.set(uniforms.subarray(0, 4), 0);
+    mapped.set(uniforms.subarray(4, 8), 64);
+    buffer.unmap();
+    this.staging.push(buffer);
+    pass.setPipeline(pipeline);
+    pass.setBindGroup(0, this.device.createBindGroup({ layout: pipeline.getBindGroupLayout(0), entries: [
+      { binding: 0, resource: { buffer, offset: 0, size: 16 } },
+      { binding: 1, resource: { buffer, offset: 256, size: 16 } }
+    ] }));
+    this.apply_scissor(pass, c, target);
+    pass.setViewport(0, 0, target.width, target.height, 0, 1);
+    if (want.stencil) pass.setStencilReference(c.clear_stencil & 255);
+    pass.draw(3);
+  };
+  GLESExecutor.prototype.apply_scissor = function(pass, c, target) {
+    let [x, y, w, h] = c.enabled.has(3089) ? c.scissor : [0, 0, target.width, target.height];
+    const x0 = Math.max(0, Math.min(target.width, x)), y0 = Math.max(0, Math.min(target.height, y));
+    const x1 = Math.max(x0, Math.min(target.width, x + w)), y1 = Math.max(y0, Math.min(target.height, y + h));
+    pass.setScissorRect(x0, y0, x1 - x0, y1 - y0);
+    return x1 > x0 && y1 > y0;
+  };
+  GLESExecutor.prototype.draw = function(c, mode, first, count, elements) {
+    if (!count) return;
+    const program = c.api === 1 ? null : c.group.objects.get(c.program);
+    if (c.api !== 1 && (!program || !program.info || !program.info.ok)) return;
+    if (c.enabled.has(2884) && c.cull_face === 1032 && mode >= GL.TRIANGLES) return;
+    const target = this.target_of(c);
+    if (!target) return;
+    let indices = null, low = first, high = first + count - 1;
+    if (elements) {
+      const source = elements.bytes || (c.group.buffers.get(c.element_array_buffer) || {}).data;
+      if (!source) return;
+      const size = elements.type === GL.UNSIGNED_BYTE ? 1 : elements.type === GL.UNSIGNED_SHORT ? 2 : 4;
+      const offset = elements.bytes ? 0 : elements.offset;
+      if (offset + count * size > source.length) return;
+      const view = new DataView(source.buffer, source.byteOffset + offset, count * size);
+      indices = new Uint32Array(count);
+      low = Infinity;
+      high = 0;
+      for (let i = 0; i < count; i++) {
+        const v = size === 1 ? view.getUint8(i) : size === 2 ? view.getUint16(2 * i, true) : view.getUint32(4 * i, true);
+        indices[i] = v;
+        if (v < low) low = v;
+        if (v > high) high = v;
+      }
+    }
+    const vertices = high - low + 1;
+    if (vertices <= 0 || vertices > 1 << 24) return;
+    let topology = {
+      [GL.POINTS]: "point-list",
+      [GL.LINES]: "line-list",
+      [GL.LINE_STRIP]: "line-strip",
+      [GL.LINE_LOOP]: "line-strip",
+      [GL.TRIANGLES]: "triangle-list",
+      [GL.TRIANGLE_STRIP]: "triangle-strip",
+      [GL.TRIANGLE_FAN]: "triangle-list"
+    }[mode];
+    let list = indices ? Array.from(indices, (v) => v - low) : null;
+    if (mode === GL.TRIANGLE_FAN || mode === GL.LINE_LOOP) {
+      const order = list || Array.from({ length: count }, (_, i) => i);
+      if (mode === GL.TRIANGLE_FAN) {
+        list = [];
+        for (let i = 1; i + 1 < order.length; i++) list.push(order[0], order[i], order[i + 1]);
+      } else list = [...order, order[0]];
+    }
+    const index_count = list ? list.length : count;
+    if (!index_count) return;
+    const ff = c.api === 1 ? this.ff_shaders(c, mode === GL.POINTS) : null;
+    const shaders = ff ? ff.shaders : this.program_shaders(program);
+    if (!shaders) return;
+    const layout = ff ? this.ff_layout(c, ff.generated, low, vertices) : this.vertex_layout(c, program, low, vertices);
+    if (!layout) return;
+    const [vx, vy, vw, vh] = c.viewport;
+    if (vw <= 0 || vh <= 0) return;
+    let index_buffer = null;
+    if (list) {
+      const data = new Uint32Array(list);
+      index_buffer = this.device.createBuffer({ size: align4(data.byteLength), usage: B.INDEX, mappedAtCreation: true });
+      new Uint32Array(index_buffer.getMappedRange()).set(data);
+      index_buffer.unmap();
+      this.staging.push(index_buffer);
+    }
+    for (const face of this.stencil_faces(c, target, mode)) {
+      const pipeline = this.pipeline(c, program, shaders, layout, topology, target, !!list, face);
+      if (!pipeline) return;
+      const pass = this.begin_pass(target, null);
+      pass.setPipeline(pipeline);
+      const groups = ff ? this.ff_bind_groups(c, ff, pipeline, target, c.viewport) : this.bind_groups(c, program, shaders, pipeline, target);
+      for (const [index, group] of groups) pass.setBindGroup(index, group);
+      layout.buffers.forEach((buffer, slot) => pass.setVertexBuffer(slot, buffer));
+      pass.setViewport(vx, vy, vw, vh, Math.min(c.depth_range[0], c.depth_range[1]), Math.max(c.depth_range[0], c.depth_range[1]));
+      if (!this.apply_scissor(pass, c, target)) return;
+      pass.setBlendConstant(c.blend_func.some((f) => f === 32771 || f === 32772) ? { r: c.blend_color[3], g: c.blend_color[3], b: c.blend_color[3], a: c.blend_color[3] } : { r: c.blend_color[0], g: c.blend_color[1], b: c.blend_color[2], a: c.blend_color[3] });
+      if (c.enabled.has(2960)) pass.setStencilReference(c.stencil_func[face === void 0 ? 0 : face][1] & 255);
+      if (index_buffer) {
+        pass.setIndexBuffer(index_buffer, "uint32");
+        pass.drawIndexed(index_count);
+      } else pass.draw(count);
+    }
+    this.stats.draws++;
+  };
+  GLESExecutor.prototype.stencil_faces = function(c, target, mode) {
+    if (!c.enabled.has(2960) || !target.depth || !target.depth_format.includes("stencil") || mode < GL.TRIANGLES) return [void 0];
+    const same = c.stencil_func[0][1] === c.stencil_func[1][1] && c.stencil_func[0][2] === c.stencil_func[1][2] && c.stencil_writemask[0] === c.stencil_writemask[1];
+    if (same) return [void 0];
+    if (c.enabled.has(2884)) return c.cull_face === 1028 ? [1] : [0];
+    return [0, 1];
+  };
+  GLESExecutor.prototype.ff_shaders = function(c, rectangle) {
+    const textures = Array.from({ length: UNITS }, (_, i) => unit_texture(c, i));
+    const signature = ff_signature(c, false, textures);
+    if (rectangle) {
+      signature.lighting = { enabled: false, lights: [] };
+      signature.fog = { enabled: false };
+      signature.attributes.normal = false;
+      signature.attributes.position = { components: 4 };
+      signature.clipPlaneCount = 0;
+      signature.texture.forEach((t) => {
+        if (t.enabled) t.matrix = false;
+      });
+    }
+    const FF = globalThis["GLFixedFunction"];
+    const key = FF.signatureKey(signature);
+    this.ff_cache = this.ff_cache || /* @__PURE__ */ new Map();
+    let entry = this.ff_cache.get(key);
+    if (!entry) {
+      const generated = FF.generate(signature);
+      const module = (code) => {
+        let m = this.shaders.get(code);
+        if (!m) this.shaders.set(code, m = this.device.createShaderModule({ label: "GLES 1.1 fixed function", code }));
+        return m;
+      };
+      const bindings = /* @__PURE__ */ new Set();
+      reachable_bindings(generated.wgslVertex, "vs_main", bindings);
+      reachable_bindings(generated.wgslFragment, "fs_main", bindings);
+      entry = { generated, shaders: { vertex: module(generated.wgslVertex), fragment: module(generated.wgslFragment), bindings } };
+      this.ff_cache.set(key, entry);
+    }
+    return { generated: entry.generated, shaders: entry.shaders, textures };
+  };
+  GLESExecutor.prototype.ff_layout = function(c, generated, low, vertices) {
+    const buffers = [], formats = [];
+    for (const input of ff_inputs(c, generated.attributes)) {
+      const a = input.array;
+      let values;
+      if (a.enabled) values = this.attribute_values(
+        c,
+        Object.assign({}, a, { normalized: input.normalized && a.type !== GL.FLOAT && a.type !== GL.FIXED }),
+        low,
+        vertices,
+        input.components
+      );
+      else values = new Float32Array([...input.current, 0, 0, 0, 1].slice(0, input.components).map((v, i) => i < input.current.length ? v : i === 3 ? 1 : 0));
+      if (!values) return null;
+      const buffer = this.device.createBuffer({ size: align4(Math.max(4, values.byteLength)), usage: B.VERTEX, mappedAtCreation: true });
+      new Float32Array(buffer.getMappedRange()).set(values);
+      buffer.unmap();
+      this.staging.push(buffer);
+      buffers.push(buffer);
+      formats.push({ location: input.location, components: input.components, stride: a.enabled ? input.components * 4 : 0 });
+    }
+    return { buffers, formats, key: "ff:" + formats.map((f) => f.location + ":" + f.components + ":" + f.stride).join(",") };
+  };
+  GLESExecutor.prototype.ff_bind_groups = function(c, ff, pipeline, target, viewport, snapshot) {
+    const groups = [];
+    const generated = ff.generated;
+    if (ff.shaders.bindings.has("1:0")) {
+      const layout = globalThis["GLStateLayout"].buildLayout(generated.stateFields);
+      const floats = new Float32Array(Math.max(4, layout.floats));
+      globalThis["GLStateLayout"].writeLayout(layout, snapshot || ff_snapshot(c, viewport), floats, 0);
+      groups.push([1, this.device.createBindGroup({ layout: pipeline.getBindGroupLayout(1), entries: [{ binding: 0, resource: { buffer: this.uniform_buffer(floats.buffer) } }] })]);
+    }
+    const entries = [];
+    for (const t of generated.textures) {
+      const texture = ff.textures[t.unit];
+      if (ff.shaders.bindings.has("2:" + t.textureBinding)) entries.push({ binding: t.textureBinding, resource: this.texture_view(texture, false, target.color) });
+      if (ff.shaders.bindings.has("2:" + t.samplerBinding)) entries.push({ binding: t.samplerBinding, resource: this.sampler(texture) });
+    }
+    if (entries.length) groups.push([2, this.device.createBindGroup({ layout: pipeline.getBindGroupLayout(2), entries })]);
+    return groups;
+  };
+  GLESExecutor.prototype.draw_tex = function(c, [x, y, z, w, h]) {
+    if (c.api !== 1 || !(w > 0) || !(h > 0)) return;
+    const target = this.target_of(c);
+    if (!target) return;
+    const ff = this.ff_shaders(c, true);
+    const W = target.width, H = target.height;
+    const zw = c.depth_range[0] + Math.min(1, Math.max(0, z)) * (c.depth_range[1] - c.depth_range[0]);
+    const ndc_z = zw * 2 - 1;
+    const corners = [[x, y], [x + w, y], [x + w, y + h], [x, y], [x + w, y + h], [x, y + h]];
+    const values = /* @__PURE__ */ new Map();
+    for (const a of ff.generated.attributes) {
+      if (a.name === "position") values.set(a.location, corners.flatMap(([px, py]) => [px / W * 2 - 1, py / H * 2 - 1, ndc_z, 1]));
+      else if (a.name === "color") values.set(a.location, corners.flatMap(() => c.ff.color));
+      else if (a.name.startsWith("texCoord")) {
+        const texture = ff.textures[+a.name.slice(8)];
+        const base = texture && texture.images.get(0);
+        const [u, v, cw, ch] = texture ? texture.crop : [0, 0, 1, 1];
+        const tw = base ? base.width : 1, th = base ? base.height : 1;
+        values.set(a.location, corners.flatMap(([px, py]) => [(u + (px - x) / w * cw) / tw, (v + (py - y) / h * ch) / th, 0, 1].slice(0, a.components)));
+      } else values.set(a.location, corners.flatMap(() => new Array(a.components).fill(0)));
+    }
+    const buffers = [], formats = [];
+    for (const a of ff.generated.attributes) {
+      const data = new Float32Array(values.get(a.location));
+      const buffer = this.device.createBuffer({ size: align4(data.byteLength), usage: B.VERTEX, mappedAtCreation: true });
+      new Float32Array(buffer.getMappedRange()).set(data);
+      buffer.unmap();
+      this.staging.push(buffer);
+      buffers.push(buffer);
+      formats.push({ location: a.location, components: a.components, stride: a.components * 4 });
+    }
+    const layout = { buffers, formats, key: "tex:" + formats.map((f) => f.location + ":" + f.components).join(",") };
+    const pipeline = this.pipeline(c, null, ff.shaders, layout, "triangle-list", target, false);
+    if (!pipeline) return;
+    const pass = this.begin_pass(target, null);
+    pass.setPipeline(pipeline);
+    const snapshot = ff_snapshot(c, [0, 0, W, H]);
+    const identity = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
+    Object.assign(snapshot.matrices, { modelview: identity, projection: identity, mvp: identity });
+    snapshot.depthRange = { near: 0, far: 1 };
+    for (const [index, group] of this.ff_bind_groups(c, ff, pipeline, target, [0, 0, W, H], snapshot)) pass.setBindGroup(index, group);
+    buffers.forEach((buffer, slot) => pass.setVertexBuffer(slot, buffer));
+    pass.setViewport(0, 0, W, H, 0, 1);
+    if (!this.apply_scissor(pass, c, target)) return;
+    if (c.enabled.has(2960)) pass.setStencilReference(c.stencil_func[0][1] & 255);
+    pass.draw(6);
+    this.stats.draws++;
+  };
+  GLESExecutor.prototype.program_shaders = function(program) {
+    const info = program.info;
+    if (info.gpu) return info.gpu;
+    if (!info.wgsl) return null;
+    const module = (code) => {
+      let m = this.shaders.get(code);
+      if (!m) this.shaders.set(code, m = this.device.createShaderModule({ label: "GLES program", code }));
+      return m;
+    };
+    const bindings = /* @__PURE__ */ new Set();
+    reachable_bindings(info.wgsl.vertex, "vs_main", bindings);
+    reachable_bindings(info.wgsl.fragment, "fs_main", bindings);
+    info.gpu = { vertex: module(info.wgsl.vertex), fragment: module(info.wgsl.fragment), bindings };
+    return info.gpu;
+  };
+  GLESExecutor.prototype.vertex_layout = function(c, program, low, vertices) {
+    const buffers = [], formats = [];
+    for (const attribute of program.info.reflection.attributes) {
+      for (let slot = 0; slot < attribute.slots; slot++) {
+        const location = attribute.location + slot;
+        const a = c.attribs[location];
+        const components = attribute.slots > 1 ? attribute.components / attribute.slots : attribute.components;
+        let values;
+        if (a.enabled) {
+          values = this.attribute_values(c, a, low, vertices, components);
+          if (!values) return null;
+        } else values = new Float32Array(a.current.slice(0, components));
+        const buffer = this.device.createBuffer({ size: align4(Math.max(4, values.byteLength)), usage: B.VERTEX, mappedAtCreation: true });
+        new Float32Array(buffer.getMappedRange()).set(values);
+        buffer.unmap();
+        this.staging.push(buffer);
+        buffers.push(buffer);
+        formats.push({ location, components, stride: a.enabled ? components * 4 : 0 });
+      }
+    }
+    return { buffers, formats, key: formats.map((f) => f.location + ":" + f.components + ":" + f.stride).join(",") };
+  };
+  GLESExecutor.prototype.attribute_values = function(c, a, low, vertices, components) {
+    const type_bytes = TYPE_BYTES2[a.type];
+    const element = a.size * type_bytes;
+    let source, base, stride;
+    if (a.data) {
+      source = a.data;
+      stride = element;
+      base = low * element;
+    } else {
+      const buffer = c.group.buffers.get(a.buffer);
+      if (!buffer || !buffer.data) return null;
+      source = buffer.data;
+      stride = a.stride || element;
+      base = a.offset + low * stride;
+    }
+    const out = new Float32Array(vertices * components);
+    const view = new DataView(source.buffer, source.byteOffset, source.byteLength);
+    const normalized = a.normalized;
+    for (let v = 0; v < vertices; v++) {
+      const at = base + v * stride;
+      for (let i = 0; i < components; i++) {
+        let value = i === 3 ? 1 : 0;
+        if (i < a.size && at + (i + 1) * type_bytes <= source.length) {
+          const p = at + i * type_bytes;
+          switch (a.type) {
+            case GL.FLOAT:
+              value = view.getFloat32(p, true);
+              break;
+            case GL.FIXED:
+              value = view.getInt32(p, true) / 65536;
+              break;
+            case GL.HALF_FLOAT_OES:
+              value = half_to_float(view.getUint16(p, true));
+              break;
+            case GL.UNSIGNED_BYTE:
+              value = view.getUint8(p);
+              if (normalized) value /= 255;
+              break;
+            case GL.BYTE:
+              value = view.getInt8(p);
+              if (normalized) value = Math.max(-1, value / 127);
+              break;
+            case GL.UNSIGNED_SHORT:
+              value = view.getUint16(p, true);
+              if (normalized) value /= 65535;
+              break;
+            case GL.SHORT:
+              value = view.getInt16(p, true);
+              if (normalized) value = Math.max(-1, value / 32767);
+              break;
+          }
+        }
+        out[v * components + i] = value;
+      }
+    }
+    return out;
+  };
+  GLESExecutor.prototype.pipeline = function(c, program, shaders, layout, topology, target, indexed, face) {
+    const blend = c.enabled.has(3042);
+    const depth_test = c.enabled.has(2929), stencil_test = c.enabled.has(2960);
+    const cull = face === 0 ? "back" : face === 1 ? "front" : c.enabled.has(2884) ? c.cull_face === 1028 ? "front" : "back" : "none";
+    const masks = face === void 0 ? 0 : face;
+    const key = [
+      this.id_of(shaders.vertex),
+      this.id_of(shaders.fragment),
+      layout.key,
+      topology,
+      indexed ? 1 : 0,
+      c.front_face,
+      cull,
+      masks,
+      target.color_view ? target.alpha ? "a" : "x" : "-",
+      target.depth_format,
+      blend ? c.blend_func.join(",") + "/" + c.blend_equation.join(",") : "-",
+      c.color_mask.join(""),
+      depth_test ? c.depth_func + ":" + c.depth_mask : "-",
+      stencil_test ? JSON.stringify([c.stencil_func, c.stencil_op, c.stencil_writemask]) : "-",
+      c.enabled.has(32823) ? c.polygon_offset.join(",") : "-"
+    ].join("|");
+    let pipeline = this.pipelines.get(key);
+    if (pipeline) return pipeline;
+    const write_mask = (c.color_mask[0] ? 1 : 0) | (c.color_mask[1] ? 2 : 0) | (c.color_mask[2] ? 4 : 0) | (c.color_mask[3] && target.alpha ? 8 : 0);
+    const descriptor = {
+      label: "GLES pipeline",
+      layout: "auto",
+      vertex: { module: shaders.vertex, entryPoint: "vs_main", buffers: layout.formats.map((f) => ({
+        arrayStride: f.stride,
+        stepMode: "vertex",
+        attributes: [{ shaderLocation: f.location, offset: 0, format: f.components === 1 ? "float32" : "float32x" + f.components }]
+      })) },
+      fragment: { module: shaders.fragment, entryPoint: "fs_main", targets: target.color_view ? [{
+        format: COLOR_FORMAT,
+        writeMask: write_mask,
+        blend: blend ? {
+          color: blend_component(c.blend_equation[0], c.blend_func[0], c.blend_func[1]),
+          alpha: blend_component(c.blend_equation[1], c.blend_func[2], c.blend_func[3])
+        } : void 0
+      }] : [] },
+      // (the translator's Y flip reverses the winding: GL's CCW is WebGPU's CW)
+      primitive: {
+        topology,
+        frontFace: c.front_face === 2305 ? "cw" : "ccw",
+        cullMode: cull,
+        ...indexed && topology.endsWith("strip") ? { stripIndexFormat: "uint32" } : {}
+      }
+    };
+    if (target.depth) {
+      const stencil = target.depth_format.includes("stencil");
+      const face_state = (i) => ({
+        compare: COMPARE[c.stencil_func[i][0]],
+        failOp: STENCIL_OPS2[c.stencil_op[i][0]],
+        depthFailOp: STENCIL_OPS2[c.stencil_op[i][1]],
+        passOp: STENCIL_OPS2[c.stencil_op[i][2]]
+      });
+      descriptor.depthStencil = Object.assign(
+        { format: target.depth_format },
+        target.depth_format !== "stencil8" ? { depthWriteEnabled: depth_test && !!c.depth_mask, depthCompare: depth_test ? COMPARE[c.depth_func] : "always" } : {},
+        stencil && stencil_test ? {
+          stencilFront: face_state(0),
+          stencilBack: face_state(1),
+          stencilReadMask: c.stencil_func[masks][2] & 255,
+          stencilWriteMask: c.stencil_writemask[masks] & 255
+        } : {},
+        c.enabled.has(32823) && target.depth_format !== "stencil8" ? { depthBias: Math.round(c.polygon_offset[1]), depthBiasSlopeScale: c.polygon_offset[0] } : {}
+      );
+    }
+    try {
+      pipeline = this.device.createRenderPipeline(descriptor);
+    } catch (error) {
+      if (this.stats.errors.length < 20) this.stats.errors.push("pipeline: " + error.message);
+      return null;
+    }
+    this.stats.pipelines++;
+    this.pipelines.set(key, pipeline);
+    return pipeline;
+  };
+  GLESExecutor.prototype.bind_groups = function(c, program, shaders, pipeline, target) {
+    const reflection = program.info.reflection;
+    const groups = [];
+    const active = shaders.bindings;
+    const group1 = [];
+    if (active.has("1:0")) {
+      const layout = globalThis["GLStateLayout"].buildLayout(reflection.stateFields);
+      const floats = new Float32Array(Math.max(4, layout.floats));
+      globalThis["GLStateLayout"].writeLayout(layout, {
+        depthRange: { near: c.depth_range[0], far: c.depth_range[1] },
+        viewport: { x: c.viewport[0], y: c.viewport[1], width: c.viewport[2], height: c.viewport[3] },
+        point: { size: 1, sizeMin: 1, sizeMax: 256, fadeThreshold: 1, attenuation: [1, 0, 0] }
+      }, floats, 0);
+      group1.push({ binding: 0, resource: { buffer: this.uniform_buffer(floats.buffer) } });
+    }
+    if (active.has("1:1")) {
+      group1.push({ binding: 1, resource: { buffer: this.uniform_buffer(this.uniform_block(program)) } });
+    }
+    if (group1.length) groups.push([1, this.device.createBindGroup({ layout: pipeline.getBindGroupLayout(1), entries: group1 })]);
+    const textures = [];
+    for (const sampler of reflection.samplers) {
+      const count = Math.max(1, sampler.arraySize);
+      for (let i = 0; i < count; i++) {
+        const values = program.values.get(sampler.location + i);
+        const unit = Math.max(0, Math.min(31, values ? values[0] : 0));
+        const slot = sampler.external ? 2 : sampler.dim === "Cube" ? 1 : 0;
+        const name = c.textures[unit][slot];
+        const texture = name ? c.group.textures.get(name) : null;
+        const view = this.texture_view(texture, sampler.dim === "Cube", target.color);
+        if (active.has("2:" + (sampler.binding + i * 2))) textures.push({ binding: sampler.binding + i * 2, resource: view });
+        if (active.has("2:" + (sampler.binding + i * 2 + 1))) textures.push({ binding: sampler.binding + i * 2 + 1, resource: this.sampler(texture) });
+      }
+    }
+    if (textures.length) groups.push([2, this.device.createBindGroup({ layout: pipeline.getBindGroupLayout(2), entries: textures })]);
+    return groups;
+  };
+  GLESExecutor.prototype.uniform_buffer = function(bytes) {
+    const size = Math.max(16, align4(bytes.byteLength));
+    const buffer = this.device.createBuffer({ size: Math.ceil(size / 16) * 16, usage: B.UNIFORM, mappedAtCreation: true });
+    new Uint8Array(buffer.getMappedRange()).set(new Uint8Array(bytes));
+    buffer.unmap();
+    this.staging.push(buffer);
+    return buffer;
+  };
+  GLESExecutor.prototype.uniform_block = function(program) {
+    const reflection = program.info.reflection;
+    const block = new ArrayBuffer(Math.max(16, reflection.uniformBlockBytes));
+    const floats = new Float32Array(block), ints = new Int32Array(block);
+    for (const u of reflection.uniforms) {
+      const count = Math.max(1, u.arraySize);
+      const stride = u.arraySize ? u.arrayStrideBytes : 0;
+      for (let e = 0; e < count; e++) {
+        const values = program.values.get(u.location + e);
+        if (!values) continue;
+        const base = u.offsetBytes + e * stride;
+        if (u.kind === "matrix") {
+          const column_stride = u.matrixColumnStrideBytes || (u.rows === 2 ? 8 : 16);
+          for (let col = 0; col < u.columns; col++) {
+            for (let row = 0; row < u.rows; row++) floats[(base + col * column_stride) / 4 + row] = values[col * u.rows + row];
+          }
+          continue;
+        }
+        for (let i = 0; i < u.components; i++) {
+          if (u.baseType === "float") floats[base / 4 + i] = values[i];
+          else ints[base / 4 + i] = values[i];
+        }
+      }
+    }
+    return block;
+  };
+  GLESExecutor.prototype.texture_view = function(texture, cube, drawn_to) {
+    const fallback = () => {
+      if (!this.fallback) {
+        this.fallback = this.device.createTexture({ size: [1, 1, 6], format: COLOR_FORMAT, usage: U.TEXTURE_BINDING | U.COPY_DST });
+        this.device.queue.writeTexture(
+          { texture: this.fallback },
+          new Uint8Array([0, 0, 0, 255, 0, 0, 0, 255, 0, 0, 0, 255, 0, 0, 0, 255, 0, 0, 0, 255, 0, 0, 0, 255]),
+          { bytesPerRow: 4, rowsPerImage: 1 },
+          [1, 1, 6]
+        );
+        this.fallback_views = { "2d": this.fallback.createView({ dimension: "2d", arrayLayerCount: 1 }), cube: this.fallback.createView({ dimension: "cube" }) };
+      }
+      return this.fallback_views[cube ? "cube" : "2d"];
+    };
+    if (!texture) return fallback();
+    const base = texture.images.get(0);
+    if (base && (base.image || base.color_buffer)) {
+      const t = base.image ? this.image_texture(base.image) : this.color_buffer_texture(base.color_buffer);
+      return t && t.texture !== drawn_to ? t.texture.createView() : fallback();
+    }
+    const gpu = this.gpu_texture(texture);
+    if (!gpu || gpu.texture === drawn_to) return fallback();
+    const first = [0, 1, 2, 3, 4, 5].map((face) => texture.images.get(face * 32)).find(Boolean);
+    if (gpu.cube && (gpu.width !== gpu.height || [0, 1, 2, 3, 4, 5].some((face) => {
+      const i = texture.images.get(face * 32);
+      return !i || i.width !== gpu.width || i.height !== gpu.height || i.format !== first.format;
+    }))) {
+      return fallback();
+    }
+    const mipmapped = texture.min_filter !== GL.NEAREST && texture.min_filter !== GL.LINEAR;
+    let levels = 1;
+    if (mipmapped) {
+      for (levels = 1; levels < gpu.levels; levels++) {
+        const w = Math.max(1, gpu.width >> levels), h = Math.max(1, gpu.height >> levels);
+        for (let face = 0; face < (gpu.cube ? 6 : 1); face++) {
+          const image = texture.images.get(face * 32 + levels);
+          if (!image || image.width !== w || image.height !== h || image.format !== first.format) return fallback();
+        }
+      }
+    }
+    const key = (cube ? "cube" : "2d") + levels;
+    let view = gpu.views.get(key);
+    if (!view) gpu.views.set(key, view = gpu.texture.createView({
+      dimension: cube ? "cube" : "2d",
+      mipLevelCount: levels,
+      ...cube ? {} : { arrayLayerCount: 1 }
+    }));
+    return view;
+  };
+  GLESExecutor.prototype.sampler = function(texture) {
+    const t = texture || { min_filter: GL.NEAREST, mag_filter: GL.NEAREST, wrap_s: GL.CLAMP_TO_EDGE, wrap_t: GL.CLAMP_TO_EDGE };
+    const key = [t.min_filter, t.mag_filter, t.wrap_s, t.wrap_t].join("|");
+    let sampler = this.samplers.get(key);
+    if (!sampler) {
+      const min_linear = t.min_filter === GL.LINEAR || t.min_filter === GL.LINEAR_MIPMAP_NEAREST || t.min_filter === GL.LINEAR_MIPMAP_LINEAR;
+      const mip_linear = t.min_filter === GL.NEAREST_MIPMAP_LINEAR || t.min_filter === GL.LINEAR_MIPMAP_LINEAR;
+      const mipmapped = t.min_filter !== GL.NEAREST && t.min_filter !== GL.LINEAR;
+      sampler = this.device.createSampler({
+        addressModeU: WRAPS3[t.wrap_s] || "repeat",
+        addressModeV: WRAPS3[t.wrap_t] || "repeat",
+        magFilter: t.mag_filter === GL.LINEAR ? "linear" : "nearest",
+        minFilter: min_linear ? "linear" : "nearest",
+        mipmapFilter: mip_linear ? "linear" : "nearest",
+        lodMaxClamp: mipmapped ? 32 : 0
+      });
+      this.samplers.set(key, sampler);
+    }
+    return sampler;
+  };
+  Object.assign(GLESExecutor.prototype, GLES3);
+  GLESExecutor.prototype.flush_surface = function(id) {
+    const s = this.surfaces.get(id);
+    const cb = s && this.rc.color_buffers.get(s.color_buffer);
+    if (!s || !cb || !s.texture) {
+      this.stats.flush_skipped = this.stats.flush_skipped || {};
+      const why = !s ? "no surface" : !cb ? "no color buffer " + s.color_buffer : "nothing drawn";
+      this.stats.flush_skipped[why] = (this.stats.flush_skipped[why] || 0) + 1;
+      return;
+    }
+    this.stats.flushes = (this.stats.flushes || 0) + 1;
+    this.end_pass();
+    this.blit_into(s.view, cb.texture.createView(), true, true);
+  };
+  GLESExecutor.prototype.blit_into = function(source, target, flip, linear) {
+    if (!this.blit) {
+      const module = this.device.createShaderModule({ code: `
+            struct VOut { @builtin(position) p : vec4<f32>, @location(0) uv : vec2<f32> };
+            @group(0) @binding(0) var t : texture_2d<f32>;
+            @group(0) @binding(1) var s : sampler;
+            @group(0) @binding(2) var<uniform> flip : vec4<f32>;
+            @vertex fn vs(@builtin(vertex_index) i : u32) -> VOut {
+                let p = array<vec2<f32>, 3>(vec2<f32>(-1.0, -1.0), vec2<f32>(3.0, -1.0), vec2<f32>(-1.0, 3.0));
+                var o : VOut;
+                o.p = vec4<f32>(p[i], 0.0, 1.0);
+                let uv = vec2<f32>(p[i].x * 0.5 + 0.5, 0.5 - p[i].y * 0.5);
+                o.uv = vec2<f32>(uv.x, select(uv.y, 1.0 - uv.y, flip.x > 0.5));
+                return o;
+            }
+            @fragment fn fs(i : VOut) -> @location(0) vec4<f32> { return textureSampleLevel(t, s, i.uv, 0.0); }` });
+      this.blit = {
+        module,
+        pipeline: this.device.createRenderPipeline({
+          label: "GLES blit",
+          layout: "auto",
+          vertex: { module, entryPoint: "vs" },
+          fragment: { module, entryPoint: "fs", targets: [{ format: COLOR_FORMAT }] },
+          primitive: { topology: "triangle-list" }
+        }),
+        linear: this.device.createSampler({ magFilter: "linear", minFilter: "linear" }),
+        nearest: this.device.createSampler({})
+      };
+      this.blit.flip = [0, 1].map((f) => {
+        const buffer = this.device.createBuffer({ size: 16, usage: B.UNIFORM, mappedAtCreation: true });
+        new Float32Array(buffer.getMappedRange()).set([f, 0, 0, 0]);
+        buffer.unmap();
+        return buffer;
+      });
+    }
+    this.end_pass();
+    const pass = this.encoder.beginRenderPass({ colorAttachments: [{ view: target, loadOp: "clear", clearValue: { r: 0, g: 0, b: 0, a: 1 }, storeOp: "store" }] });
+    pass.setPipeline(this.blit.pipeline);
+    pass.setBindGroup(0, this.device.createBindGroup({ layout: this.blit.pipeline.getBindGroupLayout(0), entries: [
+      { binding: 0, resource: source },
+      { binding: 1, resource: linear ? this.blit.linear : this.blit.nearest },
+      { binding: 2, resource: { buffer: this.blit.flip[flip ? 1 : 0] } }
+    ] }));
+    pass.draw(3);
+    pass.end();
+  };
+  GLESExecutor.prototype.post = function(handle) {
+    const cb = this.rc.color_buffers.get(handle);
+    if (!cb) return;
+    this.stats.posts++;
+    if (this.layer) {
+      this.end_pass();
+      const layer = this.layer;
+      const configuration = layer.context.getConfiguration && layer.context.getConfiguration();
+      if (!configuration || configuration.format !== COLOR_FORMAT) layer.context.configure({ device: this.device, format: COLOR_FORMAT });
+      layer.canvas.width = cb.width;
+      layer.canvas.height = cb.height;
+      this.encoder.copyTextureToTexture({ texture: cb.texture }, { texture: layer.context.getCurrentTexture() }, [cb.width, cb.height, 1]);
+      layer.place(0, 0, cb.width, cb.height, true);
+      return;
+    }
+    if (this.post_pending) {
+      this.post_next = handle;
+      return;
+    }
+    this.post_pending = true;
+    this.read_texture(cb.texture, 0, 0, cb.width, cb.height, false, (rgba, sink) => {
+      this.post_pending = false;
+      if (sink.frame) sink.frame(rgba, cb.width, cb.height);
+    });
+  };
+  GLESExecutor.prototype.read_pixels = function(record) {
+    const conn = this.conns.get(record.conn);
+    const c = conn && this.shadow.context(conn.context);
+    if (c && c.glslang) return this.read_pixels3(c, record);
+    const target = c && this.target_of(c);
+    if (!target || !target.color) return this.answer_failed(record.request);
+    const x0 = Math.max(0, record.x), y0 = Math.max(0, record.y);
+    const x1 = Math.min(target.width, record.x + record.width), y1 = Math.min(target.height, record.y + record.height);
+    const alignment = c.pack_alignment;
+    if (x1 <= x0 || y1 <= y0) return this.answer(null, record.request, new Uint8Array(0), true);
+    return this.read_texture(target.color, x0, y0, x1 - x0, y1 - y0, false, (rgba, sink) => {
+      const full = new Uint8Array(record.width * record.height * 4);
+      const w = x1 - x0;
+      for (let y = 0; y < y1 - y0; y++) {
+        full.set(rgba.subarray(y * w * 4, (y + 1) * w * 4), ((y + y0 - record.y) * record.width + (x0 - record.x)) * 4);
+      }
+      this.answer(sink, record.request, pack_rgba8(full, record.width, record.height, alignment));
+    });
+  };
+  GLESExecutor.prototype.read_texture = function(texture, x, y, width, height, flip, done, mip = 0, layer = 0, texel = 4) {
+    this.end_pass();
+    const stride = Math.ceil(width * texel / 256) * 256;
+    const buffer = this.device.createBuffer({ size: stride * height, usage: B.COPY_DST | B.MAP_READ });
+    this.encoder.copyTextureToBuffer({ texture, mipLevel: mip, origin: [x, y, layer] }, { buffer, bytesPerRow: stride, rowsPerImage: height }, [width, height, 1]);
+    this.reads.push({ buffer, stride, width, height, flip, done, texel });
+  };
+  GLESExecutor.prototype.answer = function(sink, request, bytes, later) {
+    const answer = new Uint8Array(READBACK_HEADER + bytes.length);
+    const view = new DataView(answer.buffer);
+    view.setUint32(0, request, true);
+    view.setUint32(4, bytes.length, true);
+    view.setUint32(12, 1, true);
+    answer.set(bytes, READBACK_HEADER);
+    if (later || !sink) this.reads.push({ buffer: null, done: (_, s) => s.writeResponse(0, answer), immediate: true });
+    else sink.writeResponse(0, answer);
+  };
+  GLESExecutor.prototype.answer_failed = function(request) {
+    const answer = new Uint8Array(READBACK_HEADER);
+    new DataView(answer.buffer).setUint32(0, request, true);
+    new DataView(answer.buffer).setUint32(12, 2, true);
+    this.reads.push({ buffer: null, done: (_, sink) => sink.writeResponse(0, answer), immediate: true });
+  };
+  function all_textures(shadow) {
+    const textures = /* @__PURE__ */ new Set();
+    for (const group of shadow.groups.values()) for (const t of group.textures.values()) textures.add(t);
+    for (const c of shadow.contexts.values()) for (const t of c.defaults ? c.defaults.values() : []) textures.add(t);
+    return textures;
+  }
+  GLESExecutor.prototype.save = async function() {
+    const reads = [];
+    const read = (owner, texture, levels, layers, width, height) => {
+      owner.saved = [];
+      for (let level = 0; level < levels; level++) {
+        for (let layer = 0; layer < layers; layer++) {
+          reads.push({ owner, texture, level, layer, width: Math.max(1, width >> level), height: Math.max(1, height >> level) });
+        }
+      }
+    };
+    for (const cb of this.rc.color_buffers.values()) read(cb, cb.texture, 1, 1, cb.width, cb.height);
+    for (const s of this.surfaces.values()) if (s.texture) read(s, s.texture, 1, 1, s.width, s.height);
+    for (const t of all_textures(this.shadow)) {
+      if (t.gpu && t.gpu.es3) this.save_texture3(t, reads);
+      else if (t.gpu && t.gpu.texture) read(t, t.gpu.texture, t.gpu.levels, t.gpu.cube ? 6 : 1, t.gpu.width, t.gpu.height);
+    }
+    for (const group of this.shadow.groups.values()) {
+      for (const rb of group.renderbuffers.values()) {
+        if (rb.gpu && rb.gpu.es3) this.save_renderbuffer3(rb, reads);
+        else if (rb.gpu && rb.gpu.format === COLOR_FORMAT) read(rb, rb.gpu.texture, 1, 1, rb.width, rb.height);
+      }
+    }
+    const encoder = this.device.createCommandEncoder({ label: "GLES save" });
+    const buffer_reads = this.save_buffers3(encoder);
+    for (const r of reads) {
+      r.row = r.row || r.width * 4;
+      r.rows = r.rows || r.height;
+      r.stride = Math.ceil(r.row / 256) * 256;
+      r.buffer = this.device.createBuffer({ size: r.stride * r.rows, usage: B.COPY_DST | B.MAP_READ });
+      encoder.copyTextureToBuffer(
+        { texture: r.texture, mipLevel: r.level, origin: [0, 0, r.layer] },
+        { buffer: r.buffer, bytesPerRow: r.stride, rowsPerImage: r.rows },
+        r.extent || [r.width, r.height, 1]
+      );
+    }
+    this.device.queue.submit([encoder.finish()]);
+    for (const r of reads) {
+      await r.buffer.mapAsync(globalThis.GPUMapMode ? globalThis.GPUMapMode.READ : 1);
+      const mapped = new Uint8Array(r.buffer.getMappedRange());
+      const rgba = new Uint8Array(r.row * r.rows);
+      for (let y = 0; y < r.rows; y++) rgba.set(mapped.subarray(y * r.stride, y * r.stride + r.row), y * r.row);
+      r.buffer.unmap();
+      r.buffer.destroy();
+      r.owner.saved.push([r.gl_level === void 0 ? r.level : r.gl_level, r.layer, r.width, r.height, rgba]);
+    }
+    await this.saved_buffers3(buffer_reads);
+    const state = { shadow: this.shadow.get_state(), rc: this.rc, conns: this.conns, surfaces: this.surfaces, posted: this.posted };
+    const packed = pack2(state, { classes: SHADOW_CLASSES, skip: shadow_skip });
+    for (const r of reads) {
+      delete r.owner.saved;
+      delete r.owner.saved3;
+    }
+    return packed;
+  };
+  GLESExecutor.prototype.restore = function(packed) {
+    this.reset();
+    const state = unpack(packed, SHADOW_CLASSES);
+    this.rc.images = state.rc.images;
+    this.rc.color_buffers = state.rc.color_buffers;
+    this.shadow.set_state(state.shadow);
+    this.conns = state.conns;
+    this.surfaces = state.surfaces;
+    this.posted = state.posted;
+    this.encoder = this.device.createCommandEncoder({ label: "GLES restore" });
+    this.staging = [];
+    const put2 = (owner, texture) => {
+      for (const [level, layer, width, height, rgba] of owner.saved || []) this.upload(texture, level, layer, 0, 0, width, height, rgba);
+      delete owner.saved;
+    };
+    for (const [handle, cb] of this.rc.color_buffers) {
+      cb.texture = this.device.createTexture({ label: "color buffer " + handle, size: [cb.width, cb.height], format: COLOR_FORMAT, usage: TEXTURE_USAGE });
+      if (cb.saved) put2(cb, cb.texture);
+      else if (cb.format === GL.RGB) this.clear_texture(cb.texture, [0, 0, 0, 1]);
+    }
+    for (const s of this.surfaces.values()) {
+      if (!s.saved) continue;
+      s.texture = null;
+      this.surface_textures(s);
+      put2(s, s.texture);
+    }
+    for (const t of all_textures(this.shadow)) {
+      if (!t.saved) continue;
+      t.gpu = null;
+      if (t.saved3) this.restore_texture3(t);
+      else {
+        const gpu = this.gpu_texture(t);
+        if (gpu) put2(t, gpu.texture);
+      }
+      delete t.saved;
+      delete t.saved3;
+    }
+    for (const group of this.shadow.groups.values()) {
+      for (const rb of group.renderbuffers.values()) {
+        rb.gpu = null;
+        if (!rb.width || !rb.height || rb.image) continue;
+        if (rb.saved3) {
+          this.restore_renderbuffer3(rb);
+          continue;
+        }
+        const format = DEPTH_FORMATS[rb.format] || COLOR_FORMAT;
+        const texture = this.device.createTexture({
+          label: "GL renderbuffer",
+          size: [rb.width, rb.height],
+          format,
+          usage: U.RENDER_ATTACHMENT | U.COPY_SRC | U.COPY_DST | (format === COLOR_FORMAT ? U.TEXTURE_BINDING : 0)
+        });
+        rb.gpu = { texture, format, destroy: () => texture.destroy() };
+        put2(rb, texture);
+      }
+    }
+    this.device.queue.submit([this.encoder.finish()]);
+    this.encoder = null;
+    for (const object of this.staging) object.destroy();
+    this.staging = [];
+  };
+
+  // src/gles/page/entry.js
+  globalThis["V86GLESExecutor"] = { "GLESExecutor": GLESExecutor };
+})();
+
+;
 // The host half of the display adapters' 3D (graphics_adapter "vmware_svga"
 // and "virtio_gpu"; docs/gpu-devices.md, "Architecture"). At levels vgpu9 and
 // gb9 the SVGA device (src/graphics_adapters/vmware_svga/svga3d.js) turns the
@@ -52425,15 +68877,33 @@ struct Out { @builtin(position) position: vec4<f32>, @location(0) uv: vec2<f32> 
 // back to the device as readbacks, and the device shows them on its screens
 // like 2D ones.
 //
+// With options.scanoutLayer (a layer of the page's compositor, whose device
+// it then shares, webgpu_compositor.js) GX's SURFACE_PRESENT copies a
+// scanout's picture into that layer on the GPU: no readback
+// (docs/gfxstream-plan.md G4).
+//
+// The ranchu machine's GLES host (docs/gles-proxy-plan.md) sends stream
+// "gles": GLES batches for the GLES executor (V86GLESExecutor, E3), on the
+// same device.
+//
 // Channel messages, device -> renderer:
 //   submit { seq, bytes, stream }   a D9WG batch, or with stream "gx" a GX
-//                           batch, "vx" a VX one (virtio-gpu's Vulkan)
+//                           batch, "vx" a VX one (virtio-gpu's Vulkan),
+//                           "gles" a GLES one
 //   reset  {}               the machine was reset: forget every object
+//   hello  {}               the device asks what the renderer can do
+//   gles_save { id }        (the GLES host, before a snapshot) the GLES
+//                           executor's state, with the GPU's contents
+//   gles_restore { state }  (after a reset) a snapshot's GLES state back
 // renderer -> device:
 //   write  { offset, bytes } into the response region: a query result or a
 //                            readback, tagged with its request id
 //   done   { seq }           the batch has run and its writes were sent
 //   lost   { reason }        the renderer cannot go on
+//   caps   { present }       (to hello and reset) whether SURFACE_PRESENT shows pictures
+//   frame  { width, height, bytes }  (stream "gles", without a layer) a posted
+//                            color buffer, RGBA rows from the top
+//   gles_saved { id, state } gles_save's answer (null: no GLES executor yet)
 (function(global) {
     "use strict";
 
@@ -52487,10 +68957,32 @@ struct Out { @builtin(position) position: vec4<f32>, @location(0) uv: vec2<f32> 
                 // (a surface goes: VX's commands recorded with it, as images Venus imported, are submitted first)
                 releasing: () => { if (vx) vx.flushEncoder(); },
             };
+            if (layer) peer.present = present;
             gx = new GX.GXExecutor({ device: executor.device, formats: global.V86SVGADXFormats,
                 features: executor.deviceFeatures || {}, peer });
             return gx;
         };
+
+        // The page's screen: a layer of its compositor, the GX surface's
+        // rectangle copied into it (the same format) and shown over the screen
+        const layer = options.scanoutLayer || null;
+        const present = p => {
+            if (!p) {
+                layer.place(0, 0, 0, 0, false);
+                return;
+            }
+            const configuration = layer.context.getConfiguration();
+            if (!configuration || configuration.format !== p.format) {
+                layer.context.configure({ format: p.format });
+                layer.texture = null;
+            }
+            layer.canvas.width = p.width;
+            layer.canvas.height = p.height;
+            p.encoder.copyTextureToTexture({ texture: p.texture, origin: [p.x, p.y, 0] },
+                { texture: layer.context.getCurrentTexture(), origin: [p.dx, p.dy, 0] }, [p.w, p.h, 1]);
+            layer.place(0, 0, p.width, p.height, true);
+        };
+        const caps = () => channel.post({ type: "caps", present: !!layer });
 
         // VX (virtio-gpu's Venus contexts), on the same device
         let vx = null;
@@ -52505,6 +68997,34 @@ struct Out { @builtin(position) position: vec4<f32>, @location(0) uv: vec2<f32> 
             return vx;
         };
 
+        // GLES (the ranchu machine's GLES host), on the same device; until
+        // the page has its executor, a batch's reads fail (the guest reads
+        // zeros) and nothing is drawn
+        let gles = null;
+        const glesExecutor = async () => {
+            if (gles) return gles;
+            const GLES = global.V86GLESExecutor;
+            if (!GLES) return null;
+            if (!executor.device) await executor.initialize();
+            gles = new GLES.GLESExecutor({ device: executor.device, layer, features: executor.deviceFeatures || {} });
+            return gles;
+        };
+        const glesUnanswered = bytes => {
+            // (the records' READ_PIXELS and COLOR_BUFFER_READ: request ids at
+            // dword 3 and dword 9 of their bodies; renderer_protocol.js GLES)
+            const words = new Uint32Array(bytes.buffer, bytes.byteOffset, bytes.byteLength >> 2);
+            for (let at = 4, i = 0; i < words[3] && at + 1 < words.length; i++) {
+                const op = words[at], request = op === 17 ? words[at + 3] : op === 11 ? words[at + 9] : 0;
+                if (request) {
+                    const answer = new Uint8Array(16);
+                    new DataView(answer.buffer).setUint32(0, request, true);
+                    new DataView(answer.buffer).setUint32(12, 2, true); // RESPONSE_FAILED
+                    channel.post({ type: "write", offset: 0, bytes: answer }, [answer.buffer]);
+                }
+                at += 2 + words[at + 1];
+            }
+        };
+
         channel.listen(message => {
             switch (message.type) {
                 case "submit": {
@@ -52512,7 +69032,25 @@ struct Out { @builtin(position) position: vec4<f32>, @location(0) uv: vec2<f32> 
                     const stream = message.stream || "d9wg";
                     queue = queue.then(async () => {
                         if (forGeneration !== generation) return;
-                        if (!lost && stream === "vx") {
+                        if (stream === "gles") {
+                            try {
+                                const target = lost ? null : await glesExecutor();
+                                if (target) {
+                                    await target.submit(bytes, { writeResponse: (offset, data) => {
+                                        if (forGeneration !== generation) return;
+                                        const copy = data.slice();
+                                        channel.post({ type: "write", offset, bytes: copy }, [copy.buffer]);
+                                    }, frame: (rgba, width, height) => {
+                                        if (forGeneration !== generation) return;
+                                        channel.post({ type: "frame", width, height, bytes: rgba }, [rgba.buffer]);
+                                    } });
+                                } else {
+                                    glesUnanswered(bytes);
+                                }
+                            } catch (error) {
+                                fail(error && error.stack || error);
+                            }
+                        } else if (!lost && stream === "vx") {
                             try {
                                 const target = await vxExecutor();
                                 await target.submit(bytes, { writeResponse: (offset, data) => {
@@ -52543,10 +69081,43 @@ struct Out { @builtin(position) position: vec4<f32>, @location(0) uv: vec2<f32> 
                     });
                     break;
                 }
+                case "hello":
+                    caps();
+                    break;
+                case "gles_save": {
+                    // (after the batches sent before it)
+                    const id = message.id;
+                    queue = queue.then(async () => {
+                        let state = null;
+                        try {
+                            if (gles && !lost) state = await gles.save();
+                        } catch (error) {
+                            console.warn("GLES: the page's state could not be saved: " + (error && error.message || error));
+                        }
+                        channel.post({ type: "gles_saved", id, state }, state ? state[1].map(b => b.buffer) : []);
+                    });
+                    break;
+                }
+                case "gles_restore": {
+                    const state = message.state, forGeneration = generation;
+                    queue = queue.then(async () => {
+                        if (forGeneration !== generation || lost) return;
+                        try {
+                            const target = await glesExecutor();
+                            if (target) target.restore(state);
+                        } catch (error) {
+                            fail(error && error.stack || error);
+                        }
+                    });
+                    break;
+                }
                 case "reset":
                     ++generation;
+                    if (layer) layer.place(0, 0, 0, 0, false);
+                    caps();
                     queue = queue.then(() => {
                         // (VX first: its images may be GX's surfaces)
+                        if (gles) gles.reset();
                         if (vx) vx.reset();
                         if (gx) gx.reset();
                         return executor.resetForReplay();
@@ -52559,6 +69130,7 @@ struct Out { @builtin(position) position: vec4<f32>, @location(0) uv: vec2<f32> 
             executor,
             get gx() { return gx; },
             get vx() { return vx; },
+            get gles() { return gles; },
             // the batches sent so far have run
             idle: () => queue.then(() => executor.checkpointIdle()),
             destroy() {

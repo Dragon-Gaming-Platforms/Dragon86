@@ -1,4 +1,4 @@
-globalThis.V86GL_BUILD_REVISION = "6a5936bfd189a5d6221e";
+globalThis.V86GL_BUILD_REVISION = "f77b8908d07b0f3e0acd";
 // The v86gl virtio device: the CPU side of the graphics proxy, a descriptor
 // for v86's virtio_devices. It runs where the CPU runs (the page, or the CPU
 // worker), knows nothing of WebGPU, and talks to the renderer
