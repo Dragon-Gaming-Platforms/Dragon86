@@ -1,16 +1,18 @@
-# Vendored: v86 compatibility engine
+# Vendored: the guest — kernel, initramfs, and guest-side tools
 
-The Terminal's third engine option ("v86 (compatibility)") for browsers
-that can't do cross-origin isolation (Android WebView, locked-down
-browsers…). v86 needs no SharedArrayBuffer and no service worker.
+The Arch Linux guest the Terminal's machines boot. The emulator itself
+lives in `public/v64/` (built from speedyHKjournalist/v64 by the
+"Build v64" workflow); this folder is everything the *guest* is made of,
+plus the distro's App Store manifest (`app-manifest.json`, dump `/`).
+The folder keeps its historical `v86/` name because every device that
+ever booted carries this path in its marker and `/boot` copies.
+
+(The old v86 engine build — `libv86.js`, `v86.wasm`, `bios/` — used to
+live here too; it was removed once v64's 32-bit machine passed the same
+boot proofs.)
 
 Contents and provenance:
 
-- `libv86.js`, `v86.wasm`, `v86-fallback.wasm` — npm package `v86@0.5.472`
-  (upstream copy/v86, latest release line). BSD-2-Clause, see
-  `LICENSE.v86`.
-- `bios/seabios.bin`, `bios/vgabios.bin` — from copy/v86 `bios/`.
-  SeaBIOS is LGPLv3, see `LICENSE.seabios`.
 - `bzImage` — Arch Linux 32 kernel `vmlinuz-linux` 6.12.4-arch1-1.0
   (GPL-2.0; source via the Arch Linux 32 kernel package / kernel.org),
   taken from the copy/v86 Arch demo image set. Despite the filename

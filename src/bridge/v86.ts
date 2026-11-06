@@ -1,21 +1,22 @@
 /**
  * The Terminal's machine — the in-page emulator backend.
  *
- * Two vendored emulator builds share this file, chosen by the architecture
- * in Settings (the user picks hardware, not an emulator):
+ * Every architecture runs on one vendored emulator build, public/v64/
+ * (upstream speedyHKjournalist/v64, a v86 descendant), chosen by the
+ * architecture in Settings (the user picks hardware, not an emulator):
  *
- *   x86_32 → public/v86/  (upstream v86 — the proven default; runs on
- *                          every browser Dragon86 targets)
- *   x86_64 → public/v64/  (the v64 fork: an x86-64 machine; it boots the
- *                          same 32-bit distro, the way real x86-64
- *                          hardware boots a 32-bit OS)
- *   arm64  → public/v64/  (v64's ARM64 machine — but no ARM64 distro is
- *                          installed, so the Terminal refuses honestly;
- *                          see apps/terminal.ts)
+ *   x86_32 → v64's 32-bit x86 machine (its default cpu_type — the same
+ *            machine v86 always was; proven against the real guest by
+ *            tools/vm/boot.mjs)
+ *   x86_64 → v64 with cpu_type "x86_64"; it boots the same 32-bit distro,
+ *            the way real x86-64 hardware boots a 32-bit OS
+ *   arm64  → v64 has the machine, but no ARM64 distro is installed, so
+ *            the Terminal refuses honestly (see apps/terminal.ts)
  *
- * Both keep the same JS API (V86, handle9p, keyboard_send_scancodes), which
- * is why one backend class serves both. Neither needs cross-origin
- * isolation or a service worker.
+ * (The old 32-bit-only v86 build used to serve x86_32; it was removed
+ * once v64's 32-bit machine passed the same boot proofs.) The API is the
+ * v86 one: V86, handle9p, keyboard_send_scancodes. No cross-origin
+ * isolation, no service worker.
  *
  * The guest's root filesystem is *the OS filesystem* — literally `/` in
  * ZenFS, the persistent system root (core/vfs.ts). No disk image, no copy
@@ -77,8 +78,11 @@ const STATE_KEY = "latest";
  * public/v86/ — they are distro files, identical for every engine. */
 const ASSET_BASE = `${import.meta.env.BASE_URL}v86/`;
 
-export function engineDirFor(arch: MachineArch): "v86" | "v64" {
-  return arch === "x86_32" ? "v86" : "v64";
+export function engineDirFor(arch: MachineArch): "v64" {
+  /* One engine build serves every architecture; the function stays so the
+     "which directory runs this arch" question keeps having one answer. */
+  void arch;
+  return "v64";
 }
 
 function engineBase(arch: MachineArch): string {
@@ -501,7 +505,6 @@ class V86Backend implements TerminalBackend {
     try {
       const arch = this.arch;
       const BASE = engineBase(arch);
-      const isV64 = engineDirFor(arch) === "v64";
       const wantSaved = !this.freshBoot;
       const [V86, loaded] = await Promise.all([
         loadLib(BASE),
@@ -523,19 +526,14 @@ class V86Backend implements TerminalBackend {
         memory_size: 128 * 1024 * 1024,
         bios: { url: `${BASE}bios/seabios.bin` },
         vga_bios: { url: `${BASE}bios/vgabios.bin` },
-        /* v64 only. Its display is a plugin loaded beside the bundle
-           (bochs_vga = the display v86 always had), its x86-64 machine is
-           an option, and it renamed vga_memory_size to vram_size. Upstream
-           v86 must not see these keys — it has no graphics_adapter and no
-           cpu_type, and warns on unknown options. Proven against the real
-           guest by tools/vm/boot.mjs (ENGINE_DIR/CPU_TYPE). */
-        ...(isV64
-          ? {
-              graphics_adapter: "bochs_vga",
-              graphics_adapter_path: `${BASE}v86-bochs-vga.js`,
-              ...(arch === "x86_64" ? { cpu_type: "x86_64" } : {}),
-            }
-          : {}),
+        /* v64's display is a plugin loaded beside the bundle (bochs_vga =
+           the display v86 always had). Its default machine is the 32-bit
+           x86 one, so cpu_type is only passed for x86-64. Both machines
+           are proven against the real guest by tools/vm/boot.mjs
+           (CPU_TYPE=x86_64 for the 64-bit one). */
+        graphics_adapter: "bochs_vga",
+        graphics_adapter_path: `${BASE}v86-bochs-vga.js`,
+        ...(arch === "x86_64" ? { cpu_type: "x86_64" } : {}),
         /* Give fresh guests v86's ACPI tables. Without them, SeaBIOS
            leaves the Arch kernel to fall back to a bogus MP table,
            producing harmless-but-alarming RSDP/APIC/IOAPIC errors. */

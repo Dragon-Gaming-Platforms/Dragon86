@@ -5,7 +5,7 @@
  * the guest's /etc/profile hooks and the shell can be observed without a
  * browser. `npm run test:vm` compiles the 9p server for Node and boots it.
  *
- * It runs the *real* pieces — public/v86/libv86.js, the real kernel and
+ * It runs the *real* pieces — public/v64/libv86.js, the real kernel and
  * initramfs, and the real src/bridge/p9.ts server — against a filesystem that
  * is the host's own (instead of ZenFS), extracted from the initramfs the same
  * way guest-root.ts does it.
@@ -176,11 +176,12 @@ const fsImpl = {
 
 /* ---------- boot ---------- */
 
-/* Which emulator build to boot: public/v86 (default) or a fork that keeps
-   the same API — ENGINE_DIR=public/v64 boots the vendored v64 build. The
-   guest (kernel, initramfs, 9p root) stays the same either way; this is how
-   a fork is proven against the real guest before any UI offers it. */
-const ENGINE_DIR = process.env.ENGINE_DIR ?? "public/v86";
+/* Which emulator build to boot. public/v64 (the default) is the only
+   vendored engine — its 32-bit machine took over from the old v86 build
+   once it passed these same proofs. ENGINE_DIR stays overridable so a
+   candidate build can be proven against the real guest before any UI
+   offers it; CPU_TYPE=x86_64 proves the 64-bit machine. */
+const ENGINE_DIR = process.env.ENGINE_DIR ?? "public/v64";
 
 /* libv86.js is a classic script. Under "type": "module" a require() of a .js
    file is treated as ESM and its module.exports never lands, so hand the
