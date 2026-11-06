@@ -35,8 +35,11 @@ import { logInfo, logWarn } from "../core/log";
  *  - arch64: Arch's own x86_64 build (linux-lts kernel, 64-bit userland,
  *    static 64-bit git) — needs the x86_64 machine; a 32-bit CPU cannot
  *    run it, and the Terminal says so instead of pretending.
+ *  - alpine-rv64: official Alpine Linux riscv64 (bash, Alpine's own git
+ *    with real HTTPS, openssl) — needs the RISC-V 64 machine
+ *    (bridge/rv64.ts); an x86 CPU cannot run it, and the Terminal says so.
  */
-export type DistroId = "arch32" | "arch64";
+export type DistroId = "arch32" | "arch64" | "alpine-rv64";
 
 export interface Distro {
   id: DistroId;
@@ -47,6 +50,8 @@ export interface Distro {
   storeId: string;
   /** Machine architectures (Settings → Machine) whose CPU can run it. */
   runsOn: readonly string[];
+  /** The kernel's filename under `base` (x86 ships bzImage; riscv64 Image). */
+  kernel: string;
 }
 
 export const DISTROS: Record<DistroId, Distro> = {
@@ -56,6 +61,7 @@ export const DISTROS: Record<DistroId, Distro> = {
     name: "Arch Linux (x86)",
     storeId: "arch-linux",
     runsOn: ["x86_32", "x86_64"],
+    kernel: "bzImage",
   },
   arch64: {
     id: "arch64",
@@ -63,6 +69,15 @@ export const DISTROS: Record<DistroId, Distro> = {
     name: "Arch Linux (x86-64)",
     storeId: "arch-linux-64",
     runsOn: ["x86_64"],
+    kernel: "bzImage",
+  },
+  "alpine-rv64": {
+    id: "alpine-rv64",
+    base: "rv64/",
+    name: "Alpine Linux (RISC-V 64)",
+    storeId: "alpine-linux-riscv64",
+    runsOn: ["riscv64"],
+    kernel: "Image",
   },
 };
 
@@ -310,7 +325,7 @@ export async function ensureGuestRoot(
   const distro: DistroId = opts.distro ?? marker0?.distro ?? "arch32";
   const BASE = baseFor(distro);
 
-  const kernel = await ensureArtifact(root, "vmlinuz", `${BASE}bzImage`);
+  const kernel = await ensureArtifact(root, "vmlinuz", `${BASE}${DISTROS[distro].kernel}`);
   const initrd = await ensureArtifact(root, "initrd.gz", `${BASE}initrd.gz`);
 
   const marker = marker0;

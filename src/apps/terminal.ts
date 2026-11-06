@@ -1,11 +1,12 @@
 /**
  * Terminal — xterm.js front end.
  *
- * The machine behind it is an in-page emulator (bridge/v86.ts) chosen by
- * the architecture in Settings: 32-bit x86 (the v86 build) or x86-64 (the
- * v64 build), both booting the installed distro from the OS filesystem's
- * own `/`. ARM64 is emulatable (v64) but no ARM64 distro is installed, so
- * it refuses honestly instead of pretending.
+ * The machine behind it is an in-page emulator chosen by the architecture
+ * in Settings: the x86 machines (bridge/v86.ts, the v64 build) and the
+ * RISC-V 64 machine (bridge/rv64.ts, the rv64.js build), all booting the
+ * installed distro from the OS filesystem's own `/`. ARM64 is emulatable
+ * (v64) but no ARM64 distro is installed, so it refuses honestly instead
+ * of pretending.
  */
 
 import { Terminal } from "@xterm/xterm";
@@ -16,7 +17,8 @@ import { getSettings, onSettingsChange, type MachineArch } from "../core/setting
 import type { Win } from "../core/wm";
 import type { TerminalBackend } from "../bridge/engine";
 import { getV86Backend } from "../bridge/v86";
-import { distroInstalled, installedDistro, DISTROS } from "../bridge/guest-root";
+import { getRV64Backend } from "../bridge/rv64";
+import { distroInstalled, installedDistro, DISTROS, type DistroId } from "../bridge/guest-root";
 import * as vfs from "../core/vfs";
 import { isolationReport, logInfo, logWarn } from "../core/log";
 import { rememberEngine } from "./engine-viewer";
@@ -25,6 +27,7 @@ const ARCH_LABEL: Record<MachineArch, string> = {
   x86_32: "x86 (32-bit)",
   x86_64: "x86-64",
   arm64: "ARM64",
+  riscv64: "RISC-V 64",
 };
 
 const GREEN = "\x1b[38;2;46;204;113m";
@@ -230,8 +233,8 @@ export function openTerminal(win: Win, options: TerminalOptions = {}): void {
     term.writeln(`  The ${ARCH_LABEL[arch]} machine can be emulated, but Dragon86 does not`);
     term.writeln(`  ship a kernel or distro for it yet — there is nothing to boot.`);
     term.writeln("");
-    term.writeln(`  Pick ${BOLD}x86 (32-bit)${RESET} or ${BOLD}x86-64${RESET} in Settings → Engine: both boot`);
-    term.writeln(`  the installed Arch userland from your filesystem's own /.`);
+    term.writeln(`  Pick ${BOLD}x86 (32-bit)${RESET}, ${BOLD}x86-64${RESET} or ${BOLD}RISC-V 64${RESET} in Settings → Engine:`);
+    term.writeln(`  they boot the distro installed in your filesystem's own /.`);
     term.writeln("");
     setChip("offline", `No ${ARCH_LABEL[arch]} operating system installed`);
   };
@@ -250,19 +253,32 @@ export function openTerminal(win: Win, options: TerminalOptions = {}): void {
     term.writeln("");
     term.writeln(`  The machine has nothing to boot: no OS is installed in /.`);
     term.writeln("");
-    term.writeln(`  Open the ${BOLD}App Store${RESET} and install ${BOLD}Arch Linux${RESET} — (x86) runs on both`);
-    term.writeln(`  x86 machines, (x86-64) only on the x86-64 machine. It unpacks a`);
-    term.writeln(`  real Arch userland into your filesystem's /, and this machine`);
-    term.writeln(`  boots it. Then hit ${BOLD}Reconnect${RESET} here.`);
+    if (arch === "riscv64") {
+      term.writeln(`  Open the ${BOLD}App Store${RESET} and install ${BOLD}${DISTROS["alpine-rv64"].name}${RESET} —`);
+      term.writeln(`  the OS built for this machine. It unpacks a real Alpine riscv64`);
+      term.writeln(`  userland into your filesystem's /, and this machine boots it.`);
+      term.writeln(`  Then hit ${BOLD}Reconnect${RESET} here.`);
+    } else {
+      term.writeln(`  Open the ${BOLD}App Store${RESET} and install ${BOLD}Arch Linux${RESET} — (x86) runs on both`);
+      term.writeln(`  x86 machines, (x86-64) only on the x86-64 machine. It unpacks a`);
+      term.writeln(`  real Arch userland into your filesystem's /, and this machine`);
+      term.writeln(`  boots it. Then hit ${BOLD}Reconnect${RESET} here.`);
+    }
     term.writeln("");
     setChip("offline", "No operating system installed — see the App Store");
   };
 
   /** Honest refusal, the third kind: an OS is installed, but this CPU
-      cannot run it — Arch Linux (x86-64) on the 32-bit machine. The same
-      rule real hardware enforces (the other direction, the 32-bit OS on
-      the x86-64 machine, boots fine and is allowed). */
-  const wrongArchBanner = (arch: MachineArch, distroName: string) => {
+      cannot run it — Arch Linux (x86-64) on the 32-bit machine, Alpine
+      (RISC-V 64) on any x86 machine, or Arch on the RISC-V machine. The
+      same rule real hardware enforces (the one allowed direction, the
+      32-bit x86 OS on the x86-64 machine, boots fine). */
+  const wrongArchBanner = (arch: MachineArch, distro: DistroId) => {
+    const distroName = DISTROS[distro].name;
+    /* The machines whose CPU can actually boot this OS, by their labels. */
+    const needs = DISTROS[distro].runsOn
+      .map((a) => ARCH_LABEL[a as MachineArch] ?? a)
+      .join(" or ");
     term.clear();
     term.writeln(`${BOLD}${RED}  ╔══════════════════════════════════════════╗${RESET}`);
     term.writeln(`${BOLD}${RED}  ║        DRAGON86  ·  TERMINAL             ║${RESET}`);
@@ -270,16 +286,16 @@ export function openTerminal(win: Win, options: TerminalOptions = {}): void {
     term.writeln("");
     term.writeln(`  ${GREEN}●${RESET} Terminal emulator : ready`);
     term.writeln(`  ${GREEN}●${RESET} ${ARCH_LABEL[arch]} machine : ready`);
-    term.writeln(`  ${RED}●${RESET} Operating system  : ${distroName} — needs a 64-bit CPU`);
+    term.writeln(`  ${RED}●${RESET} Operating system  : ${distroName} — needs ${needs}`);
     term.writeln("");
     term.writeln(`  ${distroName} is installed in /, but this machine's CPU is`);
-    term.writeln(`  32-bit — a 64-bit kernel cannot run on it, here or on real`);
+    term.writeln(`  ${ARCH_LABEL[arch]} — that kernel cannot run on it, here or on real`);
     term.writeln(`  hardware.`);
     term.writeln("");
-    term.writeln(`  Switch Settings → Machine to ${BOLD}x86-64${RESET}, or install`);
-    term.writeln(`  ${BOLD}${DISTROS.arch32.name}${RESET} from the App Store instead.`);
+    term.writeln(`  Switch Settings → Machine to ${BOLD}${needs}${RESET}, or install an OS`);
+    term.writeln(`  built for this machine from the ${BOLD}App Store${RESET}.`);
     term.writeln("");
-    setChip("offline", `${distroName} needs the x86-64 machine`);
+    setChip("offline", `${distroName} needs the ${needs} machine`);
   };
 
   /* The window title says which machine is behind this terminal. The user
@@ -287,9 +303,9 @@ export function openTerminal(win: Win, options: TerminalOptions = {}): void {
      detail (bridge/v86.ts). */
   const engineLabel = (): string => {
     const arch = getSettings().arch;
-    return arch === "arm64"
-      ? `Terminal — ${ARCH_LABEL.arm64} (no OS installed)`
-      : `Terminal — ${ARCH_LABEL[arch]} · Arch Linux`;
+    if (arch === "arm64") return `Terminal — ${ARCH_LABEL.arm64} (no OS installed)`;
+    if (arch === "riscv64") return `Terminal — ${ARCH_LABEL.riscv64} · Alpine Linux`;
+    return `Terminal — ${ARCH_LABEL[arch]} · Arch Linux`;
   };
   const refreshTitle = () => win.setTitle(engineLabel());
   refreshTitle();
@@ -328,11 +344,14 @@ export function openTerminal(win: Win, options: TerminalOptions = {}): void {
       saveStateBtn.style.display = "none";
       viewEngineBtn.style.display = "none";
       flushPrint();
-      wrongArchBanner(arch, DISTROS[distro].name);
+      wrongArchBanner(arch, distro);
       return;
     }
-    saveStateBtn.style.display = "";
-    viewEngineBtn.style.display = "";
+    /* The RISC-V machine has no snapshot API and no display device, so the
+       two buttons that promise those stay hidden instead of lying. */
+    const isRv = arch === "riscv64";
+    saveStateBtn.style.display = isRv ? "none" : "";
+    viewEngineBtn.style.display = isRv ? "none" : "";
     logInfo(
       "terminal",
       `connect arch=${arch} (in-page engine, no isolation needed) boot=${freshBoot ? "image" : "saved-state-if-present"}`,
@@ -340,28 +359,30 @@ export function openTerminal(win: Win, options: TerminalOptions = {}): void {
     setChip("connecting", "Connecting…");
     term.clear();
     flushPrint();
-    term.writeln(`${DIM}Starting the ${ARCH_LABEL[arch]} machine (Arch userland, in-page).${RESET}`);
+    const osName = isRv ? "Alpine" : "Arch";
+    term.writeln(`${DIM}Starting the ${ARCH_LABEL[arch]} machine (${osName} userland, in-page).${RESET}`);
     term.writeln(`${DIM}Its root filesystem is YOUR filesystem: the guest's / is the / that Files shows.${RESET}`);
-    term.writeln(`${DIM}It boots the Arch userland installed in / (App Store → Arch Linux).${RESET}`);
+    term.writeln(`${DIM}It boots the ${osName} userland installed in / (App Store → ${isRv ? DISTROS["alpine-rv64"].name : "Arch Linux"}).${RESET}`);
     term.writeln(`${DIM}/home/user in the guest is your home — Documents, Downloads and Desktop included.${RESET}`);
     if (arch === "x86_64") {
       term.writeln(`${DIM}x86-64 machine: the installed distro is 32-bit and boots the way it would on real 64-bit hardware.${RESET}`);
     }
     if (freshBoot) {
-      term.writeln(`${DIM}Reconnect: fresh boot from the guest image — saved state is not loaded.${RESET}`);
+      term.writeln(`${DIM}Reconnect: fresh boot from the guest image${isRv ? "" : " — saved state is not loaded"}.${RESET}`);
     }
-    term.writeln(`${DIM}Network is emulated; in the guest run /networking.sh to bring the card up.${RESET}`);
-    term.writeln(`${DIM}In the guest:  git clone https://…  works,  d86-net check  tests the link.${RESET}`);
-    /* A snapshot can only be resumed safely within the session that took
-       it: it remembers the guest's open files, and those are handles in a
-       9p server that no longer exists after a reload. Resuming one was
-       "Session ended" forever, so a new page always cold-boots. */
-    const vb = getV86Backend({
-      onData: (data) => term.write(filterOutput(data)),
-      onNotice: (text) => term.writeln(`${DIM}[engine] ${text}${RESET}`),
-      onStatus: (s) => {
+    if (isRv) {
+      term.writeln(`${DIM}Network comes up by itself (the emulator's fetch backend): git clone https://… just works.${RESET}`);
+      term.writeln(`${DIM}This machine has no screen — the serial console here IS its console.${RESET}`);
+    } else {
+      term.writeln(`${DIM}Network is emulated; in the guest run /networking.sh to bring the card up.${RESET}`);
+      term.writeln(`${DIM}In the guest:  git clone https://…  works,  d86-net check  tests the link.${RESET}`);
+    }
+    const handlers = {
+      onData: (data: string) => term.write(filterOutput(data)),
+      onNotice: (text: string) => term.writeln(`${DIM}[engine] ${text}${RESET}`),
+      onStatus: (s: "ready" | "offline") => {
         if (s === "ready") {
-          setChip("online", `Arch online · ${ARCH_LABEL[arch]}`);
+          setChip("online", `${osName} online · ${ARCH_LABEL[arch]}`);
           term.focus();
         } else {
           setChip("connecting", "Still starting…");
@@ -369,10 +390,24 @@ export function openTerminal(win: Win, options: TerminalOptions = {}): void {
           term.writeln(`${DIM}Keep this window open — bash appears automatically when ready, or hit Reconnect.${RESET}`);
         }
       },
-    }, freshBoot);
-    backend = vb;
-    rememberEngine(vb);
-    vb.connect();
+    };
+    /* A snapshot can only be resumed safely within the session that took
+       it: it remembers the guest's open files, and those are handles in a
+       9p server that no longer exists after a reload. Resuming one was
+       "Session ended" forever, so a new page always cold-boots. */
+    if (isRv) {
+      /* No rememberEngine: the Engine Viewer shows a machine's display,
+         and this machine has none — registering it would make the viewer
+         wait forever for a screen that cannot exist. */
+      const rb = getRV64Backend(handlers);
+      backend = rb;
+      rb.connect();
+    } else {
+      const vb = getV86Backend(handlers, freshBoot);
+      backend = vb;
+      rememberEngine(vb);
+      vb.connect();
+    }
   };
 
   reconnectBtn.addEventListener("click", () => void connect(true));

@@ -12,6 +12,7 @@ export type LogScope =
   | "terminal"
   | "os"
   | "v86"
+  | "rv64"
   | "guest"
   | "union"
   | "store"
