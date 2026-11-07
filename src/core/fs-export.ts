@@ -16,6 +16,9 @@
  */
 
 import { fs } from "@zenfs/core";
+/* The .ts extension keeps this module loadable by Node's strip-types test
+   runner too (tools/test-fs-import.mjs) — Vite and tsc both accept it. */
+import { logWarn } from "./log.ts";
 
 export interface ExportProgress {
   files: number;
@@ -233,4 +236,270 @@ export function downloadBlob(blob: Blob, filename: string): void {
   a.remove();
   /* Give the click a tick to grab the URL before it goes away. */
   setTimeout(() => URL.revokeObjectURL(url), 10_000);
+}
+
+/* ====================================================================== */
+/* Import — the other direction: restore a snapshot .tar.gz into ZenFS.  */
+/* ====================================================================== */
+
+export interface ImportResult {
+  files: number;
+  bytes: number;
+  /** Entries the import refused or could not place (with the reason logged). */
+  skipped: number;
+}
+
+/**
+ * Reads exact byte counts out of a ReadableStream without ever holding
+ * more than one file's worth of data — a distro snapshot decompresses to
+ * hundreds of MB, and "gunzip it all, then parse" would double that.
+ */
+class ByteReader {
+  private chunks: Uint8Array[] = [];
+  private buffered = 0;
+  private done = false;
+  private reader: ReadableStreamDefaultReader<Uint8Array>;
+  constructor(reader: ReadableStreamDefaultReader<Uint8Array>) {
+    this.reader = reader;
+  }
+
+  /** Exactly `n` bytes, or null at a clean end-of-stream (0 bytes left). */
+  async take(n: number): Promise<Uint8Array | null> {
+    while (this.buffered < n && !this.done) {
+      const { value, done } = await this.reader.read();
+      if (done) this.done = true;
+      else if (value.byteLength) {
+        this.chunks.push(value);
+        this.buffered += value.byteLength;
+      }
+    }
+    if (this.buffered === 0 && this.done) return null;
+    if (this.buffered < n) throw new Error(`archive ends mid-entry (${this.buffered} of ${n} bytes)`);
+    const out = new Uint8Array(n);
+    let off = 0;
+    while (off < n) {
+      const head = this.chunks[0];
+      const want = n - off;
+      if (head.byteLength <= want) {
+        out.set(head, off);
+        off += head.byteLength;
+        this.chunks.shift();
+      } else {
+        out.set(head.subarray(0, want), off);
+        this.chunks[0] = head.subarray(want);
+        off += want;
+      }
+    }
+    this.buffered -= n;
+    return out;
+  }
+}
+
+const dec = new TextDecoder();
+
+function cstr(block: Uint8Array, at: number, len: number): string {
+  const slice = block.subarray(at, at + len);
+  const nul = slice.indexOf(0);
+  return dec.decode(nul === -1 ? slice : slice.subarray(0, nul));
+}
+
+function octalField(block: Uint8Array, at: number, len: number): number {
+  const s = cstr(block, at, len).trim();
+  return s ? parseInt(s, 8) || 0 : 0;
+}
+
+/** pax extended header payload: a series of "LEN key=value\n" records. */
+function parsePax(data: Uint8Array): Map<string, string> {
+  const out = new Map<string, string>();
+  let off = 0;
+  while (off < data.byteLength) {
+    const sp = data.indexOf(0x20, off);
+    if (sp === -1) break;
+    const len = Number(dec.decode(data.subarray(off, sp)));
+    if (!Number.isFinite(len) || len <= 0) break;
+    const record = dec.decode(data.subarray(sp + 1, off + len - 1)); /* strip \n */
+    const eq = record.indexOf("=");
+    if (eq > 0) out.set(record.slice(0, eq), record.slice(eq + 1));
+    off += len;
+  }
+  return out;
+}
+
+/**
+ * "etc/../usr" must not climb out of the tree, and tar's various path
+ * spellings all normalise to one absolute ZenFS path. Null = refuse.
+ */
+function importTarget(rawName: string): string | null {
+  const parts: string[] = [];
+  for (const part of rawName.split("/")) {
+    if (part === "" || part === ".") continue;
+    if (part === "..") return null;
+    parts.push(part);
+  }
+  if (!parts.length) return null;
+  if (parts[0] === "tmp") return null; /* in-memory scratch — never imported */
+  return `/${parts.join("/")}`;
+}
+
+/**
+ * Restore a snapshot into ZenFS: every entry in the archive is written
+ * over the current filesystem (same-path files replaced, everything else
+ * left alone). Takes the .tar.gz the export produces, but also plain
+ * .tar, GNU-format and pax/POSIX-format archives made by real tar —
+ * long names via ustar prefix, GNU @LongLink and pax path= all work.
+ */
+export async function importFsSnapshot(blob: Blob, onProgress?: (p: ExportProgress) => void): Promise<ImportResult> {
+  /* gzip or bare tar? The magic bytes say. */
+  const head = new Uint8Array(await blob.slice(0, 2).arrayBuffer());
+  const gzipped = head.byteLength === 2 && head[0] === 0x1f && head[1] === 0x8b;
+  const stream = gzipped
+    ? blob.stream().pipeThrough(new DecompressionStream("gzip") as unknown as ReadableWritablePair<Uint8Array, Uint8Array>)
+    : blob.stream();
+  const r = new ByteReader(stream.getReader() as ReadableStreamDefaultReader<Uint8Array>);
+
+  /* Each directory is created exactly once, parents strictly first —
+     memoised promises instead of racing concurrent mkdir -p calls. */
+  const dirMade = new Map<string, Promise<void>>();
+  const ensureDirOnce = (path: string): Promise<void> => {
+    if (path === "/" || path === "") return Promise.resolve();
+    let p = dirMade.get(path);
+    if (!p) {
+      p = (async () => {
+        await ensureDirOnce(path.slice(0, path.lastIndexOf("/")));
+        await fs.promises.mkdir(path).catch((err: { code?: string }) => {
+          if (err?.code !== "EEXIST") throw err;
+        });
+      })();
+      dirMade.set(path, p);
+    }
+    return p;
+  };
+
+  /* Writes overlap (IndexedDB round-trips dominate), bounded in flight. */
+  const inFlight = new Set<Promise<void>>();
+  const schedule = async (work: () => Promise<void>) => {
+    const p = work().finally(() => inFlight.delete(p));
+    inFlight.add(p);
+    if (inFlight.size >= 16) await Promise.race(inFlight);
+  };
+
+  let files = 0;
+  let bytes = 0;
+  let skipped = 0;
+  /* State fed by GNU @LongLink / pax entries into the NEXT real header. */
+  let pendingName: string | null = null;
+  let pendingLink: string | null = null;
+  let zeroBlocks = 0;
+  let sawEntry = false;
+
+  for (;;) {
+    const block = await r.take(512);
+    if (block === null) break;
+    if (block.every((b) => b === 0)) {
+      if (++zeroBlocks >= 2) break;
+      continue;
+    }
+    zeroBlocks = 0;
+    const size = octalField(block, 124, 12);
+    const padded = Math.ceil(size / 512) * 512;
+    const type = String.fromCharCode(block[156] || 0x30);
+    const readData = async () => {
+      const data = size > 0 ? await r.take(padded) : new Uint8Array(0);
+      if (!data && size > 0) throw new Error("archive ends mid-file");
+      return (data ?? new Uint8Array(0)).subarray(0, size);
+    };
+
+    /* Metadata entries that describe the next real one. */
+    if (type === "L") {
+      pendingName = dec.decode(await readData()).replace(/\0+$/, "");
+      continue;
+    }
+    if (type === "K") {
+      pendingLink = dec.decode(await readData()).replace(/\0+$/, "");
+      continue;
+    }
+    if (type === "x") {
+      const pax = parsePax(await readData());
+      pendingName = pax.get("path") ?? pendingName;
+      pendingLink = pax.get("linkpath") ?? pendingLink;
+      continue;
+    }
+    if (type === "g") {
+      await readData(); /* global pax defaults — nothing we honour */
+      continue;
+    }
+
+    const prefix = cstr(block, 345, 155);
+    let name = pendingName ?? (prefix ? `${prefix}/${cstr(block, 0, 100)}` : cstr(block, 0, 100));
+    let link = pendingLink ?? cstr(block, 157, 100);
+    pendingName = null;
+    pendingLink = null;
+    const mode = octalField(block, 100, 8) & 0o7777;
+    const mtimeSec = octalField(block, 136, 12);
+    sawEntry = true;
+
+    const target = importTarget(name);
+    if (!target) {
+      if (size > 0) await readData();
+      const parts = name.split("/").filter((p) => p !== "" && p !== ".");
+      if (parts.length === 0) continue; /* the archive's "./" root — / already exists */
+      if (parts[0] !== "tmp") logWarn("os", `import: refused path "${name}"`); /* tmp/ is skipped silently by design */
+      skipped++;
+      continue;
+    }
+
+    if (type === "5" || name.endsWith("/")) {
+      await ensureDirOnce(target);
+      await fs.promises.chmod(target, mode || 0o755).catch(() => {});
+      files++;
+    } else if (type === "2") {
+      await ensureDirOnce(target.slice(0, target.lastIndexOf("/")));
+      await schedule(async () => {
+        await fs.promises.rm(target, { recursive: true, force: true }).catch(() => {});
+        await fs.promises.symlink(link, target);
+      });
+      files++;
+    } else if (type === "1") {
+      /* Hardlink: tar guarantees the source came earlier — settle the
+         queue, then copy its bytes. */
+      await Promise.all([...inFlight]);
+      const srcPath = importTarget(link);
+      try {
+        if (!srcPath) throw new Error("bad link target");
+        const data = new Uint8Array(await fs.promises.readFile(srcPath));
+        await ensureDirOnce(target.slice(0, target.lastIndexOf("/")));
+        await fs.promises.writeFile(target, data);
+        await fs.promises.chmod(target, mode || 0o644).catch(() => {});
+        bytes += data.byteLength;
+        files++;
+      } catch {
+        logWarn("os", `import: skipped hardlink ${name} → ${link}`);
+        skipped++;
+      }
+    } else if (type === "0" || type === "7") { /* "7" = contiguous, same as a plain file */
+      const data = await readData();
+      const copy = new Uint8Array(data); /* readData's view aliases the taken block */
+      await ensureDirOnce(target.slice(0, target.lastIndexOf("/")));
+      await schedule(async () => {
+        await fs.promises.rm(target, { recursive: true, force: true }).catch(() => {});
+        await fs.promises.writeFile(target, copy);
+        await fs.promises.chmod(target, mode || 0o644).catch(() => {});
+        await fs.promises.utimes(target, mtimeSec, mtimeSec).catch(() => {});
+      });
+      bytes += copy.byteLength;
+      files++;
+    } else {
+      /* character/block devices, fifos — nothing ZenFS can hold */
+      if (size > 0) await readData();
+      logWarn("os", `import: skipped unsupported entry type "${type}" for ${name}`);
+      skipped++;
+      continue;
+    }
+    if (files % 50 === 0) onProgress?.({ files, bytes, path: target });
+  }
+
+  await Promise.all([...inFlight]);
+  if (!sawEntry) throw new Error("that file is not a tar archive (no entries found)");
+  onProgress?.({ files, bytes, path: "" });
+  return { files, bytes, skipped };
 }

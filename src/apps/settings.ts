@@ -40,7 +40,7 @@ import {
   checkPassword,
 } from "../core/trash";
 import { logInfo } from "../core/log";
-import { downloadBlob, exportFsSnapshot, snapshotFilename } from "../core/fs-export";
+import { downloadBlob, exportFsSnapshot, importFsSnapshot, snapshotFilename } from "../core/fs-export";
 
 interface Page {
   id: string;
@@ -73,6 +73,7 @@ const SEARCH_INDEX: SearchHit[] = [
   { page: "v86", pageTitle: "Machine", label: "v86 network", keywords: "relay wisp network internet" },
   { page: "storage", pageTitle: "Storage", label: "Disk usage", keywords: "space quota bytes indexeddb" },
   { page: "storage", pageTitle: "Storage", label: "Export filesystem", keywords: "backup snapshot download tar zenfs save" },
+  { page: "storage", pageTitle: "Storage", label: "Import filesystem", keywords: "restore snapshot upload tar zenfs load backup" },
   { page: "storage", pageTitle: "Storage", label: "Factory reset", keywords: "erase wipe delete everything" },
   { page: "about", pageTitle: "About", label: "System information", keywords: "version build vendor engines" },
 ];
@@ -705,7 +706,7 @@ export function openSettings(win: Win, startPage?: string): void {
       }
     })();
 
-    host.append(section("Export", "Take the whole filesystem with you."));
+    host.append(section("Snapshots", "Take the whole filesystem with you — or bring one back."));
     const exportRow = el("div", "settings-row");
     exportRow.dataset.setting = "Export filesystem";
     const exportBtn = el("button", "btn", "Export filesystem");
@@ -735,6 +736,51 @@ export function openSettings(win: Win, startPage?: string): void {
       ),
     );
     host.append(exportNote);
+
+    const importRow = el("div", "settings-row");
+    importRow.dataset.setting = "Import filesystem";
+    const importBtn = el("button", "btn", "Import filesystem");
+    const importNote = el("div", "settings-note", "");
+    const picker = document.createElement("input");
+    picker.type = "file";
+    picker.accept = ".tar.gz,.tgz,.tar,application/gzip,application/x-tar";
+    picker.style.display = "none";
+    importBtn.addEventListener("click", () => {
+      picker.value = "";
+      picker.click();
+    });
+    picker.addEventListener("change", async () => {
+      const file = picker.files?.[0];
+      if (!file) return;
+      const ok = await showConfirm(
+        "Import filesystem",
+        `Write everything in "${file.name}" into the filesystem? Files with the same path are replaced; files the snapshot does not mention are left alone. For an exact restore, do a factory reset first and import after the reload. The page reloads when the import finishes.`,
+        true,
+      );
+      if (!ok) return;
+      importBtn.disabled = true;
+      importBtn.textContent = "Importing…";
+      try {
+        const { files, bytes, skipped } = await importFsSnapshot(file, (p) => {
+          importNote.textContent = `Restoring… ${p.files} entries, ${formatBytes(p.bytes)} so far (${p.path})`;
+        });
+        logInfo("os", `filesystem imported: ${files} entries, ${bytes} bytes, ${skipped} skipped`);
+        importNote.textContent = `Done: ${files} entries, ${formatBytes(bytes)} of file data restored${skipped ? ` (${skipped} entries skipped — see the console)` : ""}. Reloading so every app sees the imported state…`;
+        setTimeout(() => window.location.reload(), 1500);
+      } catch (err) {
+        importNote.textContent = `Import failed: ${(err as Error).message}`;
+        importBtn.disabled = false;
+        importBtn.textContent = "Import filesystem";
+      }
+    });
+    importRow.append(importBtn, picker);
+    host.append(importRow);
+    host.append(
+      note(
+        "Restores a snapshot .tar.gz into ZenFS — the files it contains are written back exactly where they were, symlinks and permission bits included. Plain .tar and archives made by real tar (GNU or POSIX format) work too. Entries under /tmp are skipped, and paths that try to climb out of the tree are refused.",
+      ),
+    );
+    host.append(importNote);
 
     host.append(section("Danger zone", "This cannot be undone."));
     const row = el("div", "settings-row");
