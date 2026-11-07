@@ -18,8 +18,23 @@ W=$(dkctl $T listwedges | awk '/d86root/ {sub(":", "", $1); print $1; exit}'); e
 newfs -O 2 /dev/r$W
 mount /dev/$W /mnt
 
+# Quiesce the live system before copying: running daemons hold sockets in
+# /var/run and keep appending to logs, both of which make pax error out
+# (sockets cannot be copied; files must not change size mid-copy).
+-/etc/rc.d/cron stop
+-/etc/rc.d/inetd stop
+-/etc/rc.d/postfix stop
+-/etc/rc.d/ntpd stop
+-/etc/rc.d/sshd stop
+-/etc/rc.d/mdnsd stop
+-/etc/rc.d/dhcpcd stop
+-/etc/rc.d/syslogd stop
+
 # the root file sets, devices included (NetBSD has no devtmpfs: /dev travels with the image)
-cd / && pax -rw -pe bin dev etc lib libdata libexec rescue root sbin stand var /mnt
+cd / && pax -rw -pe bin dev etc lib libdata libexec rescue root sbin stand /mnt
+# /var separately: skip leftover socket files and man.db (the man pages are
+# deleted below, and makemandb rewrites it during first boot anyway)
+cd / && find var \( -type s -o -path var/db/man.db \) -prune -o -print | pax -rw -pe /mnt
 -cp /netbsd /mnt/netbsd
 mkdir -p /mnt/usr /mnt/tmp /mnt/proc /mnt/kern /mnt/mnt /mnt/altroot
 chmod 1777 /mnt/tmp
