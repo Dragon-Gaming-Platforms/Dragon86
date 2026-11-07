@@ -13,6 +13,7 @@ export type LogScope =
   | "os"
   | "v86"
   | "rv64"
+  | "netbsd64"
   | "guest"
   | "union"
   | "store"

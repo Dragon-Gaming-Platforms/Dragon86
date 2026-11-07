@@ -12,8 +12,14 @@
  *            installed — Arch Linux (x86-64) runs only here, and the
  *            32-bit distro also runs here,
  *            the way real x86-64 hardware boots a 32-bit OS
- *   arm64  → v64 has the machine, but no ARM64 distro is installed, so
- *            the Terminal refuses honestly (see apps/terminal.ts)
+ *   arm64  → v64's ARM64 machine (cpu_type "arm64", the QEMU-virt board,
+ *            a separate core: v86-arm64.wasm). It boots NetBSD (ARM64)
+ *            from the App Store — not from ZenFS: NetBSD runs from a real
+ *            disk image in the browser's private storage (OPFS), served
+ *            read-write through v64's browser-disk support, which needs
+ *            the machine to run in its CPU worker (an ordinary dedicated
+ *            worker — still no cross-origin isolation). Serial console
+ *            only for now; the virt board has no VGA.
  *
  * (The old 32-bit-only v86 build used to serve x86_32; it was removed
  * once v64's 32-bit machine passed the same boot proofs.) The API is the
@@ -44,6 +50,7 @@ import { ensureDir } from "../core/vfs";
 import { getSettings, type MachineArch } from "../core/settings";
 import { createP9Handler } from "./p9";
 import { ensureGuestRoot, installedDistro, DISTROS, at } from "./guest-root";
+import { netbsd64Installed, netbsd64Kernel, netbsd64Manifest, NETBSD_DISK_URL } from "./netbsd64";
 import { createDirectFs, unionAsPromises } from "./union-fs";
 import { logInfo, logWarn } from "../core/log";
 import type { BackendHandlers, EngineScreen, TerminalBackend } from "./engine";
@@ -231,6 +238,9 @@ class V86Backend implements TerminalBackend {
   private nudgeTimer: ReturnType<typeof setInterval> | null = null;
   private acpiEnabled = false;
   private screenWarned = false;
+  /** What the serial tail must show before input flows: the x86 guests'
+      shell prompt carries "dragon86:"; NetBSD's getty prints "login:". */
+  private readyMark = "dragon86:";
   /** v86's own screen: the element its adapter draws the display into. */
   private screenHost: HTMLDivElement | null = null;
   /** Set by connect(): this backend has been asked to run a machine. */
@@ -555,10 +565,75 @@ class V86Backend implements TerminalBackend {
     await this.installHostBinary("ca-certificates.crt", at(root, "etc/ssl/certs/ca-certificates.crt"), 0o644);
   }
 
+  /**
+   * The ARM64 machine: v64's cpu_type "arm64" (the QEMU-virt board clone),
+   * booting NetBSD the way the board boots anything — a Linux-boot-header
+   * kernel image loaded directly, no firmware — with the root disk served
+   * read-write from the browser's private storage (OPFS).
+   *
+   * Differences from the x86 path, all deliberate:
+   *  - no BIOS/VGA options (the virt board refuses PC options by design),
+   *  - no 9p root: NetBSD's / is FFS inside its own disk image, so the OS
+   *    filesystem and the guest do not share files (said in the store),
+   *  - cpu_worker: true — the OPFS write-back handle only exists in
+   *    workers. A plain dedicated worker; no cross-origin isolation.
+   *  - no saved states yet: a snapshot holds a reference to the disk's
+   *    write generation, and wiring that honestly is its own task.
+   */
+  private async startArm64(): Promise<void> {
+    const BASE = engineBase(this.arch);
+    this.readyMark = "login:";
+    if (!(await netbsd64Installed())) {
+      throw new Error(
+        "no ARM64 OS is installed — install NetBSD (ARM64) from the App Store (its disk image lives in browser storage, not in /)",
+      );
+    }
+    const man = await netbsd64Manifest();
+    this.status("loading the NetBSD kernel");
+    const kernel = await netbsd64Kernel();
+    if (this.disposed) return;
+    const V86 = await loadLib(BASE);
+    if (this.disposed) return;
+
+    const opts: Record<string, unknown> = {
+      cpu_type: "arm64",
+      wasm_path: `${BASE}v86-arm64.wasm`,
+      /* The machine runs in v64's CPU worker so the OPFS disk can be
+         written back (sync access handles exist only in workers). */
+      cpu_worker: true,
+      cpu_worker_url: `${BASE}cpu-worker.js`,
+      memory_size: 512 * 1024 * 1024,
+      kernel: { buffer: kernel.buffer as ArrayBuffer },
+      cmdline: `root=${man.root.rootArg}`,
+      virtio_disks: [
+        { url: NETBSD_DISK_URL, disk_option: "read_write", size: man.root.rawBytes },
+      ],
+      /* NetBSD blocks on "Waiting for entropy..." without a source. */
+      virtio_rng: true,
+      autostart: true,
+      disable_keyboard: true,
+      disable_mouse: true,
+      disable_speaker: true,
+    };
+
+    this.status(`booting NetBSD ${man.version} from its disk image (log in as root)`);
+    logInfo("v86", `arm64: kernel ${kernel.byteLength} bytes, disk ${NETBSD_DISK_URL} (${man.root.rawBytes} bytes), cpu worker on`);
+    const emu = new V86(opts);
+    this.emu = emu;
+    emu.add_listener("serial0-output-byte", (b) => this.onByte(b));
+    setTimeout(() => {
+      if (!this.booted && !this.disposed) this.handlers.onStatus("offline");
+    }, 180_000);
+  }
+
   private async start(): Promise<void> {
     this.startTimer = null;
     try {
       const arch = this.arch;
+      if (arch === "arm64") {
+        await this.startArm64();
+        return;
+      }
       const BASE = engineBase(arch);
       const wantSaved = !this.freshBoot;
       const [V86, loaded] = await Promise.all([
@@ -734,7 +809,7 @@ class V86Backend implements TerminalBackend {
       this.handlers.onData(text);
       if (!this.booted) {
         this.tail = (this.tail + text).slice(-512);
-        if (this.tail.includes("dragon86:")) {
+        if (this.tail.includes(this.readyMark)) {
           this.booted = true;
           if (this.nudgeTimer) clearInterval(this.nudgeTimer);
           this.nudgeTimer = null;
@@ -760,6 +835,13 @@ class V86Backend implements TerminalBackend {
   /** Snapshot the machine into IndexedDB (gzip; see header). */
   async saveState(): Promise<void> {
     if (!this.emu) throw new Error("engine not running");
+    if (this.arch === "arm64") {
+      /* A snapshot of this machine references the OPFS disk's write
+         generation (upstream's rule: a snapshot never fits an image
+         written after it). Supporting that honestly is its own task, so
+         the Terminal hides the button; this guard is for anyone else. */
+      throw new Error("the ARM64 machine has no snapshots yet");
+    }
     const raw = await this.emu.save_state();
     let data = raw;
     let gzip = false;

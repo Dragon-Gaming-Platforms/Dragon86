@@ -51,7 +51,9 @@ jobs:
       - name: Install QEMU and pexpect
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends qemu-system-arm qemu-utils python3-pexpect
+          # ipxe-qemu: QEMU refuses to start without the virtio option ROM
+          # (efi-virtio.rom), even for virtio-mmio disks with no network
+          sudo apt-get install -y --no-install-recommends qemu-system-arm qemu-utils ipxe-qemu python3-pexpect
           qemu-system-aarch64 --version
 
       - name: Download NetBSD ${{ env.NETBSD_VERSION }} (kernel + official live image)
@@ -142,20 +144,22 @@ jobs:
           with open("public/netbsd64/manifest.json", "w") as f:
               json.dump(manifest, f, indent=2)
           print(json.dumps(manifest, indent=2))
-          EOF
-          cat > public/netbsd64/app-manifest.json <<'EOF'
-          {
-            "id": "netbsd-arm64",
-            "kind": "disk-image",
-            "distro": "netbsd64",
-            "arch": [
-              "arm64"
-            ],
-            "kernel": "kernel.img.gz",
-            "image": "root.img.gz",
-            "manifest": "manifest.json",
-            "note": "NetBSD boots from its own virtio disk image, not from the OS filesystem: the App Store reassembles root.img.gz.NN into the ARM64 machine's disk storage, and all changes live inside that image. Only the ARM64 machine can boot it."
+          # app-manifest.json: what the App Store reads. `files` is the real
+          # download list (kernel + the split image parts) so the store can
+          # measure the download size honestly, part count included.
+          app_manifest = {
+              "id": "netbsd-arm64",
+              "kind": "disk-image",
+              "distro": "netbsd64",
+              "arch": ["arm64"],
+              "kernel": "kernel.img.gz",
+              "image": "root.img.gz",
+              "manifest": "manifest.json",
+              "files": ["kernel.img.gz"] + parts,
+              "note": "NetBSD boots from its own virtio disk image, not from the OS filesystem: the App Store streams root.img.gz.NN into browser storage (OPFS) as the ARM64 machine's disk, and all changes live inside that image. Only the ARM64 machine can boot it.",
           }
+          with open("public/netbsd64/app-manifest.json", "w") as f:
+              json.dump(app_manifest, f, indent=2)
           EOF
           {
             echo "# public/netbsd64 — vendored NetBSD ${NETBSD_VERSION} (ARM64) guest"

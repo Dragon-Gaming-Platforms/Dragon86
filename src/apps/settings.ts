@@ -558,7 +558,7 @@ export function openSettings(win: Win, startPage?: string): void {
         id: "arm64",
         label: "ARM64",
         blurb:
-          "Emulatable, but no ARM64 kernel or distro is installed — the Terminal will say so instead of booting nothing.",
+          "An ARM64 machine (the QEMU-virt board). Boots NetBSD (ARM64) from the App Store — a real disk image in browser storage, serial console only; log in as root.",
       },
     ];
     const seg = el("div", "segmented");
