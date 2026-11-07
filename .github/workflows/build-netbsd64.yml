@@ -61,22 +61,29 @@ jobs:
           curl -fL --retry 3 -o work/netbsd-GENERIC64.img.gz "$NETBSD_URL/kernel/netbsd-GENERIC64.img.gz"
           curl -fL --retry 3 -o work/kernel.SHA512 "$NETBSD_URL/kernel/SHA512"
           curl -fL --retry 3 -o work/arm64.img.gz "$NETBSD_URL/gzimg/arm64.img.gz"
-          curl -fL --retry 3 -o work/gzimg.SHA512 "$NETBSD_URL/gzimg/SHA512"
+          curl -fL --retry 3 -o work/gzimg.MD5 "$NETBSD_URL/gzimg/MD5"
           cd work
-          for pair in "kernel.SHA512 netbsd-GENERIC64.img.gz" "gzimg.SHA512 arm64.img.gz"; do
-            set -- $pair
-            want=$(awk -F' = ' -v f="SHA512 ($2)" '$1==f {print $2}' "$1")
-            got=$(sha512sum "$2" | awk '{print $1}')
-            echo "$2: want $want"
-            echo "$2: got  $got"
-            test -n "$want" && test "$want" = "$got"
-          done
+          # the kernel directory publishes SHA512 for the .gz files
+          want=$(awk -F' = ' '$1=="SHA512 (netbsd-GENERIC64.img.gz)" {print $2}' kernel.SHA512)
+          got=$(sha512sum netbsd-GENERIC64.img.gz | awk '{print $1}')
+          echo "kernel: want $want"
+          echo "kernel: got  $got"
+          test -n "$want" && test "$want" = "$got"
+          # the gzimg directory's SHA512 file only covers arm64mbr.img;
+          # arm64.img is published with an MD5 of the UNCOMPRESSED image, so
+          # that is what can be checked (integrity over TLS from the
+          # official CDN — upstream offers nothing stronger for this file)
+          gunzip -c arm64.img.gz > arm64.img
+          want=$(awk -F' = ' '$1=="MD5 (arm64.img)" {print $2}' gzimg.MD5)
+          got=$(md5sum arm64.img | awk '{print $1}')
+          echo "arm64.img: want $want"
+          echo "arm64.img: got  $got"
+          test -n "$want" && test "$want" = "$got"
 
       - name: Assemble the trimmed root disk (QEMU, serial-driven)
         shell: bash
         run: |
           gunzip -c work/netbsd-GENERIC64.img.gz > work/netbsd-GENERIC64.img
-          gunzip -c work/arm64.img.gz > work/arm64.img
           truncate -s "${ROOT_IMG_MIB}M" work/root.img
           # the official image's GPT holds wedges dk0 (EFI) and dk1 (FFS root)
           python3 tools/netbsd64/guest-driver.py \
