@@ -23,6 +23,7 @@ the echoed input line, so matching D86-RC-<n> cannot race the tty echo.
 import argparse
 import re
 import sys
+import time
 
 import pexpect
 
@@ -54,7 +55,25 @@ child.logfile_read = sys.stdout
 def run(cmd, must_succeed=True):
     child.sendline(cmd)
     child.sendline('echo "D86""-RC-$?"')
-    child.expect(re.compile(r"D86-RC-(\d+)"))
+    # Waiting in chunks with a single newline nudge: one CI run hung forever
+    # because the serial line dropped the final newline, leaving the shell
+    # waiting on a half-received line. If the command is merely slow (the big
+    # pax copies run for many minutes), the nudge is harmless typeahead that
+    # becomes one empty prompt line after the queued echo. A truncated
+    # command line still fails honestly via its non-zero exit status, and a
+    # truly hung guest still fails at the full deadline.
+    deadline = time.time() + args.timeout
+    nudged = False
+    while True:
+        try:
+            child.expect(re.compile(r"D86-RC-(\d+)"), timeout=min(90, args.timeout))
+            break
+        except pexpect.TIMEOUT:
+            if time.time() >= deadline:
+                raise
+            if not nudged:
+                child.send("\n")
+                nudged = True
     rc = int(child.match.group(1))
     if must_succeed and rc != 0:
         print(f"\nFAILED (exit {rc}): {cmd}", file=sys.stderr)
