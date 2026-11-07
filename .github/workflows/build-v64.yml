@@ -31,7 +31,7 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 150
     steps:
       - name: Checkout Dragon86
         uses: actions/checkout@v4
@@ -61,13 +61,17 @@ jobs:
             ~/.cargo/git
           key: ${{ runner.os }}-v64-cargo-${{ env.V64_COMMIT }}
 
-      - name: Build v64 (make all)
+      - name: Build v64 (make all + the ARM64 core)
         working-directory: v64-src
         run: |
           rustc --version
           java -version
           node --version
-          make all build/v86-fallback.wasm
+          # v86-arm64.wasm is a separate core in the same crate (the x86 core
+          # does not contain the ARM code and vice versa); libv86.js already
+          # carries the virt-board JS from src/arm + src/virt. The fallback
+          # core is the no-SIMD build, mirroring v86-fallback.wasm for x86.
+          make all build/v86-fallback.wasm build/v86-arm64.wasm build/v86-arm64-fallback.wasm
 
       - name: Vendor the build into public/v64
         run: |
@@ -100,6 +104,8 @@ jobs:
           cp v64-src/LICENSE v64-src/LICENSE.MIT public/v64/
           {
             echo "Vendored build of v64 — not written by hand."
+            echo "Cores: v86.wasm (x86 32/64-bit) and v86-arm64.wasm (ARM64/arm32"
+            echo "on the virt board), plus their no-SIMD -fallback builds."
             echo "Source: https://github.com/${V64_REPO} @ ${V64_COMMIT}"
             echo "Built:  $(date -u +%Y-%m-%dT%H:%M:%SZ) by GitHub Actions run ${{ github.run_id }}"
             echo "Patched: initrd loads near the top of RAM, not at 64 MB (see the"

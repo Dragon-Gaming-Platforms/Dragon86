@@ -18,6 +18,7 @@ import type { Win } from "../core/wm";
 import type { TerminalBackend } from "../bridge/engine";
 import { getV86Backend } from "../bridge/v86";
 import { getRV64Backend } from "../bridge/rv64";
+import { netbsd64Installed } from "../bridge/netbsd64";
 import { distroInstalled, installedDistro, DISTROS, type DistroId } from "../bridge/guest-root";
 import * as vfs from "../core/vfs";
 import { isolationReport, logInfo, logWarn } from "../core/log";
@@ -219,8 +220,8 @@ export function openTerminal(win: Win, options: TerminalOptions = {}): void {
     setChip("offline", `Printed ${name} (not run)`);
   };
 
-  /** Honest refusal: v64 can emulate an ARM64 machine, but Dragon86 ships
-      no ARM64 kernel or distro, so there is nothing truthful to boot. */
+  /** Honest refusal: the ARM64 machine is real, but its OS is a disk image
+      in browser storage, and that image has not been installed yet. */
   const noDistroBanner = (arch: MachineArch) => {
     term.clear();
     term.writeln(`${BOLD}${RED}  ╔══════════════════════════════════════════╗${RESET}`);
@@ -228,15 +229,17 @@ export function openTerminal(win: Win, options: TerminalOptions = {}): void {
     term.writeln(`${BOLD}${RED}  ╚══════════════════════════════════════════╝${RESET}`);
     term.writeln("");
     term.writeln(`  ${GREEN}●${RESET} Terminal emulator : ready`);
-    term.writeln(`  ${RED}●${RESET} ${ARCH_LABEL[arch]} machine : no operating system installed`);
+    term.writeln(`  ${GREEN}●${RESET} ${ARCH_LABEL[arch]} machine : ready`);
+    term.writeln(`  ${RED}●${RESET} Operating system  : not installed`);
     term.writeln("");
-    term.writeln(`  The ${ARCH_LABEL[arch]} machine can be emulated, but Dragon86 does not`);
-    term.writeln(`  ship a kernel or distro for it yet — there is nothing to boot.`);
+    term.writeln(`  The machine has nothing to boot: no ARM64 disk image is installed.`);
     term.writeln("");
-    term.writeln(`  Pick ${BOLD}x86 (32-bit)${RESET}, ${BOLD}x86-64${RESET} or ${BOLD}RISC-V 64${RESET} in Settings → Engine:`);
-    term.writeln(`  they boot the distro installed in your filesystem's own /.`);
+    term.writeln(`  Open the ${BOLD}App Store${RESET} and install ${BOLD}NetBSD (ARM64)${RESET} — the OS built`);
+    term.writeln(`  for this machine. Unlike the Linux distros it does not unpack`);
+    term.writeln(`  into /: it boots from its own disk image in browser storage.`);
+    term.writeln(`  Then hit ${BOLD}Reconnect${RESET} here.`);
     term.writeln("");
-    setChip("offline", `No ${ARCH_LABEL[arch]} operating system installed`);
+    setChip("offline", `No ${ARCH_LABEL[arch]} operating system installed — see the App Store`);
   };
 
   /** Honest refusal, the other kind: the machine is fine, but no operating
@@ -303,7 +306,7 @@ export function openTerminal(win: Win, options: TerminalOptions = {}): void {
      detail (bridge/v86.ts). */
   const engineLabel = (): string => {
     const arch = getSettings().arch;
-    if (arch === "arm64") return `Terminal — ${ARCH_LABEL.arm64} (no OS installed)`;
+    if (arch === "arm64") return `Terminal — ${ARCH_LABEL.arm64} · NetBSD`;
     if (arch === "riscv64") return `Terminal — ${ARCH_LABEL.riscv64} · Alpine Linux`;
     return `Terminal — ${ARCH_LABEL[arch]} · Arch Linux`;
   };
@@ -325,33 +328,40 @@ export function openTerminal(win: Win, options: TerminalOptions = {}): void {
     const arch = getSettings().arch;
     backend?.dispose();
     backend = null;
-    if (arch === "arm64") {
-      saveStateBtn.style.display = "none";
-      viewEngineBtn.style.display = "none";
-      flushPrint();
-      noDistroBanner(arch);
-      return;
+    const isArm = arch === "arm64";
+    if (isArm) {
+      /* The ARM64 OS is a disk image in browser storage, not a userland
+         in ZenFS / — so the / checks below do not apply to it. */
+      if (!(await netbsd64Installed())) {
+        saveStateBtn.style.display = "none";
+        viewEngineBtn.style.display = "none";
+        flushPrint();
+        noDistroBanner(arch);
+        return;
+      }
+    } else {
+      if (!(await distroInstalled(vfs.GUEST_ROOT))) {
+        saveStateBtn.style.display = "none";
+        viewEngineBtn.style.display = "none";
+        flushPrint();
+        noOsBanner(arch);
+        return;
+      }
+      const distro = await installedDistro(vfs.GUEST_ROOT);
+      if (distro && !DISTROS[distro].runsOn.includes(arch)) {
+        saveStateBtn.style.display = "none";
+        viewEngineBtn.style.display = "none";
+        flushPrint();
+        wrongArchBanner(arch, distro);
+        return;
+      }
     }
-    if (!(await distroInstalled(vfs.GUEST_ROOT))) {
-      saveStateBtn.style.display = "none";
-      viewEngineBtn.style.display = "none";
-      flushPrint();
-      noOsBanner(arch);
-      return;
-    }
-    const distro = await installedDistro(vfs.GUEST_ROOT);
-    if (distro && !DISTROS[distro].runsOn.includes(arch)) {
-      saveStateBtn.style.display = "none";
-      viewEngineBtn.style.display = "none";
-      flushPrint();
-      wrongArchBanner(arch, distro);
-      return;
-    }
-    /* The RISC-V machine has no snapshot API and no display device, so the
-       two buttons that promise those stay hidden instead of lying. */
+    /* The RISC-V machine has no snapshot API and no display device, and
+       the ARM64 machine has neither snapshots nor a screen yet, so the
+       buttons that promise those stay hidden instead of lying. */
     const isRv = arch === "riscv64";
-    saveStateBtn.style.display = isRv ? "none" : "";
-    viewEngineBtn.style.display = isRv ? "none" : "";
+    saveStateBtn.style.display = isRv || isArm ? "none" : "";
+    viewEngineBtn.style.display = isRv || isArm ? "none" : "";
     logInfo(
       "terminal",
       `connect arch=${arch} (in-page engine, no isolation needed) boot=${freshBoot ? "image" : "saved-state-if-present"}`,
@@ -359,18 +369,27 @@ export function openTerminal(win: Win, options: TerminalOptions = {}): void {
     setChip("connecting", "Connecting…");
     term.clear();
     flushPrint();
-    const osName = isRv ? "Alpine" : "Arch";
-    term.writeln(`${DIM}Starting the ${ARCH_LABEL[arch]} machine (${osName} userland, in-page).${RESET}`);
-    term.writeln(`${DIM}Its root filesystem is YOUR filesystem: the guest's / is the / that Files shows.${RESET}`);
-    term.writeln(`${DIM}It boots the ${osName} userland installed in / (App Store → ${isRv ? DISTROS["alpine-rv64"].name : "Arch Linux"}).${RESET}`);
-    term.writeln(`${DIM}/home/user in the guest is your home — Documents, Downloads and Desktop included.${RESET}`);
+    const osName = isArm ? "NetBSD" : isRv ? "Alpine" : "Arch";
+    term.writeln(`${DIM}Starting the ${ARCH_LABEL[arch]} machine (${osName}, in-page).${RESET}`);
+    if (isArm) {
+      term.writeln(`${DIM}NetBSD boots from its own disk image in browser storage — its files are NOT in Files.${RESET}`);
+      term.writeln(`${DIM}Changes persist inside that image. Log in as: root (no password).${RESET}`);
+      term.writeln(`${DIM}This machine has no screen or network yet — the serial console here IS its console.${RESET}`);
+      term.writeln(`${DIM}Shut down cleanly with: shutdown -p now${RESET}`);
+    } else {
+      term.writeln(`${DIM}Its root filesystem is YOUR filesystem: the guest's / is the / that Files shows.${RESET}`);
+      term.writeln(`${DIM}It boots the ${osName} userland installed in / (App Store → ${isRv ? DISTROS["alpine-rv64"].name : "Arch Linux"}).${RESET}`);
+      term.writeln(`${DIM}/home/user in the guest is your home — Documents, Downloads and Desktop included.${RESET}`);
+    }
     if (arch === "x86_64") {
       term.writeln(`${DIM}x86-64 machine: the installed distro is 32-bit and boots the way it would on real 64-bit hardware.${RESET}`);
     }
     if (freshBoot) {
-      term.writeln(`${DIM}Reconnect: fresh boot from the guest image${isRv ? "" : " — saved state is not loaded"}.${RESET}`);
+      term.writeln(`${DIM}Reconnect: fresh boot from the guest image${isRv || isArm ? "" : " — saved state is not loaded"}.${RESET}`);
     }
-    if (isRv) {
+    if (isArm) {
+      /* said above — nothing more to promise */
+    } else if (isRv) {
       term.writeln(`${DIM}Network comes up by itself (the emulator's fetch backend): git clone https://… just works.${RESET}`);
       term.writeln(`${DIM}This machine has no screen — the serial console here IS its console.${RESET}`);
     } else {
@@ -402,6 +421,12 @@ export function openTerminal(win: Win, options: TerminalOptions = {}): void {
       const rb = getRV64Backend(handlers);
       backend = rb;
       rb.connect();
+    } else if (isArm) {
+      /* Same engine module as x86, but no rememberEngine: the virt board
+         runs without a display here (serial console only, for now). */
+      const vb = getV86Backend(handlers, freshBoot);
+      backend = vb;
+      vb.connect();
     } else {
       const vb = getV86Backend(handlers, freshBoot);
       backend = vb;

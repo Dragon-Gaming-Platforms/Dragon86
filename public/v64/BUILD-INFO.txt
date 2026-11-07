@@ -1,6 +1,8 @@
 Vendored build of v64 — not written by hand.
+Cores: v86.wasm (x86 32/64-bit) and v86-arm64.wasm (ARM64/arm32
+on the virt board), plus their no-SIMD -fallback builds.
 Source: https://github.com/speedyHKjournalist/v64 @ 87d26deb9a77c2e98b4b684f39cc72ba9065d76a
-Built:  2026-11-06T04:18:22Z by GitHub Actions run 42161254652
+Built:  2026-11-07T01:34:51Z by GitHub Actions run 42324543986
 Patched: initrd loads near the top of RAM, not at 64 MB (see the
 workflow's patch step — 64-bit kernels decompress over 64 MB).
 Rebuild: run the 'Build v64' workflow (it overwrites this directory).

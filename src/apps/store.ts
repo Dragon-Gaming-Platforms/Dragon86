@@ -34,6 +34,7 @@ import {
   normExt,
 } from "../core/fs-apps";
 import { ensureGuestRoot, installedDistro, type DistroId } from "../bridge/guest-root";
+import { installNetbsd64, netbsd64Installed, uninstallNetbsd64 } from "../bridge/netbsd64";
 import { fetchBytes, humanMB, mapLimit, remoteSize } from "../core/download";
 import type { Win } from "../core/wm";
 
@@ -93,8 +94,8 @@ interface AppManifest {
   /** For kind "distro": which OS this entry installs (see DISTROS in
       bridge/guest-root). Absent on the original entry → arch32. */
   distro?: string;
-  /** For kind "guest-pack": the files to dump, as paths relative to `/`.
-      Written by the build workflow, which knows how the payload was split —
+  /** For kind "guest-pack" and "disk-image": the files to download, as
+      the build workflow wrote them — it knows how the payload was split,
       the catalog never has to guess. */
   files?: string[];
   /** For kind "guest-pack": the command to run inside the machine. */
@@ -273,6 +274,13 @@ export function openStore(win: Win): void {
            so the two never disagree. The two Arch entries share /, so at
            most one of them is installed at a time. */
         if ((await installedDistro(vfs.GUEST_ROOT)) === distroIdFor(app)) installedIds.add(app.id);
+        continue;
+      }
+      if (isDiskImage(app)) {
+        /* Installed = the full-size image sits in browser storage (OPFS).
+           A half-downloaded image fails the size test and the Install
+           button honestly comes back. */
+        if (await netbsd64Installed()) installedIds.add(app.id);
         continue;
       }
       if (isGuestPack(app)) {
@@ -590,6 +598,24 @@ export function openStore(win: Win): void {
         wrap.append(openBtn);
         return wrap;
       }
+      if (isDiskImage(app)) {
+        /* Boots in the Terminal once the machine is ARM64; uninstallable,
+           because the image is one self-contained file in browser storage
+           (unlike a distro woven into /). */
+        openBtn.title = "Open the Terminal — the ARM64 machine boots this system";
+        openBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          window.dispatchEvent(new CustomEvent("d86-launch-app", { detail: "terminal" }));
+        });
+        const removeBtn = el("button", `btn ${size} danger`.trim(), "Uninstall");
+        removeBtn.title = "Delete the disk image from browser storage — everything saved inside it included";
+        removeBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          void uninstall(app);
+        });
+        wrap.append(openBtn, removeBtn);
+        return wrap;
+      }
       if (isGuestPack(app)) {
         /* The pack's second half runs inside the machine: "Open" goes to
            the Terminal, where its install script is waiting in /. */
@@ -667,7 +693,13 @@ export function openStore(win: Win): void {
     facts.append(
       fact(
         "Installs to",
-        isDistro(app) ? "/" : isGuestPack(app) ? "/ — then run its script in the Terminal" : `~/system/apps/${app.id}/`,
+        isDistro(app)
+          ? "/"
+          : isDiskImage(app)
+            ? "browser storage (OPFS) — the ARM64 machine's disk, not a folder in Files"
+            : isGuestPack(app)
+              ? "/ — then run its script in the Terminal"
+              : `~/system/apps/${app.id}/`,
       ),
     );
     if (app.opens?.length) {
@@ -695,6 +727,9 @@ export function openStore(win: Win): void {
          filesystem's root, not a folder under system/apps. */
       files.append(el("code", undefined, `/ — the distro's userland, unpacked from ${manifestFor(app)?.image ?? "initrd.gz"}`));
       files.append(el("code", undefined, `/boot/vmlinuz + /boot/initrd.gz — what the machine boots`));
+    } else if (isDiskImage(app)) {
+      files.append(el("code", undefined, "a bootable disk image in browser storage (OPFS) — the ARM64 machine's virtio disk"));
+      files.append(el("code", undefined, `${manifestFor(app)?.kernel ?? "kernel.img.gz"} — the kernel the machine boots directly`));
     } else if (isGuestPack(app)) {
       for (const file of filesFor(app)) files.append(el("code", undefined, `/${file}`));
       const run = manifestFor(app)?.run;
@@ -728,10 +763,17 @@ export function openStore(win: Win): void {
     return manifestFor(app)?.kind === "guest-pack";
   }
 
+  /** An OS that boots from its own disk image in browser storage (OPFS),
+      not from ZenFS / — NetBSD (ARM64) is the one of these today. */
+  function isDiskImage(app: StoreApp): boolean {
+    return manifestFor(app)?.kind === "disk-image";
+  }
+
   /** The files an entry downloads: the manifest's word for a guest pack
+      or a disk image (the workflow knows how the payload was split)
       (its build workflow writes the real list), the catalog's otherwise. */
   function filesFor(app: StoreApp): string[] {
-    return (isGuestPack(app) ? manifestFor(app)?.files : undefined) ?? app.files ?? [];
+    return (isGuestPack(app) || isDiskImage(app) ? manifestFor(app)?.files : undefined) ?? app.files ?? [];
   }
 
   /** Which OS a distro entry installs (its manifest's word; arch32 when
@@ -756,6 +798,10 @@ export function openStore(win: Win): void {
   async function install(app: StoreApp): Promise<void> {
     if (isDistro(app)) {
       await installDistro(app);
+      return;
+    }
+    if (isDiskImage(app)) {
+      await installDiskImage(app);
       return;
     }
     if (isGuestPack(app)) {
@@ -975,6 +1021,79 @@ export function openStore(win: Win): void {
   }
 
   /**
+   * Install a disk-image OS (NetBSD ARM64): stream the split, gzipped
+   * image into the browser's private storage (OPFS), where the ARM64
+   * machine opens it read-write as its disk. Nothing touches ZenFS /:
+   * NetBSD's files live inside the image, in its own filesystem (FFS),
+   * and Files cannot see them — the description says so.
+   */
+  async function installDiskImage(app: StoreApp): Promise<void> {
+    progress.set(app.id, { done: 0, total: 1 });
+    render();
+    try {
+      await installNetbsd64((text) => {
+        const state = progress.get(app.id);
+        progress.set(app.id, { ...(state ?? { done: 0, total: 1 }), label: text.replace(/^downloading the NetBSD disk — /, "") });
+        status.textContent = `${app.name}: ${text}`;
+        renderProgress(false);
+      });
+      await refreshInstalled();
+      notify({
+        title: `${app.name} installed`,
+        body: "The disk image is in browser storage. Switch Settings → Machine to ARM64 and open the Terminal — it boots to a login (root, no password).",
+        icon: app.icon ?? "terminal",
+        timeout: 10000,
+      });
+      logInfo("store", `installed ${app.id} as an OPFS disk image`);
+    } catch (err) {
+      logWarn("store", `install of ${app.id} failed`, err);
+      notify({
+        title: `${app.name} did not install`,
+        body: (err as Error).message,
+        icon: "info",
+        timeout: 0,
+      });
+    } finally {
+      progress.delete(app.id);
+      render();
+    }
+  }
+
+  /**
+   * Uninstall a disk-image OS: delete the image from browser storage —
+   * including everything saved inside NetBSD. Fails honestly while the
+   * ARM64 machine holds the disk open.
+   */
+  async function uninstallDiskImage(app: StoreApp): Promise<void> {
+    const ok = await showConfirm(
+      "Uninstall app",
+      `Remove ${app.name}? This deletes its disk image from browser storage — including every file saved inside that system. It cannot be undone.`,
+      true,
+      "Uninstall",
+    );
+    if (!ok) return;
+    try {
+      await uninstallNetbsd64();
+    } catch (err) {
+      notify({
+        title: `${app.name} could not be removed`,
+        body: (err as Error).message,
+        icon: "info",
+        timeout: 0,
+      });
+      return;
+    }
+    await refreshInstalled();
+    notify({
+      title: `${app.name} uninstalled`,
+      body: "The disk image is gone from browser storage.",
+      icon: "trash",
+      timeout: 6000,
+    });
+    render();
+  }
+
+  /**
    * Uninstall: a real delete, not a trip to the trash.
    *
    * Both halves have to go — the folder under ~/system/apps and the entry in
@@ -985,6 +1104,10 @@ export function openStore(win: Win): void {
   async function uninstall(app: StoreApp): Promise<void> {
     if (isGuestPack(app)) {
       await uninstallGuestPack(app);
+      return;
+    }
+    if (isDiskImage(app)) {
+      await uninstallDiskImage(app);
       return;
     }
     const dir = dumpDirFor(app);
