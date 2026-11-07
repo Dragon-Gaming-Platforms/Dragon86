@@ -33,8 +33,10 @@ mount /dev/$W /mnt
 # the root file sets, devices included (NetBSD has no devtmpfs: /dev travels with the image)
 cd / && pax -rw -pe bin dev etc lib libdata libexec rescue root sbin stand /mnt
 # /var separately: skip leftover socket files and man.db (the man pages are
-# deleted below, and makemandb rewrites it during first boot anyway)
-cd / && find var \( -type s -o -path var/db/man.db \) -prune -o -print | pax -rw -pe /mnt
+# deleted below, and makemandb keeps rewriting it mid-copy). pax needs -d,
+# otherwise it recurses every directory in the list and re-includes exactly
+# what find pruned.
+cd / && find var \( -type s -o -path var/db/man.db \) -prune -o -print | pax -rw -d -pe /mnt
 -cp /netbsd /mnt/netbsd
 mkdir -p /mnt/usr /mnt/tmp /mnt/proc /mnt/kern /mnt/mnt /mnt/altroot
 chmod 1777 /mnt/tmp
