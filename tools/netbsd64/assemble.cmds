@@ -1,0 +1,35 @@
+# Runs inside the official NetBSD 11.0 arm64 live image (ld0), assembling a
+# trimmed copy of the installed system onto the blank second disk (ld1).
+# Trimmed: no X11 sets, no man/doc/httpd pages, no /usr/include — a console
+# system that fits a browser download. Everything else is the stock system.
+
+# GPT with one FFS partition, labelled so the final boot can say root=NAME=d86root
+gpt create ld1
+gpt add -a 1m -t ffs -l d86root ld1
+sleep 2
+dkctl ld1 listwedges
+W=$(dkctl ld1 listwedges | awk '/d86root/ {sub(":", "", $1); print $1; exit}'); echo "wedge=$W"; test -n "$W"
+newfs -O 2 /dev/r$W
+mount /dev/$W /mnt
+
+# the root file sets, devices included (NetBSD has no devtmpfs: /dev travels with the image)
+cd / && pax -rw -pe bin dev etc lib libdata libexec rescue root sbin stand var /mnt
+-cp /netbsd /mnt/netbsd
+mkdir -p /mnt/usr /mnt/tmp /mnt/proc /mnt/kern /mnt/mnt /mnt/altroot
+chmod 1777 /mnt/tmp
+
+# /usr without X11R7 and include
+cd /usr && pax -rw -pe bin lib libdata libexec sbin share /mnt/usr
+-cd /usr && pax -rw -pe games /mnt/usr
+-cd /usr && pax -rw -pe mdec /mnt/usr
+rm -rf /mnt/usr/share/man /mnt/usr/share/doc /mnt/usr/share/httpd
+
+# configuration: root by GPT label, no DHCP (no network wired up yet), no resize
+printf 'NAME=d86root\t/\tffs\trw,log\t1 1\nkernfs\t/kern\tkernfs\trw\t0 0\nprocfs\t/proc\tprocfs\trw\t0 0\nptyfs\t/dev/pts\tptyfs\trw\t0 0\ntmpfs\t/tmp\ttmpfs\trw,-m=1777\t0 0\n' > /mnt/etc/fstab
+sed -e 's/^resize_root=.*/resize_root=NO/' /mnt/etc/rc.conf > /tmp/rc.conf.new && cp /tmp/rc.conf.new /mnt/etc/rc.conf
+printf '\n# Dragon86: console machine, storage is a browser-held disk image\nhostname=dragon86-netbsd\ndhcpcd=NO\nsshd=NO\nsavecore=NO\nresize_root=NO\n' >> /mnt/etc/rc.conf
+cat /mnt/etc/rc.conf
+df -k /mnt
+
+cd / && umount /mnt
+@poweroff
