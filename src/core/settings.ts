@@ -8,7 +8,7 @@ export type ThemeId = "dragon" | "cyberpunk" | "purple" | "matrix" | "amoled" | 
  * (bridge/v86.ts — the vendored v64 build for the x86 machines and ARM64;
  * bridge/rv64.ts — the vendored rv64.js build for RISC-V 64).
  */
-export type MachineArch = "x86_32" | "x86_64" | "arm64" | "riscv64";
+export type MachineArch = "x86_32" | "x86_64" | "arm64" | "arm32" | "riscv64";
 
 export interface Settings {
   theme: ThemeId;

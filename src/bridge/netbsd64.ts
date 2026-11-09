@@ -1,20 +1,25 @@
 /**
- * NetBSD (ARM64) — the disk-image OS for the ARM64 machine.
+ * NetBSD — the disk-image OS for the ARM machines, in two builds:
+ *
+ *   arm64 → NetBSD 11.0 evbarm-aarch64, public/netbsd64/, the ARM64 machine
+ *   arm32 → NetBSD 11.0 evbarm-earmv7hf, public/netbsd32/, the ARM32 machine
  *
  * This OS is nothing like the Linux distros: those unpack their userland
  * into ZenFS `/` and the guest mounts it over 9p. NetBSD boots from a real
  * disk — a GPT image with one FFS partition (label `d86root`), built and
- * boot-tested by .github/workflows/build-netbsd64.yml from the official
- * NetBSD 11.0 release — so its files live INSIDE that image, not in the OS
- * filesystem, and the Files app cannot see them. That is the honest truth
- * of a foreign filesystem (FFS), and the App Store entry says so.
+ * boot-tested by .github/workflows/build-netbsd64.yml / build-netbsd32.yml
+ * from the official NetBSD 11.0 release — so its files live INSIDE that
+ * image, not in the OS filesystem, and the Files app cannot see them. That
+ * is the honest truth of a foreign filesystem (FFS), and the App Store
+ * entry says so.
  *
  * Where the disk lives: the browser's private storage (OPFS), at
- * `dragon86-disks/netbsd64.img`. The emulator opens it as a browser disk
- * (`opfs:` url, disk_option "read_write") and writes the guest's changes
- * straight back into it through a sync access handle — which only exists
- * in workers, which is why the ARM64 machine runs with `cpu_worker: true`
- * (an ordinary dedicated worker; no cross-origin isolation anywhere).
+ * `dragon86-disks/netbsd64.img` (or netbsd32.img). The emulator opens it
+ * as a browser disk (`opfs:` url, disk_option "read_write") and writes the
+ * guest's changes straight back into it through a sync access handle —
+ * which only exists in workers, which is why the ARM machines run with
+ * `cpu_worker: true` (an ordinary dedicated worker; no cross-origin
+ * isolation anywhere).
  *
  * The install streams the split root.img.gz.NN parts through one gzip
  * decompressor straight into the OPFS file: the raw image never sits in
@@ -24,7 +29,10 @@
 import { logInfo, logWarn } from "../core/log";
 import { humanMB } from "../core/download";
 
-export interface Netbsd64Manifest {
+/** The two architectures NetBSD ships for. A subset of MachineArch. */
+export type NetbsdArch = "arm64" | "arm32";
+
+export interface NetbsdManifest {
   os: string;
   version: string;
   arch: string;
@@ -38,38 +46,64 @@ export interface Netbsd64Manifest {
   };
 }
 
-export const NETBSD_BASE = `${import.meta.env.BASE_URL}netbsd64/`;
-
-/** OPFS directory and file the machine's disk lives in. */
+/** OPFS directory both machines' disks live in. */
 const OPFS_DIR = "dragon86-disks";
-const DISK_FILE = "netbsd64.img";
 
-/** The emulator's name for the disk (src/opfs_disk.js upstream). */
-export const NETBSD_DISK_URL = `opfs:${OPFS_DIR}/${DISK_FILE}`;
-
-let manifestPromise: Promise<Netbsd64Manifest> | null = null;
-
-/** public/netbsd64/manifest.json — written by the build workflow. */
-export function netbsd64Manifest(): Promise<Netbsd64Manifest> {
-  if (!manifestPromise) {
-    manifestPromise = (async () => {
-      const res = await fetch(`${NETBSD_BASE}manifest.json`);
-      if (!res.ok) {
-        throw new Error(
-          `NetBSD's manifest is not deployed (HTTP ${res.status} for netbsd64/manifest.json) — the build workflow has not produced it yet`,
-        );
-      }
-      return (await res.json()) as Netbsd64Manifest;
-    })();
-    manifestPromise.catch(() => (manifestPromise = null));
-  }
-  return manifestPromise;
+interface Target {
+  /** public/<dir>/ — where the build workflow put the pack. */
+  dir: string;
+  /** The disk image's file name inside dragon86-disks/. */
+  disk: string;
+  /** The machine's name in user-facing messages. */
+  label: string;
 }
 
-async function opfsRoot(): Promise<FileSystemDirectoryHandle> {
+const TARGETS: Record<NetbsdArch, Target> = {
+  arm64: { dir: "netbsd64", disk: "netbsd64.img", label: "ARM64" },
+  arm32: { dir: "netbsd32", disk: "netbsd32.img", label: "ARM32" },
+};
+
+export function netbsdBase(arch: NetbsdArch): string {
+  return `${import.meta.env.BASE_URL}${TARGETS[arch].dir}/`;
+}
+
+/** The emulator's name for the disk (src/opfs_disk.js upstream). */
+export function netbsdDiskUrl(arch: NetbsdArch): string {
+  return `opfs:${OPFS_DIR}/${TARGETS[arch].disk}`;
+}
+
+/** The machine's name in user-facing copy ("ARM64" / "ARM32"). */
+export function netbsdMachineLabel(arch: NetbsdArch): string {
+  return TARGETS[arch].label;
+}
+
+const manifestPromises = new Map<NetbsdArch, Promise<NetbsdManifest>>();
+
+/** public/<dir>/manifest.json — written by the build workflow. */
+export function netbsdManifest(arch: NetbsdArch): Promise<NetbsdManifest> {
+  let p = manifestPromises.get(arch);
+  if (!p) {
+    p = (async () => {
+      const res = await fetch(`${netbsdBase(arch)}manifest.json`);
+      if (!res.ok) {
+        throw new Error(
+          `NetBSD's manifest is not deployed (HTTP ${res.status} for ${TARGETS[arch].dir}/manifest.json) — the build workflow has not produced it yet`,
+        );
+      }
+      return (await res.json()) as NetbsdManifest;
+    })();
+    p.catch(() => manifestPromises.delete(arch));
+    manifestPromises.set(arch, p);
+  }
+  return p;
+}
+
+async function opfsRoot(arch: NetbsdArch): Promise<FileSystemDirectoryHandle> {
   const storage = navigator?.storage;
   if (!storage?.getDirectory) {
-    throw new Error("this browser has no private file storage (OPFS) — the ARM64 machine's disk needs it");
+    throw new Error(
+      `this browser has no private file storage (OPFS) — the ${TARGETS[arch].label} machine's disk needs it`,
+    );
   }
   try {
     return await storage.getDirectory();
@@ -83,8 +117,8 @@ async function opfsRoot(): Promise<FileSystemDirectoryHandle> {
 
 /** The disks folder in OPFS. Throws with the browser's reason; `probe`
     callers that only want "is there a disk?" catch it themselves. */
-async function diskDir(create: boolean): Promise<FileSystemDirectoryHandle> {
-  const root = await opfsRoot();
+async function diskDir(arch: NetbsdArch, create: boolean): Promise<FileSystemDirectoryHandle> {
+  const root = await opfsRoot(arch);
   try {
     return await root.getDirectoryHandle(OPFS_DIR, { create });
   } catch (err) {
@@ -100,15 +134,15 @@ async function diskDir(create: boolean): Promise<FileSystemDirectoryHandle> {
  *    go through a small worker holding a sync access handle (worker-only
  *    API, same one the running machine uses). Each chunk is acknowledged,
  *    so pipeTo() backpressure still works.
- * Both paths hold an exclusive lock, so a running ARM64 machine makes
+ * Both paths hold an exclusive lock, so a running ARM machine makes
  * this fail — the error says to close the Terminal first.
  */
-async function openDiskWritable(handle: FileSystemFileHandle): Promise<WritableStream<Uint8Array>> {
+async function openDiskWritable(arch: NetbsdArch, handle: FileSystemFileHandle): Promise<WritableStream<Uint8Array>> {
   if (typeof handle.createWritable === "function") {
     try {
       return (await handle.createWritable()) as unknown as WritableStream<Uint8Array>;
     } catch (err) {
-      throw diskLockHint(err);
+      throw diskLockHint(arch, err);
     }
   }
   /* Safari ≤ 18.3: worker + sync access handle. */
@@ -135,10 +169,10 @@ async function openDiskWritable(handle: FileSystemFileHandle): Promise<WritableS
       worker.postMessage({ ...msg, id }, transfer);
     });
   try {
-    await call({ type: "open", dir: OPFS_DIR, file: DISK_FILE });
+    await call({ type: "open", dir: OPFS_DIR, file: TARGETS[arch].disk });
   } catch (err) {
     worker.terminate();
-    throw diskLockHint(err);
+    throw diskLockHint(arch, err);
   }
   return new WritableStream<Uint8Array>({
     async write(chunk) {
@@ -159,22 +193,22 @@ async function openDiskWritable(handle: FileSystemFileHandle): Promise<WritableS
 }
 
 /** Lock failures get actionable advice; everything else passes through. */
-function diskLockHint(err: unknown): Error {
+function diskLockHint(arch: NetbsdArch, err: unknown): Error {
   const name = (err as DOMException)?.name ?? "";
   const msg = (err as Error)?.message ?? String(err);
   if (name === "NoModificationAllowedError" || name === "InvalidStateError" || /lock|access handle/i.test(msg)) {
     return new Error(
-      `the disk file is locked — if the ARM64 machine is running, close its Terminal first, then install again (${msg})`,
+      `the disk file is locked — if the ${TARGETS[arch].label} machine is running, close its Terminal first, then install again (${msg})`,
     );
   }
   return err instanceof Error ? err : new Error(msg);
 }
 
 /** Size of the installed disk image in OPFS, or null when there is none. */
-export async function netbsd64DiskSize(): Promise<number | null> {
+export async function netbsdDiskSize(arch: NetbsdArch): Promise<number | null> {
   try {
-    const dir = await diskDir(false);
-    const file = await (await dir.getFileHandle(DISK_FILE)).getFile();
+    const dir = await diskDir(arch, false);
+    const file = await (await dir.getFileHandle(TARGETS[arch].disk)).getFile();
     return file.size;
   } catch {
     return null;
@@ -187,11 +221,11 @@ export async function netbsd64DiskSize(): Promise<number | null> {
  * store offers Install again, which re-downloads — honest and safe, since
  * a half-written image must never boot.
  */
-export async function netbsd64Installed(): Promise<boolean> {
-  const size = await netbsd64DiskSize();
+export async function netbsdInstalled(arch: NetbsdArch): Promise<boolean> {
+  const size = await netbsdDiskSize(arch);
   if (size === null) return false;
   try {
-    const man = await netbsd64Manifest();
+    const man = await netbsdManifest(arch);
     return size === man.root.rawBytes;
   } catch {
     /* Manifest unreachable (offline?) — a full-looking image counts. */
@@ -204,18 +238,18 @@ export async function netbsd64Installed(): Promise<boolean> {
  * Sequential parts → one DecompressionStream → the OPFS writable; memory
  * stays at stream-chunk size the whole way.
  */
-export async function installNetbsd64(onStatus?: (text: string) => void): Promise<void> {
-  const man = await netbsd64Manifest();
-  const dir = await diskDir(true);
-  const handle = await dir.getFileHandle(DISK_FILE, { create: true });
-  const writable = await openDiskWritable(handle);
+export async function installNetbsd(arch: NetbsdArch, onStatus?: (text: string) => void): Promise<void> {
+  const man = await netbsdManifest(arch);
+  const dir = await diskDir(arch, true);
+  const handle = await dir.getFileHandle(TARGETS[arch].disk, { create: true });
+  const writable = await openDiskWritable(arch, handle);
   const gunzip = new DecompressionStream("gzip");
   const pump = gunzip.readable.pipeTo(writable);
   const writer = gunzip.writable.getWriter();
   let got = 0;
   try {
     for (const part of man.root.parts) {
-      const res = await fetch(new URL(part.file, NETBSD_BASE).href);
+      const res = await fetch(new URL(part.file, netbsdBase(arch)).href);
       if (!res.ok || !res.body) {
         throw new Error(`${part.file}: HTTP ${res.status}`);
       }
@@ -237,17 +271,17 @@ export async function installNetbsd64(onStatus?: (text: string) => void): Promis
     } catch {
       /* the pipe already failed */
     }
-    await dir.removeEntry(DISK_FILE).catch(() => {});
+    await dir.removeEntry(TARGETS[arch].disk).catch(() => {});
     throw err;
   }
   const written = (await handle.getFile()).size;
   if (written !== man.root.rawBytes) {
-    await dir.removeEntry(DISK_FILE).catch(() => {});
+    await dir.removeEntry(TARGETS[arch].disk).catch(() => {});
     throw new Error(
       `the unpacked disk is ${written} bytes, the manifest says ${man.root.rawBytes} — download corrupted, nothing was kept`,
     );
   }
-  logInfo("netbsd64", `disk image installed in OPFS: ${humanMB(written)} raw (${humanMB(man.root.gzBytes)} downloaded)`);
+  logInfo("netbsd64", `${arch} disk image installed in OPFS: ${humanMB(written)} raw (${humanMB(man.root.gzBytes)} downloaded)`);
 }
 
 /**
@@ -255,33 +289,34 @@ export async function installNetbsd64(onStatus?: (text: string) => void): Promis
  * Fails honestly while the machine holds the disk open (the sync access
  * handle is exclusive): close the Terminal first.
  */
-export async function uninstallNetbsd64(): Promise<void> {
+export async function uninstallNetbsd(arch: NetbsdArch): Promise<void> {
+  const diskFile = TARGETS[arch].disk;
   let dir: FileSystemDirectoryHandle;
   try {
-    dir = await diskDir(false);
+    dir = await diskDir(arch, false);
   } catch {
     return; /* no disks folder — nothing to delete */
   }
   try {
-    await dir.removeEntry(DISK_FILE);
+    await dir.removeEntry(diskFile);
   } catch (err) {
     if ((err as DOMException)?.name === "NotFoundError") return;
     throw new Error(
-      "the disk image could not be deleted — if the ARM64 machine is running, close its Terminal (the disk is locked while it is open) and try again",
+      `the disk image could not be deleted — if the ${TARGETS[arch].label} machine is running, close its Terminal (the disk is locked while it is open) and try again`,
     );
   }
   /* The emulator keeps a small record beside the image (identity and
      generation, see upstream src/opfs_disk.js). Sweep the likely names. */
-  for (const record of [`${DISK_FILE}.json`, DISK_FILE.replace(/\.img$/, ".json")]) {
+  for (const record of [`${diskFile}.json`, diskFile.replace(/\.img$/, ".json")]) {
     await dir.removeEntry(record).catch(() => {});
   }
-  logInfo("netbsd64", "disk image removed from OPFS");
+  logInfo("netbsd64", `${arch} disk image removed from OPFS`);
 }
 
 /** The kernel, decompressed — v64 boots it directly (Linux boot header). */
-export async function netbsd64Kernel(): Promise<Uint8Array> {
-  const man = await netbsd64Manifest();
-  const res = await fetch(new URL(man.kernel.file, NETBSD_BASE).href);
+export async function netbsdKernel(arch: NetbsdArch): Promise<Uint8Array> {
+  const man = await netbsdManifest(arch);
+  const res = await fetch(new URL(man.kernel.file, netbsdBase(arch)).href);
   if (!res.ok) throw new Error(`${man.kernel.file}: HTTP ${res.status}`);
   const DS = (globalThis as { DecompressionStream?: typeof DecompressionStream }).DecompressionStream;
   if (!DS) throw new Error("this browser has no DecompressionStream");

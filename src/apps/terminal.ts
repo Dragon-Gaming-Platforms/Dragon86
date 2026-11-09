@@ -18,7 +18,7 @@ import type { Win } from "../core/wm";
 import type { TerminalBackend } from "../bridge/engine";
 import { getV86Backend } from "../bridge/v86";
 import { getRV64Backend } from "../bridge/rv64";
-import { netbsd64Installed } from "../bridge/netbsd64";
+import { netbsdInstalled } from "../bridge/netbsd64";
 import { distroInstalled, installedDistro, DISTROS, type DistroId } from "../bridge/guest-root";
 import * as vfs from "../core/vfs";
 import { isolationReport, logInfo, logWarn } from "../core/log";
@@ -28,6 +28,7 @@ const ARCH_LABEL: Record<MachineArch, string> = {
   x86_32: "x86 (32-bit)",
   x86_64: "x86-64",
   arm64: "ARM64",
+  arm32: "ARM32",
   riscv64: "RISC-V 64",
 };
 
@@ -232,9 +233,9 @@ export function openTerminal(win: Win, options: TerminalOptions = {}): void {
     term.writeln(`  ${GREEN}●${RESET} ${ARCH_LABEL[arch]} machine : ready`);
     term.writeln(`  ${RED}●${RESET} Operating system  : not installed`);
     term.writeln("");
-    term.writeln(`  The machine has nothing to boot: no ARM64 disk image is installed.`);
+    term.writeln(`  The machine has nothing to boot: no ${ARCH_LABEL[arch]} disk image is installed.`);
     term.writeln("");
-    term.writeln(`  Open the ${BOLD}App Store${RESET} and install ${BOLD}NetBSD (ARM64)${RESET} — the OS built`);
+    term.writeln(`  Open the ${BOLD}App Store${RESET} and install ${BOLD}NetBSD (${ARCH_LABEL[arch]})${RESET} — the OS built`);
     term.writeln(`  for this machine. Unlike the Linux distros it does not unpack`);
     term.writeln(`  into /: it boots from its own disk image in browser storage.`);
     term.writeln(`  Then hit ${BOLD}Reconnect${RESET} here.`);
@@ -306,7 +307,7 @@ export function openTerminal(win: Win, options: TerminalOptions = {}): void {
      detail (bridge/v86.ts). */
   const engineLabel = (): string => {
     const arch = getSettings().arch;
-    if (arch === "arm64") return `Terminal — ${ARCH_LABEL.arm64} · NetBSD`;
+    if (arch === "arm64" || arch === "arm32") return `Terminal — ${ARCH_LABEL[arch]} · NetBSD`;
     if (arch === "riscv64") return `Terminal — ${ARCH_LABEL.riscv64} · Alpine Linux`;
     return `Terminal — ${ARCH_LABEL[arch]} · Arch Linux`;
   };
@@ -328,11 +329,11 @@ export function openTerminal(win: Win, options: TerminalOptions = {}): void {
     const arch = getSettings().arch;
     backend?.dispose();
     backend = null;
-    const isArm = arch === "arm64";
-    if (isArm) {
-      /* The ARM64 OS is a disk image in browser storage, not a userland
-         in ZenFS / — so the / checks below do not apply to it. */
-      if (!(await netbsd64Installed())) {
+    const isArm = arch === "arm64" || arch === "arm32";
+    if (arch === "arm64" || arch === "arm32") {
+      /* The ARM OSes are disk images in browser storage, not a userland
+         in ZenFS / — so the / checks below do not apply to them. */
+      if (!(await netbsdInstalled(arch))) {
         saveStateBtn.style.display = "none";
         viewEngineBtn.style.display = "none";
         flushPrint();
