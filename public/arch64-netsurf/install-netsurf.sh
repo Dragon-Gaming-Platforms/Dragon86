@@ -63,6 +63,17 @@ if [ -x /usr/bin/netsurf-gtk3 ]; then
 export GLYCIN_DISABLE_SANDBOX=i-know-the-risks
 export GLYCIN_SANDBOX_MECHANISM=not-sandboxed
 export HOME="${HOME:-/root}"
+# From the serial console there is no DISPLAY — the desktop startwm runs
+# is on :0 (the Engine Viewer screen), so default to it instead of letting
+# GTK die with "cannot open display:".
+export DISPLAY="${DISPLAY:-:0}"
+D=${DISPLAY#:}; D=${D%%.*}
+[ -S "/tmp/.X11-unix/X$D" ] || {
+  echo "netsurf: no X server on display $DISPLAY." >&2
+  echo "Run 'startwm' first (type it in the Engine Viewer - the machine's own screen)," >&2
+  echo "then run netsurf again; the window appears on that screen." >&2
+  exit 1
+}
 LANG_PREFIX=${LANG%%[._]*}; LANG_PREFIX=${LANG_PREFIX:-en}
 [ -d "/usr/share/netsurf/$LANG_PREFIX" ] || export LANG=en_US.UTF-8
 exec /usr/bin/netsurf-gtk3 "$@"
@@ -83,8 +94,11 @@ case "$FRONTEND" in
       echo "NOTE: this build needs X11, which is not installed yet -"
       echo "install install-wm64.sh from the App Store and run: sh /install-wm64.sh"
     }
-    echo "Run 'startwm' in the Engine Viewer if the desktop is not up, then start"
-    echo "NetSurf from the IceWM menu (bottom-left) or type 'netsurf &' in xterm."
+    echo "Run 'startwm' in the Engine Viewer if the desktop is not up. Then start"
+    echo "NetSurf any of these ways (the window appears on the Engine Viewer screen):"
+    echo "  - right here in this serial console:   netsurf https://example.com &"
+    echo "  - from the xterm on the desktop:       netsurf &"
+    echo "  - from the IceWM menu (bottom-left)"
     ;;
 esac
 echo "Networking: run /networking.sh first if the machine is not online yet."
