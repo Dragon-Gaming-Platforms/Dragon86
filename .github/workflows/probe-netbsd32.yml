@@ -1,0 +1,49 @@
+name: Probe NetBSD earmv7hf CDN layout
+
+# Temporary diagnostic: the development sandbox cannot reach cdn.netbsd.org
+# OR the Actions log storage, so this writes what the CDN actually serves
+# (directory listings + checksum files) into the branch, where the sandbox
+# can read it. Deleted once build-netbsd32.yml is green.
+
+on:
+  push:
+    paths:
+      - ".github/workflows/probe-netbsd32.yml"
+
+permissions:
+  contents: write
+
+concurrency: probe-netbsd32
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch listings and checksums
+        run: |
+          set -x
+          URL=https://cdn.netbsd.org/pub/NetBSD/NetBSD-11.0/evbarm-earmv7hf/binary
+          out=tools/netbsd64/probe-earmv7hf.txt
+          {
+            echo "== $URL/kernel/ =="
+            curl -fsL "$URL/kernel/" || echo "LISTING FAILED $?"
+            echo; echo "== $URL/gzimg/ =="
+            curl -fsL "$URL/gzimg/" || echo "LISTING FAILED $?"
+            echo; echo "== kernel/SHA512 =="
+            curl -fsL "$URL/kernel/SHA512" || echo "FETCH FAILED $?"
+            echo; echo "== gzimg/MD5 =="
+            curl -fsL "$URL/gzimg/MD5" || echo "FETCH FAILED $?"
+            echo; echo "== gzimg/SHA512 (if any) =="
+            curl -fsL "$URL/gzimg/SHA512" || echo "FETCH FAILED $?"
+          } > "$out" 2>&1
+          wc -c "$out"
+      - name: Commit the probe result
+        run: |
+          git config user.name "dragon86-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add tools/netbsd64/probe-earmv7hf.txt
+          git commit -m "probe: what cdn.netbsd.org serves for evbarm-earmv7hf 11.0"
+          for i in 1 2 3; do git push && exit 0 || git pull --rebase; done
+          git push
