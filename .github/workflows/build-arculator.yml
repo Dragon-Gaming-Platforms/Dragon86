@@ -75,6 +75,12 @@ jobs:
                  -e '/^#define true  ((bool) 1)\r\?$/d' \
                  -e '/^#define false ((bool) 0)\r\?$/d' arc-src/src/hostfs.c
           grep -n "stdbool" arc-src/src/hostfs.c
+          # The Makefile only passes -sUSE_ZLIB=1 at compile time; current
+          # emscripten builds ports lazily, so at link time the zlib port
+          # doesn't exist yet and bare -lz fails. Request the port at link
+          # time too.
+          sed -i 's/^LINKFLAGS_WASM := /LINKFLAGS_WASM := -sUSE_ZLIB=1 /' arc-src/Makefile
+          grep -n "LINKFLAGS_WASM" arc-src/Makefile | head -2
           docker run -v "$PWD/arc-src":/src emscripten/emsdk sh -c \
             "apt-get update && apt-get install -yy xxd && git config --global --add safe.directory /src && make -C /src -j\$(nproc) wasm"
           ls -la arc-src/build/wasm/
