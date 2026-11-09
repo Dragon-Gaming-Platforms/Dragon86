@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- a bound wiki book with linked pages -->
+  <path d="M12 12 a4 4 0 0 1 4-4 h32 a4 4 0 0 1 4 4 v40 a4 4 0 0 1-4 4 H16 a4 4 0 0 1-4-4 z" fill="#2563b0" stroke="#1b4a85"/>
+  <rect x="18" y="8" width="34" height="48" rx="3" fill="#fdfaf2" stroke="#b9a97c"/>
+  <rect x="12" y="8" width="7" height="48" rx="2" fill="#1b4a85"/>
+  <line x1="24" y1="18" x2="46" y2="18" stroke="#2b313c" stroke-width="2.6" stroke-linecap="round"/>
+  <line x1="24" y1="26" x2="46" y2="26" stroke="#c8bb94" stroke-width="2" stroke-linecap="round"/>
+  <line x1="24" y1="32" x2="40" y2="32" stroke="#c8bb94" stroke-width="2" stroke-linecap="round"/>
+  <line x1="24" y1="38" x2="44" y2="38" stroke="#c8bb94" stroke-width="2" stroke-linecap="round"/>
+  <!-- the link chain -->
+  <g fill="none" stroke="#2fa84f" stroke-width="2.4" stroke-linecap="round">
+    <rect x="26" y="44" width="9" height="6" rx="3"/>
+    <rect x="33" y="44" width="9" height="6" rx="3"/>
+  </g>
+</svg>

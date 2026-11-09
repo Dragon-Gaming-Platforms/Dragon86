@@ -1,0 +1,6 @@
+{
+  "id": "wiki",
+  "kind": "iframe-app",
+  "dump": "~/system/apps/wiki/",
+  "note": "Where the App Store writes this app's files when it installs it. The OS serves them from that folder (9pf/wiki/). Everything the app saves stays in the browser's own storage - nothing talks to Puter's cloud."
+}

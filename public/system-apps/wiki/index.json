@@ -1,0 +1,20 @@
+{
+  "files": [
+    "index.html",
+    "LICENSE",
+    "VENDORED.md",
+    "apple-touch-icon.png",
+    "assets/index-BJTd63J5.css",
+    "assets/index-DC3DhKSD.js",
+    "assets/local-collab-BstvbnTo.js",
+    "favicon-16x16.png",
+    "favicon-32x32.png",
+    "favicon-48x48.png",
+    "favicon.ico",
+    "icon-192.png",
+    "icon-512-maskable.png",
+    "icon-512.png",
+    "manifest.json",
+    "worker/wiki-worker.js"
+  ]
+}

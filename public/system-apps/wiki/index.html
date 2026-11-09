@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Wiki</title>
+  <meta name="description" content="Pages, docs and databases for you and your team, stored in your own Puter cloud." />
+  <link rel="canonical" href="https://wiki.puter.com/" />
+  <meta name="theme-color" content="#ffffff" />
+  <meta name="color-scheme" content="light dark" />
+  <link rel="manifest" href="./manifest.json" />
+  <link rel="icon" href="./favicon.ico" sizes="16x16 32x32 48x48" />
+  <link rel="icon" href="./favicon-16x16.png" type="image/png" sizes="16x16" />
+  <link rel="icon" href="./favicon-32x32.png" type="image/png" sizes="32x32" />
+  <link rel="icon" href="./favicon-48x48.png" type="image/png" sizes="48x48" />
+  <link rel="apple-touch-icon" href="./apple-touch-icon.png" sizes="180x180" />
+  <script>
+    (() => {
+      let t = 'system';
+      try { t = localStorage.getItem('wiki:theme') || 'system'; } catch {}
+      const dark = t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+      document.documentElement.dataset.theme = t;
+      document.documentElement.dataset.themeResolved = dark ? 'dark' : 'light';
+    })();
+  </script>
+  <script type="module" crossorigin src="./assets/index-DC3DhKSD.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-BJTd63J5.css">
+</head>
+<body>
+  <div id="app" aria-busy="true"></div>
+  <div id="live-region" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+</body>
+</html>

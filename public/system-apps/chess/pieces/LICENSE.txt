@@ -1,0 +1,3 @@
+Chess piece images by Colin M.L. Burnett ("Cburnett" piece set).
+Source: https://commons.wikimedia.org/wiki/Category:SVG_chess_pieces
+License: CC BY-SA 3.0 (https://creativecommons.org/licenses/by-sa/3.0/)

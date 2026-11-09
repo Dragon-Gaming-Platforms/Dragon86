@@ -1,0 +1,29 @@
+{
+  "name": "Solitaire — Klondike",
+  "short_name": "Solitaire",
+  "description": "Klondike solitaire, draw-one, undo any move. Real playing-card art on larger screens, plain readable cards on phones. Installs as an app and plays offline.",
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#124e3c",
+  "background_color": "#124e3c",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

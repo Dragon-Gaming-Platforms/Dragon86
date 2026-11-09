@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta
+      name="description"
+      content="Play Sudoku free in your browser. Four difficulties, a new daily puzzle, pencil marks, undo, and hints that explain the logic instead of just giving the answer."
+    />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="favicon.ico" sizes="16x16 32x32 48x48" />
+    <!-- The same file the header mark uses, so a hi-dpi tab gets a sharp icon
+         out of a request the page was making anyway. -->
+    <link rel="icon" href="icon-96.png" type="image/png" sizes="96x96" />
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
+    <link rel="manifest" href="site.webmanifest" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://sudoku.puter.com/" />
+    <meta property="og:site_name" content="Sudoku" />
+    <meta property="og:title" content="Sudoku: play free in your browser" />
+    <meta
+      property="og:description"
+      content="Four difficulties, a new daily puzzle, pencil marks, and hints that explain the logic."
+    />
+    <!-- Matches --bg for each scheme, so the browser chrome does not flash a
+         colour the page never uses. main.js re-asserts the resolved one. -->
+    <meta name="theme-color" content="#f4f5f7" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#101215" media="(prefers-color-scheme: dark)" />
+    <title>Sudoku: Play Free in Your Browser</title>
+    <link rel="canonical" href="https://sudoku.puter.com/" />
+    <script>
+      // Resolve the theme before first paint so a dark-mode player never gets a
+      // white flash. main.js keeps this attribute in sync from here on; the
+      // key must match LS_SETTINGS in src/game/persistence.js.
+      (function () {
+        var theme;
+        try {
+          theme = (JSON.parse(localStorage.getItem('sudoku.settings.v1')) || {}).theme;
+        } catch (e) {
+          /* unreadable storage: fall through to the system setting */
+        }
+        if (theme !== 'light' && theme !== 'dark') {
+          theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        document.documentElement.dataset.theme = theme;
+      })();
+    </script>
+    <!-- Optional backend: an account carries your times and your unfinished
+         puzzle between devices. The game is fully playable if this never
+         loads, so it is not deferred behind anything. https://docs.puter.com/ -->
+    <script type="module" crossorigin src="./assets/index-B4xHpJs-.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-CZ5nmxte.css">
+  </head>
+  <body>
+    <noscript>
+      <p class="noscript-note">
+        This Sudoku runs entirely in your browser and needs JavaScript to generate
+        puzzles. Enable JavaScript to play.
+      </p>
+    </noscript>
+
+    <div id="app">
+      <header class="topbar">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true">
+            <img src="icon-96.png" alt="" width="30" height="30" />
+          </span>
+          <h1 class="brand-name">
+            Sudoku<span class="visually-hidden">, play free in your browser</span>
+          </h1>
+        </div>
+
+        <div class="topbar-right">
+          <div class="segmented" role="group" aria-label="Colour theme">
+            <button type="button" data-theme-choice="light" aria-pressed="false" title="Light theme">
+              <i data-lucide="sun"></i><span class="visually-hidden">Light theme</span>
+            </button>
+            <button type="button" data-theme-choice="dark" aria-pressed="false" title="Dark theme">
+              <i data-lucide="moon"></i><span class="visually-hidden">Dark theme</span>
+            </button>
+            <button type="button" data-theme-choice="system" aria-pressed="false" title="Match system theme">
+              <i data-lucide="monitor"></i><span class="visually-hidden">Match system theme</span>
+            </button>
+          </div>
+
+          <button class="icon-btn" id="stats-btn" type="button" title="Records" aria-label="Records">
+            <i data-lucide="chart-no-axes-column"></i>
+          </button>
+          <button class="icon-btn" id="settings-btn" type="button" title="Settings" aria-label="Settings">
+            <i data-lucide="settings"></i>
+          </button>
+          <button class="account-btn" id="account-btn" type="button" aria-label="Account">
+            <i data-lucide="user-round"></i><span class="account-name" id="account-name">Sign in</span>
+          </button>
+        </div>
+      </header>
+
+      <main class="layout">
+        <section class="board-column">
+          <div class="board-frame">
+            <!-- Rows are real DOM rows so the ARIA grid pattern works: arrow
+                 keys move a roving tabindex, and a screen reader can read a
+                 row or a column rather than 81 loose buttons. -->
+            <div id="board" class="board" role="grid" aria-label="Sudoku grid" aria-rowcount="9" aria-colcount="9"></div>
+            <div class="veil" id="veil" hidden>
+              <div class="veil-inner">
+                <span class="veil-icon" id="veil-icon"><i data-lucide="pause"></i></span>
+                <p class="veil-title" id="veil-title">Paused</p>
+                <button class="btn btn-primary" id="veil-btn" type="button">Resume</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <aside class="sidebar">
+          <section class="card status-card">
+            <div class="status-row">
+              <div class="status-text">
+                <p class="status-difficulty" id="status-difficulty">Medium</p>
+                <p class="status-note" id="status-note">New puzzle</p>
+              </div>
+              <div class="status-right">
+                <!-- role="timer" is readable on demand but never announced,
+                     which is what a value changing every second wants to be. -->
+                <span class="clock" id="clock" role="timer" aria-label="Elapsed time">0:00</span>
+                <button class="icon-btn" id="pause-btn" type="button" title="Pause" aria-label="Pause">
+                  <i data-lucide="pause"></i>
+                </button>
+              </div>
+            </div>
+            <div
+              class="progress"
+              id="progress"
+              role="progressbar"
+              aria-label="Cells filled"
+              aria-valuemin="0"
+              aria-valuemax="81"
+              aria-valuenow="0"
+            >
+              <span class="progress-fill" id="progress-fill"></span>
+            </div>
+          </section>
+
+          <section class="card hint-card" id="hint-card" hidden aria-labelledby="hint-title">
+            <div class="hint-head">
+              <span class="hint-badge" id="hint-badge">Hidden single</span>
+              <button class="icon-btn icon-btn-sm" id="hint-close" type="button" title="Dismiss hint" aria-label="Dismiss hint">
+                <i data-lucide="x"></i>
+              </button>
+            </div>
+            <h2 class="visually-hidden" id="hint-title">Hint</h2>
+            <p class="hint-text" id="hint-text"></p>
+            <button class="btn btn-primary btn-block" id="hint-apply" type="button">
+              <i data-lucide="check"></i>Apply it
+            </button>
+          </section>
+
+          <div class="tools" role="group" aria-label="Tools">
+            <button class="tool" id="undo-btn" type="button" title="Undo (Ctrl+Z)" disabled>
+              <i data-lucide="undo-2"></i><span class="tool-label">Undo</span>
+            </button>
+            <button class="tool" id="redo-btn" type="button" title="Redo (Ctrl+Shift+Z)" disabled>
+              <i data-lucide="redo-2"></i><span class="tool-label">Redo</span>
+            </button>
+            <button class="tool" id="erase-btn" type="button" title="Erase (Backspace)">
+              <i data-lucide="eraser"></i><span class="tool-label">Erase</span>
+            </button>
+            <!-- The icon carries the state as well as the colour does: a
+                 crossed-out pencil when marks are off, a plain one when they
+                 are on. Swapped by CSS from aria-pressed, so the two cannot
+                 disagree. -->
+            <button class="tool" id="notes-btn" type="button" title="Pencil marks (N)" aria-pressed="false">
+              <i data-lucide="pencil-off" class="icon-notes-off"></i>
+              <i data-lucide="pencil" class="icon-notes-on"></i>
+              <span class="tool-label">Notes</span>
+            </button>
+            <button class="tool" id="hint-btn" type="button" title="Hint (H)">
+              <i data-lucide="lightbulb"></i><span class="tool-label">Hint</span>
+            </button>
+          </div>
+
+          <div class="keypad" id="keypad" role="group" aria-label="Enter a digit"></div>
+
+          <section class="controls">
+            <!-- "Next puzzle" rather than "Difficulty": this select does not
+                 change the board in play, and labelling it after the puzzle it
+                 governs is what stops it from looking like it disagrees with
+                 the level named in the status card. -->
+            <label class="field">
+              <span class="field-label">Next puzzle</span>
+              <select id="difficulty-select"></select>
+            </label>
+            <div class="button-row">
+              <button class="btn btn-primary" id="new-game-btn" type="button">
+                <i data-lucide="plus"></i>New puzzle
+              </button>
+              <button class="btn btn-ghost" id="daily-btn" type="button">
+                <i data-lucide="calendar-days"></i>Daily
+              </button>
+            </div>
+            <p class="controls-hint" id="controls-hint"></p>
+          </section>
+
+          <footer class="app-footer">
+            <a href="https://developer.puter.com" target="_blank" rel="noopener noreferrer">Powered by Puter</a>
+          </footer>
+        </aside>
+      </main>
+    </div>
+
+    <!-- Announces placements, mistakes, hints and results to assistive tech. -->
+    <div class="visually-hidden" role="status" aria-live="polite" id="sr-status"></div>
+
+    <!-- Transient notices (saved to your account, puzzle restored, and so on). -->
+    <div class="toast" id="toast" role="status"></div>
+
+    <dialog class="dialog" id="solved-dialog" aria-labelledby="solved-title" aria-describedby="solved-sub">
+      <span class="dialog-icon dialog-icon-good"><i data-lucide="trophy"></i></span>
+      <h2 class="dialog-title" id="solved-title">Solved</h2>
+      <p class="dialog-sub" id="solved-sub"></p>
+      <dl class="result-grid" id="result-grid"></dl>
+      <div class="dialog-buttons">
+        <button class="btn btn-primary" id="solved-new" type="button" autofocus>New puzzle</button>
+        <button class="btn btn-ghost" id="solved-close" type="button">Close</button>
+      </div>
+    </dialog>
+
+    <dialog class="dialog" id="stats-dialog" aria-labelledby="stats-title">
+      <h2 class="dialog-title" id="stats-title">Records</h2>
+      <p class="dialog-sub" id="stats-sub"></p>
+      <div class="stats-table-wrap">
+        <table class="stats-table">
+          <thead>
+            <tr>
+              <th scope="col">Level</th>
+              <th scope="col">Played</th>
+              <th scope="col">Solved</th>
+              <th scope="col">Best</th>
+              <th scope="col">Clean</th>
+            </tr>
+          </thead>
+          <tbody id="stats-body"></tbody>
+        </table>
+      </div>
+      <div class="dialog-buttons">
+        <button class="btn btn-ghost btn-danger" id="stats-reset" type="button">Reset</button>
+        <button class="btn btn-primary" id="stats-close" type="button" autofocus>Done</button>
+      </div>
+    </dialog>
+
+    <dialog class="dialog" id="settings-dialog" aria-labelledby="settings-title">
+      <h2 class="dialog-title" id="settings-title">Settings</h2>
+      <div class="option-list" id="option-list"></div>
+      <div class="dialog-buttons">
+        <button class="btn btn-primary" id="settings-close" type="button" autofocus>Done</button>
+      </div>
+    </dialog>
+
+    <dialog class="dialog" id="confirm-dialog" aria-labelledby="confirm-title" aria-describedby="confirm-sub">
+      <h2 class="dialog-title" id="confirm-title"></h2>
+      <p class="dialog-sub" id="confirm-sub"></p>
+      <div class="dialog-buttons">
+        <button class="btn btn-danger-solid" id="confirm-yes" type="button"></button>
+        <button class="btn btn-ghost" id="confirm-no" type="button" autofocus>Cancel</button>
+      </div>
+    </dialog>
+
+  </body>
+</html>

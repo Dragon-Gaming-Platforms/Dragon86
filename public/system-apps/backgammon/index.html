@@ -1,0 +1,397 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Play backgammon for free, right in your browser. Challenge the computer, pass &amp; play with a friend on one device, or invite a friend to a private online game with provably fair dice." />
+    <link rel="canonical" href="https://backgammon.puter.com/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Backgammon" />
+    <meta property="og:url" content="https://backgammon.puter.com/" />
+    <meta property="og:title" content="Play Backgammon Online — vs the Computer or a Friend" />
+    <meta property="og:description" content="Play backgammon for free, right in your browser. Challenge the computer, pass &amp; play on one device, or invite a friend to a private online game." />
+    <!-- 1200x630 (1.91:1) is the ratio Facebook, LinkedIn, Slack, and X's
+         large card all render. Built from tools/og-image.svg. -->
+    <meta property="og:image" content="https://backgammon.puter.com/og-image.png" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Play Backgammon Online — free in your browser. A backgammon board with the dice thrown." />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Play Backgammon Online — vs the Computer or a Friend" />
+    <meta name="twitter:description" content="Play backgammon for free, right in your browser. Challenge the computer, pass &amp; play on one device, or invite a friend to a private online game." />
+    <meta name="twitter:image" content="https://backgammon.puter.com/og-image.png" />
+    <meta name="twitter:image:alt" content="Play Backgammon Online — free in your browser. A backgammon board with the dice thrown." />
+    <link rel="icon" href="favicon.ico" sizes="48x48" />
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
+    <link rel="manifest" href="site.webmanifest" />
+    <!-- --bg for each scheme, i.e. the felt the icon is built on. main.js
+         re-asserts these from the resolved theme once it loads. -->
+    <meta name="theme-color" content="#eef4f0" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0e1611" media="(prefers-color-scheme: dark)" />
+    <title>Play Backgammon Online — vs the Computer or a Friend</title>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": ["WebApplication", "VideoGame"],
+        "name": "Backgammon — Play Online",
+        "url": "https://backgammon.puter.com/",
+        "description": "Play backgammon for free, right in your browser. Challenge the computer, pass & play with a friend on one device, or invite a friend to a private online game.",
+        "applicationCategory": "GameApplication",
+        "operatingSystem": "Any",
+        "browserRequirements": "Requires JavaScript",
+        "genre": "Board game",
+        "gamePlatform": "Web browser",
+        "playMode": ["SinglePlayer", "MultiPlayer"],
+        "image": "https://backgammon.puter.com/icon-512.png",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        }
+      }
+    </script>
+    <script>
+      // Resolve the theme before first paint to avoid a flash. main.js keeps
+      // the attribute in sync afterwards; "system" follows the OS setting.
+      (function () {
+        var theme;
+        try {
+          theme = (JSON.parse(localStorage.getItem('backgammon-settings')) || {}).theme;
+        } catch (e) {
+          /* fall through to system */
+        }
+        if (theme !== 'light' && theme !== 'dark') {
+          theme = window.matchMedia('(prefers-color-scheme: dark)').matches
+            ? 'dark'
+            : 'light';
+        }
+        document.documentElement.dataset.theme = theme;
+      })();
+    </script>
+    <!-- Privacy-friendly analytics by Plausible. No cookies, no personal
+         data, nothing that needs a consent banner.
+
+         The stub below queues calls made before the script arrives, and keeps
+         absorbing them if it never does — blocked by an extension, offline, or
+         a self-hosted deploy with no analytics. src/analytics.js swallows the
+         rest, so the game plays the same either way.
+
+         The plausible.io origin is already allowed by the CSP in
+         customHttp.yml, for both the script and the events it posts. -->
+    <script>
+      window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
+      plausible.init()
+    </script>
+    <script type="module" crossorigin src="./assets/index-DqL-Q3eF.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-DVPLngS5.css">
+  </head>
+  <body>
+    <noscript>
+      <p class="noscript-note">
+        This backgammon game runs entirely in your browser and needs JavaScript
+        to work. Enable JavaScript to play against the computer, pass &amp; play
+        with a friend on one device, or start a private online game.
+      </p>
+    </noscript>
+    <div id="app">
+      <header class="topbar">
+        <div class="brand">
+          <span class="brand-mark"><img src="./assets/icon-128-C8fQemSe.png" alt="" width="128" height="128" /></span>
+          <h1 class="brand-name">Backgammon<span class="visually-hidden"> — play the computer or a friend, free in your browser</span></h1>
+        </div>
+        <div class="topbar-right">
+          <span class="topbar-note" id="topbar-note">Player vs. Computer</span>
+          <div class="theme-toggle" role="group" aria-label="Theme">
+            <button type="button" data-theme-choice="light" title="Light theme" aria-label="Light theme">
+              <i data-lucide="sun"></i>
+            </button>
+            <button type="button" data-theme-choice="dark" title="Dark theme" aria-label="Dark theme">
+              <i data-lucide="moon"></i>
+            </button>
+            <button type="button" data-theme-choice="system" title="Follow system theme" aria-label="Follow system theme">
+              <i data-lucide="monitor"></i>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <main class="layout">
+        <section class="board-column">
+          <div class="board-frame">
+            <div id="board" class="board" role="grid" aria-label="Backgammon board"></div>
+            <!-- The doubling cube sits on the edge of the board, level with
+                 whoever owns it, exactly as it does on a real one. -->
+            <div class="cube" id="cube" data-owner="middle">
+              <span class="cube-value" id="cube-value">1</span>
+              <span class="visually-hidden" id="cube-note"></span>
+            </div>
+          </div>
+        </section>
+
+        <aside class="sidebar">
+          <div class="mode-switch" role="group" aria-label="Game mode">
+            <button type="button" data-mode="computer" aria-pressed="true">
+              <i data-lucide="cpu"></i>Computer
+            </button>
+            <button type="button" data-mode="local" aria-pressed="false">
+              <i data-lucide="users"></i>Pass &amp; Play
+            </button>
+            <button type="button" data-mode="online" aria-pressed="false">
+              <i data-lucide="globe"></i>Online
+            </button>
+          </div>
+
+          <div id="result-banner" class="result-banner hidden"></div>
+
+          <section class="card online-card hidden" id="online-card" aria-label="Online game setup">
+            <div class="online-section" id="online-idle">
+              <h2 class="card-title">Play a friend</h2>
+              <p class="online-note" id="online-invite-note" hidden>
+                You&rsquo;ve been invited to a game — press Join to connect.
+              </p>
+              <button class="btn btn-primary btn-block" id="host-btn" type="button">
+                <i data-lucide="plus"></i><span id="host-btn-label">Create game</span>
+              </button>
+              <div class="online-divider" aria-hidden="true"><span>or join with a code</span></div>
+              <form class="join-row" id="join-form">
+                <label class="visually-hidden" for="join-input">Invite code</label>
+                <!-- Invite codes are served uppercase and the peer API matches
+                     them exactly, so a phone keyboard that starts in lowercase
+                     costs the player a failed join. Ask for capitals. -->
+                <input
+                  id="join-input"
+                  name="code"
+                  placeholder="Invite code"
+                  autocomplete="off"
+                  autocapitalize="characters"
+                  autocorrect="off"
+                  spellcheck="false"
+                />
+                <button class="btn btn-ghost" id="join-btn" type="submit">Join</button>
+              </form>
+              <p class="online-error" id="online-error" role="alert" hidden></p>
+            </div>
+
+            <div class="online-section hidden" id="online-hosting">
+              <h2 class="card-title">Invite your friend</h2>
+              <div class="invite-box">
+                <code class="invite-code" id="invite-code"></code>
+                <button class="icon-btn" id="copy-code-btn" type="button" title="Copy invite code" aria-label="Copy invite code">
+                  <i data-lucide="copy" class="icon-copy"></i>
+                  <i data-lucide="check" class="icon-check hidden"></i>
+                </button>
+              </div>
+              <button class="btn btn-primary btn-block" id="copy-link-btn" type="button">
+                <i data-lucide="link"></i><span id="copy-link-label">Copy invite link</span>
+              </button>
+              <p class="online-wait"><span class="spinner" aria-hidden="true"></span>Waiting for your friend to join…</p>
+              <button class="btn btn-ghost btn-block" id="cancel-host-btn" type="button">Cancel</button>
+            </div>
+
+            <div class="online-section hidden" id="online-joining">
+              <h2 class="card-title">Joining game</h2>
+              <p class="online-wait"><span class="spinner" aria-hidden="true"></span>Connecting to your friend…</p>
+              <button class="btn btn-ghost btn-block" id="cancel-join-btn" type="button">Cancel</button>
+            </div>
+          </section>
+
+          <section class="card player-card" id="card-top">
+            <span class="player-icon">
+              <i data-lucide="cpu" class="icon-cpu"></i>
+              <i data-lucide="user" class="icon-user hidden"></i>
+            </span>
+            <div class="player-info">
+              <p class="player-line">
+                <span class="player-name" id="top-name">Computer</span>
+                <span class="player-note" id="top-caption">Medium</span>
+                <span class="dots" aria-hidden="true"><span></span><span></span><span></span></span>
+              </p>
+              <p class="player-stats">
+                <span class="pips" id="pips-top"></span>
+                <span class="borne-note" id="borne-top"></span>
+              </p>
+            </div>
+            <!-- role="timer" is readable on demand but never announced, which
+                 is what a value changing ten times a second wants to be. -->
+            <span class="clock hidden" id="clock-top" role="timer"></span>
+            <span class="turn-dot" aria-hidden="true"></span>
+          </section>
+
+          <section class="card moves-card" id="moves-card">
+            <div class="card-head">
+              <!-- A disclosure button inside the heading: the panel is closed
+                   by default, so the sidebar stays quiet for the many players
+                   who never read the notation. -->
+              <h2 class="card-title">
+                <button class="card-toggle" id="moves-toggle" type="button" aria-expanded="false" aria-controls="moves-body">
+                  <i data-lucide="chevron-right" class="toggle-chevron"></i>
+                  Moves
+                  <span class="move-count" id="move-count"></span>
+                </button>
+              </h2>
+              <div class="card-actions">
+                <button class="icon-btn icon-btn-sm" id="mat-copy-btn" type="button" title="Copy the game as a .mat transcript" aria-label="Copy the game as a .mat transcript" disabled>
+                  <i data-lucide="clipboard-copy"></i>
+                </button>
+                <button class="icon-btn icon-btn-sm" id="mat-download-btn" type="button" title="Download the game as a .mat file" aria-label="Download the game as a .mat file" disabled>
+                  <i data-lucide="download"></i>
+                </button>
+              </div>
+            </div>
+            <div class="moves-body" id="moves-body">
+            <ol class="move-list" id="move-list"></ol>
+            <p class="moves-empty" id="moves-empty">No moves yet — roll to see who starts.</p>
+            <div class="review-bar">
+              <div class="review-nav" role="group" aria-label="Review the game">
+                <button class="icon-btn icon-btn-sm" id="review-first-btn" type="button" title="Starting position" aria-label="Go to the starting position" disabled>
+                  <i data-lucide="chevron-first"></i>
+                </button>
+                <button class="icon-btn icon-btn-sm" id="review-prev-btn" type="button" title="Previous turn" aria-label="Go back one turn" disabled>
+                  <i data-lucide="chevron-left"></i>
+                </button>
+                <button class="icon-btn icon-btn-sm" id="review-next-btn" type="button" title="Next turn" aria-label="Go forward one turn" disabled>
+                  <i data-lucide="chevron-right"></i>
+                </button>
+                <button class="icon-btn icon-btn-sm" id="review-last-btn" type="button" title="Current position" aria-label="Return to the current position" disabled>
+                  <i data-lucide="chevron-last"></i>
+                </button>
+              </div>
+              <p class="review-note" id="review-note"></p>
+            </div>
+            </div>
+          </section>
+
+          <section class="card player-card" id="card-bottom">
+            <span class="player-icon"><i data-lucide="user"></i></span>
+            <div class="player-info">
+              <p class="player-line">
+                <span class="player-name" id="bottom-name">You</span>
+                <span class="player-note" id="bottom-caption">Playing White</span>
+              </p>
+              <p class="player-stats">
+                <span class="pips" id="pips-bottom"></span>
+                <span class="borne-note" id="borne-bottom"></span>
+              </p>
+            </div>
+            <span class="clock hidden" id="clock-bottom" role="timer"></span>
+            <span class="turn-dot" aria-hidden="true"></span>
+          </section>
+
+          <section class="controls" id="controls">
+            <div class="action-row" id="action-row">
+              <p class="action-note" id="action-note"></p>
+              <div class="action-buttons">
+                <button class="btn btn-ghost" id="double-btn" type="button">
+                  <i data-lucide="chevrons-up"></i>Double
+                </button>
+                <button class="btn btn-primary" id="roll-btn" type="button">
+                  <i data-lucide="dices"></i><span id="roll-label">Roll</span>
+                </button>
+              </div>
+            </div>
+            <div class="field-row" id="field-row">
+              <label class="field" id="level-field">
+                <span class="field-label">Difficulty</span>
+                <select id="level-select">
+                  <option value="easy">Easy</option>
+                  <option value="medium" selected>Medium</option>
+                  <option value="hard">Hard</option>
+                </select>
+              </label>
+              <label class="field" id="time-field">
+                <span class="field-label">Clock</span>
+                <!-- Options are built from TIME_CONTROLS in src/game/clock.js,
+                     so the ids that cross the wire and land in saved games
+                     have exactly one definition. -->
+                <select id="time-select"></select>
+              </label>
+              <label class="field" id="cube-field">
+                <span class="field-label">Doubling cube</span>
+                <select id="cube-select">
+                  <option value="off" selected>Off</option>
+                  <option value="on">On</option>
+                </select>
+              </label>
+              <label class="field" id="color-field">
+                <span class="field-label" id="color-label">Play as</span>
+                <select id="color-select">
+                  <option value="w" selected>White</option>
+                  <option value="b">Black</option>
+                  <option value="random">Random</option>
+                </select>
+              </label>
+            </div>
+            <div class="button-row" id="button-row">
+              <button class="btn btn-ghost" id="new-game-btn" type="button">
+                <i data-lucide="plus"></i>New game
+              </button>
+              <button class="btn btn-ghost" id="undo-btn" type="button" disabled>
+                <i data-lucide="undo-2"></i><span id="undo-label">Undo</span>
+              </button>
+              <button class="btn btn-primary hidden" id="rematch-btn" type="button">
+                <i data-lucide="rotate-ccw"></i><span id="rematch-label">Rematch</span>
+              </button>
+              <button class="btn btn-ghost btn-danger hidden" id="resign-btn" type="button">
+                <i data-lucide="flag"></i>Resign
+              </button>
+              <button class="btn btn-ghost hidden" id="leave-btn" type="button">
+                <i data-lucide="log-out"></i>Leave
+              </button>
+            </div>
+            <p class="controls-hint" id="controls-hint">Colour takes effect when a new game starts.</p>
+          </section>
+        </aside>
+      </main>
+    </div>
+
+    <!-- Announces rolls, moves, and game results to assistive technology. -->
+    <div class="visually-hidden" role="status" id="sr-status"></div>
+
+    <!-- Transient notices (copied link, opponent events, connection errors). -->
+    <div class="toast" id="toast" role="status"></div>
+
+    <dialog class="dialog gameover-dialog" id="gameover-dialog" aria-labelledby="gameover-title" aria-describedby="gameover-sub">
+      <span class="gameover-icon" id="gameover-icon-win"><i data-lucide="trophy"></i></span>
+      <span class="gameover-icon" id="gameover-icon-loss"><i data-lucide="flag"></i></span>
+      <span class="gameover-icon" id="gameover-icon-draw"><i data-lucide="handshake"></i></span>
+      <h2 class="dialog-title" id="gameover-title">Game over</h2>
+      <p class="dialog-sub" id="gameover-sub"></p>
+      <div class="dialog-buttons">
+        <button class="btn btn-primary" id="gameover-new" type="button" autofocus>New game</button>
+        <button class="btn btn-ghost" id="gameover-close" type="button">Review board</button>
+      </div>
+    </dialog>
+
+    <dialog class="dialog cube-dialog" id="cube-dialog" aria-labelledby="cube-title" aria-describedby="cube-sub">
+      <span class="cube-offer" id="cube-offer" aria-hidden="true">2</span>
+      <h2 class="dialog-title" id="cube-title">Double</h2>
+      <p class="dialog-sub" id="cube-sub"></p>
+      <div class="dialog-buttons">
+        <button class="btn btn-primary" id="cube-take" type="button" autofocus>Take</button>
+        <button class="btn btn-ghost" id="cube-drop" type="button">Drop</button>
+      </div>
+    </dialog>
+
+    <dialog class="dialog" id="confirm-dialog" aria-labelledby="confirm-title" aria-describedby="confirm-sub">
+      <h2 class="dialog-title" id="confirm-title"></h2>
+      <p class="dialog-sub" id="confirm-sub"></p>
+      <div class="dialog-buttons">
+        <button class="btn btn-danger-solid" id="confirm-yes" type="button"></button>
+        <button class="btn btn-ghost" id="confirm-no" type="button" autofocus>Cancel</button>
+      </div>
+    </dialog>
+
+    <dialog class="dialog" id="rematch-dialog" aria-labelledby="rematch-title" aria-describedby="rematch-sub">
+      <h2 class="dialog-title" id="rematch-title">Rematch?</h2>
+      <p class="dialog-sub" id="rematch-sub"></p>
+      <div class="dialog-buttons">
+        <button class="btn btn-primary" id="rematch-accept" type="button" autofocus>Accept</button>
+        <button class="btn btn-ghost" id="rematch-decline" type="button">Decline</button>
+      </div>
+    </dialog>
+
+  </body>
+</html>
