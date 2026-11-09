@@ -116,7 +116,17 @@ function makeStat(st, path) {
 }
 
 const fsImpl = {
+  /* Faithful to production ZenFS: stat FOLLOWS symlinks, lstat does not.
+     This shim used to make stat() an lstat, which hid a real bug — the
+     production wrapper had no symlink()/lstat() at all, so guest tar
+     could not create symlinks over 9p even though this harness said
+     everything was fine. The shim must stay semantically identical to
+     unionAsPromises(createDirectFs(...)) or it proves nothing. */
   async stat(p) {
+    const st = await fsp.stat(p);
+    return makeStat(st, p);
+  },
+  async lstat(p) {
     const st = await fsp.lstat(p);
     return makeStat(st, p);
   },
