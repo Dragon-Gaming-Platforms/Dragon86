@@ -1,12 +1,16 @@
 /**
- * Union filesystem — a read-only floor with ZenFS on top, presented to the
- * 9p server as if it were one ordinary filesystem.
+ * The filesystem surface behind the 9p server.
  *
- * One job now: the guest's `/shared` is your Files folder. ZenFS is the floor
- * (everything already in `~/`), `~/v86/shared` is where the guest's changes
- * land, and the Files app sees both. The guest's *root* no longer needs an
- * overlay — it is plain ZenFS at `~/v86` (see bridge/guest-root.ts), so every
- * file the distro reads and writes is an ordinary file in the OS.
+ * What production actually uses is `createDirectFs` + `unionAsPromises`:
+ * the guest's `/` is plain ZenFS (see bridge/guest-root.ts), so every file
+ * the distro reads and writes is an ordinary file in the OS — no overlay.
+ *
+ * `createUnionFs` (a read-only floor with ZenFS on top, plus whiteouts),
+ * `withSubmount` and `zenfsBase` were built for the retired guest
+ * `/shared` folder (vfs.ts still migrates its leftovers home). No shipped
+ * code path constructs them today; they are kept because they are the
+ * working recipe for serving a read-only image with local edits, which is
+ * how a future image-backed machine would mount things.
  */
 
 import { fs } from "@zenfs/core";
@@ -45,6 +49,8 @@ export interface UnionFs {
   utimes(path: string, atime: number, mtime: number): Promise<void>;
   readlink(path: string): Promise<string>;
   symlink(target: string, path: string): Promise<void>;
+  /** Hard link: `path` becomes another name for `existing`'s inode. */
+  link(existing: string, path: string): Promise<void>;
   /** Force a path out of the image into ZenFS (used by the Files app). */
   materialize(path: string): Promise<void>;
 }
@@ -389,6 +395,14 @@ export function createUnionFs(upperRoot: string, base: BaseLayer): UnionFs {
     await fs.promises.symlink(target, p);
   }
 
+  async function link(existing: string, p: string): Promise<void> {
+    /* A hard link shares an inode, which only exists in the upper layer —
+       an image-only source must be pulled up first. */
+    if (!(await upperStat(existing))) await copyUp(existing);
+    await ensureUpperDir(parentOf(p));
+    await fs.promises.link(existing, p);
+  }
+
   /** Pull a path (or a whole directory) out of the image into ZenFS. */
   async function materialize(p: string): Promise<void> {
     await loadWhiteouts();
@@ -424,6 +438,7 @@ export function createUnionFs(upperRoot: string, base: BaseLayer): UnionFs {
     utimes,
     readlink,
     symlink,
+    link,
     materialize,
   };
 }
@@ -463,6 +478,7 @@ export function createDirectFs(root: string): UnionFs {
     utimes: (p, a, m) => fs.promises.utimes(p, a, m),
     readlink: (p) => fs.promises.readlink(p),
     symlink: (target, p) => fs.promises.symlink(target, p),
+    link: (existing, p) => fs.promises.link(existing, p),
     materialize: async () => {},
   };
 }
@@ -548,6 +564,7 @@ export function unionAsPromises(u: UnionFs): {
   utimes(p: string, a: number, m: number): Promise<void>;
   readlink(p: string): Promise<string>;
   symlink(target: string, p: string): Promise<void>;
+  link(existing: string, p: string): Promise<void>;
 } {
   const plain = (st: UnionStat) => {
     const ms = st.mtimeMs || 0;
@@ -592,6 +609,7 @@ export function unionAsPromises(u: UnionFs): {
     utimes: (p, a, m) => u.utimes(p, a, m),
     readlink: (p) => u.readlink(p),
     symlink: (target, p) => u.symlink(target, p),
+    link: (existing, p) => u.link(existing, p),
   };
 }
 
@@ -645,6 +663,14 @@ export function withSubmount(fs: UnionFs, mount: string, sub: UnionFs): UnionFs 
     symlink: async (t, p) => {
       const x = target(p);
       return x ? x.fs.symlink(t, x.path) : fs.symlink(t, p);
+    },
+    link: async (existing, p) => {
+      const a = target(existing);
+      const b = target(p);
+      if (a && b && a.fs === b.fs) return a.fs.link(a.path, b.path);
+      if (!a && !b) return fs.link(existing, p);
+      /* an inode cannot span two filesystems */
+      throw Object.assign(new Error("EXDEV: cross-device link"), { code: "EXDEV" });
     },
     materialize: wrap((f, p) => f.materialize(p)),
     open: async (p, flags) => {

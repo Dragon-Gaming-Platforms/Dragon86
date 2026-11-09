@@ -22,6 +22,8 @@
  *   - Treadlink returns the target text
  *   - Tlsetattr on a symlink succeeds (tar sets mtimes after linking)
  *   - Tunlinkat removes the link and leaves the target alone
+ *   - Tlink creates a hard link that shares the inode (pacman packages
+ *     and tar payloads carry them; `ln` used to answer ENOSYS)
  *
  * Needs the vm bundle (same one test:vm uses):
  *   vite build --config tools/vm/vite.config.ts && node tools/test-p9-symlink.mjs
@@ -197,6 +199,26 @@ const walk = async (newfid, names) => {
   const mode = ga.u32();
   check("a regular file getattrs as S_IFREG", (mode & S_IFMT) === S_IFREG,
     `mode ${(mode >>> 0).toString(8)}`);
+}
+
+/* ---------- Tlink: hard links share the inode ---------- */
+{
+  // dfid: the directory the new name lands in; fid: the existing file
+  await walk(5, ["usr", "share", "conf.avail"]);
+  const r = new R(await call(handler, new W().u32(5).u32(4).str("hard.conf").frame(70, 10)));
+  check("Tlink → Rlink (not Rlerror)", r.type === 71, `got type ${r.type}`);
+  const viaLink = await fs.promises.readFile(`${ROOT}/usr/share/conf.avail/hard.conf`, "utf8")
+    .catch((e) => `(read failed: ${e.code})`);
+  check("…and the new name reads the file", viaLink === "<fontconfig/>", viaLink);
+  await fs.promises.writeFile(`${ROOT}/usr/share/conf.avail/10-hinting.conf`, "<changed/>");
+  const after = await fs.promises.readFile(`${ROOT}/usr/share/conf.avail/hard.conf`, "utf8")
+    .catch((e) => `(read failed: ${e.code})`);
+  check("…and it is the same inode, not a copy", after === "<changed/>", after);
+  await fs.promises.writeFile(`${ROOT}/usr/share/conf.avail/10-hinting.conf`, "<fontconfig/>");
+  const rm = new R(await call(handler, new W().u32(5).str("hard.conf").u32(0).frame(76, 11)));
+  const orig = await fs.promises.readFile(`${ROOT}/usr/share/conf.avail/10-hinting.conf`, "utf8")
+    .then(() => true, () => false);
+  check("…unlinking one name keeps the other", rm.type === 77 && orig);
 }
 
 /* ---------- removing a link removes the link, not the target ---------- */

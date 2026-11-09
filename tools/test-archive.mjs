@@ -12,6 +12,10 @@
  */
 import { deflateRawSync, gzipSync } from "node:zlib";
 import { crc32 } from "node:zlib";
+import { execFileSync } from "node:child_process";
+import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 
 const {
   detectArchiveKind,
@@ -233,6 +237,55 @@ function tar(entries) {
     err = e;
   }
   check("tar: an empty archive says why", err instanceof ArchiveError, String(err));
+}
+
+/* ---------- tar, pax format (bsdtar / macOS default) ---------- */
+{
+  /* Hand-built: an 'x' extended header whose path= record must override
+     the following header's truncated name — skipping it (the old
+     behaviour) extracted files under 100-byte garbage names. */
+  const realPath = "folder/" + "pax-archives-store-long-names-like-this/".repeat(3) + "file.txt";
+  const record = (key, value) => {
+    /* "<len> key=value\n", len counts the whole record including itself */
+    const body = ` ${key}=${value}\n`;
+    let len = body.length + 1;
+    while (String(len).length + body.length !== len) len = String(len).length + body.length;
+    return `${len}${body}`;
+  };
+  const paxPayload = Buffer.from(record("path", realPath), "utf8");
+  const bytes = new Uint8Array(Buffer.concat([
+    tarHeader("PaxHeaders.0/file.txt", paxPayload.length, { type: "x" }),
+    pad512(paxPayload),
+    tarHeader(realPath.slice(0, 100), 8),
+    pad512(Buffer.from("pax-data")),
+    Buffer.alloc(1024),
+  ]));
+  const entries = await listArchive(bytes, "tar");
+  check("pax: the extended header is not an entry", entries.length === 1, String(entries.length));
+  check("pax: path= overrides the truncated name", entries[0]?.path === realPath, entries[0]?.path);
+  const opened = await openArchive(bytes, "tar");
+  check("pax: the data reads back", text(await readEntry(opened, entries[0])) === "pax-data");
+
+  /* And the real thing: GNU tar writing pax format. */
+  const dir = mkdtempSync(join(tmpdir(), "d86-pax-"));
+  try {
+    const deep = "nested/" + "a-rather-long-directory-name-component/".repeat(4);
+    mkdirSync(join(dir, deep), { recursive: true });
+    writeFileSync(join(dir, deep, "leaf.txt"), "made by tar --format=pax\n");
+    execFileSync("tar", ["--format=pax", "-cf", join(dir, "out.tar"), "-C", dir, "nested"]);
+    const real = new Uint8Array(readFileSync(join(dir, "out.tar")));
+    const realEntries = await listArchive(real, "tar");
+    const leaf = realEntries.find((e) => e.path.endsWith("leaf.txt"));
+    check("pax: a real tar --format=pax long path survives", leaf?.path === `${deep}leaf.txt`, leaf?.path);
+    check("pax: no PaxHeaders entries leak into the listing",
+      realEntries.every((e) => !e.path.includes("PaxHeaders")),
+      JSON.stringify(realEntries.map((e) => e.path)));
+    const openedReal = await openArchive(real, "tar");
+    check("pax: the real file's bytes read back",
+      leaf !== undefined && text(await readEntry(openedReal, leaf)) === "made by tar --format=pax\n");
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
 }
 
 /* ---------- gzip ---------- */

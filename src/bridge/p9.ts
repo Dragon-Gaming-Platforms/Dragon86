@@ -12,9 +12,10 @@
  * layer calls their host fs; this is the stock-upstream-v86 equivalent.)
  *
  * Scope: the subset of 9p2000.L a Linux client exercises against a
- * simple file share. Symlinks are first-class (create, read, lstat-true
- * attributes — the kernel resolves them itself via Treadlink); xattrs,
- * locks (beyond trivial success) and device nodes return ENOSYS.
+ * simple file share. Symlinks and hard links are first-class (create,
+ * read, lstat-true attributes — the kernel resolves symlinks itself via
+ * Treadlink); xattrs, locks (beyond trivial success) and device nodes
+ * return ENOSYS.
  */
 
 import { fs } from "@zenfs/core";
@@ -27,7 +28,7 @@ const MSIZE = 262144;
 const IOUNIT = MSIZE - 64;
 
 /* errno values the guest turns into strerror() text */
-const ENOENT = 2, EPERM = 1, EIO = 5, EEXIST = 17, ENOTDIR = 20,
+const ENOENT = 2, EPERM = 1, EIO = 5, EEXIST = 17, EXDEV = 18, ENOTDIR = 20,
   EISDIR = 21, EINVAL = 22, ENODATA = 61, ENOSYS = 38, ENOTEMPTY = 39, ENOTSUP = 95;
 
 function errnoOf(err: unknown): number {
@@ -40,6 +41,10 @@ function errnoOf(err: unknown): number {
     case "EINVAL": return EINVAL;
     case "EPERM": case "EACCES": return EPERM;
     case "ENOTEMPTY": return ENOTEMPTY;
+    /* EXDEV matters: mv and install(1) fall back to copy+delete when a
+       rename or link answers EXDEV — an EIO instead makes them give up. */
+    case "EXDEV": return EXDEV;
+    case "ENOTSUP": return ENOTSUP;
     default: return EIO;
   }
 }
@@ -510,6 +515,15 @@ export function createP9Handler(
         }
         case 18: { // Tmknod — a regular guest has no business creating devices
           return error(tag, ENOTSUP);
+        }
+        case 70: { // Tlink — hard link; tar payloads and pacman packages
+          // carry them (bzcat/bunzip2 are one inode on Arch), and `ln`
+          // answered "Function not implemented" while this was missing.
+          const dfid = r.u32(), fid = r.u32(), name = r.str();
+          const path = joinRel(getFid(dfid).path, name);
+          if (!inside(path)) return error(tag, EPERM);
+          await fsImpl.link(getFid(fid).path, path);
+          return new Writer().build(71, tag);
         }
         case 50: // Tfsync
           return new Writer().build(51, tag);
