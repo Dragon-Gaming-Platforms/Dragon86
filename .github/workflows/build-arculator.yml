@@ -56,11 +56,16 @@ jobs:
           # packs them into arculator.data — exactly what must not happen.
           # The release build packs DATA=ddnoise only.
           #
-          # -Werror comes out of the Makefile first: upstream only CI-tests
-          # DEBUG builds, where DEBUG_LOG makes some variables (arm.c cyc_s/
-          # cyc_n) used; in release the current clang flags them as set-but-
-          # unused and -Werror kills the build. The warnings stay in the log.
-          sed -i 's/-Wall -Werror/-Wall/' arc-src/Makefile
+          # Two Makefile adjustments for today's clang, neither touching the
+          # emulator's code:
+          #  - -Werror goes: upstream only CI-tests DEBUG builds, where
+          #    DEBUG_LOG makes some variables (arm.c cyc_s/cyc_n) used; in
+          #    release clang flags them set-but-unused and -Werror kills the
+          #    build. The warnings stay visible in the log.
+          #  - -std=gnu11 pins the C standard the code was written for:
+          #    clang 24 defaults to C23, where `bool` is a keyword and
+          #    hostfs.c's `typedef int bool;` is a hard error.
+          sed -i 's/-Wall -Werror/-Wall -std=gnu11/' arc-src/Makefile
           docker run -v "$PWD/arc-src":/src emscripten/emsdk sh -c \
             "apt-get update && apt-get install -yy xxd && git config --global --add safe.directory /src && make -C /src -j\$(nproc) wasm"
           ls -la arc-src/build/wasm/
