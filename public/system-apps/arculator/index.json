@@ -1,0 +1,18 @@
+{
+  "files": [
+    "index.html",
+    "app.js",
+    "icon.svg",
+    "arculator.js",
+    "arculator.wasm",
+    "arculator.data",
+    "arculator.data.js",
+    "arcrom_ext",
+    "cmos-arthur.bin",
+    "cmos-riscos2.bin",
+    "cmos-riscos3_old.bin",
+    "cmos-riscos3_new.bin",
+    "LICENSE",
+    "VENDORED.md"
+  ]
+}

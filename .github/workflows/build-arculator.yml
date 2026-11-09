@@ -1,0 +1,123 @@
+name: Build Arculator
+
+# Builds Arculator WASM (pdjstone/arculator-wasm, GPL-2.0) — an Acorn
+# Archimedes emulator ported to WebAssembly — from a pinned commit, and
+# commits the build output to public/system-apps/arculator/ on the branch
+# the workflow ran on.
+#
+# What this deliberately does NOT do: bundle an operating system. Upstream's
+# FULL_FAT/DEBUG builds download RISC OS ROMs from the official Arculator
+# release and pack them into arculator.data; those ROMs are copyrighted
+# (RISC OS Developments Ltd) and this machine ships bring-your-own-ROM.
+# The release build packs only the floppy-drive noise samples, and a step
+# below verifies no ROM slipped into the bundle. The one ROM that IS
+# vendored — arcrom_ext, the 64 KB Arculator support ROM providing HostFS
+# and absolute-mouse sync — is part of the GPL-2.0 upstream repo itself.
+#
+# Why a workflow: the build needs the Emscripten toolchain, which the
+# development sandbox cannot install. Upstream's own CI builds inside the
+# emscripten/emsdk Docker image exactly like this.
+#
+# Triggers: pushing this file (first build) or a manual dispatch (rebuilds).
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/build-arculator.yml"
+
+permissions:
+  contents: write
+
+concurrency: build-arculator
+
+env:
+  ARC_REPO: pdjstone/arculator-wasm
+  ARC_COMMIT: 579ac437b9a4ebe83b9b5f9b8e50b0c9c530509e
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout Dragon86
+        uses: actions/checkout@v4
+
+      - name: Checkout arculator-wasm (pinned)
+        uses: actions/checkout@v4
+        with:
+          repository: pdjstone/arculator-wasm
+          ref: 579ac437b9a4ebe83b9b5f9b8e50b0c9c530509e
+          path: arc-src
+
+      - name: Build the WASM emulator (release, no FULL_FAT)
+        run: |
+          # DEBUG=1 would force FULL_FAT=1, which downloads RISC OS ROMs and
+          # packs them into arculator.data — exactly what must not happen.
+          # The release build packs DATA=ddnoise only.
+          docker run -v "$PWD/arc-src":/src emscripten/emsdk sh -c \
+            "apt-get update && apt-get install -yy xxd && git config --global --add safe.directory /src && make -C /src -j\$(nproc) wasm"
+          ls -la arc-src/build/wasm/
+
+      - name: Verify no operating system got bundled
+        run: |
+          # arculator.data.js carries the manifest of what file_packager put
+          # into arculator.data. The only payload must be ddnoise (floppy
+          # seek noise); any roms/, cmos or cfg entry means an OS or machine
+          # state got in, and the build must fail rather than ship it.
+          node -e '
+            const fs = require("fs");
+            const txt = fs.readFileSync("arc-src/build/wasm/arculator.data.js", "utf8");
+            const names = [...txt.matchAll(/"filename":\s*"([^"]+)"/g)].map(m => m[1]);
+            if (!names.length) { console.error("no packaged files found — manifest format changed?"); process.exit(1); }
+            const bad = names.filter(n => !n.startsWith("/ddnoise"));
+            console.log(`packaged: ${names.length} files, ${bad.length} outside /ddnoise`);
+            if (bad.length) { console.error("unexpected payload:", bad.slice(0, 20)); process.exit(1); }
+          '
+
+      - name: Assemble public/system-apps/arculator
+        run: |
+          mkdir -p public/system-apps/arculator
+          cp arc-src/build/wasm/arculator.js \
+             arc-src/build/wasm/arculator.wasm \
+             arc-src/build/wasm/arculator.data \
+             arc-src/build/wasm/arculator.data.js \
+             public/system-apps/arculator/
+          # The GPL support ROM from the upstream repo (HostFS + mouse sync),
+          # loaded as podule 0. NOT an operating system.
+          cp arc-src/roms/arcrom_ext public/system-apps/arculator/
+          # Default CMOS contents per OS family, from the upstream repo,
+          # flattened to one file per family.
+          for fam in arthur riscos2 riscos3_old riscos3_new; do
+            cp "arc-src/cmos/$fam/cmos.bin" "public/system-apps/arculator/cmos-$fam.bin"
+          done
+          cp arc-src/COPYING public/system-apps/arculator/LICENSE
+          {
+            echo "# Vendored Arculator WASM build"
+            echo
+            echo "- source: https://github.com/${ARC_REPO} @ ${ARC_COMMIT} (GPL-2.0)"
+            echo "- built: $(date -u +%Y-%m-%dT%H:%M:%SZ) by .github/workflows/build-arculator.yml"
+            echo "- contents: emulator (arculator.js/.wasm/.data/.data.js),"
+            echo "  the GPL support ROM (arcrom_ext) and default CMOS images."
+            echo "- NO operating system is included. RISC OS / Arthur ROM images"
+            echo "  are copyrighted and must never be committed here; the app asks"
+            echo "  the user for one and keeps it in their browser storage."
+          } > public/system-apps/arculator/VENDORED.md
+          du -sh public/system-apps/arculator
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A public/system-apps/arculator
+          if git diff --cached --quiet; then
+            echo "build output unchanged — nothing to commit"
+          else
+            git commit -m "Vendor Arculator WASM build (${ARC_REPO} @ ${ARC_COMMIT})"
+            # Vendor workflows triggered by the same push can race each other
+            # to this push; rebase onto whatever won and try again.
+            for i in 1 2 3; do
+              git push origin "HEAD:${{ github.ref_name }}" && break
+              git pull --rebase origin "${{ github.ref_name }}"
+            done
+          fi

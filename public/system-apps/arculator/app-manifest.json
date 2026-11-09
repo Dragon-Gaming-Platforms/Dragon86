@@ -1,0 +1,6 @@
+{
+  "id": "arculator",
+  "kind": "iframe-app",
+  "dump": "~/system/apps/arculator/",
+  "note": "Where the App Store writes this app's files when it installs it. The OS serves them from that folder (9pf/arculator/). The emulator ships with NO operating system: the user's ROM image lives in IndexedDB in their browser, never in this folder and never in the repo."
+}

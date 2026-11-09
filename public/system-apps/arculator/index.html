@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>Archimedes — Arculator</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: #0f0d0c; color: #f3ece4; font: 13px/1.45 system-ui, sans-serif;
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    padding: 10px; overflow: hidden;
+  }
+  header { display: flex; align-items: baseline; gap: 8px; width: 100%; max-width: 920px; }
+  header b { color: #ff5a3c; letter-spacing: .5px; }
+  header span { color: #9d938a; font-size: 11px; }
+  #screenwrap {
+    width: 100%; max-width: 920px; flex: 1 1 auto; min-height: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: #000; border: 1px solid #2a2523; border-radius: 6px; overflow: hidden;
+  }
+  canvas#canvas {
+    max-width: 100%; max-height: 100%;
+    image-rendering: pixelated; background: #000; outline: none;
+  }
+  .bar { width: 100%; max-width: 920px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  button, select {
+    font: 600 12px system-ui, sans-serif; color: #f3ece4; background: #241f1d;
+    border: 1px solid #3a332f; border-radius: 8px; padding: 7px 10px;
+    touch-action: manipulation; user-select: none;
+  }
+  button:active { background: #ff5a3c; border-color: #ff5a3c; color: #14100e; }
+  button:disabled { opacity: .45; }
+  #status { color: #9d938a; font-size: 11px; min-height: 15px; width: 100%; max-width: 920px; }
+  #status.err { color: #ff8a6d; }
+
+  /* setup panel (no ROM yet) */
+  #setup {
+    width: 100%; max-width: 560px; margin: auto;
+    background: #171311; border: 1px solid #2a2523; border-radius: 10px;
+    padding: 16px; display: flex; flex-direction: column; gap: 10px;
+  }
+  #setup h1 { font-size: 15px; margin: 0; color: #f3ece4; }
+  #setup p { margin: 0; color: #b8aea5; font-size: 12px; }
+  #setup p.fine { color: #7d746d; font-size: 11px; }
+  #setup label { font-size: 12px; color: #9d938a; display: flex; flex-direction: column; gap: 4px; }
+  #setup input[type=file] { font-size: 12px; color: #b8aea5; }
+  #setup .go { background: #ff5a3c; border-color: #ff5a3c; color: #14100e; padding: 9px 12px; }
+  a { color: #ff8a6d; }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<header><b>ARCHIMEDES</b><span>Arculator WASM — the machine runs entirely in this window</span></header>
+
+<div id="setup" class="hidden">
+  <h1>This machine has no operating system yet</h1>
+  <p>
+    Arculator emulates an Acorn Archimedes, but Dragon86 does not ship an OS
+    for it: Arthur and RISC OS ROM images are copyrighted (the rights now sit
+    with RISC OS Developments Ltd), so you bring your own ROM image. It is
+    kept in this browser's storage — it never leaves your machine.
+  </p>
+  <p class="fine">
+    The desktop <a href="https://b-em.bbcmicro.com/arculator/" target="_blank" rel="noopener">Arculator
+    download</a> includes RISC OS 3.1 ROMs distributed with the rights-holder's
+    permission — the file <code>roms/riscos311/ros311</code> from that archive
+    works here. A ROM dumped from an Archimedes you own works too.
+  </p>
+  <label>ROM image (.rom / ros311 / similar, 512&nbsp;KB – 4&nbsp;MB)
+    <input type="file" id="romfile" />
+  </label>
+  <label>Which OS family is this ROM?
+    <select id="family">
+      <option value="riscos3-a3000" selected>RISC OS 3.1x — as an A3000 (ARM2)</option>
+      <option value="riscos3-a5000">RISC OS 3.1x — as an A5000 (ARM3)</option>
+      <option value="riscos2">RISC OS 2.0x — as an A310 (ARM2)</option>
+      <option value="arthur">Arthur 1.20 — as an A310 (ARM2)</option>
+    </select>
+  </label>
+  <button class="go" id="start" disabled>Save ROM &amp; switch on</button>
+</div>
+
+<div id="screenwrap" class="hidden">
+  <canvas id="canvas" oncontextmenu="event.preventDefault()" tabindex="0"></canvas>
+</div>
+<div class="bar hidden" id="controls">
+  <button id="insert">Insert disc…</button>
+  <button id="eject" disabled>Eject</button>
+  <button id="reset">Reset</button>
+  <button id="fullscreen">Fullscreen</button>
+  <button id="changerom">Change ROM…</button>
+  <input type="file" id="discfile" class="hidden" accept=".adf,.adl,.apd,.fdi,.jfd,.hfe,.scp,.img" />
+</div>
+<div id="status">starting…</div>
+
+<script src="app.js"></script>
+</body>
+</html>

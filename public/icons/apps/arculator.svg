@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- an Acorn Archimedes: pizza-box case + monitor, with the three-slot vent -->
+  <rect x="8" y="12" width="48" height="30" rx="4" fill="#1b1e26" stroke="#2b313c"/>
+  <rect x="13" y="17" width="38" height="20" rx="2" fill="#0a0c10" stroke="#3a4150"/>
+  <!-- RISC OS desktop hint: grey backdrop, iconbar -->
+  <rect x="14" y="18" width="36" height="18" rx="1.5" fill="#8f99a3"/>
+  <rect x="14" y="31" width="36" height="5" fill="#c8cdd2"/>
+  <rect x="16" y="32.2" width="4" height="2.6" rx="0.6" fill="#2563b0"/>
+  <rect x="22" y="32.2" width="4" height="2.6" rx="0.6" fill="#2fa84f"/>
+  <rect x="44" y="32.2" width="4" height="2.6" rx="0.6" fill="#d8a022"/>
+  <rect x="17" y="20" width="14" height="9" rx="1" fill="#e9ecef" stroke="#5c6670"/>
+  <rect x="17" y="20" width="14" height="2.4" rx="1" fill="#2563b0"/>
+  <!-- the case -->
+  <rect x="12" y="44" width="40" height="10" rx="2.5" fill="#d9d2c2" stroke="#8a8272"/>
+  <rect x="16" y="47" width="12" height="3.4" rx="1.2" fill="#9b9484"/>
+  <circle cx="45" cy="49" r="1.9" fill="#3fae49"/>
+</svg>
