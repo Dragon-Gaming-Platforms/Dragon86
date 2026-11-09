@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- a slide on an easel with a chart and title -->
+  <rect x="10" y="10" width="44" height="32" rx="3" fill="#fbfcfd" stroke="#8a93a0"/>
+  <rect x="10" y="10" width="44" height="7" rx="3" fill="#7a4fb0"/>
+  <rect x="10" y="14" width="44" height="3" fill="#7a4fb0"/>
+  <rect x="15" y="22" width="18" height="3" rx="1.5" fill="#2b313c"/>
+  <rect x="15" y="28" width="12" height="2.2" rx="1.1" fill="#c8cdd2"/>
+  <rect x="15" y="32.5" width="14" height="2.2" rx="1.1" fill="#c8cdd2"/>
+  <g>
+    <rect x="38" y="30" width="4" height="7" fill="#2563b0"/>
+    <rect x="43.5" y="26" width="4" height="11" fill="#2fa84f"/>
+    <rect x="49" y="22" width="4" height="15" fill="#e8b440"/>
+  </g>
+  <line x1="32" y1="42" x2="32" y2="47" stroke="#8a93a0" stroke-width="2"/>
+  <line x1="32" y1="45" x2="22" y2="54" stroke="#8a93a0" stroke-width="2" stroke-linecap="round"/>
+  <line x1="32" y1="45" x2="42" y2="54" stroke="#8a93a0" stroke-width="2" stroke-linecap="round"/>
+</svg>

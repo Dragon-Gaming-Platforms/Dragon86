@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="description" content="Free, open-source 2D drafting in the browser: precise drawing and editing, layers, blocks, dimensions, hatching, and DWG and DXF files." />
+    <link rel="canonical" href="https://cad.puter.com/" />
+    <title>CAD</title>
+    <meta name="theme-color" content="#eef0f3" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#1a1e25" media="(prefers-color-scheme: dark)" />
+    <link rel="manifest" href="./manifest.json" />
+    <link rel="icon" href="./favicon.ico" sizes="48x48" />
+    <link rel="icon" type="image/png" href="./icons/icon-192.png" sizes="192x192" />
+    <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
+    <script>
+      // Apply a forced theme before first paint to avoid a flash.
+      try {
+        var t = localStorage.getItem('cad.theme');
+        if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+      } catch (e) {}
+    </script>
+    <script type="module" crossorigin src="./assets/index-BzJc2Wey.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-CwDn3vo1.css">
+  </head>
+  <body>
+    <div id="app"></div>
+    <noscript>This drafting app needs JavaScript to run.</noscript>
+  </body>
+</html>

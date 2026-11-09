@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Circuits</title>
+    <meta name="description" content="Schematic capture and PCB layout in your browser. Draw schematics, lay out boards, pour copper, check design rules and export manufacturing files, stored in your own Puter cloud." />
+    <link rel="canonical" href="https://circuits.puter.com/" />
+    <meta name="theme-color" content="#f2f2f0" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#2f2f2f" media="(prefers-color-scheme: dark)" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="./favicon-32.png" type="image/png" sizes="32x32" />
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png" sizes="180x180" />
+    <link rel="manifest" href="./manifest.json" />
+    <script>
+      // Resolve the theme before first paint to avoid a flash.
+      (function () {
+        var root = document.documentElement, t = 'system';
+        try { t = localStorage.getItem('circuits:theme') || 'system'; } catch (e) {}
+        var dark = t === 'dark' || (t === 'system' && window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches);
+        root.dataset.theme = t;
+        root.dataset.themeResolved = dark ? 'dark' : 'light';
+      })();
+    </script>
+    <script>window.__puterFailed = true; /* Dragon86: no Puter SDK - the app's own offline path */</script>
+    <script type="module" crossorigin src="./assets/index-CS2cI7Uz.js"></script>
+    <link rel="modulepreload" crossorigin href="./assets/geom-kxNHhSp4.js">
+    <link rel="modulepreload" crossorigin href="./assets/place--fpxLP2w.js">
+    <link rel="modulepreload" crossorigin href="./assets/pcb-BO3KSN85.js">
+    <link rel="stylesheet" crossorigin href="./assets/index-C-BOeamF.css">
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to the design canvas</a>
+    <div id="app" aria-busy="true"></div>
+    <div id="live-region" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+    <noscript>Circuits needs JavaScript to run.</noscript>
+  </body>
+</html>

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- a data base: grid of records with a colored key column -->
+  <rect x="8" y="10" width="48" height="44" rx="4" fill="#fbfcfd" stroke="#8a93a0"/>
+  <rect x="8" y="10" width="48" height="10" rx="4" fill="#2563b0"/>
+  <rect x="8" y="16" width="48" height="4" fill="#2563b0"/>
+  <path d="M22 20 V54 M40 20 V54 M8 31 H56 M8 42 H56" stroke="#c3cad3" stroke-width="1.6"/>
+  <rect x="11" y="24" width="8" height="4" rx="2" fill="#2fa84f"/>
+  <rect x="11" y="35" width="8" height="4" rx="2" fill="#e8b440"/>
+  <rect x="11" y="46" width="8" height="4" rx="2" fill="#d33b3b"/>
+  <rect x="25" y="24" width="12" height="4" rx="1" fill="#c8cdd2"/>
+  <rect x="25" y="35" width="10" height="4" rx="1" fill="#c8cdd2"/>
+  <rect x="25" y="46" width="12" height="4" rx="1" fill="#c8cdd2"/>
+  <rect x="43" y="24" width="10" height="4" rx="1" fill="#c8cdd2"/>
+  <rect x="43" y="35" width="8" height="4" rx="1" fill="#c8cdd2"/>
+  <rect x="43" y="46" width="10" height="4" rx="1" fill="#c8cdd2"/>
+</svg>

@@ -1,0 +1,24 @@
+{
+  "name": "CAD",
+  "short_name": "CAD",
+  "description": "Free, open-source 2D drafting in the browser.",
+  "id": "cad",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#1a1e25",
+  "theme_color": "#1a1e25",
+  "categories": ["productivity", "utilities"],
+  "icons": [
+    { "src": "./icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "./icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "./icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "launch_handler": { "client_mode": "focus-existing" },
+  "file_handlers": [
+    {
+      "action": "./",
+      "accept": { "application/dxf": [".dxf"], "image/vnd.dwg": [".dwg"], "application/octet-stream": [".cad"] }
+    }
+  ]
+}

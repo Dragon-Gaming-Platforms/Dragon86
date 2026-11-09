@@ -1,0 +1,32 @@
+{
+  "files": [
+    "index.html",
+    "LICENSE",
+    "VENDORED.md",
+    "apple-touch-icon.png",
+    "assets/aws-sigv4-DSse3dyH.js",
+    "assets/cm-etmrxWdP.js",
+    "assets/codegen-Dxq5ks6x.js",
+    "assets/curl-D2PrlA9X.js",
+    "assets/dialogs-8NBc8B2f.js",
+    "assets/dist-Briugsxw.js",
+    "assets/format.worker-C2QWuHNU.js",
+    "assets/index-NxfRjAla.css",
+    "assets/index-RH2ZZ7JO.js",
+    "assets/json-path-Dnljzfw0.js",
+    "assets/model-DSi0lvXa.js",
+    "assets/palette-DdIaYmct.js",
+    "assets/runner-view-CX4YUyVt.js",
+    "assets/sandbox-DQqu8xRE.js",
+    "assets/share-dialog-CFet_k-d.js",
+    "assets/websocket-view-D8_XSfFU.js",
+    "favicon-16x16.png",
+    "favicon-32x32.png",
+    "favicon-48x48.png",
+    "favicon.ico",
+    "icon-192.png",
+    "icon-512-maskable.png",
+    "icon-512.png",
+    "manifest.json"
+  ]
+}

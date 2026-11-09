@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Parametric</title>
+    <meta name="description" content="Parametric is an open-source 3D CAD app for feature-based part modeling in your browser: constrained sketches, extrudes, revolves, fillets, shells, holes and patterns on a real B-rep kernel, with STEP and STL export." />
+    <link rel="canonical" href="https://parametric.puter.com/" />
+    <meta name="theme-color" content="#f7f8fa" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#1f2226" media="(prefers-color-scheme: dark)" />
+    <meta name="color-scheme" content="light dark" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Parametric" />
+    <meta property="og:title" content="Parametric — open-source 3D CAD in your browser" />
+    <meta property="og:description" content="Open-source parametric 3D CAD in your browser." />
+    <meta property="og:url" content="https://parametric.puter.com/" />
+    <meta property="og:image" content="https://parametric.puter.com/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="The Parametric CAD app showing an extruded part in an isometric view." />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Parametric — open-source 3D CAD in your browser" />
+    <meta name="twitter:description" content="Open-source parametric 3D CAD in your browser." />
+    <meta name="twitter:image" content="https://parametric.puter.com/og-image.png" />
+    <link rel="icon" href="./favicon-32.png" type="image/png" sizes="32x32" />
+    <link rel="icon" href="./favicon-16.png" type="image/png" sizes="16x16" />
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png" sizes="180x180" />
+    <link rel="manifest" href="./manifest.json" />
+    <script>
+      // Resolve the theme before first paint to avoid a flash.
+      (function () {
+        var root = document.documentElement, t = 'system';
+        try { t = localStorage.getItem('parametric:theme') || 'system'; } catch (e) {}
+        var dark = t === 'dark' || (t === 'system' && window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches);
+        root.dataset.theme = t;
+        root.dataset.themeResolved = dark ? 'dark' : 'light';
+      })();
+    </script>
+    <script>window.__puterFailed = true; /* Dragon86: no Puter SDK - the app's own offline path */</script>
+    <script type="module" crossorigin src="./assets/index-hzGrl3CQ.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-Ch2po2PH.css">
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to the graphics area</a>
+    <div id="app" aria-busy="true"></div>
+    <div id="live-region" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+    <noscript>Parametric needs JavaScript to run.</noscript>
+  </body>
+</html>

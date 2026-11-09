@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>API Client</title>
+  <meta name="description" content="Build, send and test HTTP requests in your browser. Organize them in collections, switch environments and sync with your Puter account." />
+  <link rel="canonical" href="https://apic.puter.com/" />
+  <meta name="theme-color" content="#ffffff" />
+  <meta name="color-scheme" content="light dark" />
+  <link rel="manifest" href="./manifest.json" />
+  <link rel="icon" href="./favicon.ico" sizes="16x16 32x32 48x48" />
+  <link rel="icon" href="./favicon-16x16.png" type="image/png" sizes="16x16" />
+  <link rel="icon" href="./favicon-32x32.png" type="image/png" sizes="32x32" />
+  <link rel="icon" href="./favicon-48x48.png" type="image/png" sizes="48x48" />
+  <link rel="apple-touch-icon" href="./apple-touch-icon.png" sizes="180x180" />
+  <script>
+    (() => {
+      let t = 'system';
+      try { t = JSON.parse(localStorage.getItem('api-client:prefs') || '{}').theme || 'system'; } catch {}
+      const dark = t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+      document.documentElement.dataset.theme = t;
+      document.documentElement.dataset.themeResolved = dark ? 'dark' : 'light';
+      document.documentElement.style.background = dark ? '#18181b' : '#ffffff';
+    })();
+  </script>
+  <script type="module" crossorigin src="./assets/index-RH2ZZ7JO.js"></script>
+  <link rel="modulepreload" crossorigin href="./assets/model-DSi0lvXa.js">
+  <link rel="stylesheet" crossorigin href="./assets/index-NxfRjAla.css">
+</head>
+<body>
+  <div id="app" aria-busy="true"></div>
+  <noscript>API Client needs JavaScript to run.</noscript>
+</body>
+</html>

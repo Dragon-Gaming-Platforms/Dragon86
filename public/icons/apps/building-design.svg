@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- a floor plan with walls, a door swing and a window -->
+  <rect x="8" y="8" width="48" height="48" rx="4" fill="#fdfaf2" stroke="#b9a97c"/>
+  <g stroke="#2b313c" stroke-width="2.6" fill="none">
+    <path d="M14 14 H50 V50 H14 Z"/>
+    <path d="M14 32 H30 M36 32 H50 M32 32 V50"/>
+  </g>
+  <path d="M30 32 a6 6 0 0 1 6 -6" fill="none" stroke="#8a93a0" stroke-width="1.4"/>
+  <line x1="36" y1="26" x2="36" y2="32" stroke="#2b313c" stroke-width="2"/>
+  <rect x="20" y="12.8" width="10" height="2.4" fill="#5a86c0"/>
+  <rect x="48.8" y="38" width="2.4" height="8" fill="#5a86c0"/>
+  <rect x="18" y="38" width="8" height="6" fill="none" stroke="#b9a97c" stroke-width="1.4"/>
+  <circle cx="43" cy="42" r="2.2" fill="#2fa84f"/>
+</svg>

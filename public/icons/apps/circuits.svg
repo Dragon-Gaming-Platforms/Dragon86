@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- a little schematic: battery, resistor zigzag, LED lit -->
+  <rect x="8" y="8" width="48" height="48" rx="4" fill="#102418" stroke="#0a1a10"/>
+  <g stroke="#2fa84f" stroke-width="2" fill="none" stroke-linecap="round">
+    <path d="M16 24 H24 l2-4 4 8 4-8 4 8 2-4 H44"/>
+    <path d="M16 24 V44 H28 M44 24 V44 H36"/>
+  </g>
+  <line x1="26" y1="40" x2="26" y2="48" stroke="#2fa84f" stroke-width="2"/>
+  <line x1="30" y1="42" x2="30" y2="46" stroke="#2fa84f" stroke-width="3.4"/>
+  <circle cx="36" cy="44" r="4.2" fill="#0a1a10" stroke="#e8b440" stroke-width="1.8"/>
+  <path d="M34.4 42.4 l3.2 3.2 M37.6 42.4 l-3.2 3.2" stroke="#e8b440" stroke-width="1.4"/>
+  <g stroke="#ffd95e" stroke-width="1.3"><line x1="41" y1="39" x2="43.5" y2="36.5"/><line x1="42" y1="43" x2="45.5" y2="43"/></g>
+</svg>
