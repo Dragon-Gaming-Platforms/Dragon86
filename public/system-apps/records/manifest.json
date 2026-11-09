@@ -1,0 +1,18 @@
+{
+  "id": "./",
+  "name": "Records",
+  "short_name": "Records",
+  "description": "Connected tables, views and forms for your data, stored in your own Puter cloud.",
+  "lang": "en",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "theme_color": "#5554f1",
+  "background_color": "#ffffff",
+  "icons": [
+    { "src": "./favicon-48x48.png", "sizes": "48x48", "type": "image/png", "purpose": "any" },
+    { "src": "./icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "./icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "./icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

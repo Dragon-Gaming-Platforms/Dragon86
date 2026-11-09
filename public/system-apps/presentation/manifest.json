@@ -1,0 +1,26 @@
+{
+  "id": "./",
+  "name": "Presentation",
+  "short_name": "Presentation",
+  "description": "Create, edit, and present real .pptx files with Presentation on Puter.",
+  "lang": "en",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "theme_color": "#c44730",
+  "background_color": "#f9f9f7",
+  "icons": [
+    {
+      "src": "./icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

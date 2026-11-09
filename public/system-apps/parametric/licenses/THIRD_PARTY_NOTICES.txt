@@ -1,0 +1,48 @@
+Parametric - third-party notices
+================================
+
+Parametric is open-source software released under the GNU Affero General Public License v3.0.
+It includes the following third-party components. Their full license
+texts are in this folder.
+
+replicad 1.1.0 (MIT)
+  CAD modeling library on top of OpenCascade.
+  License: replicad-LICENSE.txt
+
+replicad-opencascadejs 1.1.0 (LGPL-2.1-only)
+  WebAssembly build of the Open CASCADE Technology geometry kernel.
+  It is shipped as a separate, replaceable WebAssembly module (assets/*.wasm)
+  loaded at runtime by the geometry worker. You may replace it with your own
+  build of the same library interface. Source code:
+  https://github.com/sgenoud/replicad (packages/replicad-opencascadejs) and
+  https://github.com/Open-Cascade-SAS/OCCT
+  License: replicad-opencascadejs-LICENSE.txt
+
+lucide 1.55.0 (ISC)
+  Generic interface icons. CAD-specific icons are original artwork.
+  License: lucide-LICENSE.txt
+
+flatbush 4.6.2 (ISC), flatqueue 3.1.0 (ISC)
+  Spatial indexing used by replicad.
+  Licenses: flatbush-LICENSE.txt, flatqueue-LICENSE.txt
+
+opentype.js 1.3.4 (MIT), string.prototype.codepointat 0.2.1 (MIT), tiny-inflate 1.0.3 (MIT)
+  Font parsing used by replicad.
+  Licenses: opentype.js-LICENSE.txt, string.prototype.codepointat-LICENSE.txt, tiny-inflate-LICENSE.txt
+
+SolidWorks part import (src/formats/sldprt) is based on published reverse
+engineering and the Parasolid XT Format Reference:
+  ps-parser (MIT, https://github.com/khoanguyen-3fc/ps-parser): the Parasolid
+    base schema file sch_13006.s_t, shipped unchanged, and the transmit
+    decoding scheme. License: ps-parser-LICENSE.txt
+  sldprt-format-research (MIT, https://github.com/blussyya/sldprt-format-research):
+    the SolidWorks container layouts and OLE2 reader. The test fixtures in
+    tests/fixtures/sldprt come from its corpus (sldprt-research-dump, MIT).
+    License: sldprt-format-research-LICENSE.txt
+  solid-diff (MIT, https://github.com/CosmicFrontierLabs/solid-diff): the
+    Parasolid node graph and geometry conventions. License: solid-diff-LICENSE.txt
+SolidWorks is a trademark of Dassault Systemes; Parasolid is a trademark of
+Siemens. Parametric is not affiliated with either.
+
+Puter.js (loaded at runtime from https://js.puter.com/v2/) provides
+sign-in, cloud storage and settings. It is not bundled with the app.

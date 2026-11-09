@@ -1,0 +1,31 @@
+{
+  "files": [
+    "index.html",
+    "LICENSE",
+    "VENDORED.md",
+    "apple-touch-icon.png",
+    "assets/__vite-browser-external-2aAlOMFp.js",
+    "assets/index-Ch2po2PH.css",
+    "assets/index-hzGrl3CQ.js",
+    "assets/replicad_single-B_1cTsn_.wasm",
+    "assets/worker-BjJHjCnN.js",
+    "favicon-16.png",
+    "favicon-32.png",
+    "icon-128.png",
+    "icon-192.png",
+    "icon-512.png",
+    "licenses/THIRD_PARTY_NOTICES.txt",
+    "licenses/flatbush-LICENSE.txt",
+    "licenses/flatqueue-LICENSE.txt",
+    "licenses/lucide-LICENSE.txt",
+    "licenses/opentype.js-LICENSE.txt",
+    "licenses/ps-parser-LICENSE.txt",
+    "licenses/replicad-LICENSE.txt",
+    "licenses/replicad-opencascadejs-LICENSE.txt",
+    "licenses/sldprt-format-research-LICENSE.txt",
+    "licenses/solid-diff-LICENSE.txt",
+    "licenses/string.prototype.codepointat-LICENSE.txt",
+    "licenses/tiny-inflate-LICENSE.txt",
+    "manifest.json"
+  ]
+}

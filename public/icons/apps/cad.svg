@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- a 2D drawing: dimensioned part on a blueprint grid -->
+  <rect x="8" y="8" width="48" height="48" rx="4" fill="#20395c" stroke="#16263d"/>
+  <g stroke="#2c4a73" stroke-width="1"><path d="M8 20 H56 M8 32 H56 M8 44 H56 M20 8 V56 M32 8 V56 M44 8 V56"/></g>
+  <path d="M16 40 h20 v-8 h-8 v-8 h-12 z" fill="none" stroke="#e9eef4" stroke-width="2.2" stroke-linejoin="round"/>
+  <circle cx="24" cy="33" r="3" fill="none" stroke="#e9eef4" stroke-width="1.8"/>
+  <g stroke="#e8b440" stroke-width="1.4">
+    <line x1="16" y1="46" x2="36" y2="46"/>
+    <line x1="16" y1="43.5" x2="16" y2="48.5"/><line x1="36" y1="43.5" x2="36" y2="48.5"/>
+  </g>
+  <line x1="40" y1="18" x2="52" y2="30" stroke="#8fb3dd" stroke-width="2" stroke-linecap="round"/>
+  <path d="M50.5 31.5 l3.5 3.5 1.6-5.1 z" fill="#8fb3dd"/>
+</svg>

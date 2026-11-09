@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- code on the left driving a 3D part on the right -->
+  <rect x="8" y="8" width="48" height="48" rx="4" fill="#1b1e26" stroke="#2b313c"/>
+  <rect x="11" y="12" width="20" height="40" rx="2" fill="#12151b"/>
+  <rect x="13.5" y="16" width="12" height="2.4" rx="1.2" fill="#2563b0"/>
+  <rect x="13.5" y="21" width="15" height="2.4" rx="1.2" fill="#8a93a0"/>
+  <rect x="16" y="26" width="12" height="2.4" rx="1.2" fill="#2fa84f"/>
+  <rect x="16" y="31" width="9" height="2.4" rx="1.2" fill="#e8b440"/>
+  <rect x="13.5" y="36" width="13" height="2.4" rx="1.2" fill="#8a93a0"/>
+  <rect x="13.5" y="41" width="7" height="2.4" rx="1.2" fill="#2563b0"/>
+  <path d="M44 16 L53 21 L53 33 L44 38 L35 33 L35 21 Z" fill="#35588c" stroke="#1b2f4d"/>
+  <path d="M44 16 L53 21 L44 26 L35 21 Z" fill="#5a86c0"/>
+  <path d="M44 26 L53 21 L53 33 L44 38 Z" fill="#27406a"/>
+  <circle cx="44" cy="44" r="3" fill="none" stroke="#e8b440" stroke-width="1.6"/>
+  <path d="M33 30 c-2 4-2 8 1 11" fill="none" stroke="#2fa84f" stroke-width="1.6" stroke-dasharray="2.5 2"/>
+</svg>

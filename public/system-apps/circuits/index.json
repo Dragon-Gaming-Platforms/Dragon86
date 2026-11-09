@@ -1,0 +1,33 @@
+{
+  "files": [
+    "index.html",
+    "LICENSE",
+    "VENDORED.md",
+    "apple-touch-icon.png",
+    "assets/board-svg-n97igSus.js",
+    "assets/bom-CMwTe7wu.js",
+    "assets/browser-DCz1EQL9.js",
+    "assets/common-Ck-as8OD.js",
+    "assets/excellon-khalf-Rv.js",
+    "assets/fabrication-QMhmJzsP.js",
+    "assets/geom-kxNHhSp4.js",
+    "assets/gerber-hdHZpuQb.js",
+    "assets/index-C-BOeamF.css",
+    "assets/index-CS2cI7Uz.js",
+    "assets/kernel-BJMICzIv.wasm",
+    "assets/kicad-Ccoizko5.js",
+    "assets/mesh3d-rehTHRiX.js",
+    "assets/netlist-CzyXyZPU.js",
+    "assets/pcb-BO3KSN85.js",
+    "assets/place--fpxLP2w.js",
+    "assets/pnp-8WjVDObE.js",
+    "assets/sch-svg-LzTaAQvH.js",
+    "assets/svg-batch-BrvZLS5e.js",
+    "assets/viewer3d-D4HaYMZV.js",
+    "assets/worker-BLDIqj-X.js",
+    "favicon-32.png",
+    "icon-192.png",
+    "icon-512.png",
+    "manifest.json"
+  ]
+}
