@@ -72,6 +72,14 @@ to get one legally).
 2. **ARM32 machine = RISC OS on Arculator WASM.** Vendor/build the engine
    in CI, wire its display and input into the Engine Viewer, ROM-upload
    flow, App Store entry.
+   *As shipped:* Arculator is a **self-contained App Store app**
+   ("Archimedes", own window, own canvas, own IndexedDB storage), **not**
+   an Engine Viewer machine. The Engine Viewer is wired to v86/v64 buses;
+   Arculator is an SDL2/WebGL emscripten program with its own display and
+   input handling, and bridging it into the viewer would add complexity
+   for no user benefit. Everything else stands: CI-built from a pinned
+   commit, no bundled OS ROMs, bring-your-own-ROM upload stored in the
+   browser, no coi.
 3. **FreeBSD: parked** with the reason written down (no UEFI in v64, no
    coi for QEMU Wasm). Revisit if either fact changes.
 4. The arm32-NetBSD variant (32-bit NetBSD on v64 arm32) is a possible

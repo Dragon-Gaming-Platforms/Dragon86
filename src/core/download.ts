@@ -16,6 +16,14 @@
  * What is deliberately NOT here: a WASM build of anything. The bottleneck
  * is the network and IndexedDB, not JavaScript — the only CPU-heavy steps
  * (gzip, inflate) already run native via DecompressionStream.
+ *
+ * Safari note (a real bug this file shipped with): every request that
+ * carries a Range header — the one-byte size probe included — must use
+ * cache: "no-store". WebKit writes partial 206 responses into its HTTP
+ * cache, and the next plain GET of that URL then dies with WebKit's
+ * generic "Load failed". Chrome and Firefox shrug this off; Safari does
+ * not, and it broke every App Store install there. Range responses are
+ * useless in the cache anyway, so nothing is lost by skipping it.
  */
 
 export interface FetchBytesOptions {
@@ -59,7 +67,7 @@ export async function mapLimit<T, R>(items: readonly T[], limit: number, fn: (it
  */
 export async function remoteSize(url: string): Promise<number | null> {
   try {
-    const res = await fetch(url, { method: "HEAD", cache: "no-cache" });
+    const res = await fetch(url, { method: "HEAD", cache: "no-store" });
     if (res.ok && !res.headers.get("content-encoding")) {
       const len = Number(res.headers.get("content-length"));
       if (Number.isFinite(len) && len > 0) return len;
@@ -68,7 +76,8 @@ export async function remoteSize(url: string): Promise<number | null> {
     /* fall through to the range probe */
   }
   try {
-    const res = await fetch(url, { headers: { Range: "bytes=0-0" }, cache: "no-cache" });
+    /* no-store: see the Safari note in the file header. */
+    const res = await fetch(url, { headers: { Range: "bytes=0-0" }, cache: "no-store" });
     if (res.status === 206) {
       const m = /\/(\d+)\s*$/.exec(res.headers.get("content-range") ?? "");
       /* Don't leave the one-byte body dangling. */
@@ -85,7 +94,22 @@ export async function remoteSize(url: string): Promise<number | null> {
 
 /** One streamed GET with progress. The fallback everything else rests on. */
 async function fetchStreamed(url: string, opts: FetchBytesOptions): Promise<Uint8Array> {
-  const res = await fetch(url, { cache: opts.revalidate ? "no-cache" : "default" });
+  try {
+    return await streamOnce(url, opts, opts.revalidate ? "no-cache" : "default");
+  } catch (err) {
+    /* Only a network-layer rejection (TypeError) is worth retrying — an
+       HTTP error status would just repeat. Users who hit the Safari
+       cache-poisoning bug before it was fixed still carry broken 206
+       entries in their HTTP cache; "reload" goes straight to the network
+       and overwrites the entry with the full response, healing it. */
+    if (!(err instanceof TypeError)) throw err;
+    console.warn(`[download] ${url}: GET failed at the network layer (${err.message}) — retrying past the HTTP cache`);
+    return await streamOnce(url, opts, "reload");
+  }
+}
+
+async function streamOnce(url: string, opts: FetchBytesOptions, cache: RequestCache): Promise<Uint8Array> {
+  const res = await fetch(url, { cache });
   if (!res.ok) throw new Error(`${url}: HTTP ${res.status}`);
   const totalHeader = Number(res.headers.get("content-length"));
   /* With Content-Encoding the header counts encoded bytes, not real ones. */
@@ -144,7 +168,7 @@ interface RangedPlan {
 /** Decide whether `url` is worth fetching in parallel ranges. */
 async function planRanged(url: string): Promise<RangedPlan | null> {
   try {
-    const res = await fetch(url, { method: "HEAD", cache: "no-cache" });
+    const res = await fetch(url, { method: "HEAD", cache: "no-store" });
     if (!res.ok) return null;
     if (res.headers.get("content-encoding")) return null;
     if (!(res.headers.get("accept-ranges") ?? "").includes("bytes")) return null;
@@ -163,31 +187,41 @@ async function fetchRanged(url: string, plan: RangedPlan, opts: FetchBytesOption
   for (let start = 0; start < size; start += CHUNK) {
     ranges.push({ start, end: Math.min(start + CHUNK, size) - 1 });
   }
+  /* One chunk failing must stop the others immediately: the caller falls
+     back to a plain streamed GET, and that GET should not have to share
+     the connection with five abandoned range streams. */
+  const ctrl = new AbortController();
   let done = 0;
-  await mapLimit(ranges, PARALLEL, async ({ start, end }) => {
-    const res = await fetch(url, { headers: { Range: `bytes=${start}-${end}` } });
-    if (res.status !== 206) throw new Error(`${url}: expected 206 for range ${start}-${end}, got ${res.status}`);
-    if (!res.body) {
-      const data = new Uint8Array(await res.arrayBuffer());
-      if (data.byteLength !== end - start + 1) throw new Error(`${url}: range ${start}-${end} returned ${data.byteLength} bytes`);
-      out.set(data, start);
-      done += data.byteLength;
-      opts.onProgress?.(done, size);
-      return;
-    }
-    const reader = res.body.getReader();
-    let off = start;
-    for (;;) {
-      const { value, done: eof } = await reader.read();
-      if (eof) break;
-      if (off + value.byteLength > end + 1) throw new Error(`${url}: range ${start}-${end} overflowed`);
-      out.set(value, off);
-      off += value.byteLength;
-      done += value.byteLength;
-      opts.onProgress?.(done, size);
-    }
-    if (off !== end + 1) throw new Error(`${url}: range ${start}-${end} ended short at ${off}`);
-  });
+  try {
+    await mapLimit(ranges, PARALLEL, async ({ start, end }) => {
+      /* no-store: see the Safari note in the file header. */
+      const res = await fetch(url, { headers: { Range: `bytes=${start}-${end}` }, cache: "no-store", signal: ctrl.signal });
+      if (res.status !== 206) throw new Error(`${url}: expected 206 for range ${start}-${end}, got ${res.status}`);
+      if (!res.body) {
+        const data = new Uint8Array(await res.arrayBuffer());
+        if (data.byteLength !== end - start + 1) throw new Error(`${url}: range ${start}-${end} returned ${data.byteLength} bytes`);
+        out.set(data, start);
+        done += data.byteLength;
+        opts.onProgress?.(done, size);
+        return;
+      }
+      const reader = res.body.getReader();
+      let off = start;
+      for (;;) {
+        const { value, done: eof } = await reader.read();
+        if (eof) break;
+        if (off + value.byteLength > end + 1) throw new Error(`${url}: range ${start}-${end} overflowed`);
+        out.set(value, off);
+        off += value.byteLength;
+        done += value.byteLength;
+        opts.onProgress?.(done, size);
+      }
+      if (off !== end + 1) throw new Error(`${url}: range ${start}-${end} ended short at ${off}`);
+    });
+  } catch (err) {
+    ctrl.abort();
+    throw err;
+  }
   return out;
 }
 

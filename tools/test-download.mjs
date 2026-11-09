@@ -123,6 +123,52 @@ function serve(opts) {
   srv2.close();
 }
 
+/* ---------- a network-layer failure gets exactly one retry ---------- */
+/* This is the Safari "Load failed" shape: the GET dies below HTTP (WebKit
+   kills loads served from a cache entry poisoned by earlier 206s). The
+   fix retries once with cache:"reload"; a second network failure — or any
+   HTTP error status — must still surface. */
+{
+  let gets = 0;
+  const server = createServer((req, res) => {
+    gets++;
+    if (gets === 1) {
+      req.socket.destroy();
+      return;
+    }
+    res.setHeader("content-length", "5");
+    res.end("hello");
+  });
+  const url = await new Promise((resolve) => {
+    server.listen(0, "127.0.0.1", () => resolve(`http://127.0.0.1:${server.address().port}/flaky.bin`));
+  });
+  const data = await fetchBytes(url);
+  check("network failure: one retry delivers", Buffer.from(data).toString() === "hello" && gets === 2, `gets=${gets}`);
+  server.close();
+}
+{
+  const server = createServer((req, res) => {
+    if (req.method === "HEAD") {
+      res.statusCode = 405;
+      res.end();
+      return;
+    }
+    res.statusCode = 404;
+    res.end("nope");
+  });
+  const url = await new Promise((resolve) => {
+    server.listen(0, "127.0.0.1", () => resolve(`http://127.0.0.1:${server.address().port}/gone.bin`));
+  });
+  let threw = null;
+  try {
+    await fetchBytes(url);
+  } catch (err) {
+    threw = err;
+  }
+  check("HTTP errors are not retried away", threw !== null && /404/.test(String(threw)), String(threw));
+  server.close();
+}
+
 /* ---------- mapLimit: order kept, limit respected ---------- */
 {
   let inFlight = 0;
