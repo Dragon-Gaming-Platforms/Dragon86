@@ -66,28 +66,114 @@ export function netbsd64Manifest(): Promise<Netbsd64Manifest> {
   return manifestPromise;
 }
 
-function opfsRoot(): Promise<FileSystemDirectoryHandle> {
+async function opfsRoot(): Promise<FileSystemDirectoryHandle> {
   const storage = navigator?.storage;
   if (!storage?.getDirectory) {
     throw new Error("this browser has no private file storage (OPFS) — the ARM64 machine's disk needs it");
   }
-  return storage.getDirectory();
+  try {
+    return await storage.getDirectory();
+  } catch (err) {
+    /* Keep the browser's own reason — "denied" has many distinct causes
+       (private browsing, storage pressure, a managed profile) and hiding
+       it behind one guess helps nobody. */
+    throw new Error(`the browser refused its private file storage (OPFS): ${(err as Error)?.message ?? err}`);
+  }
 }
 
-async function diskDir(create: boolean): Promise<FileSystemDirectoryHandle | null> {
+/** The disks folder in OPFS. Throws with the browser's reason; `probe`
+    callers that only want "is there a disk?" catch it themselves. */
+async function diskDir(create: boolean): Promise<FileSystemDirectoryHandle> {
+  const root = await opfsRoot();
   try {
-    const root = await opfsRoot();
     return await root.getDirectoryHandle(OPFS_DIR, { create });
-  } catch {
-    return null;
+  } catch (err) {
+    throw new Error(`could not open the ${OPFS_DIR}/ folder in browser storage: ${(err as Error)?.message ?? err}`);
   }
+}
+
+/**
+ * A WritableStream into the disk file. Two ways, same stream either way:
+ *  - createWritable() where the browser has it — writes go to a swap file
+ *    that is committed on close.
+ *  - Safari before 18.4 has OPFS but no createWritable(); there the bytes
+ *    go through a small worker holding a sync access handle (worker-only
+ *    API, same one the running machine uses). Each chunk is acknowledged,
+ *    so pipeTo() backpressure still works.
+ * Both paths hold an exclusive lock, so a running ARM64 machine makes
+ * this fail — the error says to close the Terminal first.
+ */
+async function openDiskWritable(handle: FileSystemFileHandle): Promise<WritableStream<Uint8Array>> {
+  if (typeof handle.createWritable === "function") {
+    try {
+      return (await handle.createWritable()) as unknown as WritableStream<Uint8Array>;
+    } catch (err) {
+      throw diskLockHint(err);
+    }
+  }
+  /* Safari ≤ 18.3: worker + sync access handle. */
+  logInfo("netbsd64", "no createWritable() in this browser — writing the disk through a worker sync access handle");
+  const worker = new Worker(new URL("./opfs-write.worker.ts", import.meta.url), { type: "module" });
+  let nextId = 0;
+  const pending = new Map<number, { resolve: () => void; reject: (e: Error) => void }>();
+  worker.onmessage = (e: MessageEvent<{ id: number; ok: boolean; error?: string }>) => {
+    const p = pending.get(e.data.id);
+    if (!p) return;
+    pending.delete(e.data.id);
+    if (e.data.ok) p.resolve();
+    else p.reject(new Error(e.data.error ?? "OPFS worker write failed"));
+  };
+  worker.onerror = (e) => {
+    const err = new Error(`OPFS worker failed: ${e.message || "unknown error"}`);
+    for (const p of pending.values()) p.reject(err);
+    pending.clear();
+  };
+  const call = (msg: Record<string, unknown>, transfer: Transferable[] = []) =>
+    new Promise<void>((resolve, reject) => {
+      const id = nextId++;
+      pending.set(id, { resolve, reject });
+      worker.postMessage({ ...msg, id }, transfer);
+    });
+  try {
+    await call({ type: "open", dir: OPFS_DIR, file: DISK_FILE });
+  } catch (err) {
+    worker.terminate();
+    throw diskLockHint(err);
+  }
+  return new WritableStream<Uint8Array>({
+    async write(chunk) {
+      /* The chunk is copied into its own transferable buffer: gzip reuses
+         its output buffer, and a view into it must not be detached. */
+      const buf = chunk.slice().buffer as ArrayBuffer;
+      await call({ type: "write", buf }, [buf]);
+    },
+    async close() {
+      await call({ type: "close" });
+      worker.terminate();
+    },
+    async abort() {
+      await call({ type: "abort" }).catch(() => {});
+      worker.terminate();
+    },
+  });
+}
+
+/** Lock failures get actionable advice; everything else passes through. */
+function diskLockHint(err: unknown): Error {
+  const name = (err as DOMException)?.name ?? "";
+  const msg = (err as Error)?.message ?? String(err);
+  if (name === "NoModificationAllowedError" || name === "InvalidStateError" || /lock|access handle/i.test(msg)) {
+    return new Error(
+      `the disk file is locked — if the ARM64 machine is running, close its Terminal first, then install again (${msg})`,
+    );
+  }
+  return err instanceof Error ? err : new Error(msg);
 }
 
 /** Size of the installed disk image in OPFS, or null when there is none. */
 export async function netbsd64DiskSize(): Promise<number | null> {
   try {
     const dir = await diskDir(false);
-    if (!dir) return null;
     const file = await (await dir.getFileHandle(DISK_FILE)).getFile();
     return file.size;
   } catch {
@@ -121,9 +207,8 @@ export async function netbsd64Installed(): Promise<boolean> {
 export async function installNetbsd64(onStatus?: (text: string) => void): Promise<void> {
   const man = await netbsd64Manifest();
   const dir = await diskDir(true);
-  if (!dir) throw new Error("the browser refused a private storage (OPFS) directory for the disk");
   const handle = await dir.getFileHandle(DISK_FILE, { create: true });
-  const writable = (await handle.createWritable()) as unknown as WritableStream<Uint8Array>;
+  const writable = await openDiskWritable(handle);
   const gunzip = new DecompressionStream("gzip");
   const pump = gunzip.readable.pipeTo(writable);
   const writer = gunzip.writable.getWriter();
@@ -171,8 +256,12 @@ export async function installNetbsd64(onStatus?: (text: string) => void): Promis
  * handle is exclusive): close the Terminal first.
  */
 export async function uninstallNetbsd64(): Promise<void> {
-  const dir = await diskDir(false);
-  if (!dir) return;
+  let dir: FileSystemDirectoryHandle;
+  try {
+    dir = await diskDir(false);
+  } catch {
+    return; /* no disks folder — nothing to delete */
+  }
   try {
     await dir.removeEntry(DISK_FILE);
   } catch (err) {

@@ -28,20 +28,28 @@ import time
 import pexpect
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--kernel", required=True, help="uncompressed netbsd-GENERIC64.img")
+parser.add_argument("--kernel", required=True, help="uncompressed netbsd-GENERIC64.img / netbsd-GENERIC.img")
 parser.add_argument("--disk", action="append", required=True,
                     help="raw disk image; repeatable, order = ld0, ld1, ...")
-parser.add_argument("--root", required=True, help="kernel root= argument (dk1, NAME=label, ...)")
+parser.add_argument("--root", required=True,
+                    help="kernel root= argument (dk1, NAME=label, ...). A comma list "
+                         "('ld0a,ld1a,ld2a') boots with the first and answers the kernel's "
+                         "'root device:' prompt with the rest in turn — 32-bit virt numbers "
+                         "its virtio-mmio slots unpredictably, so ld numbering is a guess there.")
 parser.add_argument("--script", required=True, help="command script file")
 parser.add_argument("--timeout", type=int, default=1800, help="per-step timeout in seconds")
 parser.add_argument("--memory", default="2048")
+parser.add_argument("--qemu", default="qemu-system-aarch64", help="qemu binary (qemu-system-arm for armv7)")
+parser.add_argument("--cpu", default="cortex-a57", help="-cpu model (cortex-a15 for armv7)")
 args = parser.parse_args()
 
-qemu = ["qemu-system-aarch64",
-        "-M", "virt", "-cpu", "cortex-a57", "-smp", "2", "-m", args.memory,
+root_candidates = args.root.split(",")
+
+qemu = [args.qemu,
+        "-M", "virt", "-cpu", args.cpu, "-smp", "2", "-m", args.memory,
         "-display", "none", "-monitor", "none", "-serial", "stdio",
         "-no-reboot",
-        "-kernel", args.kernel, "-append", "root=" + args.root,
+        "-kernel", args.kernel, "-append", "root=" + root_candidates[0],
         "-device", "virtio-rng-device"]
 for i, disk in enumerate(args.disk):
     qemu += ["-drive", f"if=none,file={disk},format=raw,id=hd{i}",
@@ -82,7 +90,26 @@ def run(cmd, must_succeed=True):
 
 # Boot to the login prompt and log in as root (the official live image and
 # the image this builds both allow root on the secure console, no password).
-child.expect("login:")
+# On the way there the kernel may fail to mount the first root= guess and
+# ask on the console; answer with the remaining candidates in turn. The
+# prompts ("root device:", then "dump device" and "file system (default
+# generic)") only appear when the guess was wrong, so a correct first guess
+# sails straight to login:.
+tries = root_candidates[1:]
+while True:
+    i = child.expect(["login:", r"root device.*:", r"dump device.*:", r"file system.*:"])
+    if i == 0:
+        break
+    if i == 1:
+        if not tries:
+            print("\nFAILED: the kernel rejected every root device candidate", file=sys.stderr)
+            child.terminate(force=True)
+            sys.exit(1)
+        answer = tries.pop(0)
+        print(f"\n[driver] root device prompt — trying {answer}", flush=True)
+        child.sendline(answer)
+    else:
+        child.sendline("")  # defaults for dump device / file system type
 child.sendline("root")
 child.expect("# ")
 # a sentinel prompt, so command output containing "# " cannot confuse us
