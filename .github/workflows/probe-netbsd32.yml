@@ -23,21 +23,23 @@ jobs:
       - uses: actions/checkout@v4
       - name: Fetch listings and checksums
         run: |
-          set -x
-          URL=https://cdn.netbsd.org/pub/NetBSD/NetBSD-11.0/evbarm-earmv7hf/binary
           out=tools/netbsd64/probe-earmv7hf.txt
-          {
-            echo "== $URL/kernel/ =="
-            curl -fsL "$URL/kernel/" || echo "LISTING FAILED $?"
-            echo; echo "== $URL/gzimg/ =="
-            curl -fsL "$URL/gzimg/" || echo "LISTING FAILED $?"
-            echo; echo "== kernel/SHA512 =="
-            curl -fsL "$URL/kernel/SHA512" || echo "FETCH FAILED $?"
-            echo; echo "== gzimg/MD5 =="
-            curl -fsL "$URL/gzimg/MD5" || echo "FETCH FAILED $?"
-            echo; echo "== gzimg/SHA512 (if any) =="
-            curl -fsL "$URL/gzimg/SHA512" || echo "FETCH FAILED $?"
-          } > "$out" 2>&1
+          : > "$out"
+          for host in cdn.netbsd.org ftp.netbsd.org nycdn.netbsd.org archive.netbsd.org; do
+            URL="https://$host/pub/NetBSD/NetBSD-11.0/evbarm-earmv7hf/binary"
+            {
+              echo "===== $host ====="
+              echo "== $URL/kernel/ =="
+              curl -fsSL -m 25 "$URL/kernel/" || echo "LISTING FAILED exit=$?"
+              echo; echo "== $URL/gzimg/ =="
+              curl -fsSL -m 25 "$URL/gzimg/" || echo "LISTING FAILED exit=$?"
+              echo; echo "== kernel/SHA512 =="
+              curl -fsSL -m 25 "$URL/kernel/SHA512" || echo "FETCH FAILED exit=$?"
+              echo; echo "== gzimg/MD5 =="
+              curl -fsSL -m 25 "$URL/gzimg/MD5" || echo "FETCH FAILED exit=$?"
+              echo
+            } >> "$out" 2>&1
+          done
           wc -c "$out"
       - name: Commit the probe result
         run: |
