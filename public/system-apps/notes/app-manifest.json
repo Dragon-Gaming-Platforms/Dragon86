@@ -1,0 +1,6 @@
+{
+  "id": "notes",
+  "kind": "iframe-app",
+  "dump": "~/system/apps/notes/",
+  "note": "Where the App Store writes this app's files when it installs it. The OS serves them from that folder (9pf/notes/). All documents stay in the browser's own IndexedDB - nothing talks to Puter's cloud."
+}
