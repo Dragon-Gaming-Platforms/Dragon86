@@ -1,0 +1,6 @@
+{
+  "id": "chess",
+  "kind": "iframe-app",
+  "dump": "~/system/apps/chess/",
+  "note": "Where the App Store writes this app's files when it installs it. The OS serves them from that folder (9pf/chess/). Everything the app saves stays in the browser's own storage - nothing talks to Puter's cloud."
+}

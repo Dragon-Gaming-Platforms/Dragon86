@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- checkerboard with a crowned king piece -->
+  <rect x="8" y="8" width="48" height="48" rx="4" fill="#f0e3cb" stroke="#9a8a68"/>
+  <g fill="#c46a3f">
+    <rect x="8" y="8" width="12" height="12"/><rect x="32" y="8" width="12" height="12"/>
+    <rect x="20" y="20" width="12" height="12"/><rect x="44" y="20" width="12" height="12"/>
+    <rect x="8" y="32" width="12" height="12"/><rect x="32" y="32" width="12" height="12"/>
+    <rect x="20" y="44" width="12" height="12"/><rect x="44" y="44" width="12" height="12"/>
+  </g>
+  <ellipse cx="38" cy="40" rx="11" ry="5" fill="#8c1f1f"/>
+  <rect x="27" y="33" width="22" height="7" rx="3.5" fill="#b02a2a"/>
+  <ellipse cx="38" cy="33" rx="11" ry="5" fill="#d33b3b" stroke="#8c1f1f"/>
+  <path d="M31 33 l2.4-4 2.4 3 2.2-4.4 2.2 4.4 2.4-3 2.4 4 z" fill="#ffd95e" stroke="#c9a53a" stroke-width="0.8" stroke-linejoin="round"/>
+</svg>

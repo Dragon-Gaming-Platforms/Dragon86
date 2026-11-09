@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="description" content="Klondike solitaire, free in your browser. Draw one card at a time, undo any move. Real playing-card art on larger screens, plain and legible cards on phones. Installs as an app and plays offline." />
+<link rel="canonical" href="https://solitaire.puter.com/" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Solitaire" />
+<meta property="og:url" content="https://solitaire.puter.com/" />
+<meta property="og:title" content="Play Klondike Solitaire Online — Draw-One, Undo Any Move" />
+<meta property="og:description" content="Klondike solitaire, free in your browser. Draw one card at a time, undo any move. Real playing-card art on larger screens, plain cards on phones. Plays offline, syncs your record when signed in to Puter." />
+<!-- 1200x630 (1.91:1) is the ratio Facebook, LinkedIn, Slack, and X's
+     large card all render. Built from tools/og-image.html. -->
+<meta property="og:image" content="https://solitaire.puter.com/og-image.png" />
+<meta property="og:image:type" content="image/png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="A Klondike solitaire board mid-game, with real playing-card art on several face-up cards." />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Play Klondike Solitaire Online — Draw-One, Undo Any Move" />
+<meta name="twitter:description" content="Klondike solitaire, free in your browser. Draw one card at a time, undo any move. Real playing-card art on larger screens, plain cards on phones. Plays offline, syncs your record when signed in to Puter." />
+<meta name="twitter:image" content="https://solitaire.puter.com/og-image.png" />
+<meta name="twitter:image:alt" content="A Klondike solitaire board mid-game, with real playing-card art on several face-up cards." />
+<link rel="icon" href="favicon.ico" sizes="48x48" />
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png" />
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png" />
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
+<link rel="manifest" href="site.webmanifest" />
+<!-- Solitaire has one look -- dark green felt -- in every browser and OS
+     theme; there is no separate light mode to switch to. These are just the
+     closest chrome color to that look for each color scheme, so the browser
+     UI around the page doesn't clash with it. -->
+<meta name="theme-color" content="#16604a" media="(prefers-color-scheme: light)" />
+<meta name="theme-color" content="#0f1419" media="(prefers-color-scheme: dark)" />
+<title>Play Klondike Solitaire Online — Draw-One, Undo Any Move</title>
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": ["WebApplication", "VideoGame"],
+    "name": "Solitaire — Klondike",
+    "url": "https://solitaire.puter.com/",
+    "description": "Klondike solitaire, free in your browser. Draw one card at a time, undo any move. Real playing-card art on larger screens, plain and legible cards on phones. Installs as an app and plays offline.",
+    "applicationCategory": "GameApplication",
+    "operatingSystem": "Any",
+    "browserRequirements": "Requires JavaScript",
+    "genre": "Card game",
+    "gamePlatform": "Web browser",
+    "playMode": "SinglePlayer",
+    "image": "https://solitaire.puter.com/icon-512.png",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    }
+  }
+</script>
+  <script type="module" crossorigin src="./assets/index-CteBnce_.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-Q02lBpeq.css">
+</head>
+<body>
+
+<noscript>
+  <p style="position:fixed;inset:0;margin:0;padding:24px;background:#124e3c;color:#f5f5f5;font:16px/1.5 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+    This solitaire game runs entirely in your browser and needs JavaScript to
+    work. Enable JavaScript to deal, drag, and win a game.
+  </p>
+</noscript>
+
+<header>
+  <div class="brand">
+    <!-- The app icon itself, at a 128px source for a 22px slot so it stays
+         crisp on 2x/3x screens. Decorative: the word "Solitaire" right
+         beside it already names the app. -->
+    <img class="mark" src="./assets/icon-128-BI-_x9AN.png" alt="" width="22" height="22" />
+    Solitaire
+  </div>
+  <div class="stats">
+    <span id="movesStat">Moves<b id="moves">0</b></span>
+    <span id="scoreStat" hidden>Score<b id="score"></b></span>
+    <span id="bankStat" hidden>Bank<b id="bank"></b></span>
+  </div>
+  <div class="actions">
+    <div class="menu-wrap">
+      <button class="btn" id="mode" title="Choose a game" aria-haspopup="menu" aria-expanded="false" aria-controls="modeMenu">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="11" height="15" rx="2" transform="rotate(-10 8.5 13.5)"/><rect x="10" y="3" width="11" height="15" rx="2"/></svg><span id="modeLabel">Klondike</span><svg class="icon chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+      </button>
+      <div class="menu" id="modeMenu" role="menu" aria-label="Game" hidden></div>
+    </div>
+    <button class="btn" id="undo" title="Undo">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg><span>Undo</span>
+    </button>
+    <button class="btn primary" id="newgame">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 0 1 15.3-6.4L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15.3 6.4L3 16"/><path d="M3 21v-5h5"/></svg><span>New</span>
+    </button>
+  </div>
+</header>
+
+<main>
+  <div id="board" data-mode="simple"></div>
+</main>
+
+<div id="win">
+  <div class="win-card">
+    <h2>You won</h2>
+    <p id="winStats">Nicely done.</p>
+    <button class="btn primary" id="winNew">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 0 1 15.3-6.4L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15.3 6.4L3 16"/><path d="M3 21v-5h5"/></svg><span>Play again</span>
+    </button>
+  </div>
+</div>
+
+<div id="toast" role="status" aria-live="polite"></div>
+
+<footer class="credit">
+  <a href="https://developer.puter.com" target="_blank" rel="noopener">Powered by Puter</a>
+</footer>
+
+</body>
+</html>
