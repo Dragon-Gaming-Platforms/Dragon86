@@ -822,6 +822,11 @@ export function openStore(win: Win): void {
     const tracker = byteTracker(app.id, files.length, () => written);
     try {
       await vfs.ensureDir(dir);
+      /* Listings may nest files ("assets/app.js"). Create every parent up
+         front, one at a time — concurrent mkdirs of the same new folder
+         race in ZenFS, and the parallel writers below must never mkdir. */
+      const parents = [...new Set(files.filter((f) => f.includes("/")).map((f) => f.slice(0, f.lastIndexOf("/"))))];
+      for (const parent of parents) await vfs.ensureDir(`${dir}/${parent}`);
       /* Files download in parallel (and big ones in parallel ranges inside
          fetchBytes) — the progress label counts real bytes as they land. */
       await mapLimit(files, 3, async (file, i) => {

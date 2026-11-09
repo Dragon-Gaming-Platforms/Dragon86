@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- a whiteboard on a tray: sketch, sticky note and a marker -->
+  <rect x="6" y="10" width="52" height="38" rx="3" fill="#fbfcfd" stroke="#8a93a0"/>
+  <rect x="6" y="44" width="52" height="4" rx="2" fill="#c8cdd2" stroke="#8a93a0"/>
+  <!-- freehand stroke -->
+  <path d="M13 36 C18 22, 26 22, 30 30 S 40 40, 46 26" fill="none" stroke="#2563b0" stroke-width="3" stroke-linecap="round"/>
+  <!-- sticky note -->
+  <rect x="38" y="14" width="13" height="13" rx="1" fill="#ffd95e" stroke="#c9a53a" transform="rotate(6 44.5 20.5)"/>
+  <!-- shape -->
+  <circle cx="17" cy="19" r="5" fill="none" stroke="#2fa84f" stroke-width="2.5"/>
+  <!-- the marker on the tray -->
+  <rect x="20" y="42.6" width="16" height="4.4" rx="2" fill="#d33b3b" stroke="#9c2323"/>
+  <rect x="34" y="43.4" width="3.5" height="2.8" rx="1" fill="#1b1e26"/>
+</svg>

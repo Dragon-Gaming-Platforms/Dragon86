@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- a spiral notebook page with ruled lines and a pen -->
+  <rect x="12" y="8" width="36" height="46" rx="4" fill="#fdf6e3" stroke="#b9a97c"/>
+  <rect x="12" y="8" width="36" height="9" rx="4" fill="#e8b440"/>
+  <rect x="12" y="13" width="36" height="4" fill="#e8b440"/>
+  <circle cx="18" cy="12.5" r="1.6" fill="#fdf6e3"/>
+  <circle cx="25" cy="12.5" r="1.6" fill="#fdf6e3"/>
+  <circle cx="32" cy="12.5" r="1.6" fill="#fdf6e3"/>
+  <circle cx="39" cy="12.5" r="1.6" fill="#fdf6e3"/>
+  <line x1="17" y1="24" x2="43" y2="24" stroke="#c8bb94" stroke-width="2" stroke-linecap="round"/>
+  <line x1="17" y1="31" x2="43" y2="31" stroke="#c8bb94" stroke-width="2" stroke-linecap="round"/>
+  <line x1="17" y1="38" x2="35" y2="38" stroke="#c8bb94" stroke-width="2" stroke-linecap="round"/>
+  <!-- the pen -->
+  <g transform="rotate(40 44 40)">
+    <rect x="41.5" y="26" width="5" height="22" rx="1.4" fill="#2563b0" stroke="#1b4a85"/>
+    <path d="M41.5 48 L44 54 L46.5 48 Z" fill="#e9ecef" stroke="#1b4a85"/>
+    <path d="M43.3 51.5 L44 54 L44.7 51.5 Z" fill="#1b1e26"/>
+  </g>
+</svg>
