@@ -61,10 +61,10 @@ jobs:
         shell: bash
         run: |
           mkdir -p work
-          curl -fL --retry 3 -o work/netbsd-GENERIC.img.gz "$NETBSD_URL/kernel/netbsd-GENERIC.img.gz"
-          curl -fL --retry 3 -o work/kernel.SHA512 "$NETBSD_URL/kernel/SHA512"
-          curl -fL --retry 3 -o work/armv7.img.gz "$NETBSD_URL/gzimg/armv7.img.gz"
-          curl -fL --retry 3 -o work/gzimg.MD5 "$NETBSD_URL/gzimg/MD5"
+          curl -fL --retry 8 --retry-all-errors --retry-delay 15 --connect-timeout 30 -o work/netbsd-GENERIC.img.gz "$NETBSD_URL/kernel/netbsd-GENERIC.img.gz"
+          curl -fL --retry 8 --retry-all-errors --retry-delay 15 --connect-timeout 30 -o work/kernel.SHA512 "$NETBSD_URL/kernel/SHA512"
+          curl -fL --retry 8 --retry-all-errors --retry-delay 15 --connect-timeout 30 -o work/armv7.img.gz "$NETBSD_URL/gzimg/armv7.img.gz"
+          curl -fL --retry 8 --retry-all-errors --retry-delay 15 --connect-timeout 30 -o work/gzimg.MD5 "$NETBSD_URL/gzimg/MD5"
           cd work
           # the kernel directory publishes SHA512 for the .gz files
           want=$(awk -F' = ' '$1=="SHA512 (netbsd-GENERIC.img.gz)" {print $2}' kernel.SHA512)
