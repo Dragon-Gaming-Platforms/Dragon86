@@ -1,0 +1,26 @@
+{
+  "files": [
+    "index.html",
+    "LICENSE",
+    "VENDORED.md",
+    "app-icon.png",
+    "apple-touch-icon.png",
+    "assets/engine-B69xOC6D.wasm",
+    "assets/engine-DM6LYhNg.js",
+    "assets/index-BSnYzSdo.css",
+    "assets/index-BntBOMcR.js",
+    "assets/offline-worker-BByMXUCD.js",
+    "assets/offline-worker-DW0m9aDy.js",
+    "assets/worklet-EsVNoTMW.js",
+    "assets/worklet-UkneG4kr.js",
+    "favicon-16x16.png",
+    "favicon-32x32.png",
+    "favicon-48x48.png",
+    "favicon.ico",
+    "icon-192.png",
+    "icon-512.png",
+    "icon-maskable-512.png",
+    "manifest.json",
+    "third-party/lucide-LICENSE.txt"
+  ]
+}

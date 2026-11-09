@@ -145,13 +145,33 @@ export function openStore(win: Win): void {
   /** id → done/total while an install is running. `label` carries byte
       progress ("12.4 MB of 59.1 MB") when the download knows it. */
   const progress = new Map<string, { done: number; total: number; label?: string }>();
-  /** Progress arrives per network chunk — repaint at most ~8×/s. */
+  /** Progress arrives per network chunk — update at most ~8×/s. */
   let lastProgressRender = 0;
   function renderProgress(force = false): void {
     const now = Date.now();
     if (!force && now - lastProgressRender < 120) return;
     lastProgressRender = now;
-    render();
+    /* Update the "Installing…" buttons in place instead of rebuilding the
+       page: a full render() would throw away the scroll position (and the
+       open detail page) on every network chunk, snapping the user back to
+       the top while they are browsing during a download. */
+    for (const btn of content.querySelectorAll<HTMLButtonElement>("[data-progress-for]")) {
+      const state = progress.get(btn.dataset.progressFor ?? "");
+      if (state) btn.textContent = installingLabel(state);
+    }
+  }
+
+  function installingLabel(state: { done: number; total: number; label?: string }): string {
+    return `Installing… ${state.label ?? `${state.done}/${state.total}`}`;
+  }
+
+  /** Re-render whatever is on screen (list or detail) without losing the
+      user's place — for installs finishing, disk rescans and the like.
+      Navigation (tabs, search, Back) still uses render(), which goes to
+      the top like opening a fresh page. */
+  function repaint(): void {
+    if (detailShown) openDetail(detailShown, true);
+    else render(true);
   }
 
   /**
@@ -359,7 +379,7 @@ export function openStore(win: Win): void {
         /* The Installed list is a *disk* question, and the disk can change
            while this window is open (an install, a folder dropped in with
            Files). Re-scan before showing it. */
-        if (t.id === "installed") void refreshInstalled().then(render);
+        if (t.id === "installed") void refreshInstalled().then(() => render());
         else render();
       });
       side.append(b);
@@ -398,7 +418,13 @@ export function openStore(win: Win): void {
     });
   }
 
-  function render(): void {
+  function render(keepScroll = false): void {
+    /* The content is cleared and rebuilt below, which resets the scroll to
+       the top. When this render is a refresh rather than a navigation,
+       put the user back where they were — the microtask runs after the
+       rebuild but before the browser paints, so nothing jumps. */
+    const scrollY = content.scrollTop;
+    if (keepScroll) queueMicrotask(() => (content.scrollTop = scrollY));
     detailShown = null;
     renderSide();
     content.textContent = "";
@@ -578,8 +604,10 @@ export function openStore(win: Win): void {
     const size = large ? "" : "sm";
 
     if (state) {
-      const busy = el("button", `btn ${size}`.trim(), `Installing… ${state.label ?? `${state.done}/${state.total}`}`);
+      const busy = el("button", `btn ${size}`.trim(), installingLabel(state));
       busy.disabled = true;
+      /* renderProgress updates this text in place on every network chunk. */
+      busy.dataset.progressFor = app.id;
       wrap.append(busy);
       return wrap;
     }
@@ -660,7 +688,9 @@ export function openStore(win: Win): void {
 
   /* ---------- the detail page ---------- */
 
-  function openDetail(app: StoreApp): void {
+  function openDetail(app: StoreApp, keepScroll = false): void {
+    const scrollY = content.scrollTop;
+    if (keepScroll) queueMicrotask(() => (content.scrollTop = scrollY));
     detailShown = app;
     content.textContent = "";
     content.scrollTop = 0;
@@ -816,7 +846,7 @@ export function openStore(win: Win): void {
     const baseUrl = new URL(app.base ?? `${app.id}/`, catalogBase());
     const dir = dumpDirFor(app);
     progress.set(app.id, { done: 0, total: files.length });
-    render();
+    repaint();
 
     let written = 0;
     const tracker = byteTracker(app.id, files.length, () => written);
@@ -872,7 +902,7 @@ export function openStore(win: Win): void {
       });
     } finally {
       progress.delete(app.id);
-      render();
+      repaint();
     }
   }
 
@@ -896,7 +926,7 @@ export function openStore(win: Win): void {
     }
     const baseUrl = new URL(app.base ?? `${app.id}/`, catalogBase());
     progress.set(app.id, { done: 0, total: files.length });
-    render();
+    repaint();
     let written = 0;
     const tracker = byteTracker(app.id, files.length, () => written);
     try {
@@ -931,7 +961,7 @@ export function openStore(win: Win): void {
       });
     } finally {
       progress.delete(app.id);
-      render();
+      repaint();
     }
   }
 
@@ -976,7 +1006,7 @@ export function openStore(win: Win): void {
       icon: "trash",
       timeout: 6000,
     });
-    render();
+    repaint();
   }
 
   /**
@@ -990,7 +1020,7 @@ export function openStore(win: Win): void {
    */
   async function installDistro(app: StoreApp): Promise<void> {
     progress.set(app.id, { done: 0, total: 1 });
-    render();
+    repaint();
     try {
       const res = await ensureGuestRoot(vfs.GUEST_ROOT, {
         install: true,
@@ -1021,7 +1051,7 @@ export function openStore(win: Win): void {
       });
     } finally {
       progress.delete(app.id);
-      render();
+      repaint();
     }
   }
 
@@ -1034,7 +1064,7 @@ export function openStore(win: Win): void {
    */
   async function installDiskImage(app: StoreApp): Promise<void> {
     progress.set(app.id, { done: 0, total: 1 });
-    render();
+    repaint();
     try {
       await installNetbsd64((text) => {
         const state = progress.get(app.id);
@@ -1060,7 +1090,7 @@ export function openStore(win: Win): void {
       });
     } finally {
       progress.delete(app.id);
-      render();
+      repaint();
     }
   }
 
@@ -1095,7 +1125,7 @@ export function openStore(win: Win): void {
       icon: "trash",
       timeout: 6000,
     });
-    render();
+    repaint();
   }
 
   /**
@@ -1156,7 +1186,7 @@ export function openStore(win: Win): void {
       icon: "trash",
       timeout: 6000,
     });
-    render();
+    repaint();
   }
 
   function spinner(text: string): HTMLElement {
@@ -1178,8 +1208,7 @@ export function openStore(win: Win): void {
       .then(() => {
         scanQueued = false;
         /* Do not throw the user out of a listing they were reading. */
-        if (detailShown) openDetail(detailShown);
-        else render();
+        repaint();
       })
       .catch(() => {
         scanQueued = false;

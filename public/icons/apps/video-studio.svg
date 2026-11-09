@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- a timeline with clips and a preview monitor playing -->
+  <rect x="8" y="8" width="48" height="26" rx="3" fill="#1b1e26" stroke="#2b313c"/>
+  <path d="M28 15 l10 6 -10 6 z" fill="#fbfcfd"/>
+  <rect x="8" y="38" width="48" height="7" rx="2" fill="#2b313c"/>
+  <rect x="9.5" y="39.2" width="17" height="4.6" rx="1.4" fill="#2563b0"/>
+  <rect x="28.5" y="39.2" width="12" height="4.6" rx="1.4" fill="#2fa84f"/>
+  <rect x="42.5" y="39.2" width="12" height="4.6" rx="1.4" fill="#e8b440"/>
+  <rect x="8" y="47" width="48" height="7" rx="2" fill="#2b313c"/>
+  <rect x="14" y="48.2" width="22" height="4.6" rx="1.4" fill="#7a4fb0"/>
+  <line x1="33" y1="36" x2="33" y2="55.5" stroke="#d33b3b" stroke-width="1.8"/>
+</svg>
