@@ -115,7 +115,14 @@ function makeStat(st, path) {
 }
 
 const fsImpl = {
+  /* Faithful to production ZenFS: stat FOLLOWS symlinks, lstat does not
+     (see the note in boot.mjs — an lstat-shaped stat here once masked a
+     real symlink bug in the production wrapper). */
   async stat(p) {
+    const st = await fsp.stat(p);
+    return makeStat(st, p);
+  },
+  async lstat(p) {
     const st = await fsp.lstat(p);
     return makeStat(st, p);
   },

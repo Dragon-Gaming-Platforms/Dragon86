@@ -30,6 +30,8 @@ interface UHandle {
 export interface UnionFs {
   root: string;
   stat(path: string): Promise<UnionStat>;
+  /** Like stat, but reports a symlink itself instead of following it. */
+  lstat(path: string): Promise<UnionStat>;
   readdir(path: string): Promise<string[]>;
   open(path: string, flags: string): Promise<UHandle>;
   readFile(path: string): Promise<Uint8Array>;
@@ -42,6 +44,7 @@ export interface UnionFs {
   truncate(path: string, length: number): Promise<void>;
   utimes(path: string, atime: number, mtime: number): Promise<void>;
   readlink(path: string): Promise<string>;
+  symlink(target: string, path: string): Promise<void>;
   /** Force a path out of the image into ZenFS (used by the Files app). */
   materialize(path: string): Promise<void>;
 }
@@ -126,6 +129,24 @@ export function createUnionFs(upperRoot: string, base: BaseLayer): UnionFs {
       const st = up as unknown as BaseStat;
       return Object.assign(Object.create(Object.getPrototypeOf(st)), st, { origin: "upper" as const });
     }
+    const bs = await baseStatFor(p);
+    if (bs) return Object.assign(bs, { origin: "base" as const });
+    throw notFound(p);
+  }
+
+  async function lstat(p: string): Promise<UnionStat> {
+    await loadWhiteouts();
+    try {
+      /* lstat directly: a dangling upper symlink is still an entry, while
+         upperStat (stat) would follow it, miss, and fall through to the
+         base layer. */
+      const up = await fs.promises.lstat(p);
+      const st = up as unknown as BaseStat;
+      return Object.assign(Object.create(Object.getPrototypeOf(st)), st, { origin: "upper" as const });
+    } catch {
+      /* not in the upper layer */
+    }
+    /* The base layer's stat is index data and never follows links. */
     const bs = await baseStatFor(p);
     if (bs) return Object.assign(bs, { origin: "base" as const });
     throw notFound(p);
@@ -350,11 +371,22 @@ export function createUnionFs(upperRoot: string, base: BaseLayer): UnionFs {
   }
 
   async function readlink(p: string): Promise<string> {
-    if (await upperStat(p)) return fs.promises.readlink(p);
+    try {
+      /* readlink directly — upperStat would follow a dangling link and
+         wrongly report the upper entry as absent. */
+      return await fs.promises.readlink(p);
+    } catch {
+      /* not an upper symlink */
+    }
     const rel = basePath(p);
     const target = rel !== null ? await base.readlink?.(rel) : null;
     if (!target) throw Object.assign(new Error("EINVAL"), { code: "EINVAL" });
     return target;
+  }
+
+  async function symlink(target: string, p: string): Promise<void> {
+    await ensureUpperDir(parentOf(p));
+    await fs.promises.symlink(target, p);
   }
 
   /** Pull a path (or a whole directory) out of the image into ZenFS. */
@@ -378,6 +410,7 @@ export function createUnionFs(upperRoot: string, base: BaseLayer): UnionFs {
   return {
     root: upperRoot,
     stat,
+    lstat,
     readdir,
     open,
     readFile,
@@ -390,6 +423,7 @@ export function createUnionFs(upperRoot: string, base: BaseLayer): UnionFs {
     truncate,
     utimes,
     readlink,
+    symlink,
     materialize,
   };
 }
@@ -408,6 +442,10 @@ export function createDirectFs(root: string): UnionFs {
       const st = await fs.promises.stat(p);
       return Object.assign(st, { origin: "upper" as const }) as unknown as UnionStat;
     },
+    async lstat(p) {
+      const st = await fs.promises.lstat(p);
+      return Object.assign(st, { origin: "upper" as const }) as unknown as UnionStat;
+    },
     readdir: (p) => fs.promises.readdir(p),
     async open(p, flags) {
       return (await fs.promises.open(p, flags)) as unknown as UHandle;
@@ -424,6 +462,7 @@ export function createDirectFs(root: string): UnionFs {
     truncate: (p, n) => fs.promises.truncate(p, n),
     utimes: (p, a, m) => fs.promises.utimes(p, a, m),
     readlink: (p) => fs.promises.readlink(p),
+    symlink: (target, p) => fs.promises.symlink(target, p),
     materialize: async () => {},
   };
 }
@@ -492,6 +531,10 @@ export function unionAsPromises(u: UnionFs): {
     mode: number; size: number; mtimeMs: number; atimeMs: number; ctimeMs: number;
     isDirectory(): boolean; isSymbolicLink(): boolean; isFile(): boolean;
   }>;
+  lstat(p: string): Promise<{
+    mode: number; size: number; mtimeMs: number; atimeMs: number; ctimeMs: number;
+    isDirectory(): boolean; isSymbolicLink(): boolean; isFile(): boolean;
+  }>;
   readdir(p: string): Promise<string[]>;
   open(p: string, flags: string): Promise<UHandle>;
   readFile(p: string): Promise<Uint8Array>;
@@ -504,22 +547,24 @@ export function unionAsPromises(u: UnionFs): {
   truncate(p: string, n: number): Promise<void>;
   utimes(p: string, a: number, m: number): Promise<void>;
   readlink(p: string): Promise<string>;
+  symlink(target: string, p: string): Promise<void>;
 } {
+  const plain = (st: UnionStat) => {
+    const ms = st.mtimeMs || 0;
+    return {
+      mode: st.mode,
+      size: st.size,
+      mtimeMs: ms,
+      atimeMs: ms,
+      ctimeMs: ms,
+      isDirectory: () => st.isDirectory(),
+      isSymbolicLink: () => st.isSymbolicLink(),
+      isFile: () => st.isFile(),
+    };
+  };
   return {
-    async stat(p) {
-      const st = await u.stat(p);
-      const ms = st.mtimeMs || 0;
-      return {
-        mode: st.mode,
-        size: st.size,
-        mtimeMs: ms,
-        atimeMs: ms,
-        ctimeMs: ms,
-        isDirectory: () => st.isDirectory(),
-        isSymbolicLink: () => st.isSymbolicLink(),
-        isFile: () => st.isFile(),
-      };
-    },
+    stat: async (p) => plain(await u.stat(p)),
+    lstat: async (p) => plain(await u.lstat(p)),
     readdir: (p) => u.readdir(p),
     open: (p, flags) => u.open(p, flags),
     readFile: (p) => u.readFile(p),
@@ -546,6 +591,7 @@ export function unionAsPromises(u: UnionFs): {
     truncate: (p, n) => u.truncate(p, n),
     utimes: (p, a, m) => u.utimes(p, a, m),
     readlink: (p) => u.readlink(p),
+    symlink: (target, p) => u.symlink(target, p),
   };
 }
 
@@ -585,6 +631,7 @@ export function withSubmount(fs: UnionFs, mount: string, sub: UnionFs): UnionFs 
   return {
     root: fs.root,
     stat: wrap((f, p) => f.stat(p)),
+    lstat: wrap((f, p) => f.lstat(p)),
     readdir: wrap((f, p) => f.readdir(p)),
     readFile: wrap((f, p) => f.readFile(p)),
     writeFile: (p, d) => writeThrough(p, d),
@@ -595,6 +642,10 @@ export function withSubmount(fs: UnionFs, mount: string, sub: UnionFs): UnionFs 
     truncate: (p, n) => truncateThrough(p, n),
     utimes: (p, a, m) => utimesThrough(p, a, m),
     readlink: wrap((f, p) => f.readlink(p)),
+    symlink: async (t, p) => {
+      const x = target(p);
+      return x ? x.fs.symlink(t, x.path) : fs.symlink(t, p);
+    },
     materialize: wrap((f, p) => f.materialize(p)),
     open: async (p, flags) => {
       const t = target(p);

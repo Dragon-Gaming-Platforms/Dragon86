@@ -12,8 +12,9 @@
  * layer calls their host fs; this is the stock-upstream-v86 equivalent.)
  *
  * Scope: the subset of 9p2000.L a Linux client exercises against a
- * simple file share. xattrs, locks (beyond trivial success), symlinks
- * and device nodes return ENOSYS.
+ * simple file share. Symlinks are first-class (create, read, lstat-true
+ * attributes — the kernel resolves them itself via Treadlink); xattrs,
+ * locks (beyond trivial success) and device nodes return ENOSYS.
  */
 
 import { fs } from "@zenfs/core";
@@ -135,7 +136,12 @@ export function createP9Handler(
   const inside = (p: string): boolean => p === root || p.startsWith(prefix);
 
   async function qidFor(path: string): Promise<Qid> {
-    const st = await fsImpl.stat(path);
+    /* lstat, not stat: a symlink must be its own entry. ZenFS's stat
+       follows links, so stat-based qids reported the target instead —
+       and threw ENOENT for a dangling link, which made tar-created
+       symlinks (target not extracted yet) look like failures and dropped
+       them from directory listings. */
+    const st = await fsImpl.lstat(path);
     let id = qidIds.get(path);
     if (id === undefined) {
       id = nextQid++;
@@ -274,7 +280,7 @@ export function createP9Handler(
               const p = joinRel(f.path, name);
               let q: Qid;
               try { q = await qidFor(p); } catch { continue; }
-              const st = await fsImpl.stat(p).catch(() => null);
+              const st = await fsImpl.lstat(p).catch(() => null);
               const dtype = st?.isDirectory() ? 4 : st?.isSymbolicLink() ? 10 : 8;
               const entryLen = 13 + 8 + 1 + 2 + new TextEncoder().encode(name).length;
               const wpart = writeQid(new Writer(), q).u64(total + entryLen).u8(dtype).str(name);
@@ -302,7 +308,7 @@ export function createP9Handler(
           const fid = r.u32();
           r.u64();
           const f = getFid(fid);
-          const st = await fsImpl.stat(f.path);
+          const st = await fsImpl.lstat(f.path);
           const q = await qidFor(f.path);
           const sec = (ms: number) => Math.floor(ms / 1000);
           const nsec = (ms: number) => Math.floor((ms % 1000) * 1e6);
@@ -337,6 +343,15 @@ export function createP9Handler(
              ATIME_SET=128 MTIME_SET=256. A previous version read two
              u64s too many here, ran off the packet, and turned every
              chmod/touch/truncate into EIO. */
+          /* Symlinks: every attribute op below would follow the link
+             (ZenFS has no lchmod/lutimes), which is wrong for the link
+             itself and an ENOENT when the target does not exist yet —
+             tar extracts links before their targets all the time. A
+             symlink's attributes don't matter to the guest; succeed as
+             a no-op. */
+          if ((await fsImpl.lstat(f.path)).isSymbolicLink()) {
+            return new Writer().build(27, tag);
+          }
           if (valid & 0x1) {
             const st = await fsImpl.stat(f.path);
             /* Guest mode may or may not carry file-type bits; keep the
@@ -397,7 +412,8 @@ export function createP9Handler(
           const f = getFid(fid);
           if (f.path === root) return error(tag, EPERM);
           if (f.handle) await f.handle.close().catch(() => {});
-          const st = await fsImpl.stat(f.path);
+          /* lstat: removing a symlink removes the link, never the target. */
+          const st = await fsImpl.lstat(f.path);
           if (st.isDirectory()) await fsImpl.rmdir(f.path);
           else await fsImpl.unlink(f.path);
           fids.delete(fid);
