@@ -55,6 +55,12 @@ jobs:
           # DEBUG=1 would force FULL_FAT=1, which downloads RISC OS ROMs and
           # packs them into arculator.data — exactly what must not happen.
           # The release build packs DATA=ddnoise only.
+          #
+          # -Werror comes out of the Makefile first: upstream only CI-tests
+          # DEBUG builds, where DEBUG_LOG makes some variables (arm.c cyc_s/
+          # cyc_n) used; in release the current clang flags them as set-but-
+          # unused and -Werror kills the build. The warnings stay in the log.
+          sed -i 's/-Wall -Werror/-Wall/' arc-src/Makefile
           docker run -v "$PWD/arc-src":/src emscripten/emsdk sh -c \
             "apt-get update && apt-get install -yy xxd && git config --global --add safe.directory /src && make -C /src -j\$(nproc) wasm"
           ls -la arc-src/build/wasm/
