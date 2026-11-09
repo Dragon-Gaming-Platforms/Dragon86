@@ -1,0 +1,1 @@
+.dub-progress{background:var(--bg-input);border-radius:2px;height:4px;overflow:hidden}.dub-progress-fill{width:var(--pct,0%);background:var(--accent);height:100%;transition:width var(--t)}

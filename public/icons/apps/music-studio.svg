@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- piano-roll blocks and a note -->
+  <rect x="8" y="8" width="48" height="48" rx="4" fill="#1b1e26" stroke="#2b313c"/>
+  <g fill="#2b313c"><rect x="8" y="20" width="48" height="1.2"/><rect x="8" y="32" width="48" height="1.2"/><rect x="8" y="44" width="48" height="1.2"/></g>
+  <rect x="12" y="13" width="14" height="6" rx="2" fill="#2563b0"/>
+  <rect x="24" y="25" width="18" height="6" rx="2" fill="#2fa84f"/>
+  <rect x="16" y="37" width="12" height="6" rx="2" fill="#e8b440"/>
+  <rect x="34" y="49" width="16" height="4" rx="2" fill="#d33b3b"/>
+  <g fill="#fbfcfd"><ellipse cx="43" cy="44" rx="4" ry="3"/><rect x="45.6" y="26" width="2" height="18" rx="1"/><path d="M45.6 26 c4 1 6 3 7 6 c-2-1.5-4.5-2-7-2 z"/></g>
+</svg>

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- a shaded cube on a grid floor with an axis gizmo -->
+  <rect x="8" y="8" width="48" height="48" rx="4" fill="#1b1e26" stroke="#2b313c"/>
+  <g stroke="#2b313c" stroke-width="1"><path d="M8 46 H56 M8 51 H56 M14 42 L10 56 M26 42 L24 56 M38 42 L40 56 M50 42 L54 56"/></g>
+  <path d="M32 14 L46 21 L46 37 L32 44 L18 37 L18 21 Z" fill="#35588c" stroke="#1b2f4d"/>
+  <path d="M32 14 L46 21 L32 28 L18 21 Z" fill="#5a86c0"/>
+  <path d="M32 28 L46 21 L46 37 L32 44 Z" fill="#27406a"/>
+  <g stroke-width="2" stroke-linecap="round">
+    <line x1="13" y1="18" x2="13" y2="11" stroke="#2fa84f"/>
+    <line x1="13" y1="18" x2="19" y2="20" stroke="#d33b3b"/>
+    <line x1="13" y1="18" x2="9" y2="22" stroke="#2563b0"/>
+  </g>
+</svg>

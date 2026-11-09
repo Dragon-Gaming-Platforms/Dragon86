@@ -1,0 +1,1 @@
+var e=class extends Error{constructor(e){super(e),this.name=`UserError`,this.expected=!0}};function t(e){return!!(e&&e.expected===!0)}export{t as n,e as t};

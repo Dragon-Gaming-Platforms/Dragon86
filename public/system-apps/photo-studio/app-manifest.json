@@ -1,0 +1,6 @@
+{
+  "id": "photo-studio",
+  "kind": "iframe-app",
+  "dump": "~/system/apps/photo-studio/",
+  "note": "Where the App Store writes this app's files when it installs it. The OS serves them from that folder (9pf/photo-studio/). Everything the app saves stays in the browser's own storage - nothing talks to Puter's cloud."
+}

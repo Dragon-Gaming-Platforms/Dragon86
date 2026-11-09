@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Vector Studio</title>
+  <meta name="description" content="A vector illustration editor: pen and shape tools, Pathfinder, gradients, type, artboards and layers, with SVG, PDF and PNG export. Files are stored in your own Puter cloud." />
+  <link rel="canonical" href="https://ves.puter.com/" />
+  <meta name="theme-color" content="#f3f3f3" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#2b2b2b" media="(prefers-color-scheme: dark)" />
+  <meta name="color-scheme" content="light dark" />
+  <link rel="icon" href="./favicon-32x32.png" type="image/png" sizes="32x32" />
+  <link rel="icon" href="./favicon-16x16.png" type="image/png" sizes="16x16" />
+  <link rel="apple-touch-icon" href="./apple-touch-icon.png" sizes="180x180" />
+  <link rel="manifest" href="./manifest.json" />
+  <script>
+    // Apply the saved theme before first paint so there is no flash.
+    (() => {
+      let t = 'system';
+      try { t = localStorage.getItem('vector-studio:theme') || 'system'; } catch {}
+      const levels = ['dark', 'medium-dark', 'medium-light', 'light'];
+      if (!levels.includes(t)) t = 'system';
+      const dark = t === 'system' ? matchMedia('(prefers-color-scheme: dark)').matches : t.endsWith('dark');
+      const root = document.documentElement;
+      root.dataset.theme = t;
+      root.dataset.themeResolved = dark ? 'dark' : 'light';
+      root.dataset.brightness = t === 'system' ? (dark ? 'dark' : 'light') : t;
+    })();
+  </script>
+  <script type="module" crossorigin src="./assets/index-C2LX_EHD.js"></script>
+  <link rel="modulepreload" crossorigin href="./assets/rolldown-runtime-hePW80VL.js">
+  <link rel="modulepreload" crossorigin href="./assets/emitter-_mj4BK29.js">
+  <link rel="modulepreload" crossorigin href="./assets/dom-dFpu144q.js">
+  <link rel="modulepreload" crossorigin href="./assets/nodes-C8bg4nOk.js">
+  <link rel="modulepreload" crossorigin href="./assets/shapes-D9Apjla1.js">
+  <link rel="modulepreload" crossorigin href="./assets/text-runs-CxSk2gwO.js">
+  <link rel="modulepreload" crossorigin href="./assets/geometry-Ceannv0T.js">
+  <link rel="modulepreload" crossorigin href="./assets/errors-BEwURZpB.js">
+  <link rel="modulepreload" crossorigin href="./assets/color-CQsYXitq.js">
+  <link rel="modulepreload" crossorigin href="./assets/appearance-B1EBtklm.js">
+  <link rel="modulepreload" crossorigin href="./assets/live-effects-BF6xmN3c.js">
+  <link rel="modulepreload" crossorigin href="./assets/draw-8z0usG1j.js">
+  <link rel="modulepreload" crossorigin href="./assets/clipboard-CyXLIb7g.js">
+  <link rel="modulepreload" crossorigin href="./assets/units-BI2otOjX.js">
+  <link rel="stylesheet" crossorigin href="./assets/index-CJV9FynL.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to canvas</a>
+  <div id="app" class="app" aria-busy="true"></div>
+  <div id="live-region" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+</body>
+</html>

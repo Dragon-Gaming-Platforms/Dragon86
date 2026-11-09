@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- a pen-tool curve with anchor points on an artboard -->
+  <rect x="8" y="8" width="48" height="48" rx="4" fill="#fbfcfd" stroke="#8a93a0"/>
+  <path d="M16 46 C 24 18, 40 18, 48 40" fill="none" stroke="#2563b0" stroke-width="3" stroke-linecap="round"/>
+  <line x1="16" y1="46" x2="28" y2="26" stroke="#8a93a0" stroke-width="1.4"/>
+  <line x1="48" y1="40" x2="40" y2="22" stroke="#8a93a0" stroke-width="1.4"/>
+  <rect x="13" y="43" width="6" height="6" fill="#fbfcfd" stroke="#2563b0" stroke-width="1.8"/>
+  <rect x="45" y="37" width="6" height="6" fill="#fbfcfd" stroke="#2563b0" stroke-width="1.8"/>
+  <circle cx="28" cy="26" r="2.6" fill="#2fa84f"/>
+  <circle cx="40" cy="22" r="2.6" fill="#2fa84f"/>
+  <path d="M30 40 l6 14 2.4-5 5 2.4 z" fill="#1b1e26" stroke="#fbfcfd" stroke-width="1.2"/>
+</svg>
