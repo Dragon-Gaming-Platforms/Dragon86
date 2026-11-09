@@ -66,6 +66,15 @@ jobs:
           #    clang 24 defaults to C23, where `bool` is a keyword and
           #    hostfs.c's `typedef int bool;` is a hard error.
           sed -i 's/-Wall -Werror/-Wall -std=gnu11/' arc-src/Makefile
+          # One three-line compatibility patch (not a behaviour change):
+          # hostfs.c hand-rolls bool/true/false, which collides with the
+          # <stdbool.h> that current emscripten's em_js.h now includes.
+          # Its bool was int; stdbool's is _Bool — same truth values at
+          # every use site in the file.
+          sed -i -e 's/^typedef int bool;\r\?$/#include <stdbool.h>/' \
+                 -e '/^#define true  ((bool) 1)\r\?$/d' \
+                 -e '/^#define false ((bool) 0)\r\?$/d' arc-src/src/hostfs.c
+          grep -n "stdbool" arc-src/src/hostfs.c
           docker run -v "$PWD/arc-src":/src emscripten/emsdk sh -c \
             "apt-get update && apt-get install -yy xxd && git config --global --add safe.directory /src && make -C /src -j\$(nproc) wasm"
           ls -la arc-src/build/wasm/
