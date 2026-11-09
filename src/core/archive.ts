@@ -312,10 +312,29 @@ function isTar(bytes: Uint8Array): boolean {
   return sum === checksum;
 }
 
+/** pax extended header payload: "<len> key=value\n" records, len in
+    decimal counting the whole record including itself and the newline. */
+function paxRecords(payload: Uint8Array): Map<string, string> {
+  const out = new Map<string, string>();
+  let at = 0;
+  while (at < payload.length) {
+    let sp = at;
+    while (sp < payload.length && payload[sp] !== 0x20) sp++;
+    const len = parseInt(utf8.decode(payload.subarray(at, sp)), 10);
+    if (!Number.isFinite(len) || len <= 0 || at + len > payload.length) break;
+    const text = utf8.decode(payload.subarray(sp + 1, at + len));
+    const eq = text.indexOf("=");
+    if (eq > 0) out.set(text.slice(0, eq), text.slice(eq + 1).replace(/\n$/, ""));
+    at += len;
+  }
+  return out;
+}
+
 function parseTar(bytes: Uint8Array): ArchiveEntry[] {
   const entries: ArchiveEntry[] = [];
   let at = 0;
   let longName: string | null = null;
+  let pax: Map<string, string> | null = null;
 
   while (at + 512 <= bytes.length) {
     const block = bytes.subarray(at, at + 512);
@@ -327,10 +346,10 @@ function parseTar(bytes: Uint8Array): ArchiveEntry[] {
     const prefix = tarString(block, 345, 155);
     longName = null;
     if (prefix) name = `${prefix}/${name}`;
-    const size = tarNumber(block, 124, 12);
+    let size = tarNumber(block, 124, 12);
     const type = String.fromCharCode(block[156] || 0x30);
     const dataStart = at + 512;
-    const dataBlocks = Math.ceil(size / 512) * 512;
+    let dataBlocks = Math.ceil(size / 512) * 512;
 
     if (type === "L") {
       /* GNU long name: this entry *is* the next entry's name. */
@@ -339,10 +358,32 @@ function parseTar(bytes: Uint8Array): ArchiveEntry[] {
       at = dataStart + dataBlocks;
       continue;
     }
-    if (type === "x" || type === "g" || type === "K") {
-      /* pax headers, and long link names: skip the payload, keep going. */
+    if (type === "x") {
+      /* pax extended header: it CARRIES the next entry's real path (and
+         size, for files past the octal field) — bsdtar (macOS default)
+         writes every long name this way. Skipping it extracted files
+         under their truncated 100-byte names. */
+      need(bytes, dataStart, size, "pax header");
+      pax = paxRecords(bytes.subarray(dataStart, dataStart + size));
       at = dataStart + dataBlocks;
       continue;
+    }
+    if (type === "g" || type === "K") {
+      /* global pax defaults and GNU long *link* names: nothing this
+         index keeps — skip the payload, keep going. */
+      at = dataStart + dataBlocks;
+      continue;
+    }
+    if (pax) {
+      /* pax overrides apply to exactly this one entry. */
+      const paxPath = pax.get("path");
+      if (paxPath) name = paxPath;
+      const paxSize = pax.get("size");
+      if (paxSize !== undefined && /^\d+$/.test(paxSize)) {
+        size = parseInt(paxSize, 10);
+        dataBlocks = Math.ceil(size / 512) * 512;
+      }
+      pax = null;
     }
     if (type === "5" || name.endsWith("/")) {
       if (name) {

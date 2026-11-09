@@ -179,6 +179,9 @@ const fsImpl = {
   async symlink(target, p) {
     await fsp.symlink(target, p);
   },
+  async link(existing, p) {
+    await fsp.link(existing, p);
+  },
 };
 
 /* ---------- boot ---------- */
