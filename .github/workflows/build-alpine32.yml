@@ -8,8 +8,11 @@ name: Build alpine32 guest
 #                        netboot release ships lts + rpi kernels, and lts
 #                        is the multiplatform one that drives the virt
 #                        board and its GICv3)
-#   initrd.img           Alpine's official netboot initramfs, byte for byte
-#                        (a compressed cpio the kernel inflates itself)
+#   initrd.img           Alpine's official netboot initramfs plus the ext4
+#                        module closure from the official modloop (the
+#                        netboot initramfs alone cannot mount an ext4 root
+#                        — proven on the real engine), a compressed cpio
+#                        the kernel inflates itself
 #   root.img.gz.NN       a 512 MiB ext4 disk holding the official Alpine
 #                        minirootfs plus the kernel's modules, split for
 #                        GitHub's 100 MB file limit
@@ -146,6 +149,38 @@ jobs:
           df -h mnt
           sudo umount mnt
 
+      - name: Add ext4 to the initramfs (the official netboot one cannot mount an ext4 root)
+        shell: bash
+        run: |
+          exec > >(tee -a /tmp/alpine32-debug.log) 2>&1
+          set -x
+          # Proven on the real engine: the kernel boots, virtio_blk sees
+          # /dev/vda, and then "mount ... failed: No such device" — the
+          # netboot initramfs ships squashfs/network modules but no ext4.
+          # Add ext4 and exactly its dependency closure, read from the
+          # OFFICIAL modloop's own modules.dep, then re-run depmod.
+          cd work
+          KVER=$(ls modloop/modules | head -1)
+          MODSRC="modloop/modules/$KVER"
+          mkdir irfs
+          case "$(file -b netboot/boot/initramfs-lts)" in
+            gzip*) CAT="gzip -dc";;
+            Zstandard*) CAT="zstd -dc";;
+            *) echo "unexpected initramfs compression"; file netboot/boot/initramfs-lts; exit 1;;
+          esac
+          $CAT < netboot/boot/initramfs-lts | (cd irfs && sudo cpio -idm --quiet)
+          test -d "irfs/lib/modules/$KVER"
+          deps=$(awk -F: '$1 ~ /\/ext4\.ko/ {print $1" "$2}' "$MODSRC/modules.dep")
+          test -n "$deps"
+          for m in $deps; do
+            echo "  + $m"
+            sudo install -D -m 644 "$MODSRC/$m" "irfs/lib/modules/$KVER/$m"
+          done
+          sudo depmod -b "$PWD/irfs" "$KVER"
+          sudo grep -q ext4 "irfs/lib/modules/$KVER/modules.dep"
+          (cd irfs && sudo find . | sudo cpio -o -H newc --quiet) | gzip -9 > initrd-ext4.img
+          ls -la netboot/boot/initramfs-lts initrd-ext4.img
+
       - name: Package into public/alpine32
         shell: bash
         run: |
@@ -154,9 +189,9 @@ jobs:
           rm -rf public/alpine32
           mkdir -p public/alpine32
           gzip -9c work/netboot/boot/vmlinuz-lts > public/alpine32/kernel.img.gz
-          # the initramfs ships byte for byte: it is already a compressed
+          # the rebuilt initramfs (official + ext4 modules): a compressed
           # cpio, and the kernel is the one who inflates it
-          cp work/netboot/boot/initramfs-lts public/alpine32/initrd.img
+          cp work/initrd-ext4.img public/alpine32/initrd.img
           gzip -9c work/root.img > work/root.img.gz
           split -b 94371840 -d -a 2 work/root.img.gz public/alpine32/root.img.gz.
           ls -la public/alpine32
@@ -238,9 +273,11 @@ jobs:
 
           - {netboot_file} — vmlinuz-lts (the kernel, a zImage; armv7's netboot
             release ships lts + rpi, and lts is the multiplatform build that
-            drives the virt board), initramfs-lts (shipped byte for byte as
-            initrd.img), modloop-lts (the kernel's modules, copied into the
-            disk's /lib/modules)
+            drives the virt board), initramfs-lts (shipped as initrd.img with
+            ONE addition: the ext4 module closure from modloop-lts, because
+            the official netboot initramfs cannot mount an ext4 root — the
+            boot test on the real engine proved it), modloop-lts (the
+            kernel's modules, copied into the disk's /lib/modules)
           - {rootfs_file} — the userland, unpacked onto a {os.environ["ROOT_IMG_MIB"]} MiB ext4 image
 
           Both artifacts are SHA512-verified against latest-releases.yaml.

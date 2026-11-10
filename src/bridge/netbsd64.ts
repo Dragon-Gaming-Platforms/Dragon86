@@ -43,8 +43,9 @@ export interface NetbsdManifest {
   version: string;
   arch: string;
   kernel: { file: string; gzBytes: number; rawBytes: number; sha256: string };
-  /** Alpine only: the initramfs, shipped byte for byte (a compressed cpio
-      the kernel inflates itself — fetched whole, passed whole). */
+  /** Alpine only: the initramfs (official netboot one + the ext4 module
+      closure, see build-alpine32.yml) — a compressed cpio the kernel
+      inflates itself; fetched whole, passed whole. */
   initrd?: { file: string; bytes: number; sha256: string };
   root: {
     parts: { file: string; bytes: number; sha256: string }[];
