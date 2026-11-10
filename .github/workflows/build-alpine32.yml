@@ -124,6 +124,7 @@ jobs:
           ::sysinit:/bin/mount -o remount,rw /
           ::sysinit:/bin/mkdir -p /dev/pts /dev/shm
           ::sysinit:/bin/mount -a
+          ::sysinit:/bin/hostname -F /etc/hostname
           ttyAMA0::respawn:/sbin/getty -L 115200 ttyAMA0 vt100
           ::ctrlaltdel:/sbin/reboot
           ::shutdown:/bin/umount -a -r
