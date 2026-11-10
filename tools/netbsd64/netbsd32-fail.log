@@ -1,2 +1,10 @@
-=== tail -n 600 work/assemble.log ===
-+ qemu-system-arm -M virt -cpu cortex-a15 -smp 2 -m 1024 -display none -monitor none -serial stdio -no-reboot -kernel work/netbsd-GENERIC.img -append root=ld0a -device virtio-rng-device -drive if=none,file=work/armv7.img,format=raw,id=hd0 -device virtio-blk-device,drive=hd0 -drive if=none,file=work/root.img,format=raw,id=hd1 -device virtio-blk-device,drive=hd1
+=== tail -n 600 work/probe-virt-2.12.log ===
+qemu-system-arm: unsupported machine type: "virt-2.12"
+Use -machine help to list supported machines
+=== tail -n 600 work/probe-virt-6.2.log ===
+qemu-system-arm: warning: Machine type 'virt-6.2' is deprecated: machines more than 3 years old are subject to deletion after 6 years
+qemu-system-arm: could not load kernel 'work/netbsd-GENERIC.img'
+=== tail -n 600 work/probe-virt-highmem-off.log ===
+qemu-system-arm: could not load kernel 'work/netbsd-GENERIC.img'
+=== tail -n 600 work/probe-virt.log ===
+qemu-system-arm: could not load kernel 'work/netbsd-GENERIC.img'
