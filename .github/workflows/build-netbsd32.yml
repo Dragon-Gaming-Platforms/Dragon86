@@ -14,22 +14,20 @@ name: Build netbsd32 guest
 #
 # Why a workflow: cdn.netbsd.org and qemu-system-aarch64 are out of the
 # development sandbox's reach. The root disk is assembled by booting the
-# official live image once under QEMU (tools/netbsd64/guest-driver.py drives
+# official live image once under QEMU (tools/netbsd32/guest-driver.py drives
 # the serial console) and copying the system minus the X11 sets and
 # man/doc pages onto a fresh disk; the result is then BOOT-TESTED alone,
 # with the same direct-kernel boot the browser machine uses, before it
 # ships. No hand-built binaries: every byte in the image comes from the
 # official NetBSD 11.0 release.
 #
-# Triggers: pushing this file or the tools/netbsd64 scripts, or a dispatch.
+# Trigger: workflow_dispatch only. A push trigger would rebuild on every
+# merge to main that touches these files, and a rebuild is never
+# byte-identical (the guest's own /var timestamps end up in the image), so
+# the bot would keep committing regenerated packs nobody asked for.
 
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - ".github/workflows/build-netbsd32.yml"
-      - "tools/netbsd64/assemble32.cmds"
-      - "tools/netbsd64/guest-driver.py"
 
 permissions:
   contents: write
@@ -123,24 +121,24 @@ jobs:
         run: |
           truncate -s "${ROOT_IMG_MIB}M" work/root.img
           # the official image's GPT holds wedges dk0 (EFI) and dk1 (FFS root)
-          python3 tools/netbsd64/guest-driver.py \
+          python3 tools/netbsd32/guest-driver.py \
             --qemu qemu-system-arm --cpu cortex-a15 --smp 1 --memory 1024 \
             --machine "$NB_MACHINE" \
             --kernel "$NB_KERNEL" \
             --disk work/armv7.img --disk work/root.img \
             --root ld5a,ld4a,ld3a,ld2a,ld1a,ld0a \
-            --script tools/netbsd64/assemble32.cmds \
+            --script tools/netbsd32/assemble32.cmds \
             --timeout 5400 | tee work/assemble.log
 
       - name: Boot-test the image alone (direct kernel boot, like the browser)
         shell: bash
         run: |
-          python3 tools/netbsd64/guest-driver.py \
+          python3 tools/netbsd32/guest-driver.py \
             --qemu qemu-system-arm --cpu cortex-a15 --smp 1 --memory 1024 \
             --machine "$NB_MACHINE" \
             --kernel "$NB_KERNEL" \
             --disk work/root.img \
-            --root NAME=d86root --script tools/netbsd64/verify.cmds \
+            --root NAME=d86root --script tools/netbsd32/verify.cmds \
             --timeout 3000 | tee work/verify.log
           grep "NetBSD dragon86-netbsd ${NETBSD_VERSION}" work/verify.log
 
@@ -228,10 +226,10 @@ jobs:
         if: failure()
         run: |
           { for f in work/*.log; do echo "=== tail -n 600 $f ==="; tail -n 600 "$f"; done; } \
-            > tools/netbsd64/netbsd32-fail.log 2>&1 || true
+            > tools/netbsd32/netbsd32-fail.log 2>&1 || true
           git config user.name "dragon86-bot"
           git config user.email "dragon86-bot@users.noreply.github.com"
-          git add tools/netbsd64/netbsd32-fail.log
+          git add tools/netbsd32/netbsd32-fail.log
           git commit -m "netbsd32 build: failure log (auto-exported for the sandbox)"
           for i in 1 2 3; do git push && exit 0 || git pull --rebase; done
           git push
