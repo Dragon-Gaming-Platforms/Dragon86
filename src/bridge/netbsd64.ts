@@ -122,27 +122,56 @@ export function netbsdManifest(arch: NetbsdArch): Promise<NetbsdManifest> {
   return p;
 }
 
-async function opfsRoot(arch: NetbsdArch): Promise<FileSystemDirectoryHandle> {
+/* WebKit reports many distinct failures as one error: "UnknownError: The
+   operation failed for an unknown transient reason (e.g. out of memory)".
+   Documented triggers: Safari Private Browsing tabs (they get no OPFS at
+   all), handles still held from a previous page load (genuinely transient
+   — worth retrying), and storage pressure. */
+const WEBKIT_TRANSIENT = /unknown|transient/i;
+
+function isWebkitTransient(err: unknown): boolean {
+  return WEBKIT_TRANSIENT.test(`${(err as DOMException)?.name ?? ""} ${(err as Error)?.message ?? err}`);
+}
+
+const delay = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
+
+async function opfsRoot(arch: NetbsdArch, attempts = 1): Promise<FileSystemDirectoryHandle> {
   const storage = navigator?.storage;
   if (!storage?.getDirectory) {
     throw new Error(
       `this browser has no private file storage (OPFS) — the ${TARGETS[arch].label} machine's disk needs it`,
     );
   }
-  try {
-    return await storage.getDirectory();
-  } catch (err) {
-    /* Keep the browser's own reason — "denied" has many distinct causes
-       (private browsing, storage pressure, a managed profile) and hiding
-       it behind one guess helps nobody. */
-    throw new Error(`the browser refused its private file storage (OPFS): ${(err as Error)?.message ?? err}`);
+  let last: unknown;
+  for (let attempt = 1; attempt <= attempts; attempt++) {
+    try {
+      return await storage.getDirectory();
+    } catch (err) {
+      last = err;
+      if (attempt < attempts && isWebkitTransient(err)) {
+        logInfo("netbsd64", `OPFS refused (attempt ${attempt} of ${attempts}) — retrying: ${(err as Error)?.message ?? err}`);
+        await delay(350 * attempt);
+      } else if (attempt < attempts) {
+        break; /* a non-transient refusal will not change on retry */
+      }
+    }
   }
+  /* Keep the browser's own reason — and when it is WebKit's famously vague
+     "unknown transient reason", say what actually causes it, because the
+     user can act on that and cannot act on the original text. */
+  const msg = (last as Error)?.message ?? String(last);
+  const hint = isWebkitTransient(last)
+    ? " — Safari reports exactly this in Private Browsing tabs (they get no file storage at all) and when the device is low on space; open Dragon86 in a regular tab, check free space, then install again"
+    : "";
+  throw new Error(`the browser refused its private file storage (OPFS): ${msg}${hint}`);
 }
 
 /** The disks folder in OPFS. Throws with the browser's reason; `probe`
-    callers that only want "is there a disk?" catch it themselves. */
+    callers that only want "is there a disk?" catch it themselves. The
+    install path (`create`) retries WebKit's transient refusals; probes
+    do not, so a Private-Browsing tab does not slow every store repaint. */
 async function diskDir(arch: NetbsdArch, create: boolean): Promise<FileSystemDirectoryHandle> {
-  const root = await opfsRoot(arch);
+  const root = await opfsRoot(arch, create ? 3 : 1);
   try {
     return await root.getDirectoryHandle(OPFS_DIR, { create });
   } catch (err) {
@@ -151,26 +180,35 @@ async function diskDir(arch: NetbsdArch, create: boolean): Promise<FileSystemDir
 }
 
 /**
- * A WritableStream into the disk file. Two ways, same stream either way:
- *  - createWritable() where the browser has it — writes go to a swap file
- *    that is committed on close.
- *  - Safari before 18.4 has OPFS but no createWritable(); there the bytes
- *    go through a small worker holding a sync access handle (worker-only
- *    API, same one the running machine uses). Each chunk is acknowledged,
- *    so pipeTo() backpressure still works.
+ * A WritableStream into the disk file. The PREFERRED way, in every
+ * browser, is a small worker holding a sync access handle (worker-only
+ * API, the same one the running machine uses): it writes the final file
+ * directly. createWritable() is only the fallback, because it stages all
+ * writes in a swap file that is committed on close — which needs roughly
+ * TWICE the image size free (2.5 GB for the ARM64 disk) and fails under
+ * quota pressure with the browser's vaguest errors. Each worker chunk is
+ * acknowledged, so pipeTo() backpressure still works.
  * Both paths hold an exclusive lock, so a running ARM machine makes
  * this fail — the error says to close the Terminal first.
  */
 async function openDiskWritable(arch: NetbsdArch, handle: FileSystemFileHandle): Promise<WritableStream<Uint8Array>> {
-  if (typeof handle.createWritable === "function") {
+  try {
+    return await openWorkerWritable(arch);
+  } catch (workerErr) {
+    if (typeof handle.createWritable !== "function") throw diskLockHint(arch, workerErr);
+    logInfo(
+      "netbsd64",
+      `worker disk writer failed (${(workerErr as Error)?.message ?? workerErr}) — falling back to createWritable()`,
+    );
     try {
       return (await handle.createWritable()) as unknown as WritableStream<Uint8Array>;
     } catch (err) {
       throw diskLockHint(arch, err);
     }
   }
-  /* Safari ≤ 18.3: worker + sync access handle. */
-  logInfo("netbsd64", "no createWritable() in this browser — writing the disk through a worker sync access handle");
+}
+
+async function openWorkerWritable(arch: NetbsdArch): Promise<WritableStream<Uint8Array>> {
   const worker = new Worker(new URL("./opfs-write.worker.ts", import.meta.url), { type: "module" });
   let nextId = 0;
   const pending = new Map<number, { resolve: () => void; reject: (e: Error) => void }>();
@@ -192,11 +230,23 @@ async function openDiskWritable(arch: NetbsdArch, handle: FileSystemFileHandle):
       pending.set(id, { resolve, reject });
       worker.postMessage({ ...msg, id }, transfer);
     });
-  try {
-    await call({ type: "open", dir: OPFS_DIR, file: TARGETS[arch].disk });
-  } catch (err) {
+  /* Opening can fail transiently in WebKit when a handle from a previous
+     page load has not been released yet — retry briefly before giving up. */
+  let opened = false;
+  let lastErr: unknown;
+  for (let attempt = 1; attempt <= 3 && !opened; attempt++) {
+    try {
+      await call({ type: "open", dir: OPFS_DIR, file: TARGETS[arch].disk });
+      opened = true;
+    } catch (err) {
+      lastErr = err;
+      if (attempt < 3 && isWebkitTransient(err)) await delay(400 * attempt);
+      else break;
+    }
+  }
+  if (!opened) {
     worker.terminate();
-    throw diskLockHint(arch, err);
+    throw diskLockHint(arch, lastErr);
   }
   return new WritableStream<Uint8Array>({
     async write(chunk) {
@@ -225,7 +275,36 @@ function diskLockHint(arch: NetbsdArch, err: unknown): Error {
       `the disk file is locked — if the ${TARGETS[arch].label} machine is running, close its Terminal first, then install again (${msg})`,
     );
   }
+  if (isWebkitTransient(err)) {
+    /* WebKit's one-size-fits-nothing error. The real causes, in order of
+       likelihood here: the machine still holds the disk open (close its
+       Terminal, or reload the tab), a Private Browsing tab, low storage. */
+    return new Error(
+      `the browser refused to open the disk file (${msg}) — close the ${TARGETS[arch].label} machine's Terminal if it is open (or reload this tab), make sure this is not a Private Browsing tab, check free space, then install again`,
+    );
+  }
   return err instanceof Error ? err : new Error(msg);
+}
+
+/**
+ * Pre-flight: is there plausibly room for the unpacked image? The browser's
+ * own estimate is only an estimate, so this blocks the install solely when
+ * it says the image cannot fit at all — then the honest error with real
+ * numbers beats a 500 MB download that dies at 97%.
+ */
+async function checkQuota(man: NetbsdManifest): Promise<void> {
+  let est: StorageEstimate | null = null;
+  try {
+    est = (await navigator?.storage?.estimate?.()) ?? null;
+  } catch {
+    return; /* no estimate — proceed and let the write speak for itself */
+  }
+  if (!est || typeof est.quota !== "number" || typeof est.usage !== "number") return;
+  const free = est.quota - est.usage;
+  if (free >= man.root.rawBytes) return;
+  throw new Error(
+    `not enough browser storage for the ${man.os} disk image: it needs ${humanMB(man.root.rawBytes)}, the browser reports ${humanMB(Math.max(0, free))} free of ${humanMB(est.quota)} — uninstall another disk-image OS or free device space, then install again`,
+  );
 }
 
 /** Size of the installed disk image in OPFS, or null when there is none. */
@@ -264,6 +343,7 @@ export async function netbsdInstalled(arch: NetbsdArch): Promise<boolean> {
  */
 export async function installNetbsd(arch: NetbsdArch, onStatus?: (text: string) => void): Promise<void> {
   const man = await netbsdManifest(arch);
+  await checkQuota(man);
   const dir = await diskDir(arch, true);
   await sweepLegacy(arch, dir);
   const handle = await dir.getFileHandle(TARGETS[arch].disk, { create: true });
@@ -284,7 +364,7 @@ export async function installNetbsd(arch: NetbsdArch, onStatus?: (text: string) 
         if (done) break;
         got += value.byteLength;
         await writer.write(value);
-        onStatus?.(`downloading the NetBSD disk — ${humanMB(got)} of ${humanMB(man.root.gzBytes)}`);
+        onStatus?.(`downloading the ${man.os} disk — ${humanMB(got)} of ${humanMB(man.root.gzBytes)}`);
       }
     }
     onStatus?.("finishing the disk image");

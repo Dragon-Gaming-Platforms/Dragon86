@@ -35,6 +35,32 @@ export function attachLongPress(
   });
 }
 
+/**
+ * Double-tap → handler, touch only. iOS Safari does not deliver dblclick
+ * for taps (and drops even click once pointer capture or preventDefault
+ * get involved), so anything "double-click to open" detects its own
+ * second tap: two pointerups within 400 ms and 24 px. Mouse users keep
+ * the real dblclick path — this handler ignores them entirely.
+ */
+export function attachDoubleTap(node: HTMLElement, handler: (e: PointerEvent) => void): void {
+  let lastT = 0;
+  let lastX = 0;
+  let lastY = 0;
+  node.addEventListener("pointerup", (e: PointerEvent) => {
+    if (e.pointerType === "mouse") return;
+    const now = performance.now();
+    const near = Math.hypot(e.clientX - lastX, e.clientY - lastY) < 24;
+    if (now - lastT < 400 && near) {
+      lastT = 0;
+      handler(e);
+    } else {
+      lastT = now;
+      lastX = e.clientX;
+      lastY = e.clientY;
+    }
+  });
+}
+
 export function el<K extends keyof HTMLElementTagNameMap>(
   tag: K,
   className?: string,

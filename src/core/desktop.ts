@@ -12,7 +12,7 @@
  * marquee-touched) icon gets its frame; hovering only tints it.
  */
 
-import { el, icon, attachLongPress } from "./dom";
+import { el, icon, attachLongPress, attachDoubleTap } from "./dom";
 import { showContextMenu, showInput, type CtxItem } from "./dialog";
 import { getSettings, onSettingsChange } from "./settings";
 import * as vfs from "./vfs";
@@ -330,9 +330,22 @@ export function buildDesktop(getApps: () => AppShortcut[], handlers: DesktopHand
       }
       selectOnly(key);
     });
-    node.addEventListener("dblclick", () => {
+    /* Open: real double-clicks for mice, detected double-taps for touch —
+       iOS never fires dblclick for taps, which left iPads able to select
+       icons but never open them. Debounced, in case a browser someday
+       delivers both for the same gesture. */
+    let lastOpen = 0;
+    const openOnce = (): void => {
       if (dragged) return;
+      const now = performance.now();
+      if (now - lastOpen < 500) return;
+      lastOpen = now;
       onOpen();
+    };
+    node.addEventListener("dblclick", openOnce);
+    attachDoubleTap(node, () => {
+      if (!selected.has(key)) selectOnly(key);
+      openOnce();
     });
 
     /* ---- dragging ---- */
@@ -343,7 +356,11 @@ export function buildDesktop(getApps: () => AppShortcut[], handlers: DesktopHand
       const originX = node.offsetLeft;
       const originY = node.offsetTop;
       let active = false;
-      node.setPointerCapture(e.pointerId);
+      /* The capture is taken when the drag actually starts, not on the
+         press: WebKit withholds the tap's synthesized click events once a
+         pointer is explicitly captured, which made taps select-only on
+         iPads. (Touch does not need it anyway — a touch pointer is
+         implicitly captured by its pointerdown target.) */
 
       const move = (ev: PointerEvent): void => {
         const dx = ev.clientX - startX;
@@ -352,6 +369,11 @@ export function buildDesktop(getApps: () => AppShortcut[], handlers: DesktopHand
         if (!active) {
           active = true;
           dragged = false;
+          try {
+            node.setPointerCapture(e.pointerId);
+          } catch {
+            /* a capture that cannot be taken is not worth a crash */
+          }
           node.classList.add("dragging");
           if (!selected.has(key)) selectOnly(key);
         }

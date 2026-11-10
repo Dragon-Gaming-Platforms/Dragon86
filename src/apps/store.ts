@@ -1078,7 +1078,7 @@ export function openStore(win: Win): void {
     try {
       await installNetbsd(arch, (text) => {
         const state = progress.get(app.id);
-        progress.set(app.id, { ...(state ?? { done: 0, total: 1 }), label: text.replace(/^downloading the NetBSD disk — /, "") });
+        progress.set(app.id, { ...(state ?? { done: 0, total: 1 }), label: text.replace(/^downloading the .* disk — /, "") });
         status.textContent = `${app.name}: ${text}`;
         renderProgress(false);
       });

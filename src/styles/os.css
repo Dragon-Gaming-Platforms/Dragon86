@@ -2379,6 +2379,11 @@
   overflow: hidden;
   padding: 10px;
   background: #0a0a0c;
+  /* The guest owns every touch on its screen: no browser panning or
+     double-tap zoom, and no pointercancel stealing a drag mid-gesture. */
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
 .engine-screen-host {
   position: absolute;
