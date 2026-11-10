@@ -124,11 +124,11 @@ jobs:
           truncate -s "${ROOT_IMG_MIB}M" work/root.img
           # the official image's GPT holds wedges dk0 (EFI) and dk1 (FFS root)
           python3 tools/netbsd64/guest-driver.py \
-            --qemu qemu-system-arm --cpu cortex-a15 --memory 1024 \
+            --qemu qemu-system-arm --cpu cortex-a15 --smp 1 --memory 1024 \
             --machine "$NB_MACHINE" \
             --kernel "$NB_KERNEL" \
             --disk work/armv7.img --disk work/root.img \
-            --root ld0a,ld1a,ld2a,ld3a,ld4a,ld5a \
+            --root ld5a,ld4a,ld3a,ld2a,ld1a,ld0a \
             --script tools/netbsd64/assemble32.cmds \
             --timeout 5400 | tee work/assemble.log
 
@@ -136,7 +136,7 @@ jobs:
         shell: bash
         run: |
           python3 tools/netbsd64/guest-driver.py \
-            --qemu qemu-system-arm --cpu cortex-a15 --memory 1024 \
+            --qemu qemu-system-arm --cpu cortex-a15 --smp 1 --memory 1024 \
             --machine "$NB_MACHINE" \
             --kernel "$NB_KERNEL" \
             --disk work/root.img \

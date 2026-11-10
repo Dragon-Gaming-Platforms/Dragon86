@@ -39,6 +39,7 @@ parser.add_argument("--root", required=True,
 parser.add_argument("--script", required=True, help="command script file")
 parser.add_argument("--timeout", type=int, default=1800, help="per-step timeout in seconds")
 parser.add_argument("--memory", default="2048")
+parser.add_argument("--smp", default="2", help="vCPUs (1 for armv7: two TCG cores skew the generic timer and NetBSD wedges on 'timecounter went backwards')")
 parser.add_argument("--qemu", default="qemu-system-aarch64", help="qemu binary (qemu-system-arm for armv7)")
 parser.add_argument("--cpu", default="cortex-a57", help="-cpu model (cortex-a15 for armv7)")
 parser.add_argument("--machine", default="virt",
@@ -49,7 +50,7 @@ args = parser.parse_args()
 root_candidates = args.root.split(",")
 
 qemu = [args.qemu,
-        "-M", args.machine, "-cpu", args.cpu, "-smp", "2", "-m", args.memory,
+        "-M", args.machine, "-cpu", args.cpu, "-smp", args.smp, "-m", args.memory,
         "-display", "none", "-monitor", "none", "-serial", "stdio",
         "-no-reboot",
         "-kernel", args.kernel, "-append", "root=" + root_candidates[0],
