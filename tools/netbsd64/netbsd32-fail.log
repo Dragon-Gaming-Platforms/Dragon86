@@ -1,0 +1,2 @@
+=== tail -n 600 work/assemble.log ===
++ qemu-system-arm -M virt -cpu cortex-a15 -smp 2 -m 1024 -display none -monitor none -serial stdio -no-reboot -kernel work/netbsd-GENERIC.img -append root=ld0a -device virtio-rng-device -drive if=none,file=work/armv7.img,format=raw,id=hd0 -device virtio-blk-device,drive=hd0 -drive if=none,file=work/root.img,format=raw,id=hd1 -device virtio-blk-device,drive=hd1
