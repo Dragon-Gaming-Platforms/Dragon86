@@ -55,14 +55,14 @@
       "description": "NetBSD as the NetBSD Foundation builds it for real ARM64 hardware: the official 11.0 evbarm-aarch64 release, trimmed of its X11 sets and manual pages so it fits a browser download, and boot-tested before it ships. Unlike the Linux distros it does not unpack into your filesystem's /: NetBSD boots from its own disk image in browser storage (OPFS), and its files live inside that image, in NetBSD's own FFS filesystem — Files cannot see them, and exporting your filesystem does not include them. It needs the ARM64 machine (Settings → Machine). Serial console only for now: log in as root (no password), shut down with shutdown -p now. No network on this machine yet — honestly, not “coming right up”."
     },
     {
-      "id": "netbsd-arm32",
-      "name": "NetBSD (ARM32)",
-      "sub": "Official NetBSD 11.0, for the ARM32 machine",
+      "id": "alpine-arm32",
+      "name": "Alpine Linux (ARM32)",
+      "sub": "Official Alpine armv7, for the ARM32 machine",
       "category": "System",
-      "publisher": "The NetBSD Foundation · official release",
+      "publisher": "Alpine Linux · official release",
       "icon": "terminal",
-      "base": "netbsd32/",
-      "description": "NetBSD as the NetBSD Foundation builds it for real 32-bit ARM hardware: the official 11.0 evbarm-earmv7hf release, trimmed of its X11 sets and manual pages so it fits a browser download, and boot-tested before it ships. Unlike the Linux distros it does not unpack into your filesystem's /: NetBSD boots from its own disk image in browser storage (OPFS), and its files live inside that image, in NetBSD's own FFS filesystem — Files cannot see them, and exporting your filesystem does not include them. It needs the ARM32 machine (Settings → Machine). Serial console only for now: log in as root (no password), shut down with shutdown -p now. No network on this machine yet — honestly, not “coming right up”."
+      "base": "alpine32/",
+      "description": "Alpine Linux as the Alpine project builds it for 32-bit ARM: the official armv7 release — its virt kernel, initramfs, kernel modules and minirootfs userland — assembled onto an ext4 disk image and boot-tested on Dragon86's actual emulator core before it ships. It is the minimal Alpine: busybox and apk on busybox init, a few megabytes of userland, exactly what the official minirootfs contains. Unlike the Linux distros it does not unpack into your filesystem's /: it boots from its own disk image in browser storage (OPFS), and its files live inside that image, in ext4 — Files cannot see them, and exporting your filesystem does not include them. It needs the ARM32 machine (Settings → Machine). Serial console only for now: log in as root (no password), shut down with poweroff. No network on this machine yet — honestly, not “coming right up”. (It replaces the short-lived NetBSD (ARM32) entry, which the ARM32 machine's interrupt controller can never boot — any leftover NetBSD disk image is cleaned out of browser storage automatically.)"
     },
     {
       "id": "x11-wm-64",
@@ -72,7 +72,7 @@
       "publisher": "Arch Linux x86_64 packages · Dragon86 pack",
       "icon": "desktop",
       "base": "arch64-x11/",
-      "description": "A real X11 desktop for the x86-64 machine: Xorg on the machine's own display (open the Engine Viewer to see it), the IceWM window manager, and xterm — Arch's own packages, with the bochs display and evdev input kernel modules to match the installed kernel. Installing dumps /install-wm64.sh and its payload into your filesystem; the second half runs inside the machine: sh /install-wm64.sh, then startwm. Mouse and keyboard work on the Engine Viewer screen. Needs Arch Linux (x86-64) installed and the x86_64 machine selected."
+      "description": "A real X11 desktop for the x86-64 machine: Xorg on the machine's own display (open the Engine Viewer to see it), the IceWM window manager, and xterm — Arch's own packages, with the bochs display and evdev input kernel modules to match the installed kernel. Installing dumps /install-wm64.sh and its payload into your filesystem; the second half runs inside the machine: sh /install-wm64.sh, then startwm. Mouse and keyboard work on the Engine Viewer screen. An xterm opens with the desktop; for more, right-click the desktop (or Ctrl+Esc) for the menu, or press Ctrl+Alt+T. Needs Arch Linux (x86-64) installed and the x86_64 machine selected."
     },
     {
       "id": "netsurf-64",

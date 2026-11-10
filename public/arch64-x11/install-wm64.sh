@@ -69,4 +69,6 @@ echo
 echo "    startwm"
 echo
 echo "The desktop appears there - the mouse and keyboard work on that screen."
+echo "An xterm opens with the desktop. More terminals: right-click the"
+echo "desktop (or press Ctrl+Esc) for the menu and pick xterm, or Ctrl+Alt+T."
 echo "This serial terminal keeps working alongside it."
