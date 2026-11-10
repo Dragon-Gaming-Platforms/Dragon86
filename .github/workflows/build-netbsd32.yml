@@ -83,6 +83,25 @@ jobs:
           echo "armv7.img: got  $got"
           test -n "$want" && test "$want" = "$got"
 
+      - name: Find a virt machine type NetBSD/armv7 boots on
+        shell: bash
+        run: |
+          # The modern default `virt` board boots this kernel with no serial
+          # output at all; the NetBSD wiki uses the older virt-2.12. Probe a
+          # short list and keep the first one that prints the kernel banner.
+          pick=""
+          for M in virt-2.12 virt-6.2 "virt,highmem=off" virt; do
+            echo "=== probing -M $M ==="
+            (timeout 300 qemu-system-arm -M "$M" -cpu cortex-a15 -smp 2 -m 1024 \
+              -display none -monitor none -serial stdio -no-reboot \
+              -kernel work/netbsd-GENERIC.img -append "root=ld0a" \
+              -device virtio-rng-device || true) 2>&1 | head -c 4000 | tee work/probe-"$(echo "$M" | tr ,= -)".log
+            if grep -q "NetBSD" work/probe-"$(echo "$M" | tr ,= -)".log; then pick="$M"; break; fi
+          done
+          echo "picked machine: ${pick:-NONE}"
+          test -n "$pick"
+          echo "NB_MACHINE=$pick" >> "$GITHUB_ENV"
+
       - name: Assemble the trimmed root disk (QEMU, serial-driven)
         shell: bash
         run: |
@@ -91,6 +110,7 @@ jobs:
           # the official image's GPT holds wedges dk0 (EFI) and dk1 (FFS root)
           python3 tools/netbsd64/guest-driver.py \
             --qemu qemu-system-arm --cpu cortex-a15 --memory 1024 \
+            --machine "$NB_MACHINE" \
             --kernel work/netbsd-GENERIC.img \
             --disk work/armv7.img --disk work/root.img \
             --root ld0a,ld1a,ld2a,ld3a,ld4a,ld5a \
@@ -102,6 +122,7 @@ jobs:
         run: |
           python3 tools/netbsd64/guest-driver.py \
             --qemu qemu-system-arm --cpu cortex-a15 --memory 1024 \
+            --machine "$NB_MACHINE" \
             --kernel work/netbsd-GENERIC.img \
             --disk work/root.img \
             --root NAME=d86root --script tools/netbsd64/verify.cmds \

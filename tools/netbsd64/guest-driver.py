@@ -41,12 +41,15 @@ parser.add_argument("--timeout", type=int, default=1800, help="per-step timeout 
 parser.add_argument("--memory", default="2048")
 parser.add_argument("--qemu", default="qemu-system-aarch64", help="qemu binary (qemu-system-arm for armv7)")
 parser.add_argument("--cpu", default="cortex-a57", help="-cpu model (cortex-a15 for armv7)")
+parser.add_argument("--machine", default="virt",
+                    help="-M machine (NetBSD/armv7 needs an older virt, e.g. virt-2.12 — "
+                         "the modern default boots with no serial output at all)")
 args = parser.parse_args()
 
 root_candidates = args.root.split(",")
 
 qemu = [args.qemu,
-        "-M", "virt", "-cpu", args.cpu, "-smp", "2", "-m", args.memory,
+        "-M", args.machine, "-cpu", args.cpu, "-smp", "2", "-m", args.memory,
         "-display", "none", "-monitor", "none", "-serial", "stdio",
         "-no-reboot",
         "-kernel", args.kernel, "-append", "root=" + root_candidates[0],
