@@ -128,8 +128,9 @@ jobs:
           sudo tee -a mnt/etc/securetty > /dev/null <<'EOF'
           ttyAMA0
           EOF
-          sudo sed -i 's/^root:!::/root:::/' mnt/etc/shadow
-          sudo grep -q '^root:::' mnt/etc/shadow   # the login must actually be open
+          sudo grep '^root:' mnt/etc/shadow || true   # show what we are editing
+          sudo sed -i 's/^root:[^:]*:/root::/' mnt/etc/shadow   # blank the password field, whatever it held
+          sudo grep -q '^root::' mnt/etc/shadow   # the login must actually be open
           echo dragon86-alpine | sudo tee mnt/etc/hostname
           sudo tee mnt/etc/motd > /dev/null <<'EOF'
 

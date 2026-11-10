@@ -1,86 +1,0 @@
-+ mkdir -p work
-+ cd work
-+ curl -fL --retry 8 --retry-all-errors --retry-delay 15 --connect-timeout 30 -o latest-releases.yaml https://dl-cdn.alpinelinux.org/alpine/v3.24/releases/armv7/latest-releases.yaml
-  % Total    % Received % Xferd  Average Speed  Time    Time    Time   Current
-                                 Dload  Upload  Total   Spent   Left   Speed
-  0      0   0      0   0      0      0      0                              0100   4129 100   4129   0      0  23610      0                              0100   4129 100   4129   0      0  23601      0                              0100   4129 100   4129   0      0  23591      0                              0
-+ for flavor in alpine-minirootfs alpine-netboot
-++ awk -v f=alpine-minirootfs '$1=="file:" && $2 ~ "^"f"-" {print $2; exit}' latest-releases.yaml
-+ file=alpine-minirootfs-3.24.4-armv7.tar.gz
-++ awk -v f=alpine-minirootfs '$1=="file:" && $2 ~ "^"f"-" {found=1} found && $1=="sha512:" {print $2; exit}' latest-releases.yaml
-+ sha=ec63fee3f6519843918ee2837ba781ba252426c70a1294a8a79fcca1541875273926368bb8b697b94f2eb6f7aecc3be21f236696c9e6105eb9dee1bcd2629860
-+ echo 'alpine-minirootfs: alpine-minirootfs-3.24.4-armv7.tar.gz sha512=ec63fee3f6519843918ee2837ba781ba252426c70a1294a8a79fcca1541875273926368bb8b697b94f2eb6f7aecc3be21f236696c9e6105eb9dee1bcd2629860'
-alpine-minirootfs: alpine-minirootfs-3.24.4-armv7.tar.gz sha512=ec63fee3f6519843918ee2837ba781ba252426c70a1294a8a79fcca1541875273926368bb8b697b94f2eb6f7aecc3be21f236696c9e6105eb9dee1bcd2629860
-+ test -n alpine-minirootfs-3.24.4-armv7.tar.gz
-+ test -n ec63fee3f6519843918ee2837ba781ba252426c70a1294a8a79fcca1541875273926368bb8b697b94f2eb6f7aecc3be21f236696c9e6105eb9dee1bcd2629860
-+ curl -fL --retry 8 --retry-all-errors --retry-delay 15 --connect-timeout 30 -o alpine-minirootfs.tar.gz https://dl-cdn.alpinelinux.org/alpine/v3.24/releases/armv7/alpine-minirootfs-3.24.4-armv7.tar.gz
-  % Total    % Received % Xferd  Average Speed  Time    Time    Time   Current
-                                 Dload  Upload  Total   Spent   Left   Speed
-  0      0   0      0   0      0      0      0                              0100  3.03M 100  3.03M   0      0 22.43M      0                              0100  3.03M 100  3.03M   0      0 22.42M      0                              0100  3.03M 100  3.03M   0      0 22.40M      0                              0
-++ sha512sum alpine-minirootfs.tar.gz
-++ awk '{print $1}'
-+ got=ec63fee3f6519843918ee2837ba781ba252426c70a1294a8a79fcca1541875273926368bb8b697b94f2eb6f7aecc3be21f236696c9e6105eb9dee1bcd2629860
-+ echo 'got    ec63fee3f6519843918ee2837ba781ba252426c70a1294a8a79fcca1541875273926368bb8b697b94f2eb6f7aecc3be21f236696c9e6105eb9dee1bcd2629860'
-got    ec63fee3f6519843918ee2837ba781ba252426c70a1294a8a79fcca1541875273926368bb8b697b94f2eb6f7aecc3be21f236696c9e6105eb9dee1bcd2629860
-+ test ec63fee3f6519843918ee2837ba781ba252426c70a1294a8a79fcca1541875273926368bb8b697b94f2eb6f7aecc3be21f236696c9e6105eb9dee1bcd2629860 = ec63fee3f6519843918ee2837ba781ba252426c70a1294a8a79fcca1541875273926368bb8b697b94f2eb6f7aecc3be21f236696c9e6105eb9dee1bcd2629860
-+ echo alpine-minirootfs-3.24.4-armv7.tar.gz
-+ for flavor in alpine-minirootfs alpine-netboot
-++ awk -v f=alpine-netboot '$1=="file:" && $2 ~ "^"f"-" {print $2; exit}' latest-releases.yaml
-+ file=alpine-netboot-3.24.4-armv7.tar.gz
-++ awk -v f=alpine-netboot '$1=="file:" && $2 ~ "^"f"-" {found=1} found && $1=="sha512:" {print $2; exit}' latest-releases.yaml
-+ sha=922e37f15194dfdedf202d73e1e785f27060ecf3d0d939cb228364edd89f757223837681521cc9f500894aea1b0dc5f2d67a122a365250d6037efb693fa03dc3
-+ echo 'alpine-netboot: alpine-netboot-3.24.4-armv7.tar.gz sha512=922e37f15194dfdedf202d73e1e785f27060ecf3d0d939cb228364edd89f757223837681521cc9f500894aea1b0dc5f2d67a122a365250d6037efb693fa03dc3'
-alpine-netboot: alpine-netboot-3.24.4-armv7.tar.gz sha512=922e37f15194dfdedf202d73e1e785f27060ecf3d0d939cb228364edd89f757223837681521cc9f500894aea1b0dc5f2d67a122a365250d6037efb693fa03dc3
-+ test -n alpine-netboot-3.24.4-armv7.tar.gz
-+ test -n 922e37f15194dfdedf202d73e1e785f27060ecf3d0d939cb228364edd89f757223837681521cc9f500894aea1b0dc5f2d67a122a365250d6037efb693fa03dc3
-+ curl -fL --retry 8 --retry-all-errors --retry-delay 15 --connect-timeout 30 -o alpine-netboot.tar.gz https://dl-cdn.alpinelinux.org/alpine/v3.24/releases/armv7/alpine-netboot-3.24.4-armv7.tar.gz
-  % Total    % Received % Xferd  Average Speed  Time    Time    Time   Current
-                                 Dload  Upload  Total   Spent   Left   Speed
-  0      0   0      0   0      0      0      0                              0100 121.5M 100 121.5M   0      0 306.5M      0                              0100 121.5M 100 121.5M   0      0 306.5M      0                              0100 121.5M 100 121.5M   0      0 306.4M      0                              0
-++ sha512sum alpine-netboot.tar.gz
-++ awk '{print $1}'
-+ got=922e37f15194dfdedf202d73e1e785f27060ecf3d0d939cb228364edd89f757223837681521cc9f500894aea1b0dc5f2d67a122a365250d6037efb693fa03dc3
-+ echo 'got    922e37f15194dfdedf202d73e1e785f27060ecf3d0d939cb228364edd89f757223837681521cc9f500894aea1b0dc5f2d67a122a365250d6037efb693fa03dc3'
-got    922e37f15194dfdedf202d73e1e785f27060ecf3d0d939cb228364edd89f757223837681521cc9f500894aea1b0dc5f2d67a122a365250d6037efb693fa03dc3
-+ test 922e37f15194dfdedf202d73e1e785f27060ecf3d0d939cb228364edd89f757223837681521cc9f500894aea1b0dc5f2d67a122a365250d6037efb693fa03dc3 = 922e37f15194dfdedf202d73e1e785f27060ecf3d0d939cb228364edd89f757223837681521cc9f500894aea1b0dc5f2d67a122a365250d6037efb693fa03dc3
-+ echo alpine-netboot-3.24.4-armv7.tar.gz
-+ mkdir netboot
-+ tar -xzf alpine-netboot.tar.gz -C netboot
-+ ls -la netboot/boot
-total 125432
-drwxr-xr-x 3 runner runner     4096 Nov  5 09:19 .
-drwxr-xr-x 3 runner runner     4096 Nov 10 18:06 ..
--rw-r--r-- 1 runner runner  3386662 Nov  5 09:19 System.map-6.18.60-0-lts
--rw-r--r-- 1 runner runner  3358808 Nov  5 09:19 System.map-6.18.60-0-rpi
--rw-r--r-- 1 runner runner   269502 Nov  5 09:19 config-6.18.60-0-lts
--rw-r--r-- 1 runner runner   222279 Nov  5 09:19 config-6.18.60-0-rpi
-drwxr-xr-x 2 runner runner    36864 Nov  5 09:19 dtbs-lts
--rw------- 1 runner runner  7731735 Nov  5 09:19 initramfs-lts
--rw------- 1 runner runner  4865202 Nov  5 09:19 initramfs-rpi
--rw-r--r-- 1 runner runner 52838400 Nov  5 09:19 modloop-lts
--rw-r--r-- 1 runner runner 39100416 Nov  5 09:19 modloop-rpi
--rwxr-xr-x 1 runner runner  8528384 Nov  5 09:19 vmlinuz-lts
--rwxr-xr-x 1 runner runner  8078312 Nov  5 09:19 vmlinuz-rpi
-+ test -f netboot/boot/vmlinuz-lts
-+ test -f netboot/boot/initramfs-lts
-+ test -f netboot/boot/modloop-lts
-+ cd work
-+ truncate -s 512M root.img
-+ mkfs.ext4 -F -q -L d86root root.img
-+ mkdir mnt
-+ sudo mount -o loop root.img mnt
-+ sudo tar -xzf alpine-minirootfs.tar.gz -C mnt
-+ unsquashfs -q -d modloop netboot/boot/modloop-lts
-[=============================================|                ] 4756/6324  75%[=============================================================/] 6324/6324 100%
-+ sudo mkdir -p mnt/lib/modules
-+ sudo cp -a modloop/modules/. mnt/lib/modules/
-++ ls mnt/lib/modules
-++ head -1
-+ KVER=6.18.60-0-lts
-+ echo 'kernel modules: 6.18.60-0-lts'
-kernel modules: 6.18.60-0-lts
-+ test -n 6.18.60-0-lts
-+ sudo tee mnt/etc/inittab
-+ sudo tee -a mnt/etc/securetty
-+ sudo sed -i 's/^root:!::/root:::/' mnt/etc/shadow
-+ sudo grep -q '^root:::' mnt/etc/shadow
