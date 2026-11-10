@@ -3,8 +3,11 @@ name: Build alpine32 guest
 # Builds public/alpine32/ — Alpine Linux (armv7) for the ARM32 (v64 virt)
 # machine — and commits it. The pack is three pieces:
 #
-#   kernel.img.gz        Alpine's official vmlinuz-virt (a zImage — exactly
-#                        the raw kernel v64's arm32 loader wants)
+#   kernel.img.gz        Alpine's official vmlinuz-lts (a zImage — exactly
+#                        the raw kernel v64's arm32 loader wants; armv7's
+#                        netboot release ships lts + rpi kernels, and lts
+#                        is the multiplatform one that drives the virt
+#                        board and its GICv3)
 #   initrd.img           Alpine's official netboot initramfs, byte for byte
 #                        (a compressed cpio the kernel inflates itself)
 #   root.img.gz.NN       a 512 MiB ext4 disk holding the official Alpine
@@ -86,9 +89,9 @@ jobs:
           mkdir netboot
           tar -xzf alpine-netboot.tar.gz -C netboot
           ls -la netboot/boot
-          test -f netboot/boot/vmlinuz-virt
-          test -f netboot/boot/initramfs-virt
-          test -f netboot/boot/modloop-virt
+          test -f netboot/boot/vmlinuz-lts
+          test -f netboot/boot/initramfs-lts
+          test -f netboot/boot/modloop-lts
 
       - name: Assemble the root disk (ext4, loop-mounted on the runner)
         shell: bash
@@ -102,7 +105,7 @@ jobs:
           sudo mount -o loop root.img mnt
           sudo tar -xzf alpine-minirootfs.tar.gz -C mnt
           # the kernel's modules, from the official modloop squashfs
-          unsquashfs -q -d modloop netboot/boot/modloop-virt
+          unsquashfs -q -d modloop netboot/boot/modloop-lts
           sudo mkdir -p mnt/lib/modules
           sudo cp -a modloop/modules/. mnt/lib/modules/
           KVER=$(ls mnt/lib/modules | head -1)
@@ -149,10 +152,10 @@ jobs:
           set -x
           rm -rf public/alpine32
           mkdir -p public/alpine32
-          gzip -9c work/netboot/boot/vmlinuz-virt > public/alpine32/kernel.img.gz
+          gzip -9c work/netboot/boot/vmlinuz-lts > public/alpine32/kernel.img.gz
           # the initramfs ships byte for byte: it is already a compressed
           # cpio, and the kernel is the one who inflates it
-          cp work/netboot/boot/initramfs-virt public/alpine32/initrd.img
+          cp work/netboot/boot/initramfs-lts public/alpine32/initrd.img
           gzip -9c work/root.img > work/root.img.gz
           split -b 94371840 -d -a 2 work/root.img.gz public/alpine32/root.img.gz.
           ls -la public/alpine32
@@ -208,7 +211,7 @@ jobs:
                   "rawBytes": raw,
                   "rawSha256": rawsha.hexdigest(),
                   "rootArg": "/dev/vda",
-                  "extraCmdline": "rw rootfstype=ext4 console=ttyAMA0",
+                  "extraCmdline": "rw rootfstype=ext4 modules=ext4 console=ttyAMA0",
               },
           }
           with open("public/alpine32/manifest.json", "w") as f:
@@ -232,9 +235,11 @@ jobs:
           Built by .github/workflows/build-alpine32.yml from the official
           Alpine Linux release (no hand-built binaries):
 
-          - {netboot_file} — vmlinuz-virt (the kernel, a zImage), initramfs-virt
-            (shipped byte for byte as initrd.img), modloop-virt (the kernel's
-            modules, copied into the disk's /lib/modules)
+          - {netboot_file} — vmlinuz-lts (the kernel, a zImage; armv7's netboot
+            release ships lts + rpi, and lts is the multiplatform build that
+            drives the virt board), initramfs-lts (shipped byte for byte as
+            initrd.img), modloop-lts (the kernel's modules, copied into the
+            disk's /lib/modules)
           - {rootfs_file} — the userland, unpacked onto a {os.environ["ROOT_IMG_MIB"]} MiB ext4 image
 
           Both artifacts are SHA512-verified against latest-releases.yaml.
