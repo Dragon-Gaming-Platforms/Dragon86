@@ -2,7 +2,7 @@
  * Window manager — draggable, resizable, focusable windows.
  */
 
-import { el, icon } from "./dom";
+import { el, icon, attachDoubleTap } from "./dom";
 
 export interface WindowOpts {
   title: string;
@@ -180,9 +180,15 @@ export class WindowManager {
         this.toggleMaximize(id);
       }
     });
+    /* The same gesture for fingers — iOS never fires dblclick for taps. */
+    attachDoubleTap(bar, (e) => {
+      if (!(e.target as HTMLElement).closest(".d86-win-controls")) this.toggleMaximize(id);
+    });
 
     /* drag — with an 8px threshold so a tap on the title bar
-       (e.g. a missed close button) never grabs the window */
+       (e.g. a missed close button) never grabs the window. The capture is
+       taken when the drag starts, not on the press: WebKit withholds the
+       tap's synthesized clicks once a pointer is explicitly captured. */
     bar.addEventListener("pointerdown", (e: PointerEvent) => {
       if ((e.target as HTMLElement).closest(".d86-win-controls")) return;
       if (state.maximized) return;
@@ -191,11 +197,17 @@ export class WindowManager {
       const origX = frame.offsetLeft;
       const origY = frame.offsetTop;
       let dragging = false;
-      bar.setPointerCapture(e.pointerId);
       const move = (ev: PointerEvent) => {
         const dx = ev.clientX - startX;
         const dy = ev.clientY - startY;
         if (!dragging && Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
+        if (!dragging) {
+          try {
+            bar.setPointerCapture(e.pointerId);
+          } catch {
+            /* a capture that cannot be taken is not worth a crash */
+          }
+        }
         dragging = true;
         frame.style.left = `${origX + dx}px`;
         frame.style.top = `${Math.max(0, origY + dy)}px`;

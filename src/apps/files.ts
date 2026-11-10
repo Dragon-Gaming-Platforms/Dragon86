@@ -10,7 +10,7 @@
  *     open that file, with the current default marked.
  */
 
-import { el, icon, attachLongPress } from "../core/dom";
+import { el, icon, attachLongPress, attachDoubleTap } from "../core/dom";
 import { showContextMenu, showConfirm, showInput, type CtxItem } from "../core/dialog";
 import * as vfs from "../core/vfs";
 import type { Win } from "../core/wm";
@@ -165,6 +165,14 @@ export function openFiles(win: Win, startPath: string, handlers: FilesHandlers):
       row.classList.add("selected");
     });
     row.addEventListener("dblclick", () => openEntry(entry));
+    /* iOS never fires dblclick for taps — double-tap opens, same gesture. */
+    let lastOpen = 0;
+    attachDoubleTap(row, () => {
+      const now = performance.now();
+      if (now - lastOpen < 500) return;
+      lastOpen = now;
+      openEntry(entry);
+    });
 
     const openRowMenu = (x: number, y: number): void => {
       row.classList.add("selected");

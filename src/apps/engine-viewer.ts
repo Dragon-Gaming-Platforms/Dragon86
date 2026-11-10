@@ -239,26 +239,50 @@ export function openEngineViewer(win: Win, backend?: TerminalBackend | null): vo
    * back to display pixels, and the absolute point is container-relative so
    * the ratio survives the scaling untouched (vmware maps it to 0–65535).
    */
+  /* A finger is not a mouse, and the differences all matter here:
+     - a mouse hovers to a spot and THEN clicks; a finger lands and clicks
+       at once — so button events carry their position first, or the click
+       lands wherever the cursor last was (this is exactly what broke taps
+       on iPads: the guest's cursor followed the finger, the clicks did not);
+     - iOS reports movementX/movementY as 0 for touch — deltas are computed
+       from the last seen position instead;
+     - iOS has reported buttons=0 on touch pointerdown — a touch contact IS
+       a left button, so it is synthesized when missing;
+     - a gesture the browser steals ends in pointercancel, never pointerup —
+       without handling it the guest's button stays held down forever. */
+  const lastTouch = { id: -1, x: 0, y: 0 };
   const onPointer = (event: PointerEvent): void => {
     const live = mouseTarget();
     if (!live || !mounted) return;
     const rect = mounted.getBoundingClientRect();
+    const k = mounted.offsetWidth && rect.width ? rect.width / mounted.offsetWidth : 1;
+    const absX = event.clientX - rect.left;
+    const absY = event.clientY - rect.top;
+    const sendMove = (dx: number, dy: number): void => {
+      live.sendMouseMove?.(dx / k, dy / k, absX, absY, rect.width, rect.height);
+    };
     if (event.type === "pointermove") {
-      const k = mounted.offsetWidth && rect.width ? rect.width / mounted.offsetWidth : 1;
-      live.sendMouseMove?.(
-        event.movementX / k,
-        event.movementY / k,
-        event.clientX - rect.left,
-        event.clientY - rect.top,
-        rect.width,
-        rect.height,
-      );
+      if (event.pointerType === "mouse") {
+        sendMove(event.movementX, event.movementY);
+      } else {
+        const dx = lastTouch.id === event.pointerId ? event.clientX - lastTouch.x : 0;
+        const dy = lastTouch.id === event.pointerId ? event.clientY - lastTouch.y : 0;
+        lastTouch.id = event.pointerId;
+        lastTouch.x = event.clientX;
+        lastTouch.y = event.clientY;
+        sendMove(dx, dy);
+      }
       return;
     }
-    /* pointerdown / pointerup: the full button state in one message. */
-    const b = event.buttons;
+    /* down / up / cancel: position first, then the full button state. */
+    sendMove(0, 0);
+    let b = event.type === "pointercancel" ? 0 : event.buttons;
+    if (event.type === "pointerdown" && event.pointerType !== "mouse") b |= 1;
     live.sendMouseButtons?.(Boolean(b & 1), Boolean(b & 4), Boolean(b & 2));
     if (event.type === "pointerdown") {
+      lastTouch.id = event.pointerId;
+      lastTouch.x = event.clientX;
+      lastTouch.y = event.clientY;
       /* Keep the drag even when it leaves the window mid-move. */
       try {
         stage.setPointerCapture(event.pointerId);
@@ -271,6 +295,7 @@ export function openEngineViewer(win: Win, backend?: TerminalBackend | null): vo
   stage.addEventListener("pointermove", onPointer);
   stage.addEventListener("pointerdown", onPointer);
   stage.addEventListener("pointerup", onPointer);
+  stage.addEventListener("pointercancel", onPointer);
   const onWheel = (event: WheelEvent): void => {
     const live = mouseTarget();
     if (!live) return;
