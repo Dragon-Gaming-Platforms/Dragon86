@@ -44,7 +44,7 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    timeout-minutes: 200
     steps:
       - name: Checkout Dragon86
         uses: actions/checkout@v4
@@ -95,7 +95,7 @@ jobs:
             --disk work/armv7.img --disk work/root.img \
             --root ld0a,ld1a,ld2a,ld3a,ld4a,ld5a \
             --script tools/netbsd64/assemble32.cmds \
-            --timeout 3000 | tee work/assemble.log
+            --timeout 5400 | tee work/assemble.log
 
       - name: Boot-test the image alone (direct kernel boot, like the browser)
         shell: bash
@@ -187,6 +187,18 @@ jobs:
             echo "Rebuild: run the 'Build netbsd32 guest' workflow (it overwrites these files)."
           } > public/netbsd32/VENDORED.md
           du -sh public/netbsd32
+
+      - name: Export failure logs to the branch (the dev sandbox cannot read Actions logs)
+        if: failure()
+        run: |
+          { for f in work/*.log; do echo "=== tail -n 600 $f ==="; tail -n 600 "$f"; done; } \
+            > tools/netbsd64/netbsd32-fail.log 2>&1 || true
+          git config user.name "dragon86-bot"
+          git config user.email "dragon86-bot@users.noreply.github.com"
+          git add tools/netbsd64/netbsd32-fail.log
+          git commit -m "netbsd32 build: failure log (auto-exported for the sandbox)"
+          for i in 1 2 3; do git push && exit 0 || git pull --rebase; done
+          git push
 
       - name: Commit and push
         run: |
