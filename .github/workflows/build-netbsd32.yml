@@ -89,8 +89,9 @@ jobs:
           # The modern default `virt` board boots this kernel with no serial
           # output at all; the NetBSD wiki uses the older virt-2.12. Probe a
           # short list and keep the first one that prints the kernel banner.
+          gunzip -c work/netbsd-GENERIC.img.gz > work/netbsd-GENERIC.img
           pick=""
-          for M in virt-2.12 virt-6.2 "virt,highmem=off" virt; do
+          for M in virt-6.2 virt-7.2 "virt,highmem=off" "virt-6.2,highmem=off" virt; do
             echo "=== probing -M $M ==="
             (timeout 300 qemu-system-arm -M "$M" -cpu cortex-a15 -smp 2 -m 1024 \
               -display none -monitor none -serial stdio -no-reboot \
