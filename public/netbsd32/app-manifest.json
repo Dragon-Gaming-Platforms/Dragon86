@@ -1,7 +1,7 @@
 {
   "id": "netbsd-arm32",
   "kind": "disk-image",
-  "distro": "netbsd64",
+  "distro": "netbsd32",
   "arch": [
     "arm32"
   ],
