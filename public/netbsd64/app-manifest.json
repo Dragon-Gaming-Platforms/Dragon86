@@ -12,8 +12,7 @@
     "kernel.img.gz",
     "root.img.gz.00",
     "root.img.gz.01",
-    "root.img.gz.02",
-    "root.img.gz.03"
+    "root.img.gz.02"
   ],
   "note": "NetBSD boots from its own virtio disk image, not from the OS filesystem: the App Store streams root.img.gz.NN into browser storage (OPFS) as the ARM64 machine's disk, and all changes live inside that image. Only the ARM64 machine can boot it."
 }
