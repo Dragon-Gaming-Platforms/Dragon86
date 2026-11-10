@@ -64,6 +64,8 @@ jobs:
       - name: Download Alpine (minirootfs + netboot), SHA512-verified
         shell: bash
         run: |
+          exec > >(tee -a /tmp/alpine32-debug.log) 2>&1
+          set -x
           mkdir -p work
           cd work
           curl -fL --retry 8 --retry-all-errors --retry-delay 15 --connect-timeout 30 \
@@ -91,6 +93,8 @@ jobs:
       - name: Assemble the root disk (ext4, loop-mounted on the runner)
         shell: bash
         run: |
+          exec > >(tee -a /tmp/alpine32-debug.log) 2>&1
+          set -x
           cd work
           truncate -s "${ROOT_IMG_MIB}M" root.img
           mkfs.ext4 -F -q -L d86root root.img
@@ -141,6 +145,8 @@ jobs:
       - name: Package into public/alpine32
         shell: bash
         run: |
+          exec > >(tee -a /tmp/alpine32-debug.log) 2>&1
+          set -x
           rm -rf public/alpine32
           mkdir -p public/alpine32
           gzip -9c work/netboot/boot/vmlinuz-virt > public/alpine32/kernel.img.gz
@@ -246,12 +252,28 @@ jobs:
       - name: Boot-test on the real engine (v64 arm32, the browser's machine)
         shell: bash
         run: |
+          exec > >(tee -a /tmp/alpine32-debug.log) 2>&1
+          set -x
           BOOT_TIMEOUT=1500000 node tools/vm/boot-arm.mjs --arch arm32
+
+      - name: Publish the failure log into the branch (runner logs are unreachable from the dev sandbox)
+        if: failure()
+        run: |
+          mkdir -p ci-debug
+          cp /tmp/alpine32-debug.log ci-debug/alpine32-failure.log 2>/dev/null             || echo "the step failed before any logging started" > ci-debug/alpine32-failure.log
+          echo "--- last lines ---"; tail -n 60 ci-debug/alpine32-failure.log
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add ci-debug
+          git commit -m "ci: alpine32 build failure log" || exit 0
+          git pull --rebase origin "${{ github.ref_name }}" || true
+          git push origin "HEAD:${{ github.ref_name }}"
 
       - name: Commit and push
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          git rm -r -q --ignore-unmatch ci-debug
           git add -A public/alpine32
           if git diff --cached --quiet; then
             echo "build output unchanged — nothing to commit"
