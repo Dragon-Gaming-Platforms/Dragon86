@@ -1,0 +1,17 @@
+{
+  "id": "alpine-arm32",
+  "kind": "disk-image",
+  "distro": "alpine32",
+  "arch": [
+    "arm32"
+  ],
+  "kernel": "kernel.img.gz",
+  "image": "root.img.gz",
+  "manifest": "manifest.json",
+  "files": [
+    "kernel.img.gz",
+    "initrd.img",
+    "root.img.gz.00"
+  ],
+  "note": "Alpine boots from its own virtio disk image, not from the OS filesystem: the App Store streams root.img.gz.NN into browser storage (OPFS) as the ARM32 machine's disk, and all changes live inside that image. Only the ARM32 machine can boot it."
+}
