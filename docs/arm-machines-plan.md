@@ -49,6 +49,14 @@ The same wiki page shows the armv7 GENERIC kernel booting the 32-bit
 question to verify: v64's board is GICv3-only, and NetBSD/armv7's GICv3
 support needs checking (QEMU's 32-bit virt defaults to GICv2).
 
+**That question is now answered (checked in the vendored engine):** v64's
+arm32 machine is *not* GICv3-only — `libv86.js` sets `gic_v2` whenever
+`cpu_type === "arm32"` and emits an `arm,cortex-a15-gic` (GICv2) node in
+the device tree. NetBSD 11's armv7 GENERIC kernel has exactly that driver
+(`gic*`/`armgic`, no `gicvthree`), and QEMU's 32-bit `virt` board defaults
+to GICv2 too — so the CI boot test exercises the same interrupt controller
+the browser machine has. NetBSD (ARM32) shipped on this basis.
+
 **RISC OS: v64's arm32 does not help, and that is a board problem, not a
 CPU problem.** RISC OS only runs on hardware it was ported to — Archimedes
 (IOC/MEMC/VIDC), RiscPC (IOMD), Raspberry Pi (BCM283x), and a few others.
