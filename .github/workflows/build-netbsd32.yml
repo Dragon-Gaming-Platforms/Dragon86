@@ -62,6 +62,7 @@ jobs:
         run: |
           mkdir -p work
           curl -fL --retry 8 --retry-all-errors --retry-delay 15 --connect-timeout 30 -o work/netbsd-GENERIC.img.gz "$NETBSD_URL/kernel/netbsd-GENERIC.img.gz"
+          curl -fL --retry 8 --retry-all-errors --retry-delay 15 --connect-timeout 30 -o work/netbsd-GENERIC.ub.gz "$NETBSD_URL/kernel/netbsd-GENERIC.ub.gz"
           curl -fL --retry 8 --retry-all-errors --retry-delay 15 --connect-timeout 30 -o work/kernel.SHA512 "$NETBSD_URL/kernel/SHA512"
           curl -fL --retry 8 --retry-all-errors --retry-delay 15 --connect-timeout 30 -o work/armv7.img.gz "$NETBSD_URL/gzimg/armv7.img.gz"
           curl -fL --retry 8 --retry-all-errors --retry-delay 15 --connect-timeout 30 -o work/gzimg.MD5 "$NETBSD_URL/gzimg/MD5"
@@ -71,6 +72,11 @@ jobs:
           got=$(sha512sum netbsd-GENERIC.img.gz | awk '{print $1}')
           echo "kernel: want $want"
           echo "kernel: got  $got"
+          test -n "$want" && test "$want" = "$got"
+          want=$(awk -F' = ' '$1=="SHA512 (netbsd-GENERIC.ub.gz)" {print $2}' kernel.SHA512)
+          got=$(sha512sum netbsd-GENERIC.ub.gz | awk '{print $1}')
+          echo "ub kernel: want $want"
+          echo "ub kernel: got  $got"
           test -n "$want" && test "$want" = "$got"
           # the gzimg directory's SHA512 file only covers arm64mbr.img;
           # armv7.img is published with an MD5 of the UNCOMPRESSED image, so
@@ -86,33 +92,41 @@ jobs:
       - name: Find a virt machine type NetBSD/armv7 boots on
         shell: bash
         run: |
-          # The modern default `virt` board boots this kernel with no serial
-          # output at all; the NetBSD wiki uses the older virt-2.12. Probe a
-          # short list and keep the first one that prints the kernel banner.
+          # The .img kernel is a raw objcopy binary (no zImage header) and
+          # the default virt board booted it with zero serial output. QEMU's
+          # loader explicitly understands the .ub (uImage kernel_noload)
+          # format, so probe kernel formats x machine types and keep the
+          # first combination that prints the kernel banner. The browser
+          # still ships the raw .img: v64 takes a raw kernel buffer, and the
+          # .ub is that same binary behind a 64-byte header.
           gunzip -c work/netbsd-GENERIC.img.gz > work/netbsd-GENERIC.img
-          pick=""
-          for M in virt-6.2 virt-7.2 "virt,highmem=off" "virt-6.2,highmem=off" virt; do
-            echo "=== probing -M $M ==="
-            (timeout 300 qemu-system-arm -M "$M" -cpu cortex-a15 -smp 2 -m 1024 \
-              -display none -monitor none -serial stdio -no-reboot \
-              -kernel work/netbsd-GENERIC.img -append "root=ld0a" \
-              -device virtio-rng-device || true) 2>&1 | head -c 4000 | tee work/probe-"$(echo "$M" | tr ,= -)".log
-            if grep -q "NetBSD" work/probe-"$(echo "$M" | tr ,= -)".log; then pick="$M"; break; fi
+          gunzip -c work/netbsd-GENERIC.ub.gz > work/netbsd-GENERIC.ub
+          pickK=""; pickM=""
+          for K in ub img; do
+            for M in virt "virt,highmem=off" virt-6.2; do
+              tag="$K-$(echo "$M" | tr ,= -)"
+              echo "=== probing -kernel .$K -M $M ==="
+              (timeout 240 qemu-system-arm -M "$M" -cpu cortex-a15 -smp 2 -m 1024 \
+                -display none -monitor none -serial stdio -no-reboot \
+                -kernel "work/netbsd-GENERIC.$K" -append "root=ld0a" \
+                -device virtio-rng-device || true) 2>&1 | head -c 4000 | tee "work/probe-$tag.log"
+              if grep -q "NetBSD" "work/probe-$tag.log"; then pickK="$K"; pickM="$M"; break 2; fi
+            done
           done
-          echo "picked machine: ${pick:-NONE}"
-          test -n "$pick"
-          echo "NB_MACHINE=$pick" >> "$GITHUB_ENV"
+          echo "picked kernel format: ${pickK:-NONE}, machine: ${pickM:-NONE}"
+          test -n "$pickK"
+          echo "NB_KERNEL=work/netbsd-GENERIC.$pickK" >> "$GITHUB_ENV"
+          echo "NB_MACHINE=$pickM" >> "$GITHUB_ENV"
 
       - name: Assemble the trimmed root disk (QEMU, serial-driven)
         shell: bash
         run: |
-          gunzip -c work/netbsd-GENERIC.img.gz > work/netbsd-GENERIC.img
           truncate -s "${ROOT_IMG_MIB}M" work/root.img
           # the official image's GPT holds wedges dk0 (EFI) and dk1 (FFS root)
           python3 tools/netbsd64/guest-driver.py \
             --qemu qemu-system-arm --cpu cortex-a15 --memory 1024 \
             --machine "$NB_MACHINE" \
-            --kernel work/netbsd-GENERIC.img \
+            --kernel "$NB_KERNEL" \
             --disk work/armv7.img --disk work/root.img \
             --root ld0a,ld1a,ld2a,ld3a,ld4a,ld5a \
             --script tools/netbsd64/assemble32.cmds \
@@ -124,7 +138,7 @@ jobs:
           python3 tools/netbsd64/guest-driver.py \
             --qemu qemu-system-arm --cpu cortex-a15 --memory 1024 \
             --machine "$NB_MACHINE" \
-            --kernel work/netbsd-GENERIC.img \
+            --kernel "$NB_KERNEL" \
             --disk work/root.img \
             --root NAME=d86root --script tools/netbsd64/verify.cmds \
             --timeout 3000 | tee work/verify.log
