@@ -129,7 +129,7 @@ jobs:
           ttyAMA0
           EOF
           sudo sed -i 's/^root:!::/root:::/' mnt/etc/shadow
-          grep '^root:' mnt/etc/shadow | head -c 24; echo
+          sudo grep -q '^root:::' mnt/etc/shadow   # the login must actually be open
           echo dragon86-alpine | sudo tee mnt/etc/hostname
           sudo tee mnt/etc/motd > /dev/null <<'EOF'
 
