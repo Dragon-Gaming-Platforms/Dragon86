@@ -1,0 +1,30 @@
+{
+  "os": "Alpine Linux",
+  "version": "3.24.4",
+  "arch": "arm32",
+  "kernel": {
+    "file": "kernel.img.gz",
+    "gzBytes": 8456646,
+    "rawBytes": 8528384,
+    "sha256": "bb3acbde45447780bcec2b09a414816d48da5d17daadb0b028fecd218b52e4c1"
+  },
+  "initrd": {
+    "file": "initrd.img",
+    "bytes": 8222859,
+    "sha256": "0f6a0d085a2dc9daacbf52bfa773caf66b5cffb1128a0a5f31396ea1c87ddeda"
+  },
+  "root": {
+    "parts": [
+      {
+        "file": "root.img.gz.00",
+        "bytes": 70803715,
+        "sha256": "027b3810e170f0f75c5bcf0e79a7353341087bf4a49d61667c9bf4b024ec0581"
+      }
+    ],
+    "gzBytes": 70803715,
+    "rawBytes": 536870912,
+    "rawSha256": "f79b188090e6db6d1dc11d9d3cb673c6f7b37a6759e48b90d052a10a6de6cb65",
+    "rootArg": "/dev/vda",
+    "extraCmdline": "rw rootfstype=ext4 modules=ext4 console=ttyAMA0"
+  }
+}

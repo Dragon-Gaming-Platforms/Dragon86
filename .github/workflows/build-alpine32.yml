@@ -1,0 +1,330 @@
+name: Build alpine32 guest
+
+# Builds public/alpine32/ — Alpine Linux (armv7) for the ARM32 (v64 virt)
+# machine — and commits it. The pack is three pieces:
+#
+#   kernel.img.gz        Alpine's official vmlinuz-lts (a zImage — exactly
+#                        the raw kernel v64's arm32 loader wants; armv7's
+#                        netboot release ships lts + rpi kernels, and lts
+#                        is the multiplatform one that drives the virt
+#                        board and its GICv3)
+#   initrd.img           Alpine's official netboot initramfs plus the ext4
+#                        module closure from the official modloop (the
+#                        netboot initramfs alone cannot mount an ext4 root
+#                        — proven on the real engine), a compressed cpio
+#                        the kernel inflates itself
+#   root.img.gz.NN       a 512 MiB ext4 disk holding the official Alpine
+#                        minirootfs plus the kernel's modules, split for
+#                        GitHub's 100 MB file limit
+#
+# Why Alpine and not NetBSD here: v64's 32-bit virt board is GICv3-only
+# (upstream docs/arm32.md; its QEMU reference is virt-9.2,gic-version=3),
+# and NetBSD/armv7's GENERIC kernel only drives GICv2 — it boots QEMU's
+# default 32-bit virt and dies silently on v64's board. Alpine armv7 is
+# the guest upstream verified on this exact machine.
+#
+# The decisive test runs HERE, not in QEMU: tools/vm/boot-arm.mjs boots
+# the packaged files on the real vendored engine (public/v64, cpu_type
+# "arm32") under Node and fails unless Alpine reaches a root shell — the
+# same board, wasm and options the browser uses.
+#
+# No hand-built binaries: kernel, initramfs, modules and userland all come
+# from the official Alpine release, SHA512-verified via latest-releases.yaml.
+#
+# Trigger: pushing this file on a working branch, or a dispatch. Pushes to
+# main never build — a rebuild is never byte-identical, and nobody wants
+# regenerated packs committed on every merge.
+
+on:
+  workflow_dispatch:
+  push:
+    branches-ignore:
+      - main
+    paths:
+      - ".github/workflows/build-alpine32.yml"
+
+permissions:
+  contents: write
+
+concurrency: build-alpine32
+
+env:
+  ALPINE_BRANCH: v3.24
+  ALPINE_URL: https://dl-cdn.alpinelinux.org/alpine/v3.24/releases/armv7
+  ROOT_IMG_MIB: 512
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout Dragon86
+        uses: actions/checkout@v4
+
+      - name: Install tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends squashfs-tools
+          node --version
+
+      - name: Download Alpine (minirootfs + netboot), SHA512-verified
+        shell: bash
+        run: |
+          exec > >(tee -a /tmp/alpine32-debug.log) 2>&1
+          set -x
+          mkdir -p work
+          cd work
+          curl -fL --retry 8 --retry-all-errors --retry-delay 15 --connect-timeout 30 \
+            -o latest-releases.yaml "$ALPINE_URL/latest-releases.yaml"
+          # latest-releases.yaml names each flavor's file and its sha512
+          for flavor in alpine-minirootfs alpine-netboot; do
+            file=$(awk -v f="$flavor" '$1=="file:" && $2 ~ "^"f"-" {print $2; exit}' latest-releases.yaml)
+            sha=$(awk -v f="$flavor" '$1=="file:" && $2 ~ "^"f"-" {found=1} found && $1=="sha512:" {print $2; exit}' latest-releases.yaml)
+            echo "$flavor: $file sha512=$sha"
+            test -n "$file" && test -n "$sha"
+            curl -fL --retry 8 --retry-all-errors --retry-delay 15 --connect-timeout 30 \
+              -o "$flavor.tar.gz" "$ALPINE_URL/$file"
+            got=$(sha512sum "$flavor.tar.gz" | awk '{print $1}')
+            echo "got    $got"
+            test "$sha" = "$got"
+            echo "$file" > "$flavor.name"
+          done
+          mkdir netboot
+          tar -xzf alpine-netboot.tar.gz -C netboot
+          ls -la netboot/boot
+          test -f netboot/boot/vmlinuz-lts
+          test -f netboot/boot/initramfs-lts
+          test -f netboot/boot/modloop-lts
+
+      - name: Assemble the root disk (ext4, loop-mounted on the runner)
+        shell: bash
+        run: |
+          exec > >(tee -a /tmp/alpine32-debug.log) 2>&1
+          set -x
+          cd work
+          truncate -s "${ROOT_IMG_MIB}M" root.img
+          mkfs.ext4 -F -q -L d86root root.img
+          mkdir mnt
+          sudo mount -o loop root.img mnt
+          sudo tar -xzf alpine-minirootfs.tar.gz -C mnt
+          # the kernel's modules, from the official modloop squashfs
+          unsquashfs -q -d modloop netboot/boot/modloop-lts
+          sudo mkdir -p mnt/lib/modules
+          sudo cp -a modloop/modules/. mnt/lib/modules/
+          KVER=$(ls mnt/lib/modules | head -1)
+          echo "kernel modules: $KVER"
+          test -n "$KVER"
+          # Serial-console machine: getty on the PL011, root with no
+          # password (the same deal as the NetBSD packs — storage is the
+          # user's own browser), no VGA ttys to spawn.
+          sudo tee mnt/etc/inittab > /dev/null <<'EOF'
+          # Dragon86: busybox init on the ARM32 machine's serial console.
+          ::sysinit:/bin/mount -t proc proc /proc
+          ::sysinit:/bin/mount -t sysfs sysfs /sys
+          ::sysinit:/bin/mount -o remount,rw /
+          ::sysinit:/bin/mkdir -p /dev/pts /dev/shm
+          ::sysinit:/bin/mount -a
+          ::sysinit:/bin/hostname -F /etc/hostname
+          ttyAMA0::respawn:/sbin/getty -L 115200 ttyAMA0 vt100
+          ::ctrlaltdel:/sbin/reboot
+          ::shutdown:/bin/umount -a -r
+          EOF
+          sudo tee -a mnt/etc/securetty > /dev/null <<'EOF'
+          ttyAMA0
+          EOF
+          sudo grep '^root:' mnt/etc/shadow || true   # show what we are editing
+          sudo sed -i 's/^root:[^:]*:/root::/' mnt/etc/shadow   # blank the password field, whatever it held
+          sudo grep -q '^root::' mnt/etc/shadow   # the login must actually be open
+          echo dragon86-alpine | sudo tee mnt/etc/hostname
+          sudo tee mnt/etc/motd > /dev/null <<'EOF'
+
+          Alpine Linux (ARM32) on Dragon86 — the official minirootfs on
+          busybox init. Everything you change lives inside this disk image
+          in your browser's storage. Power off with: poweroff
+          EOF
+          sudo tee mnt/etc/fstab > /dev/null <<'EOF'
+          /dev/vda  /         ext4   rw,noatime  0 1
+          devpts    /dev/pts  devpts gid=5,mode=620  0 0
+          tmpfs     /dev/shm  tmpfs  nodev,nosuid,noexec  0 0
+          EOF
+          df -h mnt
+          sudo umount mnt
+
+      - name: Add ext4 to the initramfs (the official netboot one cannot mount an ext4 root)
+        shell: bash
+        run: |
+          exec > >(tee -a /tmp/alpine32-debug.log) 2>&1
+          set -x
+          # Proven on the real engine: the kernel boots, virtio_blk sees
+          # /dev/vda, and then "mount ... failed: No such device" — the
+          # netboot initramfs ships squashfs/network modules but no ext4.
+          # Add ext4 and exactly its dependency closure, read from the
+          # OFFICIAL modloop's own modules.dep, then re-run depmod.
+          cd work
+          KVER=$(ls modloop/modules | head -1)
+          MODSRC="modloop/modules/$KVER"
+          mkdir irfs
+          case "$(file -b netboot/boot/initramfs-lts)" in
+            gzip*) CAT="gzip -dc";;
+            Zstandard*) CAT="zstd -dc";;
+            *) echo "unexpected initramfs compression"; file netboot/boot/initramfs-lts; exit 1;;
+          esac
+          $CAT < netboot/boot/initramfs-lts | (cd irfs && sudo cpio -idm --quiet)
+          test -d "irfs/lib/modules/$KVER"
+          deps=$(awk -F: '$1 ~ /\/ext4\.ko/ {print $1" "$2}' "$MODSRC/modules.dep")
+          test -n "$deps"
+          for m in $deps; do
+            echo "  + $m"
+            sudo install -D -m 644 "$MODSRC/$m" "irfs/lib/modules/$KVER/$m"
+          done
+          sudo depmod -b "$PWD/irfs" "$KVER"
+          sudo grep -q ext4 "irfs/lib/modules/$KVER/modules.dep"
+          (cd irfs && sudo find . | sudo cpio -o -H newc --quiet) | gzip -9 > initrd-ext4.img
+          ls -la netboot/boot/initramfs-lts initrd-ext4.img
+
+      - name: Package into public/alpine32
+        shell: bash
+        run: |
+          exec > >(tee -a /tmp/alpine32-debug.log) 2>&1
+          set -x
+          rm -rf public/alpine32
+          mkdir -p public/alpine32
+          gzip -9c work/netboot/boot/vmlinuz-lts > public/alpine32/kernel.img.gz
+          # the rebuilt initramfs (official + ext4 modules): a compressed
+          # cpio, and the kernel is the one who inflates it
+          cp work/initrd-ext4.img public/alpine32/initrd.img
+          gzip -9c work/root.img > work/root.img.gz
+          split -b 94371840 -d -a 2 work/root.img.gz public/alpine32/root.img.gz.
+          ls -la public/alpine32
+          python3 - <<'EOF'
+          import hashlib, json, os, glob, gzip
+          def sha256(p):
+              h = hashlib.sha256()
+              with open(p, "rb") as f:
+                  for chunk in iter(lambda: f.read(1 << 20), b""):
+                      h.update(chunk)
+              return h.hexdigest()
+          def rawsha_gz(p):
+              h = hashlib.sha256()
+              n = 0
+              with gzip.open(p, "rb") as f:
+                  for chunk in iter(lambda: f.read(1 << 20), b""):
+                      h.update(chunk); n += len(chunk)
+              return h.hexdigest(), n
+          kraw, kn = rawsha_gz("public/alpine32/kernel.img.gz")
+          parts = sorted(os.path.basename(p) for p in glob.glob("public/alpine32/root.img.gz.*"))
+          rawsha = hashlib.sha256()
+          raw = 0
+          with open("work/root.img", "rb") as f:
+              for chunk in iter(lambda: f.read(1 << 20), b""):
+                  rawsha.update(chunk); raw += len(chunk)
+          with open("work/alpine-minirootfs.name") as f:
+              rootfs_file = f.read().strip()
+          with open("work/alpine-netboot.name") as f:
+              netboot_file = f.read().strip()
+          version = rootfs_file.split("-")[2]
+          manifest = {
+              "os": "Alpine Linux",
+              "version": version,
+              "arch": "arm32",
+              "kernel": {
+                  "file": "kernel.img.gz",
+                  "gzBytes": os.path.getsize("public/alpine32/kernel.img.gz"),
+                  "rawBytes": kn,
+                  "sha256": kraw,
+              },
+              "initrd": {
+                  "file": "initrd.img",
+                  "bytes": os.path.getsize("public/alpine32/initrd.img"),
+                  "sha256": sha256("public/alpine32/initrd.img"),
+              },
+              "root": {
+                  "parts": [
+                      {"file": p, "bytes": os.path.getsize(f"public/alpine32/{p}"),
+                       "sha256": sha256(f"public/alpine32/{p}")}
+                      for p in parts
+                  ],
+                  "gzBytes": os.path.getsize("work/root.img.gz"),
+                  "rawBytes": raw,
+                  "rawSha256": rawsha.hexdigest(),
+                  "rootArg": "/dev/vda",
+                  "extraCmdline": "rw rootfstype=ext4 modules=ext4 console=ttyAMA0",
+              },
+          }
+          with open("public/alpine32/manifest.json", "w") as f:
+              json.dump(manifest, f, indent=2)
+          app = {
+              "id": "alpine-arm32",
+              "kind": "disk-image",
+              "distro": "alpine32",
+              "arch": ["arm32"],
+              "kernel": "kernel.img.gz",
+              "image": "root.img.gz",
+              "manifest": "manifest.json",
+              "files": ["kernel.img.gz", "initrd.img"] + parts,
+              "note": "Alpine boots from its own virtio disk image, not from the OS filesystem: the App Store streams root.img.gz.NN into browser storage (OPFS) as the ARM32 machine's disk, and all changes live inside that image. Only the ARM32 machine can boot it.",
+          }
+          with open("public/alpine32/app-manifest.json", "w") as f:
+              json.dump(app, f, indent=2)
+          with open("public/alpine32/VENDORED.md", "w") as f:
+              f.write(f"""# Alpine Linux (ARM32) — vendored guest
+
+          Built by .github/workflows/build-alpine32.yml from the official
+          Alpine Linux release (no hand-built binaries):
+
+          - {netboot_file} — vmlinuz-lts (the kernel, a zImage; armv7's netboot
+            release ships lts + rpi, and lts is the multiplatform build that
+            drives the virt board), initramfs-lts (shipped as initrd.img with
+            ONE addition: the ext4 module closure from modloop-lts, because
+            the official netboot initramfs cannot mount an ext4 root — the
+            boot test on the real engine proved it), modloop-lts (the
+            kernel's modules, copied into the disk's /lib/modules)
+          - {rootfs_file} — the userland, unpacked onto a {os.environ["ROOT_IMG_MIB"]} MiB ext4 image
+
+          Both artifacts are SHA512-verified against latest-releases.yaml.
+          Local changes: a serial-console inittab (getty on ttyAMA0), root
+          login without a password, hostname, motd, fstab. Boot-tested on
+          the REAL vendored engine (public/v64, cpu_type "arm32") by
+          tools/vm/boot-arm.mjs before this commit.
+
+          Alpine Linux is (c) its contributors, MIT-style licenses per
+          package; see https://alpinelinux.org.
+          """.replace("\n          ", "\n"))
+          print(json.dumps(manifest, indent=2))
+          EOF
+
+      - name: Boot-test on the real engine (v64 arm32, the browser's machine)
+        shell: bash
+        run: |
+          exec > >(tee -a /tmp/alpine32-debug.log) 2>&1
+          set -x
+          BOOT_TIMEOUT=1500000 node tools/vm/boot-arm.mjs --arch arm32
+
+      - name: Publish the failure log into the branch (runner logs are unreachable from the dev sandbox)
+        if: failure()
+        run: |
+          mkdir -p ci-debug
+          cp /tmp/alpine32-debug.log ci-debug/alpine32-failure.log 2>/dev/null             || echo "the step failed before any logging started" > ci-debug/alpine32-failure.log
+          echo "--- last lines ---"; tail -n 60 ci-debug/alpine32-failure.log
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add ci-debug
+          git commit -m "ci: alpine32 build failure log" || exit 0
+          git pull --rebase origin "${{ github.ref_name }}" || true
+          git push origin "HEAD:${{ github.ref_name }}"
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git rm -r -q --ignore-unmatch ci-debug
+          git add -A public/alpine32
+          if git diff --cached --quiet; then
+            echo "build output unchanged — nothing to commit"
+          else
+            git commit -m "Vendor Alpine Linux (ARM32) guest (official release, boot-tested on the vendored engine)"
+            for i in 1 2 3; do
+              git push origin "HEAD:${{ github.ref_name }}" && break
+              git pull --rebase origin "${{ github.ref_name }}"
+            done
+          fi

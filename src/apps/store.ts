@@ -1065,7 +1065,7 @@ export function openStore(win: Win): void {
   }
 
   /**
-   * Install a disk-image OS (NetBSD ARM64): stream the split, gzipped
+   * Install a disk-image OS (NetBSD ARM64 / Alpine ARM32): stream the split, gzipped
    * image into the browser's private storage (OPFS), where the matching
    * ARM machine opens it read-write as its disk. Nothing touches ZenFS /:
    * NetBSD's files live inside the image, in its own filesystem (FFS),

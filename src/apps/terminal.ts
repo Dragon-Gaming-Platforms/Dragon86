@@ -18,7 +18,7 @@ import type { Win } from "../core/wm";
 import type { TerminalBackend } from "../bridge/engine";
 import { getV86Backend } from "../bridge/v86";
 import { getRV64Backend } from "../bridge/rv64";
-import { netbsdInstalled } from "../bridge/netbsd64";
+import { netbsdInstalled, netbsdOsLabel } from "../bridge/netbsd64";
 import { distroInstalled, installedDistro, DISTROS, type DistroId } from "../bridge/guest-root";
 import * as vfs from "../core/vfs";
 import { isolationReport, logInfo, logWarn } from "../core/log";
@@ -233,9 +233,10 @@ export function openTerminal(win: Win, options: TerminalOptions = {}): void {
     term.writeln(`  ${GREEN}●${RESET} ${ARCH_LABEL[arch]} machine : ready`);
     term.writeln(`  ${RED}●${RESET} Operating system  : not installed`);
     term.writeln("");
+    const osName = arch === "arm64" || arch === "arm32" ? netbsdOsLabel(arch) : "an OS";
     term.writeln(`  The machine has nothing to boot: no ${ARCH_LABEL[arch]} disk image is installed.`);
     term.writeln("");
-    term.writeln(`  Open the ${BOLD}App Store${RESET} and install ${BOLD}NetBSD (${ARCH_LABEL[arch]})${RESET} — the OS built`);
+    term.writeln(`  Open the ${BOLD}App Store${RESET} and install ${BOLD}${osName}${RESET} — the OS built`);
     term.writeln(`  for this machine. Unlike the Linux distros it does not unpack`);
     term.writeln(`  into /: it boots from its own disk image in browser storage.`);
     term.writeln(`  Then hit ${BOLD}Reconnect${RESET} here.`);
@@ -307,7 +308,8 @@ export function openTerminal(win: Win, options: TerminalOptions = {}): void {
      detail (bridge/v86.ts). */
   const engineLabel = (): string => {
     const arch = getSettings().arch;
-    if (arch === "arm64" || arch === "arm32") return `Terminal — ${ARCH_LABEL[arch]} · NetBSD`;
+    if (arch === "arm64") return `Terminal — ${ARCH_LABEL.arm64} · NetBSD`;
+    if (arch === "arm32") return `Terminal — ${ARCH_LABEL.arm32} · Alpine Linux`;
     if (arch === "riscv64") return `Terminal — ${ARCH_LABEL.riscv64} · Alpine Linux`;
     return `Terminal — ${ARCH_LABEL[arch]} · Arch Linux`;
   };
@@ -370,13 +372,13 @@ export function openTerminal(win: Win, options: TerminalOptions = {}): void {
     setChip("connecting", "Connecting…");
     term.clear();
     flushPrint();
-    const osName = isArm ? "NetBSD" : isRv ? "Alpine" : "Arch";
+    const osName = arch === "arm64" ? "NetBSD" : arch === "arm32" ? "Alpine" : isRv ? "Alpine" : "Arch";
     term.writeln(`${DIM}Starting the ${ARCH_LABEL[arch]} machine (${osName}, in-page).${RESET}`);
     if (isArm) {
-      term.writeln(`${DIM}NetBSD boots from its own disk image in browser storage — its files are NOT in Files.${RESET}`);
+      term.writeln(`${DIM}${osName} boots from its own disk image in browser storage — its files are NOT in Files.${RESET}`);
       term.writeln(`${DIM}Changes persist inside that image. Log in as: root (no password).${RESET}`);
       term.writeln(`${DIM}This machine has no screen or network yet — the serial console here IS its console.${RESET}`);
-      term.writeln(`${DIM}Shut down cleanly with: shutdown -p now${RESET}`);
+      term.writeln(`${DIM}Shut down cleanly with: ${arch === "arm32" ? "poweroff" : "shutdown -p now"}${RESET}`);
     } else {
       term.writeln(`${DIM}Its root filesystem is YOUR filesystem: the guest's / is the / that Files shows.${RESET}`);
       term.writeln(`${DIM}It boots the ${osName} userland installed in / (App Store → ${isRv ? DISTROS["alpine-rv64"].name : "Arch Linux"}).${RESET}`);

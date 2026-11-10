@@ -564,7 +564,7 @@ export function openSettings(win: Win, startPage?: string): void {
         id: "arm32",
         label: "ARM32",
         blurb:
-          "A 32-bit ARM machine (the same QEMU-virt board, ARMv7). Boots NetBSD (ARM32) from the App Store — a real disk image in browser storage, serial console only; log in as root.",
+          "A 32-bit ARM machine (the same QEMU-virt board, ARMv7). Boots Alpine Linux (ARM32) from the App Store — a real disk image in browser storage, serial console only; log in as root.",
       },
     ];
     const seg = el("div", "segmented");

@@ -1,20 +1,26 @@
 /**
- * NetBSD — the disk-image OS for the ARM machines, in two builds:
+ * The disk-image OSes for the ARM machines. (The file keeps its first
+ * name, netbsd64 — NetBSD on ARM64 was the one of these that existed
+ * when it was written.)
  *
- *   arm64 → NetBSD 11.0 evbarm-aarch64, public/netbsd64/, the ARM64 machine
- *   arm32 → NetBSD 11.0 evbarm-earmv7hf, public/netbsd32/, the ARM32 machine
+ *   arm64 → NetBSD 11.0 evbarm-aarch64, public/netbsd64/
+ *           (built by .github/workflows/build-netbsd64.yml)
+ *   arm32 → Alpine Linux armv7, public/alpine32/
+ *           (built by .github/workflows/build-alpine32.yml; NetBSD cannot
+ *           run here — v64's 32-bit virt board is GICv3-only and
+ *           NetBSD/armv7 only drives GICv2, found the hard way with
+ *           tools/vm/boot-arm.mjs)
  *
- * This OS is nothing like the Linux distros: those unpack their userland
- * into ZenFS `/` and the guest mounts it over 9p. NetBSD boots from a real
- * disk — a GPT image with one FFS partition (label `d86root`), built and
- * boot-tested by .github/workflows/build-netbsd64.yml / build-netbsd32.yml
- * from the official NetBSD 11.0 release — so its files live INSIDE that
- * image, not in the OS filesystem, and the Files app cannot see them. That
- * is the honest truth of a foreign filesystem (FFS), and the App Store
- * entry says so.
+ * These OSes are nothing like the Linux distros in /: those unpack their
+ * userland into ZenFS `/` and the guest mounts it over 9p. A disk-image
+ * OS boots from a real disk image, built and boot-tested by its workflow
+ * from official release artifacts — its files live INSIDE that image, in
+ * its own filesystem (FFS / ext4), and the Files app cannot see them.
+ * That is the honest truth of a foreign filesystem, and the App Store
+ * entries say so.
  *
  * Where the disk lives: the browser's private storage (OPFS), at
- * `dragon86-disks/netbsd64.img` (or netbsd32.img). The emulator opens it
+ * `dragon86-disks/netbsd64.img` (or alpine32.img). The emulator opens it
  * as a browser disk (`opfs:` url, disk_option "read_write") and writes the
  * guest's changes straight back into it through a sync access handle —
  * which only exists in workers, which is why the ARM machines run with
@@ -37,12 +43,18 @@ export interface NetbsdManifest {
   version: string;
   arch: string;
   kernel: { file: string; gzBytes: number; rawBytes: number; sha256: string };
+  /** Alpine only: the initramfs (official netboot one + the ext4 module
+      closure, see build-alpine32.yml) — a compressed cpio the kernel
+      inflates itself; fetched whole, passed whole. */
+  initrd?: { file: string; bytes: number; sha256: string };
   root: {
     parts: { file: string; bytes: number; sha256: string }[];
     gzBytes: number;
     rawBytes: number;
     rawSha256: string;
     rootArg: string;
+    /** Extra kernel arguments after root= (Alpine: rw, rootfstype, console). */
+    extraCmdline?: string;
   };
 }
 
@@ -56,12 +68,24 @@ interface Target {
   disk: string;
   /** The machine's name in user-facing messages. */
   label: string;
+  /** The OS name in user-facing messages (what the App Store entry is called). */
+  os: string;
+  /** Disk files earlier builds of this target used — swept on install and
+      uninstall, so an abandoned image does not sit invisibly in OPFS. */
+  legacy: string[];
 }
 
 const TARGETS: Record<NetbsdArch, Target> = {
-  arm64: { dir: "netbsd64", disk: "netbsd64.img", label: "ARM64" },
-  arm32: { dir: "netbsd32", disk: "netbsd32.img", label: "ARM32" },
+  arm64: { dir: "netbsd64", disk: "netbsd64.img", label: "ARM64", os: "NetBSD (ARM64)", legacy: [] },
+  /* netbsd32.img: the short-lived NetBSD (ARM32) build (PR #89) that v64's
+     GICv3-only board can never boot — delete it when found. */
+  arm32: { dir: "alpine32", disk: "alpine32.img", label: "ARM32", os: "Alpine Linux (ARM32)", legacy: ["netbsd32.img", "netbsd32.json"] },
 };
+
+/** The OS an arch's App Store entry installs — for user-facing messages. */
+export function netbsdOsLabel(arch: NetbsdArch): string {
+  return TARGETS[arch].os;
+}
 
 export function netbsdBase(arch: NetbsdArch): string {
   return `${import.meta.env.BASE_URL}${TARGETS[arch].dir}/`;
@@ -241,6 +265,7 @@ export async function netbsdInstalled(arch: NetbsdArch): Promise<boolean> {
 export async function installNetbsd(arch: NetbsdArch, onStatus?: (text: string) => void): Promise<void> {
   const man = await netbsdManifest(arch);
   const dir = await diskDir(arch, true);
+  await sweepLegacy(arch, dir);
   const handle = await dir.getFileHandle(TARGETS[arch].disk, { create: true });
   const writable = await openDiskWritable(arch, handle);
   const gunzip = new DecompressionStream("gzip");
@@ -310,7 +335,35 @@ export async function uninstallNetbsd(arch: NetbsdArch): Promise<void> {
   for (const record of [`${diskFile}.json`, diskFile.replace(/\.img$/, ".json")]) {
     await dir.removeEntry(record).catch(() => {});
   }
+  await sweepLegacy(arch, dir);
   logInfo("netbsd64", `${arch} disk image removed from OPFS`);
+}
+
+/** Delete disk files earlier builds of this target left behind — best
+    effort (a locked or missing file is fine), but logged when found. */
+async function sweepLegacy(arch: NetbsdArch, dir: FileSystemDirectoryHandle): Promise<void> {
+  for (const name of TARGETS[arch].legacy) {
+    try {
+      await dir.removeEntry(name);
+      logInfo("netbsd64", `removed the abandoned ${name} from browser storage`);
+    } catch {
+      /* not there (the common case) or locked — nothing to do */
+    }
+  }
+}
+
+/** The initramfs, when the pack has one — fetched whole, passed whole:
+    it is a compressed cpio and the KERNEL inflates it, not us. */
+export async function netbsdInitrd(arch: NetbsdArch): Promise<Uint8Array | null> {
+  const man = await netbsdManifest(arch);
+  if (!man.initrd) return null;
+  const res = await fetch(new URL(man.initrd.file, netbsdBase(arch)).href);
+  if (!res.ok) throw new Error(`${man.initrd.file}: HTTP ${res.status}`);
+  const bytes = new Uint8Array(await res.arrayBuffer());
+  if (bytes.byteLength !== man.initrd.bytes) {
+    throw new Error(`${man.initrd.file} is ${bytes.byteLength} bytes, the manifest says ${man.initrd.bytes}`);
+  }
+  return bytes;
 }
 
 /** The kernel, decompressed — v64 boots it directly (Linux boot header). */

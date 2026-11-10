@@ -21,9 +21,10 @@
  *            worker — still no cross-origin isolation). Serial console
  *            only for now; the virt board has no VGA.
  *   arm32  → the same virt-board core with cpu_type "arm32" (the wasm has
- *            a 32-bit boot entry point). It boots NetBSD (ARM32) — the
- *            official evbarm-earmv7hf build — from its own OPFS disk
- *            image, exactly like the ARM64 machine.
+ *            a 32-bit boot entry point; this board is GICv3-only, which
+ *            is why its OS is Alpine and not NetBSD — NetBSD/armv7 only
+ *            drives GICv2). It boots Alpine Linux (ARM32) from its own
+ *            OPFS disk image, exactly like the ARM64 machine.
  *
  * (The old 32-bit-only v86 build used to serve x86_32; it was removed
  * once v64's 32-bit machine passed the same boot proofs.) The API is the
@@ -54,7 +55,7 @@ import { ensureDir } from "../core/vfs";
 import { getSettings, type MachineArch } from "../core/settings";
 import { createP9Handler } from "./p9";
 import { ensureGuestRoot, installedDistro, DISTROS, at } from "./guest-root";
-import { netbsdDiskUrl, netbsdInstalled, netbsdKernel, netbsdManifest, type NetbsdArch } from "./netbsd64";
+import { netbsdDiskUrl, netbsdInitrd, netbsdInstalled, netbsdKernel, netbsdManifest, netbsdOsLabel, type NetbsdArch } from "./netbsd64";
 import { createDirectFs, unionAsPromises } from "./union-fs";
 import { logInfo, logWarn } from "../core/log";
 import type { BackendHandlers, EngineScreen, TerminalBackend } from "./engine";
@@ -591,12 +592,13 @@ class V86Backend implements TerminalBackend {
     this.readyMark = "login:";
     if (!(await netbsdInstalled(arch))) {
       throw new Error(
-        `no ${label} OS is installed — install NetBSD (${label}) from the App Store (its disk image lives in browser storage, not in /)`,
+        `no ${label} OS is installed — install ${netbsdOsLabel(arch)} from the App Store (its disk image lives in browser storage, not in /)`,
       );
     }
     const man = await netbsdManifest(arch);
-    this.status("loading the NetBSD kernel");
+    this.status(`loading the ${man.os} kernel`);
     const kernel = await netbsdKernel(arch);
+    const initrd = await netbsdInitrd(arch);
     if (this.disposed) return;
     const V86 = await loadLib(BASE);
     if (this.disposed) return;
@@ -613,7 +615,10 @@ class V86Backend implements TerminalBackend {
       cpu_worker_url: `${BASE}cpu-worker.js`,
       memory_size: 512 * 1024 * 1024,
       kernel: { buffer: kernel.buffer as ArrayBuffer },
-      cmdline: `root=${man.root.rootArg}`,
+      /* Alpine's initramfs rides along as the kernel wants it — a
+         compressed cpio the kernel inflates itself. NetBSD has none. */
+      ...(initrd ? { initrd: { buffer: initrd.buffer as ArrayBuffer } } : {}),
+      cmdline: `root=${man.root.rootArg}${man.root.extraCmdline ? ` ${man.root.extraCmdline}` : ""}`,
       virtio_disks: [
         { url: DISK_URL, disk_option: "read_write", size: man.root.rawBytes },
       ],
@@ -625,7 +630,7 @@ class V86Backend implements TerminalBackend {
       disable_speaker: true,
     };
 
-    this.status(`booting NetBSD ${man.version} from its disk image (log in as root)`);
+    this.status(`booting ${man.os} ${man.version} from its disk image (log in as root)`);
     logInfo("v86", `${arch}: kernel ${kernel.byteLength} bytes, disk ${DISK_URL} (${man.root.rawBytes} bytes), cpu worker on`);
     const emu = new V86(opts);
     this.emu = emu;
