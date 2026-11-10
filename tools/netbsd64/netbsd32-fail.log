@@ -1,10 +1,13 @@
-=== tail -n 600 work/probe-virt-2.12.log ===
-qemu-system-arm: unsupported machine type: "virt-2.12"
-Use -machine help to list supported machines
+=== tail -n 600 work/probe-virt-6.2-highmem-off.log ===
+qemu-system-arm: warning: Machine type 'virt-6.2' is deprecated: machines more than 3 years old are subject to deletion after 6 years
+qemu-system-arm: terminating on signal 15 from pid 3207 (timeout)
 === tail -n 600 work/probe-virt-6.2.log ===
 qemu-system-arm: warning: Machine type 'virt-6.2' is deprecated: machines more than 3 years old are subject to deletion after 6 years
-qemu-system-arm: could not load kernel 'work/netbsd-GENERIC.img'
+qemu-system-arm: terminating on signal 15 from pid 2886 (timeout)
+=== tail -n 600 work/probe-virt-7.2.log ===
+qemu-system-arm: warning: Machine type 'virt-7.2' is deprecated: machines more than 3 years old are subject to deletion after 6 years
+qemu-system-arm: terminating on signal 15 from pid 2997 (timeout)
 === tail -n 600 work/probe-virt-highmem-off.log ===
-qemu-system-arm: could not load kernel 'work/netbsd-GENERIC.img'
+qemu-system-arm: terminating on signal 15 from pid 3062 (timeout)
 === tail -n 600 work/probe-virt.log ===
-qemu-system-arm: could not load kernel 'work/netbsd-GENERIC.img'
+qemu-system-arm: terminating on signal 15 from pid 3262 (timeout)
