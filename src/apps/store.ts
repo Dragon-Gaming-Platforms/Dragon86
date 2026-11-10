@@ -34,7 +34,7 @@ import {
   normExt,
 } from "../core/fs-apps";
 import { ensureGuestRoot, installedDistro, type DistroId } from "../bridge/guest-root";
-import { installNetbsd64, netbsd64Installed, uninstallNetbsd64 } from "../bridge/netbsd64";
+import { installNetbsd, netbsdInstalled, netbsdMachineLabel, uninstallNetbsd, type NetbsdArch } from "../bridge/netbsd64";
 import { fetchBytes, humanMB, mapLimit, remoteSize } from "../core/download";
 import type { Win } from "../core/wm";
 
@@ -98,6 +98,9 @@ interface AppManifest {
       the build workflow wrote them — it knows how the payload was split,
       the catalog never has to guess. */
   files?: string[];
+  /** For kind "disk-image": which machine boots it ("arm64" / "arm32"),
+      as the build workflow wrote it. */
+  arch?: string[];
   /** For kind "guest-pack": the command to run inside the machine. */
   run?: string;
 }
@@ -300,7 +303,7 @@ export function openStore(win: Win): void {
         /* Installed = the full-size image sits in browser storage (OPFS).
            A half-downloaded image fails the size test and the Install
            button honestly comes back. */
-        if (await netbsd64Installed()) installedIds.add(app.id);
+        if (await netbsdInstalled(diskArchFor(app))) installedIds.add(app.id);
         continue;
       }
       if (isGuestPack(app)) {
@@ -627,10 +630,10 @@ export function openStore(win: Win): void {
         return wrap;
       }
       if (isDiskImage(app)) {
-        /* Boots in the Terminal once the machine is ARM64; uninstallable,
+        /* Boots in the Terminal once the machine matches; uninstallable,
            because the image is one self-contained file in browser storage
            (unlike a distro woven into /). */
-        openBtn.title = "Open the Terminal — the ARM64 machine boots this system";
+        openBtn.title = `Open the Terminal — the ${netbsdMachineLabel(diskArchFor(app))} machine boots this system`;
         openBtn.addEventListener("click", (e) => {
           e.stopPropagation();
           window.dispatchEvent(new CustomEvent("d86-launch-app", { detail: "terminal" }));
@@ -726,7 +729,7 @@ export function openStore(win: Win): void {
         isDistro(app)
           ? "/"
           : isDiskImage(app)
-            ? "browser storage (OPFS) — the ARM64 machine's disk, not a folder in Files"
+            ? `browser storage (OPFS) — the ${netbsdMachineLabel(diskArchFor(app))} machine's disk, not a folder in Files`
             : isGuestPack(app)
               ? "/ — then run its script in the Terminal"
               : `~/system/apps/${app.id}/`,
@@ -758,7 +761,7 @@ export function openStore(win: Win): void {
       files.append(el("code", undefined, `/ — the distro's userland, unpacked from ${manifestFor(app)?.image ?? "initrd.gz"}`));
       files.append(el("code", undefined, `/boot/vmlinuz + /boot/initrd.gz — what the machine boots`));
     } else if (isDiskImage(app)) {
-      files.append(el("code", undefined, "a bootable disk image in browser storage (OPFS) — the ARM64 machine's virtio disk"));
+      files.append(el("code", undefined, `a bootable disk image in browser storage (OPFS) — the ${netbsdMachineLabel(diskArchFor(app))} machine's virtio disk`));
       files.append(el("code", undefined, `${manifestFor(app)?.kernel ?? "kernel.img.gz"} — the kernel the machine boots directly`));
     } else if (isGuestPack(app)) {
       for (const file of filesFor(app)) files.append(el("code", undefined, `/${file}`));
@@ -797,6 +800,12 @@ export function openStore(win: Win): void {
       not from ZenFS / — NetBSD (ARM64) is the one of these today. */
   function isDiskImage(app: StoreApp): boolean {
     return manifestFor(app)?.kind === "disk-image";
+  }
+
+  /** Which ARM machine a disk-image entry boots on — from its manifest's
+      arch list (the build workflow wrote it). */
+  function diskArchFor(app: StoreApp): NetbsdArch {
+    return manifestFor(app)?.arch?.[0] === "arm32" ? "arm32" : "arm64";
   }
 
   /** The files an entry downloads: the manifest's word for a guest pack
@@ -1057,16 +1066,17 @@ export function openStore(win: Win): void {
 
   /**
    * Install a disk-image OS (NetBSD ARM64): stream the split, gzipped
-   * image into the browser's private storage (OPFS), where the ARM64
-   * machine opens it read-write as its disk. Nothing touches ZenFS /:
+   * image into the browser's private storage (OPFS), where the matching
+   * ARM machine opens it read-write as its disk. Nothing touches ZenFS /:
    * NetBSD's files live inside the image, in its own filesystem (FFS),
    * and Files cannot see them — the description says so.
    */
   async function installDiskImage(app: StoreApp): Promise<void> {
+    const arch = diskArchFor(app);
     progress.set(app.id, { done: 0, total: 1 });
     repaint();
     try {
-      await installNetbsd64((text) => {
+      await installNetbsd(arch, (text) => {
         const state = progress.get(app.id);
         progress.set(app.id, { ...(state ?? { done: 0, total: 1 }), label: text.replace(/^downloading the NetBSD disk — /, "") });
         status.textContent = `${app.name}: ${text}`;
@@ -1075,7 +1085,7 @@ export function openStore(win: Win): void {
       await refreshInstalled();
       notify({
         title: `${app.name} installed`,
-        body: "The disk image is in browser storage. Switch Settings → Machine to ARM64 and open the Terminal — it boots to a login (root, no password).",
+        body: `The disk image is in browser storage. Switch Settings → Machine to ${netbsdMachineLabel(arch)} and open the Terminal — it boots to a login (root, no password).`,
         icon: app.icon ?? "terminal",
         timeout: 10000,
       });
@@ -1097,7 +1107,7 @@ export function openStore(win: Win): void {
   /**
    * Uninstall a disk-image OS: delete the image from browser storage —
    * including everything saved inside NetBSD. Fails honestly while the
-   * ARM64 machine holds the disk open.
+   * machine holds the disk open.
    */
   async function uninstallDiskImage(app: StoreApp): Promise<void> {
     const ok = await showConfirm(
@@ -1108,7 +1118,7 @@ export function openStore(win: Win): void {
     );
     if (!ok) return;
     try {
-      await uninstallNetbsd64();
+      await uninstallNetbsd(diskArchFor(app));
     } catch (err) {
       notify({
         title: `${app.name} could not be removed`,

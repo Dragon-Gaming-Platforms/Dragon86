@@ -560,6 +560,12 @@ export function openSettings(win: Win, startPage?: string): void {
         blurb:
           "An ARM64 machine (the QEMU-virt board). Boots NetBSD (ARM64) from the App Store — a real disk image in browser storage, serial console only; log in as root.",
       },
+      {
+        id: "arm32",
+        label: "ARM32",
+        blurb:
+          "A 32-bit ARM machine (the same QEMU-virt board, ARMv7). Boots NetBSD (ARM32) from the App Store — a real disk image in browser storage, serial console only; log in as root.",
+      },
     ];
     const seg = el("div", "segmented");
     const noteEl = el("div", "settings-note");

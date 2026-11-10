@@ -1,0 +1,8 @@
+# Runs inside the freshly assembled image, booted alone (root=NAME=d86root):
+# reaching these commands at all proves the image boots to a root login on
+# the serial console, exactly how the v64 ARM64 machine will boot it.
+uname -a
+hostname
+df -h /
+mount
+@poweroff

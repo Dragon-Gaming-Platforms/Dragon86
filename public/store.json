@@ -55,6 +55,16 @@
       "description": "NetBSD as the NetBSD Foundation builds it for real ARM64 hardware: the official 11.0 evbarm-aarch64 release, trimmed of its X11 sets and manual pages so it fits a browser download, and boot-tested before it ships. Unlike the Linux distros it does not unpack into your filesystem's /: NetBSD boots from its own disk image in browser storage (OPFS), and its files live inside that image, in NetBSD's own FFS filesystem — Files cannot see them, and exporting your filesystem does not include them. It needs the ARM64 machine (Settings → Machine). Serial console only for now: log in as root (no password), shut down with shutdown -p now. No network on this machine yet — honestly, not “coming right up”."
     },
     {
+      "id": "netbsd-arm32",
+      "name": "NetBSD (ARM32)",
+      "sub": "Official NetBSD 11.0, for the ARM32 machine",
+      "category": "System",
+      "publisher": "The NetBSD Foundation · official release",
+      "icon": "terminal",
+      "base": "netbsd32/",
+      "description": "NetBSD as the NetBSD Foundation builds it for real 32-bit ARM hardware: the official 11.0 evbarm-earmv7hf release, trimmed of its X11 sets and manual pages so it fits a browser download, and boot-tested before it ships. Unlike the Linux distros it does not unpack into your filesystem's /: NetBSD boots from its own disk image in browser storage (OPFS), and its files live inside that image, in NetBSD's own FFS filesystem — Files cannot see them, and exporting your filesystem does not include them. It needs the ARM32 machine (Settings → Machine). Serial console only for now: log in as root (no password), shut down with shutdown -p now. No network on this machine yet — honestly, not “coming right up”."
+    },
+    {
       "id": "x11-wm-64",
       "name": "install-wm64.sh",
       "sub": "X11 + IceWM — a window manager on the machine's display",
