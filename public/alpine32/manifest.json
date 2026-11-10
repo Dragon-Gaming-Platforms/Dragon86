@@ -10,20 +10,20 @@
   },
   "initrd": {
     "file": "initrd.img",
-    "bytes": 8222369,
-    "sha256": "5819949e881a7b4933f3b5d12bc9d5bab190c40bda8e4c960cbd992c725eca91"
+    "bytes": 8222859,
+    "sha256": "0f6a0d085a2dc9daacbf52bfa773caf66b5cffb1128a0a5f31396ea1c87ddeda"
   },
   "root": {
     "parts": [
       {
         "file": "root.img.gz.00",
-        "bytes": 70795562,
-        "sha256": "d75b119a3981472bf9a7acbdca7cf29b31305f6a493bd37fe86a96bb6f49e605"
+        "bytes": 70803715,
+        "sha256": "027b3810e170f0f75c5bcf0e79a7353341087bf4a49d61667c9bf4b024ec0581"
       }
     ],
-    "gzBytes": 70795562,
+    "gzBytes": 70803715,
     "rawBytes": 536870912,
-    "rawSha256": "a4cde5688fc37cb6c2caf69493e0812987bea5d0139acd0c3dac17c86cf6bc77",
+    "rawSha256": "f79b188090e6db6d1dc11d9d3cb673c6f7b37a6759e48b90d052a10a6de6cb65",
     "rootArg": "/dev/vda",
     "extraCmdline": "rw rootfstype=ext4 modules=ext4 console=ttyAMA0"
   }
