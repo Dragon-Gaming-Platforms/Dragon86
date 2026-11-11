@@ -6,6 +6,12 @@ same files. The `index.json` in each folder lists the files to copy — it is
 the only thing this directory is for; delete a folder here and existing
 devices keep their copy (their filesystem is the source of truth now).
 
+For vendored Puter apps, file-open, upload, save-as, and download actions are
+routed through Dragon86's ZenFS picker (the user's `/` and `/home`), not the
+host browser's file chooser or Downloads folder. Dragon86 injects the adapter
+when it serves those apps, so already-installed copies receive it too; their
+existing local project/recovery storage remains unchanged.
+
 | app          | what it is |
 |--------------|------------|
 | `preview`    | The default app for pictures, sound, video, PDFs, 3D models and ISO disc images (see below). Claims every one of those types, and ships with `"desktop": false`. |

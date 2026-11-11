@@ -41,6 +41,7 @@ import { el } from "../core/dom";
 import type { Win } from "../core/wm";
 import { logInfo, logWarn } from "../core/log";
 import appsJson from "./iframe-apps.json";
+import { installPuterFilesBridge, isPuterApp } from "./puter-files";
 
 export interface IframeAppDef {
   id: string;
@@ -154,6 +155,7 @@ export function resolveAppUrl(def: IframeAppDef, filePath?: string): string | nu
 }
 
 export function openIframeApp(win: Win, def: IframeAppDef, filePath?: string): void {
+  if (isPuterApp(def.id)) installPuterFilesBridge();
   const root = el("div", "app-root");
   const status = el("div", "app-statusbar");
   status.textContent = filePath ? `${fileName(filePath)} — ${def.name}` : (def.status ?? def.name);

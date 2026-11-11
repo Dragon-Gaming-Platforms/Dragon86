@@ -35,6 +35,7 @@ import { fs } from "@zenfs/core";
 import * as vfs from "./vfs";
 import { logInfo, logWarn } from "./log";
 import { registerFsApps, registerTransientApp, type IframeAppDef } from "../apps/iframe-app";
+import { injectPuterFilesAdapter, isPuterApp } from "../apps/puter-files";
 
 /** Where the OS looks for app registries, in order (first one wins per id). */
 export const APPS_DIRS = [`${vfs.HOME}/system/apps`];
@@ -655,7 +656,12 @@ async function readAppFile(appId: string, rel: string): Promise<ReadResult> {
   try {
     const st = await fs.promises.stat(path);
     if (st.isDirectory()) return { ok: false, status: 404, error: `${rel} is a directory` };
-    const bytes = await vfs.readBytes(path);
+    let bytes = await vfs.readBytes(path);
+    /* Existing devices keep their ZenFS app copy on update. Inject at serve
+       time so the adapter reaches both existing and freshly seeded apps. */
+    if (isPuterApp(appId) && path === vfs.join(app.dir, app.def.fs?.entry ?? "index.html") && /\.html?$/i.test(path)) {
+      bytes = new TextEncoder().encode(injectPuterFilesAdapter(new TextDecoder().decode(bytes)));
+    }
     const copy = bytes.slice();
     return { ok: true, mime: mimeFor(path), body: copy.buffer as ArrayBuffer };
   } catch {
