@@ -2604,8 +2604,8 @@
 .ps2-check-pending { color: var(--text-dim); }
 .ps2-check-ok { color: #8ac7a3; }
 .ps2-check-fail { color: #ffaaa3; }
-.ps2-blocked-note { padding: 13px; border: 1px solid rgba(225, 174, 83, .27); border-radius: 8px; color: #eccb8b; background: rgba(143, 97, 26, .12); font-size: .8rem; line-height: 1.55; }
-.ps2-blocked-note p { margin: 7px 0 0; color: var(--text-secondary); }
+.ps2-ready-note { padding: 13px; border: 1px solid rgba(66, 207, 158, .25); border-radius: 8px; color: #b1f1d8; background: rgba(36, 126, 92, .12); font-size: .8rem; line-height: 1.55; }
+.ps2-ready-note p { margin: 7px 0 0; color: var(--text-secondary); }
 .ps2-loader-note { max-width: 500px; margin: 0; color: var(--text-secondary); font-size: .78rem; line-height: 1.5; }
 .ps2-loader-card > small { color: var(--text-dim); overflow-wrap: anywhere; }
 @media (max-width: 660px) {
