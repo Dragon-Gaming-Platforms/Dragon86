@@ -3,7 +3,7 @@ export const PUTER_APP_IDS = new Set([
   "api-client", "audio-studio", "backgammon", "building-design", "cad", "checkers",
   "chess", "circuits", "music-studio", "notes", "parametric", "photo-studio",
   "presentation", "records", "solitaire", "studio3d", "sudoku", "vector-studio",
-  "video-studio", "whiteboard", "wiki",
+  "video-studio", "whiteboard", "wiki", "tasks", "contacts",
 ]);
 
 export const isPuterApp = (id: string): boolean => PUTER_APP_IDS.has(id);

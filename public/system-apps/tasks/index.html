@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Tasks · To-do Lists</title>
+  <meta name="description" content="Personal and shared to-do lists with recurring reminders, priorities, subtasks, and calendar integration." />
+  <link rel="canonical" href="https://tasks.puter.com/" />
+  <meta name="theme-color" content="#f7f7f9" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#0e0e11" media="(prefers-color-scheme: dark)" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Tasks" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="icon" href="./favicon.ico" sizes="48x48" />
+  <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
+  <script>
+    // Apply the saved theme before first paint to avoid a flash.
+    (() => {
+      try {
+        const t = localStorage.getItem('tasks:theme');
+        if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+      } catch {}
+    })();
+  </script>
+  <!-- defer keeps the SDK ahead of the module script below (same in-order
+       queue) without parser-blocking first paint. -->
+  <script src="https://js.puter.com/v2/" defer></script>
+  <script type="module" crossorigin src="./assets/index-BHvVZEc0.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-ON8P9Sd2.css">
+</head>
+<body>
+  <div id="app" class="app"></div>
+</body>
+</html>

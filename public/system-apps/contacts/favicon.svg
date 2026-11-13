@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Contacts">
+  <!-- Same mark as icon.svg, flattened for tab-strip sizes: solid glyph, crisp seam. -->
+  <defs>
+    <linearGradient id="tile" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1a86fd" />
+      <stop offset=".45" stop-color="#0059f5" />
+      <stop offset="1" stop-color="#0036d3" />
+    </linearGradient>
+    <clipPath id="behind">
+      <circle cx="338" cy="207" r="59" />
+      <path d="M243 327a18 18 0 0 0 18 18h149a18 18 0 0 0 18-18 92.5 55 0 0 0-185 0Z" />
+    </clipPath>
+  </defs>
+
+  <rect width="512" height="512" rx="125" fill="url(#tile)" />
+
+  <g fill="#fff">
+    <circle cx="338" cy="207" r="59" />
+    <path d="M243 327a18 18 0 0 0 18 18h149a18 18 0 0 0 18-18 92.5 55 0 0 0-185 0Z" />
+  </g>
+
+  <g clip-path="url(#behind)" fill="none" stroke="#0e63f7" stroke-width="14">
+    <circle cx="212" cy="182" r="79" />
+    <path d="M78 362a24 24 0 0 0 24 24h213a24 24 0 0 0 24-24 130.5 98.5 0 0 0-261 0Z" />
+  </g>
+
+  <g fill="#fff">
+    <circle cx="212" cy="182" r="79" />
+    <path d="M78 362a24 24 0 0 0 24 24h213a24 24 0 0 0 24-24 130.5 98.5 0 0 0-261 0Z" />
+  </g>
+</svg>

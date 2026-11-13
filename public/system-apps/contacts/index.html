@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, height=device-height, initial-scale=1, viewport-fit=cover"
+    />
+
+    <title>Contacts — Your address book, in the cloud</title>
+    <meta
+      name="description"
+      content="A clean, fast, private address book that lives in your cloud. Store contacts, search instantly, and sync across every device. Free, no ads, powered by Puter."
+    />
+    <meta
+      name="keywords"
+      content="contacts, address book, contact manager, online contacts, cloud contacts, vcard, private contacts, free contacts app"
+    />
+    <meta name="author" content="Puter" />
+    <meta name="application-name" content="Contacts" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <link rel="canonical" href="https://contacts.puter.com/" />
+
+    <!-- Performance -->
+    <link rel="preconnect" href="https://js.puter.com" crossorigin />
+    <link rel="dns-prefetch" href="https://js.puter.com" />
+
+    <!-- Icons & PWA -->
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <link rel="icon" type="image/png" sizes="48x48" href="./icon-48.png" />
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <!-- A single theme-color the app keeps in sync with the *active* theme (set
+         in the pre-paint script below), so a manual override is reflected too. -->
+    <meta name="theme-color" content="#ffffff" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Contacts" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Contacts" />
+    <meta property="og:title" content="Contacts — Your address book, in the cloud" />
+    <meta
+      property="og:description"
+      content="A clean, fast, private address book that lives in your cloud. Store contacts, search instantly, and sync across every device. Free, no ads, powered by Puter."
+    />
+    <meta property="og:url" content="https://contacts.puter.com/" />
+    <meta property="og:image" content="https://contacts.puter.com/social-graph.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Contacts — a clean, private address book in the cloud." />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter / X -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Contacts — Your address book, in the cloud" />
+    <meta
+      name="twitter:description"
+      content="A clean, fast, private address book that lives in your cloud. Free, no ads, powered by Puter."
+    />
+    <meta name="twitter:image" content="https://contacts.puter.com/social-graph.png" />
+    <meta name="twitter:image:alt" content="Contacts — a clean, private address book in the cloud." />
+
+    <!-- Structured data -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Contacts",
+        "url": "https://contacts.puter.com/",
+        "description": "A clean, fast, private address book that lives in your cloud. Store contacts, search instantly, and sync across every device.",
+        "applicationCategory": "BusinessApplication",
+        "operatingSystem": "Any (web-based)",
+        "browserRequirements": "Requires JavaScript and a modern web browser.",
+        "isAccessibleForFree": true,
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "creator": { "@type": "Organization", "name": "Puter", "url": "https://puter.com/" }
+      }
+    </script>
+
+    <!-- Resolve theme before first paint to avoid a flash of the wrong color scheme. -->
+    <script>
+      (function () {
+        try {
+          var stored = localStorage.getItem('contacts:theme');
+          var theme =
+            stored === 'light' || stored === 'dark'
+              ? stored
+              : window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+                ? 'dark'
+                : 'light';
+          document.documentElement.setAttribute('data-theme', theme);
+          var tc = document.querySelector('meta[name="theme-color"]');
+          if (tc) tc.setAttribute('content', theme === 'dark' ? '#0f1115' : '#ffffff');
+        } catch (_e) {
+          document.documentElement.setAttribute('data-theme', 'light');
+        }
+      })();
+    </script>
+
+    <!-- Puter.js: the only cloud/AI backend this app uses. -->
+    <script src="https://js.puter.com/v2/"></script>
+
+    <!-- When another Puter app launches Contacts as its headless contacts API
+         (see src/api/protocol.js) there is nothing to show. The Puter desktop
+         creates and shows an app's window before the app itself loads, so hide
+         it here — the earliest moment the SDK exists — rather than waiting for
+         the app bundle, which would flash an empty window on screen. main.js
+         hides again; this pass is purely cosmetic and must never throw. -->
+    <script>
+      (function () {
+        try {
+          var raw = new URLSearchParams(location.search).get('puter.args') || ''
+          // Keep in step with SERVICE_ARGS in src/api/protocol.js.
+          if (!/"service"\s*:\s*"(contacts-api|mcp)"/.test(raw)) return
+          if (window.puter && puter.ui && typeof puter.ui.hideWindow === 'function') {
+            puter.ui.hideWindow()
+          }
+        } catch (_e) {
+          /* main.js will hide the window a moment later */
+        }
+      })()
+    </script>
+
+    <!-- Privacy-friendly analytics by Plausible -->
+    <script async src="https://plausible.io/js/pa-P2qYwxML7xcGJkqsScQMv.js"></script>
+    <script>
+      window.plausible =
+        window.plausible ||
+        function () {
+          (plausible.q = plausible.q || []).push(arguments);
+        };
+      plausible.init =
+        plausible.init ||
+        function (i) {
+          plausible.o = i || {};
+        };
+      plausible.init();
+    </script>
+    <script type="module" crossorigin src="./assets/index-DiC1zdzS.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-evwjMM0J.css">
+  </head>
+  <body>
+    <div id="app" aria-busy="true">
+      <div class="boot-screen" role="status" aria-label="Loading">
+        <div class="boot-spinner"></div>
+      </div>
+    </div>
+  </body>
+</html>

@@ -11,7 +11,7 @@
  *
  *   node tools/ui-smoke/run.mjs
  */
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { JSDOM } from "jsdom";
@@ -259,11 +259,11 @@ check(
 );
 check("the desktop laid out once, not twice", icons.length === new Set([...icons].map((n) => n.dataset.key)).size);
 check("icons have no border until selected", !first.classList.contains("selected"));
-/* NES is an App Store app, not something that ships installed — and Preview
+/* EmulatorJS is an App Store app, not something that ships installed — and Preview
    is a fixed page now, so neither has a folder or an icon on a fresh device. */
 check(
-  "NES is not installed by default",
-  ![...icons].some((n) => n.textContent.trim().startsWith("NES")),
+  "EmulatorJS is not installed by default",
+  ![...icons].some((n) => n.textContent.trim().startsWith("EmulatorJS")),
   [...icons].map((n) => n.textContent.trim()).join(" | ").slice(0, 200),
 );
 check(
@@ -380,6 +380,23 @@ check(
   storeTextNow.slice(0, 120),
 );
 const catalogJson = JSON.parse(readFileSync(resolve(here, "../../public/store.json"), "utf8"));
+const publicRoot = resolve(here, "../../public");
+const emulatorCatalogApp = catalogJson.apps.find((app) => app.id === "emulatorjs");
+const ps1CatalogApp = catalogJson.apps.find((app) => app.id === "ps1");
+const emulatorFrontend = readFileSync(resolve(publicRoot, "system-apps/emulatorjs/app.js"), "utf8");
+const ps1Frontend = readFileSync(resolve(publicRoot, "system-apps/ps1/app.js"), "utf8");
+const ps1CoreEvidence = readFileSync(resolve(publicRoot, "system-apps/ps1/VENDORED.md"), "utf8");
+check("NES emulator listing and bundled test ROM are removed", !catalogJson.apps.some((app) => app.id === "nes") && !existsSync(resolve(publicRoot, "system-apps/nes/test.nes")));
+check("EmulatorJS passes a user-selected File to the core", Boolean(emulatorCatalogApp) && emulatorFrontend.includes("EJS_gameUrl = file"));
+check("PS1 frontend selects PSX and explicitly disables threads", Boolean(ps1CatalogApp) && ps1Frontend.includes("const isPsxApp = true") && ps1Frontend.includes("EJS_threads = false"));
+check("PS1 core evidence records pcsx_rearmed as non-threaded upstream", /pcsx_rearmed.{0,160}not thread-required/s.test(ps1CoreEvidence));
+check("Puter Tasks and Contacts are listed", ["tasks", "contacts"].every((id) => catalogJson.apps.some((app) => app.id === id)));
+const gameAssetFiles = [emulatorCatalogApp, ps1CatalogApp].flatMap((app) => app?.files ?? []);
+check("emulator app packages contain no ROM or BIOS files", !gameAssetFiles.some((file) => /\.(?:nes|rom|bin|cue|chd|pbp|iso|bios)$/i.test(file)));
+check("catalog app file manifests resolve to shipped files", ["emulatorjs", "ps1", "tasks", "contacts"].every((id) => {
+  const app = catalogJson.apps.find((item) => item.id === id);
+  return app?.files?.length && app.files.every((file) => existsSync(resolve(publicRoot, app.base, file)));
+}));
 const invented = new Set();
 for (const app of catalogJson.apps) {
   for (const key of ["rating", "reviews", "downloads", "size", "version", "updated", "highlights", "screenshots"]) {
@@ -407,27 +424,29 @@ check(
   archButtons.join(", "),
 );
 
-/* NES is in the catalog but not on the device: Install is what puts it there. */
-const nesCardCatalog = [...cards].find((n) => n.textContent.includes("NES"));
-check("catalog has NES", Boolean(nesCardCatalog));
-const nesCatalogButtons = [...(nesCardCatalog?.querySelectorAll("button") ?? [])].map((b) =>
+/* EmulatorJS is in the catalog but not on the device: Install is what puts it there. */
+const emulatorJsCardCatalog = [...cards].find((n) => n.textContent.includes("EmulatorJS"));
+check("catalog has EmulatorJS", Boolean(emulatorJsCardCatalog));
+check("the old standalone NES app is absent", ![...cards].some((n) => n.textContent.includes("NES")));
+check("catalog includes the PS1 emulator and additional Puter apps", ["PlayStation (PS1)", "Tasks", "Contacts"].every((name) => [...cards].some((n) => n.textContent.includes(name))));
+const emulatorJsCatalogButtons = [...(emulatorJsCardCatalog?.querySelectorAll("button") ?? [])].map((b) =>
   b.textContent.trim(),
 );
 check(
-  "NES offers Install, not Open",
-  nesCatalogButtons.includes("Install") && !nesCatalogButtons.includes("Open"),
-  nesCatalogButtons.join(" | "),
+  "EmulatorJS offers Install, not Open",
+  emulatorJsCatalogButtons.includes("Install") && !emulatorJsCatalogButtons.includes("Open"),
+  emulatorJsCatalogButtons.join(" | "),
 );
-nesCardCatalog.querySelector("button").dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+emulatorJsCardCatalog.querySelector("button").dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
 await wait(1400);
 check(
-  "installing NES confirms itself",
-  [...document.querySelectorAll(".toast")].some((n) => /NES installed/.test(n.textContent)),
+  "installing EmulatorJS confirms itself",
+  [...document.querySelectorAll(".toast")].some((n) => /EmulatorJS installed/.test(n.textContent)),
   [...document.querySelectorAll(".toast")].map((n) => n.textContent).join(" | ").slice(0, 200),
 );
 check(
   "…and puts it on the desktop",
-  [...document.querySelectorAll(".desktop-icon")].some((n) => n.textContent.trim().startsWith("NES")),
+  [...document.querySelectorAll(".desktop-icon")].some((n) => n.textContent.trim().startsWith("EmulatorJS")),
   [...document.querySelectorAll(".desktop-icon")].map((n) => n.textContent.trim()).join(" | ").slice(0, 200),
 );
 
@@ -508,19 +527,8 @@ check(
   installedSnakeIcon,
 );
 
-/* The ask toast queues behind the install toast (both are toasts, and they
-   are shown one at a time), so give it time to reach the front. */
-const askToast = await (async () => {
-  for (let i = 0; i < 24; i++) {
-    const hit = [...document.querySelectorAll(".toast")]
-      .map((n) => n.textContent)
-      .find((t) => /can open \.nes files/.test(t));
-    if (hit) return hit;
-    await wait(500);
-  }
-  return toasts.join(" | ");
-})();
-check("installed apps ask to be the default opener", /can open \.nes files/.test(askToast), askToast.slice(0, 200));
+/* EmulatorJS is a launcher frontend with an explicit local-file picker. It does not claim a file-type association because opening a filesystem path is not the same as exposing its bytes to the browser. */
+check("EmulatorJS does not claim a .nes default opener", ![...document.querySelectorAll(".app-list-opens")].some((n) => n.textContent.includes(".nes")));
 
 /* The detail page: real facts only, including a measured download size. */
 const calcCard = [...document.querySelectorAll(".store-card")].find((n) =>
@@ -760,7 +768,7 @@ await wait(300);
 const listedApps = [...settingsWindow.querySelectorAll(".app-list-row")].map((r) => r.textContent);
 check(
   "Settings lists installed apps",
-  listedApps.some((t) => t.includes("NES")),
+  listedApps.some((t) => t.includes("EmulatorJS")),
   listedApps.join(" | ").slice(0, 160),
 );
 check(
@@ -769,8 +777,8 @@ check(
   listedApps.join(" | ").slice(0, 160),
 );
 check(
-  "Settings shows claimed file types",
-  [...settingsWindow.querySelectorAll(".app-list-opens")].some((n) => n.textContent.includes(".nes")),
+  "no bundled NES app is registered as an opener",
+  ![...settingsWindow.querySelectorAll(".app-list-opens")].some((n) => n.textContent.includes(".nes")),
 );
 check(
   "default apps table exists",
@@ -877,11 +885,11 @@ check(
 );
 
 /* ---- Remove from Desktop / Add to Desktop ---- */
-const nesDesktopIcon = [...document.querySelectorAll(".desktop-icon")].find((n) =>
-  n.textContent.trim().startsWith("NES"),
+const emulatorJsDesktopIcon = [...document.querySelectorAll(".desktop-icon")].find((n) =>
+  n.textContent.trim().startsWith("EmulatorJS"),
 );
-check("NES has a desktop icon to start with", Boolean(nesDesktopIcon));
-nesDesktopIcon?.dispatchEvent(
+check("EmulatorJS has a desktop icon to start with", Boolean(emulatorJsDesktopIcon));
+emulatorJsDesktopIcon?.dispatchEvent(
   new window.MouseEvent("contextmenu", { bubbles: true, cancelable: true, clientX: 60, clientY: 60 }),
 );
 await tick();
@@ -893,12 +901,12 @@ removeItem?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
 await wait(500);
 check(
   "the app leaves the desktop",
-  ![...document.querySelectorAll(".desktop-icon")].some((n) => n.textContent.trim().startsWith("NES")),
+  ![...document.querySelectorAll(".desktop-icon")].some((n) => n.textContent.trim().startsWith("EmulatorJS")),
 );
 const stillInMenu = await (async () => {
   document.querySelector(".start-btn").dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
   await wait(200);
-  const found = [...document.querySelectorAll(".start-app")].some((n) => n.textContent.includes("NES"));
+  const found = [...document.querySelectorAll(".start-app")].some((n) => n.textContent.includes("EmulatorJS"));
   document.querySelector(".start-btn").dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
   await wait(150);
   return found;
@@ -916,15 +924,15 @@ check(
   })(),
 );
 
-/* Put it back from the app's own page: Files → system/apps/nes → index.html */
+/* Put it back from the app's own page: Files → system/apps/emulatorjs → index.html */
 const filesWinY = [...document.querySelectorAll(".d86-window")].find((w) => w.querySelector(".fm-root"));
 const pathInputY = filesWinY.querySelector(".fm-path-input");
-pathInputY.value = "/home/user/system/apps/nes";
+pathInputY.value = "/home/user/system/apps/emulatorjs";
 pathInputY.dispatchEvent(new window.KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
 await wait(400);
-const nesIndexRow = [...filesWinY.querySelectorAll(".fm-row")].find((r) => r.textContent.includes("index.html"));
-check("the app's html is visible in Files", Boolean(nesIndexRow));
-nesIndexRow?.dispatchEvent(
+const emulatorJsIndexRow = [...filesWinY.querySelectorAll(".fm-row")].find((r) => r.textContent.includes("index.html"));
+check("the app's html is visible in Files", Boolean(emulatorJsIndexRow));
+emulatorJsIndexRow?.dispatchEvent(
   new window.MouseEvent("contextmenu", { bubbles: true, cancelable: true, clientX: 70, clientY: 70 }),
 );
 await tick();
@@ -936,7 +944,7 @@ addItem?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
 await wait(600);
 check(
   "Add to Desktop brings the icon back",
-  [...document.querySelectorAll(".desktop-icon")].some((n) => n.textContent.trim().startsWith("NES")),
+  [...document.querySelectorAll(".desktop-icon")].some((n) => n.textContent.trim().startsWith("EmulatorJS")),
   [...document.querySelectorAll(".desktop-icon")].map((n) => n.textContent.trim()).join(" | ").slice(0, 160),
 );
 
@@ -954,15 +962,15 @@ check(
   String(await snakeCardIcon),
 );
 
-const nesCardIcon = await (async () => {
+const emulatorJsCardIcon = await (async () => {
   const storeW = [...document.querySelectorAll(".d86-window")].find((w) => w.querySelector(".store-body"));
-  const cardEl = [...storeW.querySelectorAll(".store-card")].find((n) => n.textContent.includes("NES"));
+  const cardEl = [...storeW.querySelectorAll(".store-card")].find((n) => n.textContent.includes("EmulatorJS"));
   return cardEl?.querySelector(".store-app-icon img")?.getAttribute("src") ?? "";
 })();
 check(
   "…and the app's own installed icon afterwards",
-  nesCardIcon.includes("9pf/nes/icon.svg"),
-  nesCardIcon || (() => {
+  emulatorJsCardIcon.includes("9pf/emulatorjs/icon.svg"),
+  emulatorJsCardIcon || (() => {
     const storeW = [...document.querySelectorAll(".d86-window")].find((w) => w.querySelector(".store-body"));
     return [...storeW.querySelectorAll(".store-card")].map((n) => n.querySelector(".store-card-head")?.innerHTML?.slice(0, 120)).join(" || ");
   })(),

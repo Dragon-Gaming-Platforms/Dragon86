@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>EmulatorJS · Your games, your files</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="shell">
+    <header><div class="mark">EJ</div><div><h1>EmulatorJS</h1><p>Play games you provide. No games or BIOS files are included.</p></div></header>
+    <section class="controls" id="controls">
+      <label>System<select id="core"><option value="nes">Nintendo Entertainment System</option><option value="snes">Super Nintendo</option><option value="gb">Game Boy</option><option value="gba">Game Boy Advance</option><option value="segaMD">Sega Genesis / Mega Drive</option><option value="psx">PlayStation</option></select></label>
+      <label class="pick">Choose a game file<input id="game" type="file" accept=".nes,.sfc,.smc,.gb,.gbc,.gba,.bin,.md,.gen,.iso,.chd,.pbp,.cue"></label>
+      <button id="restart" type="button" hidden>Choose another game</button>
+      <p class="hint">Choose a local ROM/disc image to start. PlayStation uses EmulatorJS's single-threaded <code>pcsx_rearmed</code> core and does not need cross-origin isolation. CHD or PBP is recommended for PS1 discs. The emulator engine is loaded from EmulatorJS's CDN; an internet connection is required.</p>
+      <p class="error" id="error" role="status"></p>
+    </section>
+    <section id="player" aria-label="EmulatorJS game screen"></section>
+    <footer>Only load games and BIOS files you have the right to use. Files are selected from your device and are not uploaded by this frontend.</footer>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>
