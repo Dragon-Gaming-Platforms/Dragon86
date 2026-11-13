@@ -1699,7 +1699,7 @@ check(
   sWin.close();
 }
 
-/* ---- PS2 Web Recomp library: ZenFS package import and honest loading gate ---- */
+/* ---- PS2 Web Recomp library: ZenFS import and isolated standalone launch ---- */
 await window.d86.fs.mkdir("/home/user/Downloads");
 await window.d86.fs.writeBytes("/home/user/Downloads/web-sample.zip", storedZip([
   ["web-sample/ps2web.html", "<!doctype html><title>sample</title>"],
@@ -1730,10 +1730,21 @@ ps2Picker = document.querySelector(".ps2-picker");
 ps2Picker?.querySelector(".ps2-picker-row")?.click();
 ps2Picker?.querySelector(".ps2-picker-footer .btn.primary")?.click();
 await wait(100);
-ps2?.querySelector(".ps2-game-actions .btn.primary")?.click();
-for (let i = 0; i < 20 && !ps2?.querySelector(".ps2-blocked-note"); i++) await wait(20);
+[...(ps2?.querySelectorAll(".ps2-game-actions button") ?? [])].find((button) => button.textContent === "Check build")?.click();
+for (let i = 0; i < 20 && !ps2?.querySelector(".ps2-ready-note"); i++) await wait(20);
 check("loading screen verifies the web build and disc", /Disc image/.test(ps2?.querySelector(".ps2-check-list")?.textContent ?? ""));
-check("loading screen explains the no-COI playback limitation", /cross-origin isolation/.test(ps2?.querySelector(".ps2-blocked-note")?.textContent ?? ""), `${ps2?.querySelector(".ps2-loading-screen")?.textContent}; card=${ps2?.querySelector(".ps2-game-card")?.textContent}`);
+check("loading screen offers a separate isolated game tab", /outside the Dragon86 desktop/.test(ps2?.querySelector(".ps2-ready-note")?.textContent ?? ""), `${ps2?.querySelector(".ps2-loading-screen")?.textContent}; card=${ps2?.querySelector(".ps2-game-card")?.textContent}`);
+const ps2Launch = ps2?.querySelector(".ps2-game-actions a.btn.primary");
+check("each imported game has a standalone launch URL", Boolean(ps2Launch?.href.includes("/ps2/?game=sample")) && ps2Launch?.target === "_blank", `${ps2Launch?.href}; target=${ps2Launch?.target}`);
+const ps2Html = readFileSync(resolve(dirname(fileURLToPath(import.meta.url)), "../../ps2/index.html"), "utf8");
+const ps2Worker = readFileSync(resolve(dirname(fileURLToPath(import.meta.url)), "../../public/ps2/ps2-coi-sw.js"), "utf8");
+const ps2Launcher = readFileSync(resolve(dirname(fileURLToPath(import.meta.url)), "../../src/ps2/launcher.ts"), "utf8");
+check("PS2 runtime is a top-level game page, not an iframe", !/<iframe/i.test(ps2Launcher) && /location\.replace\(gameFileUrl/.test(ps2Launcher));
+check("PS2 COOP/COEP lives only in the nested /ps2/ worker", /Cross-Origin-Embedder-Policy/.test(ps2Worker) && /serviceWorker\.register\(workerUrl\.href, \{ scope \}\)/.test(ps2Launcher) && /ps2\//.test(ps2Html));
+check("PS2 asset pages are matched by their path for relative asset requests", /fileGameId === gameId/.test(ps2Worker));
+check("PS2 asset server preserves byte-range support", /Content-Range/.test(ps2Worker) && /bytes=\(\\d\+\)-\(\\d\*\)/.test(ps2Worker));
+check("PS2 file responses transfer exact byte buffers", /byteOffset \+ result\.bytes\.byteLength/.test(ps2Launcher) && /response\.bytes instanceof ArrayBuffer/.test(ps2Worker));
+check("PS1 remains configured without threaded COI", Boolean(ps1CatalogApp) && ps1Frontend.includes("EJS_threads = false"));
 
 console.log(`\n${failures === 0 ? "all checks passed" : `${failures} check(s) failed`}`);
 process.exit(failures === 0 ? 0 : 1);

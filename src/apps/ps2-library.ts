@@ -1,8 +1,8 @@
 /**
  * PS2 Web Recomp library frontend. It stores user-built web packages and disc
- * references in ZenFS; the native recompilation toolchain is intentionally
- * outside the browser app, and playback is disabled under Dragon86's no-COI
- * policy (see the in-app explanation).
+ * references in ZenFS. Games launch in a separate /ps2/ tab whose nested
+ * service-worker scope applies COOP/COEP only to that standalone player; the
+ * Dragon86 desktop and root service-worker scope remain non-isolated.
  */
 import { fs } from "@zenfs/core";
 import { el, icon } from "../core/dom";
@@ -32,7 +32,7 @@ type Game = {
 
 export function openPs2Library(win: Win): void {
   const root = el("div", "app-root ps2-app");
-  const status = el("div", "app-statusbar", "Game builds and disc references stay in ZenFS");
+  const status = el("div", "app-statusbar", "Builds stay in ZenFS · gameplay opens in an isolated tab");
   const shell = el("div", "ps2-library");
   const header = el("header", "ps2-header");
   const branding = el("div", "ps2-brand");
@@ -51,7 +51,7 @@ export function openPs2Library(win: Win): void {
   header.append(branding, actions);
 
   const notice = el("div", "ps2-notice");
-  notice.innerHTML = `<strong>What this app does:</strong> import an already-built <code>.zip</code> from Dragon86 Files and keep the web build in <code>~/PS2-Web-Recomp/games/</code>. Recompilation itself uses the upstream native C++/Emscripten tools, not this browser UI.`;
+  notice.innerHTML = `<strong>What this app does:</strong> import an already-built <code>.zip</code> from Dragon86 Files and keep the web build in <code>~/PS2-Web-Recomp/games/</code>. Recompilation itself uses the upstream native C++/Emscripten tools. Launch opens a separate, full-window tab with COOP/COEP scoped to <code>/ps2/</code>; the Dragon86 desktop stays non-isolated.`;
   const list = el("div", "ps2-game-list");
   const loading = el("div", "ps2-loading-screen");
   loading.hidden = true;
@@ -99,12 +99,17 @@ export function openPs2Library(win: Win): void {
     const size = el("span", "ps2-size", `${game.files} files · ${vfs.formatSize(game.bytes, false)}`);
     details.append(size);
     const controls = el("div", "ps2-game-actions");
-    const load = el("button", "btn primary sm", "Load game");
-    load.prepend(icon("play"));
-    load.onclick = () => void showLoadingScreen(game);
+    const launch = el("a", "btn primary sm", "Launch in new tab") as HTMLAnchorElement;
+    launch.prepend(icon("play"));
+    launch.href = ps2LauncherUrl(game.id);
+    launch.target = "_blank";
+    launch.rel = "noopener noreferrer";
+    launch.title = "Open this game in a standalone, cross-origin-isolated tab; Dragon86 itself remains non-isolated.";
+    const check = el("button", "btn ghost sm", "Check build");
+    check.onclick = () => void showLoadingScreen(game);
     const disc = el("button", "btn ghost sm", game.discPath ? "Change disc" : "Choose disc ISO");
     disc.onclick = () => void openZipPicker((path) => void setDisc(game, path), ".iso");
-    controls.append(disc, load);
+    controls.append(disc, launch, check);
     card.append(mark, details, controls);
     return card;
   }
@@ -208,13 +213,17 @@ export function openPs2Library(win: Win): void {
       panel.append(close);
       return;
     }
-    step.className = "ps2-loader-step is-blocked";
-    step.textContent = "Build and disc are present in ZenFS — ready for a compatible runtime.";
-    const blocked = el("div", "ps2-blocked-note");
-    blocked.append(el("strong", "", "Playback is unavailable in Dragon86's current configuration."));
-    blocked.append(el("p", "", "PS2 Web Recomp requires cross-origin isolation (COOP/COEP) for its browser runtime. Dragon86 deliberately keeps that feature disabled, so this frontend verifies and stores the game package but does not pretend it can start gameplay."));
-    const pathNote = el("small", "", `Your build and disc are local in ZenFS: ${GAMES}/${game.id}`);
-    panel.append(blocked, pathNote, close);
+    step.className = "ps2-loader-step";
+    step.textContent = "Build and disc are present in ZenFS — ready to launch in a separate tab.";
+    const isolatedNote = el("div", "ps2-ready-note");
+    isolatedNote.append(el("strong", "", "The game opens outside the Dragon86 desktop."));
+    isolatedNote.append(el("p", "", "COOP/COEP is applied only under the PS2 launcher’s /ps2/ service-worker scope. Dragon86’s main page and service-worker scope remain non-isolated."));
+    const launch = el("a", "btn primary", "Launch game in isolated tab") as HTMLAnchorElement;
+    launch.href = ps2LauncherUrl(game.id);
+    launch.target = "_blank";
+    launch.rel = "noopener noreferrer";
+    const pathNote = el("small", "", `Your build and disc remain in ZenFS: ${GAMES}/${game.id}`);
+    panel.append(isolatedNote, launch, pathNote, close);
   }
 
   async function hasSibling(game: Game, extension: string): Promise<boolean> {
@@ -324,4 +333,10 @@ function parentRel(path: string): string {
 
 function errorText(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
+}
+
+function ps2LauncherUrl(gameId: string): string {
+  const url = new URL(`${import.meta.env.BASE_URL}ps2/`, window.location.origin);
+  url.searchParams.set("game", gameId);
+  return url.href;
 }
