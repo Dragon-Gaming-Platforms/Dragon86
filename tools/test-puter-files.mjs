@@ -3,8 +3,10 @@ import { injectPuterFilesAdapter, isPuterApp, PUTER_APP_IDS } from '../src/apps/
 
 assert.equal(isPuterApp('cad'), true);
 assert.equal(isPuterApp('whiteboard'), true);
+assert.equal(isPuterApp('tasks'), true);
+assert.equal(isPuterApp('contacts'), true);
 assert.equal(isPuterApp('arculator'), false);
-assert.equal(PUTER_APP_IDS.size, 21);
+assert.equal(PUTER_APP_IDS.size, 23);
 
 const html = '<!doctype html><html><head><title>Test</title></head><body></body></html>';
 const injected = injectPuterFilesAdapter(html);
