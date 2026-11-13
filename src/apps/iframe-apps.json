@@ -1,5 +1,14 @@
 [
   {
+    "id": "ps2-web-recomp",
+    "name": "PS2 Web Recomp",
+    "sub": "ZenFS library for your recompiled PS2 games",
+    "icon": "games",
+    "width": 920,
+    "height": 640,
+    "status": "Local library — imports web builds from ZenFS; playback is unavailable without cross-origin isolation"
+  },
+  {
     "id": "preview",
     "name": "Preview",
     "sub": "Images, audio, video, 3D models, PDF, ISO",

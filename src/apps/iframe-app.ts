@@ -42,6 +42,7 @@ import type { Win } from "../core/wm";
 import { logInfo, logWarn } from "../core/log";
 import appsJson from "./iframe-apps.json";
 import { installPuterFilesBridge, isPuterApp } from "./puter-files";
+import { openPs2Library } from "./ps2-library";
 
 export interface IframeAppDef {
   id: string;
@@ -155,6 +156,10 @@ export function resolveAppUrl(def: IframeAppDef, filePath?: string): string | nu
 }
 
 export function openIframeApp(win: Win, def: IframeAppDef, filePath?: string): void {
+  if (def.id === "ps2-web-recomp") {
+    openPs2Library(win);
+    return;
+  }
   if (isPuterApp(def.id)) installPuterFilesBridge();
   const root = el("div", "app-root");
   const status = el("div", "app-statusbar");

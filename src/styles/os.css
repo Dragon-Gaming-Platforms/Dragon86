@@ -2530,3 +2530,89 @@
   font-size: 12px;
   font-variant-numeric: tabular-nums;
 }
+
+/* ---------- PS2 Web Recomp local library ---------- */
+.ps2-app { overflow: hidden; }
+.ps2-library {
+  position: relative;
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  flex-direction: column;
+  gap: 16px;
+  overflow: auto;
+  padding: clamp(14px, 3vw, 28px);
+  background:
+    radial-gradient(ellipse at 10% 0%, rgba(44, 101, 181, .24), transparent 48%),
+    var(--bg-dark);
+}
+.ps2-header { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+.ps2-brand { display: flex; align-items: center; gap: 16px; min-width: 0; }
+.ps2-brand > svg { width: 48px; height: 48px; padding: 9px; flex: none; border: 1px solid rgba(104, 153, 224, .3); border-radius: 14px; color: #9fc5ff; background: rgba(55, 97, 160, .18); }
+.ps2-eyebrow { color: #86a9d4; font-size: .68rem; font-weight: 750; letter-spacing: .16em; }
+.ps2-header h1 { margin: 3px 0 2px; font-size: clamp(1.3rem, 3vw, 1.9rem); letter-spacing: -.035em; }
+.ps2-header p { margin: 0; max-width: 700px; color: var(--text-secondary); font-size: .84rem; line-height: 1.5; }
+.ps2-actions { display: flex; flex: none; gap: 8px; }
+.ps2-actions .btn, .ps2-game-actions .btn { display: inline-flex; align-items: center; gap: 7px; }
+.ps2-actions svg, .ps2-game-actions svg { width: 16px; height: 16px; }
+.ps2-notice { padding: 12px 14px; border: 1px solid rgba(102, 145, 206, .24); border-radius: 9px; color: var(--text-secondary); background: rgba(46, 79, 123, .12); font-size: .8rem; line-height: 1.55; }
+.ps2-notice strong { color: var(--text-primary); }
+.ps2-notice code { color: #b4d2ff; font-family: var(--font-mono, monospace); }
+.ps2-game-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 390px), 1fr)); align-content: start; gap: 12px; }
+.ps2-game-card { display: flex; align-items: center; gap: 12px; min-width: 0; padding: 14px; border: 1px solid var(--border-color); border-radius: 11px; background: color-mix(in srgb, var(--bg-card) 92%, #1c3556); box-shadow: 0 7px 24px #0002; }
+.ps2-game-mark { display: grid; width: 54px; height: 64px; flex: none; place-items: center; border: 1px solid #49688f; border-radius: 7px 12px 12px 7px; color: #c7ddff; background: linear-gradient(145deg, #243957, #111c2d); font-size: .75rem; font-weight: 850; letter-spacing: .08em; }
+.ps2-game-details { flex: 1; min-width: 0; }
+.ps2-game-details h2 { margin: 0 0 4px; font-size: 1rem; }
+.ps2-game-details p { margin: 4px 0; font-size: .75rem; }
+.ps2-path { overflow: hidden; color: var(--text-dim); text-overflow: ellipsis; white-space: nowrap; font-family: var(--font-mono, monospace); }
+.ps2-disc.is-set { overflow: hidden; color: #8ac7a3; text-overflow: ellipsis; white-space: nowrap; }
+.ps2-disc.is-missing { color: #e6bd76; }
+.ps2-size { color: var(--text-dim); font-size: .72rem; }
+.ps2-game-actions { display: flex; flex: none; flex-direction: column; gap: 7px; }
+.ps2-game-actions .btn { justify-content: center; }
+.ps2-empty { grid-column: 1 / -1; display: flex; min-height: 200px; flex-direction: column; align-items: center; justify-content: center; padding: 30px; text-align: center; }
+.ps2-empty > svg { width: 44px; height: 44px; color: #7598c5; }
+.ps2-empty h2 { margin: 12px 0 3px; font-size: 1.1rem; }
+.ps2-empty p { max-width: 530px; margin: 3px 0; color: var(--text-secondary); font-size: .82rem; line-height: 1.55; }
+.ps2-error { color: #ff9c9c; }
+.ps2-picker, .ps2-import-overlay { position: absolute; z-index: 30; inset: 0; display: grid; place-items: center; padding: 16px; background: rgba(4, 8, 15, .78); backdrop-filter: blur(8px); }
+.ps2-picker-dialog { display: flex; width: min(680px, 100%); max-height: min(590px, 94%); flex-direction: column; gap: 9px; padding: 17px; border: 1px solid var(--border-color-light); border-radius: 13px; background: var(--bg-card); box-shadow: 0 20px 70px #0009; }
+.ps2-picker-dialog h2 { margin: 0; font-size: 1.08rem; }
+.ps2-picker-dialog > p { margin: 0; color: var(--text-secondary); font-size: .78rem; line-height: 1.5; }
+.ps2-picker-nav { display: flex; align-items: center; gap: 6px; padding: 7px 0; border-bottom: 1px solid var(--border-color); }
+.ps2-picker-path { overflow: hidden; margin-left: 5px; color: var(--text-dim); text-overflow: ellipsis; white-space: nowrap; font: .73rem var(--font-mono, monospace); }
+.ps2-picker-entries { min-height: 180px; overflow: auto; padding: 4px; }
+.ps2-picker-row { display: flex; width: 100%; align-items: center; gap: 10px; padding: 8px 9px; border: 1px solid transparent; border-radius: 6px; color: var(--text-primary); background: transparent; text-align: left; cursor: pointer; }
+.ps2-picker-row:hover, .ps2-picker-row.selected { border-color: rgba(89, 142, 216, .34); background: rgba(68, 119, 188, .16); }
+.ps2-picker-row svg { width: 17px; height: 17px; flex: none; color: #8db8ef; }
+.ps2-picker-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ps2-picker-row small { color: var(--text-dim); }
+.ps2-picker-empty { padding: 20px; color: var(--text-dim); text-align: center; font-size: .82rem; }
+.ps2-name { min-height: 34px; }
+.ps2-picker-footer { display: flex; align-items: center; gap: 8px; padding-top: 10px; border-top: 1px solid var(--border-color); }
+.ps2-picker-selection { flex: 1; overflow: hidden; color: var(--text-dim); text-overflow: ellipsis; white-space: nowrap; font-size: .75rem; }
+.ps2-loading-screen { position: absolute; z-index: 20; inset: 0; display: grid; place-items: center; padding: 18px; background: rgba(6, 10, 18, .96); }
+.ps2-loading-screen[hidden] { display: none; }
+.ps2-loader-card { display: flex; width: min(620px, 100%); flex-direction: column; align-items: center; gap: 11px; padding: clamp(20px, 5vw, 38px); border: 1px solid rgba(109, 150, 207, .28); border-radius: 16px; background: radial-gradient(ellipse at 50% 0%, rgba(44, 101, 181, .2), transparent 58%), var(--bg-card); box-shadow: 0 24px 80px #0008; text-align: center; }
+.ps2-loader-ring { width: 43px; height: 43px; border: 3px solid rgba(129, 168, 221, .2); border-top-color: #9fc5ff; border-radius: 50%; animation: ps2-spin .9s linear infinite; }
+@keyframes ps2-spin { to { transform: rotate(360deg); } }
+.ps2-loader-card h2 { margin: 0; font-size: 1.35rem; }
+.ps2-loader-step { margin: 0; color: #a9c9f2; font-size: .85rem; }
+.ps2-loader-step.is-error { color: #ffaaa3; }
+.ps2-loader-step.is-blocked { color: #b6d4ff; }
+.ps2-check-list { display: grid; width: 100%; gap: 7px; margin: 5px 0; padding: 0; list-style: none; text-align: left; font-size: .82rem; }
+.ps2-check-pending { color: var(--text-dim); }
+.ps2-check-ok { color: #8ac7a3; }
+.ps2-check-fail { color: #ffaaa3; }
+.ps2-blocked-note { padding: 13px; border: 1px solid rgba(225, 174, 83, .27); border-radius: 8px; color: #eccb8b; background: rgba(143, 97, 26, .12); font-size: .8rem; line-height: 1.55; }
+.ps2-blocked-note p { margin: 7px 0 0; color: var(--text-secondary); }
+.ps2-loader-note { max-width: 500px; margin: 0; color: var(--text-secondary); font-size: .78rem; line-height: 1.5; }
+.ps2-loader-card > small { color: var(--text-dim); overflow-wrap: anywhere; }
+@media (max-width: 660px) {
+  .ps2-header { align-items: flex-start; flex-direction: column; }
+  .ps2-actions { width: 100%; }
+  .ps2-actions .btn { flex: 1; justify-content: center; }
+  .ps2-game-card { flex-wrap: wrap; }
+  .ps2-game-actions { width: 100%; flex-direction: row; }
+  .ps2-game-actions .btn { flex: 1; }
+}

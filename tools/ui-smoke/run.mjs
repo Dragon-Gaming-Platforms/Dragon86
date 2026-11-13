@@ -15,6 +15,7 @@ import { readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { JSDOM } from "jsdom";
+import { crc32 } from "node:zlib";
 import { indexedDB, IDBKeyRange, IDBFactory, IDBDatabase, IDBRequest, IDBTransaction, IDBObjectStore, IDBCursor } from "fake-indexeddb";
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -166,6 +167,46 @@ new window.MutationObserver(() => {
 }).observe(document.getElementById("os"), { attributes: true, attributeFilter: ["hidden"] });
 
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+
+function storedZip(files) {
+  const locals = [];
+  const centrals = [];
+  let offset = 0;
+  for (const [nameText, dataText] of files) {
+    const name = Buffer.from(nameText);
+    const data = Buffer.from(dataText);
+    const crc = crc32(data) >>> 0;
+    const local = Buffer.alloc(30);
+    local.writeUInt32LE(0x04034b50, 0);
+    local.writeUInt16LE(20, 4);
+    local.writeUInt16LE(0x0800, 6);
+    local.writeUInt32LE(crc, 14);
+    local.writeUInt32LE(data.length, 18);
+    local.writeUInt32LE(data.length, 22);
+    local.writeUInt16LE(name.length, 26);
+    locals.push(local, name, data);
+    const central = Buffer.alloc(46);
+    central.writeUInt32LE(0x02014b50, 0);
+    central.writeUInt16LE(20, 4);
+    central.writeUInt16LE(20, 6);
+    central.writeUInt16LE(0x0800, 8);
+    central.writeUInt32LE(crc, 16);
+    central.writeUInt32LE(data.length, 20);
+    central.writeUInt32LE(data.length, 24);
+    central.writeUInt16LE(name.length, 28);
+    central.writeUInt32LE(offset, 42);
+    centrals.push(central, name);
+    offset += local.length + name.length + data.length;
+  }
+  const centralBytes = Buffer.concat(centrals);
+  const end = Buffer.alloc(22);
+  end.writeUInt32LE(0x06054b50, 0);
+  end.writeUInt16LE(files.length, 8);
+  end.writeUInt16LE(files.length, 10);
+  end.writeUInt32LE(centralBytes.length, 12);
+  end.writeUInt32LE(offset, 16);
+  return new Uint8Array(Buffer.concat([...locals, centralBytes, end]));
+}
 const tick = () => wait(60);
 let failures = 0;
 function check(name, ok, extra = "") {
@@ -1649,6 +1690,42 @@ check(
   check("a key restarts an ended game", overlayHidden() && /Score 0/.test(score()), score());
   sWin.close();
 }
+
+/* ---- PS2 Web Recomp library: ZenFS package import and honest loading gate ---- */
+await window.d86.fs.mkdir("/home/user/Downloads");
+await window.d86.fs.writeBytes("/home/user/Downloads/web-sample.zip", storedZip([
+  ["web-sample/ps2web.html", "<!doctype html><title>sample</title>"],
+  ["web-sample/ps2web.js", "// runtime stub"],
+  ["web-sample/ps2web.wasm", "wasm stub"],
+  ["web-sample/ps2web.data", "data stub"],
+]));
+await window.d86.fs.writeBytes("/home/user/Downloads/sample.iso", new Uint8Array([1, 2, 3]));
+window.dispatchEvent(new window.CustomEvent("d86-launch-app", { detail: "ps2-web-recomp" }));
+await wait(30);
+const ps2 = document.querySelector(".ps2-app");
+check("PS2 Web Recomp is a built-in launchable app", Boolean(ps2));
+check("PS2 app explains that it imports already-recompiled builds", /native C\+\+\/Emscripten tools/.test(ps2?.textContent ?? ""));
+check("PS2 library gets its generated .d86 pointer", await window.d86.fs.exists("/home/user/applications/ps2-web-recomp.d86"));
+ps2?.querySelector(".ps2-actions .btn.primary")?.click();
+await wait(20);
+let ps2Picker = document.querySelector(".ps2-picker");
+ps2Picker?.querySelector(".ps2-picker-row")?.click();
+ps2Picker?.querySelector(".ps2-picker-footer .btn.primary")?.click();
+await wait(120);
+for (let i = 0; i < 40 && !ps2?.querySelector(".ps2-game-card"); i++) await wait(25);
+const ps2BuildExists = await window.d86.fs.exists("/home/user/PS2-Web-Recomp/games/sample/web-sample/ps2web.html");
+check("prebuilt ZIP is extracted into the ZenFS game library", Boolean(ps2?.querySelector(".ps2-game-card")) && ps2BuildExists, `file=${ps2BuildExists}; cards=${ps2?.querySelectorAll(".ps2-game-card").length}; UI=${ps2?.textContent.slice(-400)}`);
+check("game card waits for an ISO reference", /Disc image not linked yet/.test(ps2?.textContent ?? ""));
+ps2?.querySelector(".ps2-game-actions .btn.ghost")?.click();
+await wait(20);
+ps2Picker = document.querySelector(".ps2-picker");
+ps2Picker?.querySelector(".ps2-picker-row")?.click();
+ps2Picker?.querySelector(".ps2-picker-footer .btn.primary")?.click();
+await wait(100);
+ps2?.querySelector(".ps2-game-actions .btn.primary")?.click();
+for (let i = 0; i < 20 && !ps2?.querySelector(".ps2-blocked-note"); i++) await wait(20);
+check("loading screen verifies the web build and disc", /Disc image/.test(ps2?.querySelector(".ps2-check-list")?.textContent ?? ""));
+check("loading screen explains the no-COI playback limitation", /cross-origin isolation/.test(ps2?.querySelector(".ps2-blocked-note")?.textContent ?? ""), `${ps2?.querySelector(".ps2-loading-screen")?.textContent}; card=${ps2?.querySelector(".ps2-game-card")?.textContent}`);
 
 console.log(`\n${failures === 0 ? "all checks passed" : `${failures} check(s) failed`}`);
 process.exit(failures === 0 ? 0 : 1);
