@@ -2202,6 +2202,167 @@
       "opens": [
         "jar"
       ]
+    },
+    {
+      "id": "vamigaweb",
+      "name": "vAmigaWeb",
+      "sub": "Full AGA Amiga emulator · web only",
+      "category": "Machines",
+      "publisher": "vAmigaWeb contributors",
+      "icon": "browser",
+      "externalUrl": "https://vamigaweb.github.io/",
+      "externalLabel": "Launch",
+      "sourceUrl": "https://github.com/vAmigaWeb/vAmigaWeb",
+      "sourceLabel": "Source",
+      "description": "A full AGA Amiga emulator that runs on the web, with RetroShell and snapshots. Opens on the upstream site in a separate tab. It is not a Dragon86 Terminal engine: there is no Dragon86 9P mount, and Dragon86 does not bundle ROMs or software."
+    },
+    {
+      "id": "vamiga",
+      "name": "vAmiga",
+      "sub": "68k Amiga · macOS project",
+      "category": "Machines",
+      "publisher": "dirkwhoffmann",
+      "icon": "terminal",
+      "externalUrl": "https://github.com/dirkwhoffmann/vAmiga",
+      "externalLabel": "Project",
+      "description": "The upstream vAmiga 500/1000/2000 emulator project for macOS. This is a source-project listing, not a browser build or a Dragon86 Terminal engine; it does not mount Dragon86's 9P share."
+    },
+    {
+      "id": "basilisk-ii",
+      "name": "Basilisk II",
+      "sub": "68k Macintosh emulator · native project",
+      "category": "Machines",
+      "publisher": "kanjitalk755/macemu",
+      "icon": "terminal",
+      "externalUrl": "https://github.com/kanjitalk755/macemu",
+      "externalLabel": "Project",
+      "description": "Basilisk II is the 68k Macintosh emulator in the macemu project. This listing opens its upstream source repository; it is not a browser-ready build or a Dragon86 Terminal engine, and no 9P file sharing is provided."
+    },
+    {
+      "id": "minivmac",
+      "name": "Mini vMac",
+      "sub": "Compact 68k Macintosh emulator · project links",
+      "category": "Machines",
+      "publisher": "Gryphel / zydeco",
+      "icon": "terminal",
+      "externalUrl": "https://www.gryphel.com/c/minivmac/",
+      "externalLabel": "Project",
+      "sourceUrl": "https://github.com/zydeco/minivmac4ios",
+      "sourceLabel": "iOS source",
+      "description": "Mini vMac is a compact classic Macintosh emulator. The project site provides Mini vMac information and builds; the source link is the supplied iOS port. Neither is a Dragon86 9P-backed Terminal engine, and Dragon86 does not bundle ROMs or disk images."
+    },
+    {
+      "id": "sheepshaver",
+      "name": "SheepShaver",
+      "sub": "PowerPC Macintosh emulator · native project",
+      "category": "Machines",
+      "publisher": "kanjitalk755/macemu",
+      "icon": "terminal",
+      "externalUrl": "https://github.com/kanjitalk755/macemu",
+      "externalLabel": "Project",
+      "description": "SheepShaver is the PowerPC Macintosh emulator in the macemu project. This listing opens the upstream source repository; it is not a browser-ready build or a Dragon86 Terminal engine, and no 9P file sharing is provided."
+    },
+    {
+      "id": "dingusppc",
+      "name": "DingusPPC",
+      "sub": "Experimental PowerPC emulator · source project",
+      "category": "Machines",
+      "publisher": "dingusdev",
+      "icon": "terminal",
+      "externalUrl": "https://github.com/dingusdev/dingusppc",
+      "externalLabel": "Project",
+      "description": "DingusPPC is an experimental PowerPC emulator project. The App Store entry links to its upstream source; it is not a browser engine integrated with Dragon86 and has no Dragon86 9P mount."
+    },
+    {
+      "id": "pearpc",
+      "name": "PearPC",
+      "sub": "PowerPC platform emulator · source project",
+      "category": "Machines",
+      "publisher": "PearPC contributors",
+      "icon": "terminal",
+      "externalUrl": "https://github.com/sebastianbiallas/pearpc",
+      "externalLabel": "Project",
+      "sourceUrl": "https://pearpc.sourceforge.net/",
+      "sourceLabel": "Project site",
+      "description": "PearPC is a PowerPC platform emulator for running PowerPC operating systems. The supplied pearpc/pearpc GitHub URL was not found; this entry uses the verified sebastianbiallas/pearpc repository and the project site. It is a source-project link, not a browser engine or a Dragon86 9P integration."
+    },
+    {
+      "id": "infinite-mac",
+      "name": "Infinite Mac",
+      "sub": "Classic 68k and PowerPC Macs in the browser",
+      "category": "Machines",
+      "publisher": "Infinite Mac · mihaip",
+      "icon": "browser",
+      "externalUrl": "https://infinitemac.org/",
+      "externalLabel": "Launch",
+      "sourceUrl": "https://github.com/mihaip/infinite-mac",
+      "sourceLabel": "Source",
+      "description": "Launch the Infinite Mac browser experience in a separate tab, or inspect its source. This upstream hosted service is not connected to Dragon86's filesystem and does not mount its 9P share. Dragon86 does not bundle system ROMs or disk images."
+    },
+    {
+      "id": "jsbeeb",
+      "name": "jsbeeb",
+      "sub": "BBC Micro emulator · browser version",
+      "category": "Machines",
+      "publisher": "mattgodbolt/jsbeeb",
+      "icon": "browser",
+      "externalUrl": "https://bbc.xania.org/",
+      "externalLabel": "Launch",
+      "sourceUrl": "https://github.com/mattgodbolt/jsbeeb",
+      "sourceLabel": "Source",
+      "description": "Launch the JavaScript BBC Micro emulator on its upstream site, or inspect the source. It runs outside Dragon86 and is not connected to Dragon86's 9P filesystem share."
+    },
+    {
+      "id": "apple2js",
+      "name": "Apple IIjs",
+      "sub": "Apple II emulator · browser project",
+      "category": "Machines",
+      "publisher": "whscullin/apple2js",
+      "icon": "browser",
+      "externalUrl": "http://www.scullinsteel.com/apple2/",
+      "externalLabel": "Launch",
+      "sourceUrl": "https://github.com/whscullin/apple2js",
+      "sourceLabel": "Source",
+      "description": "Open the Apple IIjs hosted emulator or its source repository in a separate tab. This external page is not mounted to Dragon86's filesystem and does not provide a Dragon86 9P guest share."
+    },
+    {
+      "id": "webmsx",
+      "name": "WebMSX",
+      "sub": "MSX emulator · browser version",
+      "category": "Machines",
+      "publisher": "ppeccin/WebMSX",
+      "icon": "browser",
+      "externalUrl": "https://webmsx.org/",
+      "externalLabel": "Launch",
+      "sourceUrl": "https://github.com/ppeccin/WebMSX",
+      "sourceLabel": "Source",
+      "description": "Launch the upstream WebMSX online emulator or inspect its source. It runs in its own tab; Dragon86 does not embed it, install files into it, or mount the OS filesystem over 9P."
+    },
+    {
+      "id": "jsspeccy3",
+      "name": "JSSpeccy 3",
+      "sub": "ZX Spectrum emulator · browser version",
+      "category": "Machines",
+      "publisher": "gasman/jsspeccy3",
+      "icon": "browser",
+      "externalUrl": "https://jsspeccy.zxdemo.org/",
+      "externalLabel": "Launch",
+      "sourceUrl": "https://github.com/gasman/jsspeccy3",
+      "sourceLabel": "Source",
+      "description": "Launch the upstream JSSpeccy 3 browser emulator or inspect its source. It runs outside Dragon86 and has no Dragon86 9P filesystem mount."
+    },
+    {
+      "id": "pdp11-70",
+      "name": "PDP-11/70 Emulator",
+      "sub": "PDP-11/70 · verified project alternative",
+      "category": "Machines",
+      "publisher": "shotto42 / SIMH Realcons contributors",
+      "icon": "terminal",
+      "externalUrl": "https://hotto.de/software-hardware/pdp11-70-emulator/",
+      "externalLabel": "Project site",
+      "sourceUrl": "https://github.com/shotto42/PDP11_Emulator",
+      "sourceLabel": "Source",
+      "description": "The supplied dcheney/pdp11 GitHub URL was not found. This links to a verifiable PDP-11/70 emulator project and its source; the project documents Linux and Raspberry Pi targets, not a browser build. It is an informational project listing, not a Dragon86 engine or 9P integration."
     }
   ]
 }

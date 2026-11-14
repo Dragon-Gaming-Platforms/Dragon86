@@ -3,7 +3,9 @@
 Each folder here is a **filesystem app**: the OS copies its listed files into
 `~/system/apps/<id>/`, and from then on the guest and Files app see the same
 files. The App Store manifest (`public/store.json`) is the source of each
-app's file list.
+app's file list. The catalog can also contain link-only emulator listings with
+`externalUrl` and optional `sourceUrl`; those open in separate tabs, download
+nothing, and never act as Dragon86 terminal engines or receive a 9P mount.
 
 For vendored Puter apps, file-open, upload, save-as, and download actions are
 routed through Dragon86's ZenFS picker (the user's `/` and `/home`), not the
