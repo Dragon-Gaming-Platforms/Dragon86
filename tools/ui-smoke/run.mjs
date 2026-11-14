@@ -1699,6 +1699,32 @@ check(
   sWin.close();
 }
 
+/* ---- External emulator catalog entries: no install, 9P mount or COI ---- */
+const emulatorStoreIds = [
+  "vamigaweb", "vamiga", "basilisk-ii", "minivmac", "sheepshaver", "dingusppc", "pearpc",
+  "infinite-mac", "jsbeeb", "apple2js", "webmsx", "jsspeccy3", "pdp11-70",
+];
+const externalEmulators = emulatorStoreIds.map((id) => catalogJson.apps.find((app) => app.id === id));
+check("all requested retro emulator projects have App Store entries", externalEmulators.every(Boolean), externalEmulators.map((app) => app?.id ?? "missing").join(", "));
+check("retro emulator entries are link-only and install no ROMs", externalEmulators.every((app) => app?.externalUrl && !app.base && !app.files?.length));
+check("retro emulator links use only HTTP(S) and open through safe new-tab links", externalEmulators.every((app) => [app?.externalUrl, app?.sourceUrl].filter(Boolean).every((value) => {
+  try { return ["https:", "http:"].includes(new URL(value).protocol); } catch { return false; }
+})));
+const emulatorStore = storeWindowEl();
+const appsTab = [...(emulatorStore?.querySelectorAll(".store-tab") ?? [])].find((button) => button.textContent.includes("Apps"));
+appsTab?.click();
+const storeSearch = emulatorStore?.querySelector(".store-search input");
+if (storeSearch) {
+  storeSearch.value = "vAmigaWeb";
+  storeSearch.dispatchEvent(new window.Event("input", { bubbles: true }));
+}
+const vAmigaWebCard = emulatorStore?.querySelector(".store-card");
+const vAmigaWebLink = vAmigaWebCard?.querySelector("a.btn.primary");
+check("external emulator action opens separately without COI or iframe embedding", Boolean(vAmigaWebLink?.href === "https://vamigaweb.github.io/" && vAmigaWebLink.target === "_blank" && vAmigaWebLink.rel.includes("noopener") && !vAmigaWebCard?.querySelector("iframe")), `${vAmigaWebLink?.href}; target=${vAmigaWebLink?.target}`);
+vAmigaWebCard?.querySelector(".store-card-title")?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+check("external emulator detail explicitly says no install or 9P mount", /No guest 9P mount; nothing is installed/.test(emulatorStore?.textContent ?? ""));
+check("external emulator detail has no install section", ![...(emulatorStore?.querySelectorAll("button") ?? [])].some((button) => button.textContent === "Install") && !emulatorStore?.textContent.includes("What gets installed"));
+
 /* ---- PS2 Web Recomp library: ZenFS import and isolated standalone launch ---- */
 await window.d86.fs.mkdir("/home/user/Downloads");
 await window.d86.fs.writeBytes("/home/user/Downloads/web-sample.zip", storedZip([

@@ -66,6 +66,11 @@ interface StoreApp {
   width?: number;
   height?: number;
   description?: string;
+  /** Catalog-only listing: open a trusted project or hosted web app in a new tab. */
+  externalUrl?: string;
+  externalLabel?: string;
+  sourceUrl?: string;
+  sourceLabel?: string;
   /** True for an app found on disk that the catalog does not list. */
   local?: boolean;
 }
@@ -462,7 +467,7 @@ export function openStore(win: Win): void {
         el(
           "p",
           "store-muted store-note",
-          "This catalog is a file that ships with Dragon86, not a server. There are no star ratings, review counts or download counts here — nobody is generating them, so the store does not print them. What it does show is checkable: the publisher, the files that get written, and the measured size of the download.",
+          "This catalog is a file that ships with Dragon86, not a server. There are no star ratings, review counts or download counts here — nobody is generating them, so the store does not print them. Packaged apps show their publisher, installed files and measured size; external emulator links are marked and open in a separate tab without installing anything.",
         ),
       );
       return;
@@ -545,7 +550,9 @@ export function openStore(win: Win): void {
     const meta = el("div", "store-card-meta");
     meta.append(el("span", undefined, app.category ?? "App"));
     if (app.local) meta.append(el("span", "store-dot", "·"), el("span", undefined, "Installed here"));
-    else {
+    else if (safeExternalUrl(app.externalUrl)) {
+      meta.append(el("span", "store-dot", "·"), el("span", undefined, "External link · no install"));
+    } else {
       const count = filesFor(app).length;
       if (count) {
         meta.append(
@@ -561,7 +568,7 @@ export function openStore(win: Win): void {
     node.append(foot);
 
     node.addEventListener("click", (e) => {
-      if ((e.target as HTMLElement).closest("button")) return;
+      if ((e.target as HTMLElement).closest("button, a")) return;
       openDetail(app);
     });
     return node;
@@ -605,6 +612,16 @@ export function openStore(win: Win): void {
     const state = progress.get(app.id);
     const installed = installedIds.has(app.id);
     const size = large ? "" : "sm";
+
+    const externalUrl = safeExternalUrl(app.externalUrl);
+    if (externalUrl) {
+      wrap.append(externalLink(externalUrl, app.externalLabel ?? "Open", app.name, true));
+      const sourceUrl = safeExternalUrl(app.sourceUrl);
+      if (sourceUrl && sourceUrl !== externalUrl) {
+        wrap.append(externalLink(sourceUrl, app.sourceLabel ?? "Source", `${app.name} source`, false));
+      }
+      return wrap;
+    }
 
     if (state) {
       const busy = el("button", `btn ${size}`.trim(), installingLabel(state));
@@ -689,6 +706,25 @@ export function openStore(win: Win): void {
     return wrap;
   }
 
+  function externalLink(url: string, label: string, title: string, primary: boolean): HTMLAnchorElement {
+    const link = el("a", `btn ${primary ? "primary" : "ghost"}`, label) as HTMLAnchorElement;
+    link.href = url;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    link.title = `${title} opens in a separate tab; nothing is installed into Dragon86.`;
+    return link;
+  }
+
+  function safeExternalUrl(value?: string): string | null {
+    if (!value) return null;
+    try {
+      const url = new URL(value);
+      return url.protocol === "https:" || url.protocol === "http:" ? url.href : null;
+    } catch {
+      return null;
+    }
+  }
+
   /* ---------- the detail page ---------- */
 
   function openDetail(app: StoreApp, keepScroll = false): void {
@@ -721,24 +757,30 @@ export function openStore(win: Win): void {
     content.append(head);
 
     const facts = el("div", "store-facts");
+    const externalUrl = safeExternalUrl(app.externalUrl);
     facts.append(fact("Category", app.category ?? "App"));
     facts.append(fact("Publisher", app.publisher ?? "Unknown"));
-    facts.append(
-      fact(
-        "Installs to",
-        isDistro(app)
-          ? "/"
-          : isDiskImage(app)
-            ? `browser storage (OPFS) — the ${netbsdMachineLabel(diskArchFor(app))} machine's disk, not a folder in Files`
-            : isGuestPack(app)
-              ? "/ — then run its script in the Terminal"
-              : `~/system/apps/${app.id}/`,
-      ),
-    );
+    if (externalUrl) {
+      facts.append(fact("Availability", "External project or hosted page — opens in a new tab"));
+      facts.append(fact("Dragon86 integration", "No guest 9P mount; nothing is installed"));
+    } else {
+      facts.append(
+        fact(
+          "Installs to",
+          isDistro(app)
+            ? "/"
+            : isDiskImage(app)
+              ? `browser storage (OPFS) — the ${netbsdMachineLabel(diskArchFor(app))} machine's disk, not a folder in Files`
+              : isGuestPack(app)
+                ? "/ — then run its script in the Terminal"
+                : `~/system/apps/${app.id}/`,
+        ),
+      );
+    }
     if (app.opens?.length) {
       facts.append(fact("Opens", app.opens.map((o) => `.${normExt(o)}`).join(", ")));
     }
-    if (!app.local) {
+    if (!app.local && !externalUrl) {
       /* Measured, not invented: the sum of the bytes actually downloaded. */
       const sizeFact = fact("Download", "measuring…");
       facts.append(sizeFact);
@@ -753,25 +795,29 @@ export function openStore(win: Win): void {
 
     if (app.description) content.append(el("p", "store-desc", app.description));
 
-    const files = el("div", "store-files");
-    files.append(el("h3", undefined, "What gets installed"));
-    if (isDistro(app)) {
-      /* The manifest dumps this one at /: the whole userland becomes your
-         filesystem's root, not a folder under system/apps. */
-      files.append(el("code", undefined, `/ — the distro's userland, unpacked from ${manifestFor(app)?.image ?? "initrd.gz"}`));
-      files.append(el("code", undefined, `/boot/vmlinuz + /boot/initrd.gz — what the machine boots`));
-    } else if (isDiskImage(app)) {
-      files.append(el("code", undefined, `a bootable disk image in browser storage (OPFS) — the ${netbsdMachineLabel(diskArchFor(app))} machine's virtio disk`));
-      files.append(el("code", undefined, `${manifestFor(app)?.kernel ?? "kernel.img.gz"} — the kernel the machine boots directly`));
-    } else if (isGuestPack(app)) {
-      for (const file of filesFor(app)) files.append(el("code", undefined, `/${file}`));
-      const run = manifestFor(app)?.run;
-      if (run) files.append(el("code", undefined, `then, in the Terminal: ${run}`));
+    if (externalUrl) {
+      content.append(el("p", "store-muted store-note", "This link opens the upstream page in another tab. Dragon86 does not bundle ROMs or BIOS files, serve the emulator through an iframe, or mount its files over 9P."));
     } else {
-      const dumpRel = dumpDirFor(app).replace(`${vfs.HOME}/`, "");
-      for (const file of app.files ?? []) files.append(el("code", undefined, `${dumpRel}/${file}`));
+      const files = el("div", "store-files");
+      files.append(el("h3", undefined, "What gets installed"));
+      if (isDistro(app)) {
+        /* The manifest dumps this one at /: the whole userland becomes your
+           filesystem's root, not a folder under system/apps. */
+        files.append(el("code", undefined, `/ — the distro's userland, unpacked from ${manifestFor(app)?.image ?? "initrd.gz"}`));
+        files.append(el("code", undefined, `/boot/vmlinuz + /boot/initrd.gz — what the machine boots`));
+      } else if (isDiskImage(app)) {
+        files.append(el("code", undefined, `a bootable disk image in browser storage (OPFS) — the ${netbsdMachineLabel(diskArchFor(app))} machine's virtio disk`));
+        files.append(el("code", undefined, `${manifestFor(app)?.kernel ?? "kernel.img.gz"} — the kernel the machine boots directly`));
+      } else if (isGuestPack(app)) {
+        for (const file of filesFor(app)) files.append(el("code", undefined, `/${file}`));
+        const run = manifestFor(app)?.run;
+        if (run) files.append(el("code", undefined, `then, in the Terminal: ${run}`));
+      } else {
+        const dumpRel = dumpDirFor(app).replace(`${vfs.HOME}/`, "");
+        for (const file of app.files ?? []) files.append(el("code", undefined, `${dumpRel}/${file}`));
+      }
+      content.append(files);
     }
-    content.append(files);
 
     status.textContent = `${app.name} · from ${catalog?.name ?? "store.json"}`;
   }
