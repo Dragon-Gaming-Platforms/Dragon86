@@ -119,7 +119,7 @@
       "name": "Notes",
       "sub": "Notebooks, checklists and sketches — saved in this browser",
       "category": "Apps",
-      "publisher": "Puter (heyputer/everything, AGPL-3.0)",
+      "publisher": "Open-source contributors (AGPL-3.0)",
       "icon": "img:icons/apps/notes.svg",
       "base": "system-apps/notes/",
       "entry": "index.html",
@@ -142,7 +142,7 @@
       ],
       "width": 1040,
       "height": 700,
-      "description": "Puter's Notes app, adapted for Dragon86: rich notes with checklists, drawings (pen and highlighter), math, PDF attachments and full-text search. Everything is stored in this browser's own database — there is no account, no sign-in, and nothing leaves your machine. From the open-source heyputer/everything collection (AGPL-3.0); the Puter cloud SDK was removed for this build.",
+      "description": "Dragon86 Notes app, adapted for Dragon86: rich notes with checklists, drawings (pen and highlighter), math, PDF attachments and full-text search. Everything is stored in this browser's own database — there is no account, no sign-in, and nothing leaves your machine. From an open-source project (AGPL-3.0); the upstream cloud SDK was removed for this build.",
       "icon-path": "favicon.svg"
     },
     {
@@ -150,7 +150,7 @@
       "name": "Whiteboard",
       "sub": "Infinite canvas for sketches, diagrams and sticky notes",
       "category": "Apps",
-      "publisher": "Puter (heyputer/everything, AGPL-3.0)",
+      "publisher": "Open-source contributors (AGPL-3.0)",
       "icon": "img:icons/apps/whiteboard.svg",
       "base": "system-apps/whiteboard/",
       "entry": "index.html",
@@ -232,7 +232,7 @@
       ],
       "width": 1180,
       "height": 760,
-      "description": "Puter's Whiteboard, adapted for Dragon86: an infinite canvas with freehand drawing, shapes, connectors, sticky notes, text and image paste — with named checkpoints you can roll back to. Boards are stored in this browser's own database; no account and no cloud. From the open-source heyputer/everything collection (AGPL-3.0); the Puter cloud SDK and analytics were removed for this build, so the sharing/sign-in menu entries cannot connect to anything.",
+      "description": "Dragon86 Whiteboard, adapted for Dragon86: an infinite canvas with freehand drawing, shapes, connectors, sticky notes, text and image paste — with named checkpoints you can roll back to. Boards are stored in this browser's own database; no account and no cloud. From an open-source project (AGPL-3.0); the upstream cloud SDK and analytics were removed for this build, so the sharing/sign-in menu entries cannot connect to anything.",
       "icon-path": "icons/icon-128.png"
     },
     {
@@ -240,7 +240,7 @@
       "name": "Wiki",
       "sub": "Your own wiki — linked pages, kept in this browser",
       "category": "Apps",
-      "publisher": "Puter (heyputer/everything, MIT)",
+      "publisher": "Open-source contributors (MIT)",
       "icon": "img:icons/apps/wiki.svg",
       "base": "system-apps/wiki/",
       "entry": "index.html",
@@ -264,7 +264,7 @@
       ],
       "width": 1120,
       "height": 740,
-      "description": "Puter's Wiki, adapted for Dragon86: linked pages with rich editing, history and search, organized into spaces. Everything lives in this browser's own database — no account, no cloud. From the open-source heyputer/everything collection (MIT); the Puter cloud SDK was removed and the app runs its upstream local mode permanently. Sharing menus act on an in-browser copy of the collaboration service only — invite links cannot reach another person.",
+      "description": "Dragon86 Wiki, adapted for Dragon86: linked pages with rich editing, history and search, organized into spaces. Everything lives in this browser's own database — no account, no cloud. From an open-source project (MIT); the upstream cloud SDK was removed and the app runs its upstream local mode permanently. Sharing menus act on an in-browser copy of the collaboration service only — invite links cannot reach another person.",
       "icon-path": "icon-192.png"
     },
     {
@@ -272,7 +272,7 @@
       "name": "Photo Studio",
       "sub": "Layers, brushes, masks and filters — PSD in and out",
       "category": "Apps",
-      "publisher": "Puter (heyputer/everything, MIT)",
+      "publisher": "Open-source contributors (MIT)",
       "icon": "img:icons/apps/photo-studio.svg",
       "base": "system-apps/photo-studio/",
       "entry": "index.html",
@@ -518,7 +518,7 @@
       ],
       "width": 1240,
       "height": 800,
-      "description": "Puter's Photo Studio, adapted for Dragon86: a layered image editor with brushes, selections, masks, adjustment layers, filters and PSD import/export. Documents are stored in this browser's own database — no account, no cloud. From the open-source heyputer/everything collection; the Puter cloud SDK was removed for this build, so collaboration/sign-in features are simply absent.",
+      "description": "Dragon86 Photo Studio, adapted for Dragon86: a layered image editor with brushes, selections, masks, adjustment layers, filters and PSD import/export. Documents are stored in this browser's own database — no account, no cloud. From an open-source project; the upstream cloud SDK was removed for this build, so collaboration/sign-in features are simply absent.",
       "icon-path": "app-icon.png"
     },
     {
@@ -526,7 +526,7 @@
       "name": "Vector Studio",
       "sub": "Pen-tool vector design with SVG import and export",
       "category": "Apps",
-      "publisher": "Puter (heyputer/everything, MIT)",
+      "publisher": "Open-source contributors (MIT)",
       "icon": "img:icons/apps/vector-studio.svg",
       "base": "system-apps/vector-studio/",
       "entry": "index.html",
@@ -663,7 +663,7 @@
       ],
       "width": 1240,
       "height": 800,
-      "description": "Puter's Vector Studio, adapted for Dragon86: pen and shape tools, boolean operations, gradients, typography with bundled fonts, and SVG import/export. Work is stored in this browser — no account, no cloud. From the open-source heyputer/everything collection; the Puter cloud SDK was removed for this build and the app boots straight into its local mode.",
+      "description": "Dragon86 Vector Studio, adapted for Dragon86: pen and shape tools, boolean operations, gradients, typography with bundled fonts, and SVG import/export. Work is stored in this browser — no account, no cloud. From an open-source project; the upstream cloud SDK was removed for this build and the app boots straight into its local mode.",
       "icon-path": "icon-192.png"
     },
     {
@@ -671,7 +671,7 @@
       "name": "Audio Studio",
       "sub": "Record, cut and mix audio — exports MP3 and WAV",
       "category": "Apps",
-      "publisher": "Puter (heyputer/everything, MIT)",
+      "publisher": "Open-source contributors (MIT)",
       "icon": "img:icons/apps/audio-studio.svg",
       "base": "system-apps/audio-studio/",
       "entry": "index.html",
@@ -709,7 +709,7 @@
       ],
       "width": 1180,
       "height": 760,
-      "description": "Puter's Audio Studio, adapted for Dragon86: multitrack editing with recording, cutting, fades, effects and MP3/WAV export, all processed in the page. From the open-source heyputer/everything collection; the Puter cloud SDK was removed for this build. Note: upstream's service-worker cleanup was also removed, since on Dragon86 the service worker belongs to the OS.",
+      "description": "Dragon86 Audio Studio, adapted for Dragon86: multitrack editing with recording, cutting, fades, effects and MP3/WAV export, all processed in the page. From an open-source project; the upstream cloud SDK was removed for this build. Note: upstream's service-worker cleanup was also removed, since on Dragon86 the service worker belongs to the OS.",
       "icon-path": "app-icon.png"
     },
     {
@@ -717,7 +717,7 @@
       "name": "Music Studio",
       "sub": "Piano-roll sequencer with built-in instruments",
       "category": "Apps",
-      "publisher": "Puter (heyputer/everything, MIT)",
+      "publisher": "Open-source contributors (MIT)",
       "icon": "img:icons/apps/music-studio.svg",
       "base": "system-apps/music-studio/",
       "entry": "index.html",
@@ -747,7 +747,7 @@
       ],
       "width": 1180,
       "height": 760,
-      "description": "Puter's Music Studio, adapted for Dragon86: a piano-roll sequencer with built-in synth instruments, drum patterns and per-track mixing. Songs and presets are stored in this browser's own database — no account, no cloud. From the open-source heyputer/everything collection; the Puter cloud SDK was removed for this build.",
+      "description": "Dragon86 Music Studio, adapted for Dragon86: a piano-roll sequencer with built-in synth instruments, drum patterns and per-track mixing. Songs and presets are stored in this browser's own database — no account, no cloud. From an open-source project; the upstream cloud SDK was removed for this build.",
       "icon-path": "app-icon.png"
     },
     {
@@ -755,7 +755,7 @@
       "name": "Video Studio",
       "sub": "Timeline video editing — media stays in this browser",
       "category": "Apps",
-      "publisher": "Puter (heyputer/everything, AGPL-3.0)",
+      "publisher": "Open-source contributors (AGPL-3.0)",
       "icon": "img:icons/apps/video-studio.svg",
       "base": "system-apps/video-studio/",
       "entry": "index.html",
@@ -1151,7 +1151,7 @@
       ],
       "width": 1280,
       "height": 800,
-      "description": "Puter's Video Studio, adapted for Dragon86: timeline editing with transitions, titles (bundled fonts), audio tracks and camera effects powered by on-device MediaPipe models — the largest app in the store because those models ship with it. Projects and media live in this browser's private storage. From the open-source heyputer/everything collection (AGPL-3.0); the Puter cloud SDK was removed and the app always uses its local library.",
+      "description": "Dragon86 Video Studio, adapted for Dragon86: timeline editing with transitions, titles (bundled fonts), audio tracks and camera effects powered by on-device MediaPipe models — the largest app in the store because those models ship with it. Projects and media live in this browser's private storage. From an open-source project (AGPL-3.0); the upstream cloud SDK was removed and the app always uses its local library.",
       "icon-path": "app-icon.png"
     },
     {
@@ -1159,7 +1159,7 @@
       "name": "3D Studio",
       "sub": "Model, sculpt and render 3D scenes in the browser",
       "category": "Apps",
-      "publisher": "Puter (heyputer/everything, AGPL-3.0)",
+      "publisher": "Open-source contributors (AGPL-3.0)",
       "icon": "img:icons/apps/studio3d.svg",
       "base": "system-apps/studio3d/",
       "entry": "index.html",
@@ -1260,7 +1260,7 @@
       ],
       "width": 1280,
       "height": 800,
-      "description": "Puter's 3D Studio, adapted for Dragon86: modeling, sculpting, materials, physics (Rapier) and path-traced rendering, offline-first by design. Scenes are stored in this browser. From the open-source heyputer/everything collection (AGPL-3.0); the only Puter feature — the cloud AI assistant — now reports itself unavailable instead of loading the SDK.",
+      "description": "Dragon86 3D Studio, adapted for Dragon86: modeling, sculpting, materials, physics (Rapier) and path-traced rendering, offline-first by design. Scenes are stored in this browser. From an open-source project (AGPL-3.0); the only cloud feature — the AI assistant connects to OpenRouter; sign in under Settings → AI first.",
       "icon-path": "app-icon.png"
     },
     {
@@ -1268,7 +1268,7 @@
       "name": "Presentation",
       "sub": "Slides with themes, charts and a presenter view",
       "category": "Apps",
-      "publisher": "Puter (heyputer/everything, AGPL-3.0)",
+      "publisher": "Open-source contributors (AGPL-3.0)",
       "icon": "img:icons/apps/presentation.svg",
       "base": "system-apps/presentation/",
       "entry": "index.html",
@@ -1309,7 +1309,7 @@
       ],
       "width": 1240,
       "height": 800,
-      "description": "Puter's Presentation, adapted for Dragon86: slide decks with themes, layouts, charts, drawing tools and a presenter view, plus PowerPoint import/export. Work is kept as drafts in this browser — no account, no cloud; the sign-in buttons honestly report they are unavailable in this build. From the open-source heyputer/everything collection (AGPL-3.0).",
+      "description": "Dragon86 Presentation, adapted for Dragon86: slide decks with themes, layouts, charts, drawing tools and a presenter view, plus PowerPoint import/export. Work is kept as drafts in this browser — no account, no cloud; the sign-in buttons honestly report they are unavailable in this build. From an open-source project (AGPL-3.0).",
       "icon-path": "icon-192.png"
     },
     {
@@ -1317,7 +1317,7 @@
       "name": "Records",
       "sub": "Tables, views and forms — a base builder in your browser",
       "category": "Apps",
-      "publisher": "Puter (heyputer/everything, MIT)",
+      "publisher": "Open-source contributors (MIT)",
       "icon": "img:icons/apps/records.svg",
       "base": "system-apps/records/",
       "entry": "index.html",
@@ -1339,7 +1339,7 @@
       ],
       "width": 1200,
       "height": 760,
-      "description": "Puter's Records, adapted for Dragon86: build bases from tables with typed fields, filtered views and forms — in the spirit of Airtable. Everything lives in this browser's own database; no account, no cloud. From the open-source heyputer/everything collection; the app runs its upstream local mode permanently.",
+      "description": "Dragon86 Records, adapted for Dragon86: build bases from tables with typed fields, filtered views and forms — in the spirit of Airtable. Everything lives in this browser's own database; no account, no cloud. From an open-source project; the app runs its upstream local mode permanently.",
       "icon-path": "icon-192.png"
     },
     {
@@ -1347,7 +1347,7 @@
       "name": "API Client",
       "sub": "Compose and test HTTP requests, collections included",
       "category": "Apps",
-      "publisher": "Puter (heyputer/everything, MIT)",
+      "publisher": "Open-source contributors (MIT)",
       "icon": "img:icons/apps/api-client.svg",
       "base": "system-apps/api-client/",
       "entry": "index.html",
@@ -1383,7 +1383,7 @@
       ],
       "width": 1200,
       "height": 760,
-      "description": "Puter's API Client, adapted for Dragon86: compose HTTP requests, organize them into collections, use variables and inspect responses — in the spirit of Postman. Upstream's guest mode is the only mode: collections and history stay in this browser. Requests are sent only to the servers you aim them at. From the open-source heyputer/everything collection.",
+      "description": "Dragon86 API Client, adapted for Dragon86: compose HTTP requests, organize them into collections, use variables and inspect responses — in the spirit of Postman. Upstream's guest mode is the only mode: collections and history stay in this browser. Requests are sent only to the servers you aim them at. From an open-source project.",
       "icon-path": "icon-192.png"
     },
     {
@@ -1391,7 +1391,7 @@
       "name": "CAD",
       "sub": "2D drafting with DXF/DWG import — drawings as files",
       "category": "Apps",
-      "publisher": "Puter (heyputer/everything, MIT)",
+      "publisher": "Open-source contributors (MIT)",
       "icon": "img:icons/apps/cad.svg",
       "base": "system-apps/cad/",
       "entry": "index.html",
@@ -1411,7 +1411,7 @@
       ],
       "width": 1240,
       "height": 780,
-      "description": "Puter's CAD, adapted for Dragon86: 2D drafting with precise tools, layers and dimensioning, opening and saving CAD/DXF/DWG files on this computer. Local recovery copies in the browser mean a reload never loses work; it is usable without any account by design. From the open-source heyputer/everything collection.",
+      "description": "Dragon86 CAD, adapted for Dragon86: 2D drafting with precise tools, layers and dimensioning, opening and saving CAD/DXF/DWG files on this computer. Local recovery copies in the browser mean a reload never loses work; it is usable without any account by design. From an open-source project.",
       "icon-path": "icons/icon-192.png"
     },
     {
@@ -1419,7 +1419,7 @@
       "name": "Circuits",
       "sub": "Draw and simulate electronic circuits",
       "category": "Apps",
-      "publisher": "Puter (heyputer/everything, MIT)",
+      "publisher": "Open-source contributors (MIT)",
       "icon": "img:icons/apps/circuits.svg",
       "base": "system-apps/circuits/",
       "entry": "index.html",
@@ -1456,7 +1456,7 @@
       ],
       "width": 1240,
       "height": 780,
-      "description": "Puter's Circuits, adapted for Dragon86: draw schematics from a component library and simulate them, with projects and versions kept in this browser. No account, no cloud — the app runs its own offline path. From the open-source heyputer/everything collection.",
+      "description": "Dragon86 Circuits, adapted for Dragon86: draw schematics from a component library and simulate them, with projects and versions kept in this browser. No account, no cloud — the app runs its own offline path. From an open-source project.",
       "icon-path": "icon-192.png"
     },
     {
@@ -1464,7 +1464,7 @@
       "name": "Parametric",
       "sub": "Code-driven 3D parts — OpenCascade kernel included",
       "category": "Apps",
-      "publisher": "Puter (heyputer/everything, AGPL-3.0)",
+      "publisher": "Open-source contributors (AGPL-3.0)",
       "icon": "img:icons/apps/parametric.svg",
       "base": "system-apps/parametric/",
       "entry": "index.html",
@@ -1499,7 +1499,7 @@
       ],
       "width": 1240,
       "height": 780,
-      "description": "Puter's Parametric, adapted for Dragon86: model 3D parts with code, powered by the replicad/OpenCascade geometry kernel running locally (the 22 MB of WebAssembly ships with the app). Parts stay in this browser; export produces files. From the open-source heyputer/everything collection (AGPL-3.0).",
+      "description": "Dragon86 Parametric, adapted for Dragon86: model 3D parts with code, powered by the replicad/OpenCascade geometry kernel running locally (the 22 MB of WebAssembly ships with the app). Parts stay in this browser; export produces files. From an open-source project (AGPL-3.0).",
       "icon-path": "icon-192.png"
     },
     {
@@ -1507,7 +1507,7 @@
       "name": "Building Design",
       "sub": "Floor plans and building layouts — projects as files",
       "category": "Apps",
-      "publisher": "Puter (heyputer/everything, AGPL-3.0)",
+      "publisher": "Open-source contributors (AGPL-3.0)",
       "icon": "img:icons/apps/building-design.svg",
       "base": "system-apps/building-design/",
       "entry": "index.html",
@@ -1529,7 +1529,7 @@
       ],
       "width": 1240,
       "height": 780,
-      "description": "Puter's Building Design, adapted for Dragon86: draw floor plans with walls, doors, windows and measurements, saving projects as files on this computer with browser-side recovery copies. Usable without any account by design. From the open-source heyputer/everything collection (AGPL-3.0).",
+      "description": "Dragon86 Building Design, adapted for Dragon86: draw floor plans with walls, doors, windows and measurements, saving projects as files on this computer with browser-side recovery copies. Usable without any account by design. From an open-source project (AGPL-3.0).",
       "icon-path": "icons/icon-192.png"
     },
     {
@@ -1579,7 +1579,7 @@
       "name": "Tasks",
       "sub": "Personal and shared to-do lists",
       "category": "Productivity",
-      "publisher": "Puter · open source (MIT)",
+      "publisher": "Open-source contributors (MIT)",
       "icon": "img:icons/apps/tasks.svg",
       "base": "system-apps/tasks/",
       "entry": "index.html",
@@ -1601,15 +1601,15 @@
       ],
       "width": 980,
       "height": 700,
-      "description": "Puter Tasks: task lists, reminders, recurring tasks, calendar integration, and cross-device sync. Uses Puter.js and requires an internet connection and Puter account for cloud features.",
+      "description": "Dragon86 Tasks: task lists, reminders, recurring tasks, calendar integration, and cross-device sync. Sync still depends on the upstream account service and needs an internet connection; Dragon86 does not provide that cloud backend.",
       "icon-path": "icon.svg"
     },
     {
       "id": "contacts",
       "name": "Contacts",
-      "sub": "A private address book in your Puter cloud",
+      "sub": "Address book with vCard import/export and optional cloud sync",
       "category": "Productivity",
-      "publisher": "Puter · open source (MIT)",
+      "publisher": "Open-source contributors (MIT)",
       "icon": "img:icons/apps/contacts.svg",
       "base": "system-apps/contacts/",
       "entry": "index.html",
@@ -1629,7 +1629,7 @@
       ],
       "width": 980,
       "height": 700,
-      "description": "Puter Contacts: searchable address book with vCard import/export, tags, and cross-device cloud sync. Uses Puter.js and requires an internet connection and Puter account.",
+      "description": "Dragon86 Contacts: searchable address book with vCard import/export, tags, and cross-device sync. Sync still depends on the upstream account service and needs an internet connection; Dragon86 does not provide that cloud backend.",
       "icon-path": "icon.svg"
     },
     {
@@ -1657,7 +1657,7 @@
       "name": "Sudoku",
       "sub": "Classic sudoku with hints, notes and stats — all local",
       "category": "Games",
-      "publisher": "Puter (heyputer/everything, MIT)",
+      "publisher": "Open-source contributors (MIT)",
       "icon": "img:icons/apps/sudoku.svg",
       "base": "system-apps/sudoku/",
       "entry": "index.html",
@@ -1734,7 +1734,7 @@
       ],
       "width": 860,
       "height": 700,
-      "description": "Puter's Sudoku, adapted for Dragon86: four difficulties, pencil notes, hints, mistake checking and personal best times. Puzzles in progress and stats are kept in this browser — no account, no cloud. From the open-source heyputer/everything collection (MIT); the Puter cloud SDK was removed for this build, so the app simply never shows its sign-in button.",
+      "description": "Dragon86 Sudoku, adapted for Dragon86: four difficulties, pencil notes, hints, mistake checking and personal best times. Puzzles in progress and stats are kept in this browser — no account, no cloud. From an open-source project (MIT); the upstream cloud SDK was removed for this build, so the app simply never shows its sign-in button.",
       "icon-path": "icon-96.png"
     },
     {
@@ -1742,7 +1742,7 @@
       "name": "Chess",
       "sub": "Play the computer or a friend at this keyboard",
       "category": "Games",
-      "publisher": "Puter (heyputer/everything, MIT)",
+      "publisher": "Open-source contributors (MIT)",
       "icon": "img:icons/apps/chess.svg",
       "base": "system-apps/chess/",
       "entry": "index.html",
@@ -1833,7 +1833,7 @@
       ],
       "width": 1040,
       "height": 740,
-      "description": "Puter's Chess, adapted for Dragon86: play against the computer at several strengths or two players at one keyboard, with move history, undo and board themes. Settings and the game in progress stay in this browser. From the open-source heyputer/everything collection (MIT); online multiplayer needed Puter's servers, so in this build the Online menu honestly says it is unavailable.",
+      "description": "Dragon86 Chess, adapted for Dragon86: play against the computer at several strengths or two players at one keyboard, with move history, undo and board themes. Settings and the game in progress stay in this browser. From an open-source project (MIT); online multiplayer relied on an external service, which is not available in this local build.",
       "icon-path": "icon-128.png"
     },
     {
@@ -1841,7 +1841,7 @@
       "name": "Checkers",
       "sub": "Draughts against the computer or a friend — all local",
       "category": "Games",
-      "publisher": "Puter (heyputer/everything, MIT)",
+      "publisher": "Open-source contributors (MIT)",
       "icon": "img:icons/apps/checkers.svg",
       "base": "system-apps/checkers/",
       "entry": "index.html",
@@ -1919,7 +1919,7 @@
       ],
       "width": 1040,
       "height": 740,
-      "description": "Puter's Checkers, adapted for Dragon86: play draughts against the computer or two players at one keyboard, with undo and move history. Settings and the game in progress stay in this browser. From the open-source heyputer/everything collection (MIT); online multiplayer needed Puter's servers, so in this build the Online menu honestly says it is unavailable.",
+      "description": "Dragon86 Checkers, adapted for Dragon86: play draughts against the computer or two players at one keyboard, with undo and move history. Settings and the game in progress stay in this browser. From an open-source project (MIT); online multiplayer relied on an external service, which is not available in this local build.",
       "icon-path": "icon-128.png"
     },
     {
@@ -1927,7 +1927,7 @@
       "name": "Backgammon",
       "sub": "Backgammon with doubling cube, vs computer or hotseat",
       "category": "Games",
-      "publisher": "Puter (heyputer/everything, MIT)",
+      "publisher": "Open-source contributors (MIT)",
       "icon": "img:icons/apps/backgammon.svg",
       "base": "system-apps/backgammon/",
       "entry": "index.html",
@@ -2005,7 +2005,7 @@
       ],
       "width": 1080,
       "height": 740,
-      "description": "Puter's Backgammon, adapted for Dragon86: full rules including the doubling cube, against the computer or two players at one keyboard. Settings and the game in progress stay in this browser. From the open-source heyputer/everything collection (MIT); online multiplayer needed Puter's servers, so in this build the Online menu honestly says it is unavailable.",
+      "description": "Dragon86 Backgammon, adapted for Dragon86: full rules including the doubling cube, against the computer or two players at one keyboard. Settings and the game in progress stay in this browser. From an open-source project (MIT); online multiplayer relied on an external service, which is not available in this local build.",
       "icon-path": "icon-128.png"
     },
     {
@@ -2013,7 +2013,7 @@
       "name": "Solitaire",
       "sub": "Klondike and friends — saves and stats in this browser",
       "category": "Games",
-      "publisher": "Puter (heyputer/everything, MIT)",
+      "publisher": "Open-source contributors (MIT)",
       "icon": "img:icons/apps/solitaire.svg",
       "base": "system-apps/solitaire/",
       "entry": "index.html",
@@ -2037,7 +2037,7 @@
       ],
       "width": 1000,
       "height": 720,
-      "description": "Puter's Solitaire, adapted for Dragon86: Klondike and more modes with drag-and-drop, undo, auto-complete and per-mode stats. Saves and statistics live in this browser. From the open-source heyputer/everything collection (MIT); the Puter cloud SDK and its optional sync were removed for this build, and its own offline service worker is disabled because Dragon86 already serves apps through one.",
+      "description": "Dragon86 Solitaire, adapted for Dragon86: Klondike and more modes with drag-and-drop, undo, auto-complete and per-mode stats. Saves and statistics live in this browser. From an open-source project (MIT); the upstream cloud SDK and its optional sync were removed for this build, and its own offline service worker is disabled because Dragon86 already serves apps through one.",
       "icon-path": "icon-128.png"
     },
     {
@@ -2363,6 +2363,35 @@
       "sourceUrl": "https://github.com/shotto42/PDP11_Emulator",
       "sourceLabel": "Source",
       "description": "The supplied dcheney/pdp11 GitHub URL was not found. This links to a verifiable PDP-11/70 emulator project and its source; the project documents Linux and Raspberry Pi targets, not a browser build. It is an informational project listing, not a Dragon86 engine or 9P integration."
+    },
+    {
+      "id": "flash-player",
+      "name": "Flash Player",
+      "sub": "Play legacy Flash content in your browser",
+      "category": "Games",
+      "publisher": "Ruffle contributors",
+      "icon": "gamepad",
+      "description": "A browser-based Flash Player powered by the open-source Ruffle emulator. Opens Ruffle’s official demo, where you can choose a local SWF file to play. Dragon86 does not bundle proprietary Flash Player software or provide Flash games.",
+      "externalUrl": "https://ruffle.rs/demo/",
+      "externalLabel": "Open Flash Player",
+      "sourceUrl": "https://ruffle.rs/",
+      "sourceLabel": "Ruffle project"
+    },
+    {
+      "id": "dragon86-ai",
+      "name": "Dragon86 AI",
+      "sub": "Choose OpenRouter, Pollinations.ai or Hugging Face and select a model",
+      "category": "Productivity",
+      "publisher": "Dragon Gaming Platforms",
+      "icon": "robot",
+      "base": "system-apps/dragon86-ai/",
+      "entry": "index.html",
+      "files": [
+        "index.html"
+      ],
+      "width": 900,
+      "height": 680,
+      "description": "A Dragon86 AI chat interface with OpenRouter, Pollinations.ai, and Hugging Face Inference Providers. Choose a provider and model from its live model list, then chat. OpenRouter uses the Settings sign-in; Pollinations uses user-approved PKCE authorization with a budget/expiry, and Hugging Face tokens are kept for the current tab session. Requests go directly to the chosen provider; model availability, terms, and usage costs are controlled by each provider."
     }
   ]
 }

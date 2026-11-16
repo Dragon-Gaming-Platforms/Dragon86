@@ -21,7 +21,7 @@ import { getRV64Backend } from "../bridge/rv64";
 import { netbsdInstalled, netbsdOsLabel } from "../bridge/netbsd64";
 import { distroInstalled, installedDistro, DISTROS, type DistroId } from "../bridge/guest-root";
 import * as vfs from "../core/vfs";
-import { isolationReport, logInfo, logWarn } from "../core/log";
+import { logInfo, logWarn } from "../core/log";
 import { rememberEngine } from "./engine-viewer";
 
 const ARCH_LABEL: Record<MachineArch, string> = {
@@ -53,9 +53,7 @@ export function openTerminal(win: Win, options: TerminalOptions = {}): void {
   const status = el("div", "app-statusbar");
 
   const termHost = el("div", "term-wrap");
-  const devHost = el("div", "term-devtools");
-  devHost.style.display = "none";
-  root.append(toolbar, termHost, devHost, status);
+  root.append(toolbar, termHost, status);
   win.el.append(root);
 
   const term = new Terminal({
@@ -125,40 +123,24 @@ export function openTerminal(win: Win, options: TerminalOptions = {}): void {
       });
   });
 
-  /* --- Eruda developer console, contained in this window ---
-     Loaded lazily on first click so it costs nothing until needed. It lives
-     inside `devHost` (inside this terminal window only) and captures this
-     page's console — including all [D86] diagnostics. */
-  let erudaMod: typeof import("eruda")["default"] | null = null;
+  /* --- Locally vendored Eruda developer console ---
+     The Developer setting enables it globally; the terminal button only
+     shows/hides that already-loaded console. */
   let devOpen = false;
   devBtn.addEventListener("click", () => {
     void (async () => {
       try {
-        if (!erudaMod) {
-          logInfo("terminal", "loading Eruda dev console…");
-          erudaMod = (await import("eruda")).default;
-          erudaMod.init({
-            container: devHost,
-            tool: ["console", "elements", "network", "resources", "info"],
-            defaults: { theme: "Dark" },
-          });
-          /* Inline inside our panel instead of a floating overlay. */
-          erudaMod.show();
-          logInfo("terminal", "Eruda ready. Environment:", isolationReport());
+        const { getSettings } = await import("../core/settings");
+        if (!getSettings().devConsole) {
+          status.textContent = "Enable Eruda in Settings → Developer first.";
+          return;
         }
+        const { loadEruda } = await import("../core/eruda");
+        const eruda = await loadEruda();
         devOpen = !devOpen;
-        devHost.style.display = devOpen ? "" : "none";
+        if (devOpen) eruda.show("console");
+        else eruda.hide();
         devBtn.classList.toggle("active", devOpen);
-        if (devOpen) {
-          erudaMod.show("console");
-          logInfo(
-            "terminal",
-            "Dev Console open — watch for [D86:bridge] lines. " +
-              "Key facts: OS crossOriginIsolated, iframe probe result, " +
-              "hello counts, and any ignored messages.",
-          );
-        }
-        requestAnimationFrame(() => fit.fit());
       } catch (err) {
         logWarn("terminal", "Eruda failed to load:", err);
       }

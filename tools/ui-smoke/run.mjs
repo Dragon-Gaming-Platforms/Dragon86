@@ -349,6 +349,7 @@ const win = document.querySelector(".d86-window");
 check("Settings window opened", Boolean(win));
 const navItems = document.querySelectorAll(".settings-nav-item");
 check("settings has a sidebar of pages", navItems.length >= 6, `${navItems.length} pages`);
+check("Settings includes Developer and AI pages", ["Developer", "AI"].every((label) => [...navItems].some((item) => item.textContent.trim() === label)));
 const search = document.querySelector(".settings-search input");
 search.value = "trash";
 search.dispatchEvent(new window.Event("input", { bubbles: true }));
@@ -390,7 +391,16 @@ check("NES emulator listing and bundled test ROM are removed", !catalogJson.apps
 check("EmulatorJS passes a user-selected File to the core", Boolean(emulatorCatalogApp) && emulatorFrontend.includes("EJS_gameUrl = file"));
 check("PS1 frontend selects PSX and explicitly disables threads", Boolean(ps1CatalogApp) && ps1Frontend.includes("const isPsxApp = true") && ps1Frontend.includes("EJS_threads = false"));
 check("PS1 core evidence records pcsx_rearmed as non-threaded upstream", /pcsx_rearmed.{0,160}not thread-required/s.test(ps1CoreEvidence));
-check("Puter Tasks and Contacts are listed", ["tasks", "contacts"].every((id) => catalogJson.apps.some((app) => app.id === id)));
+check("legacy cloud app entries are retained", ["tasks", "contacts"].every((id) => catalogJson.apps.some((app) => app.id === id)));
+const flashApp = catalogJson.apps.find((app) => app.id === "flash-player");
+const aiApp = catalogJson.apps.find((app) => app.id === "dragon86-ai");
+check("Flash Player is listed as an external Ruffle demo", Boolean(flashApp?.externalUrl?.includes("ruffle.rs/demo")) && !flashApp.files?.length);
+check("Dragon86 AI installs the local assistant", Boolean(aiApp?.files?.includes("index.html")) && existsSync(resolve(publicRoot, aiApp.base, "index.html")));
+const aiInterface = readFileSync(resolve(publicRoot, "system-apps/dragon86-ai/index.html"), "utf8");
+check("Dragon86 AI offers all three providers and model selection", ["OpenRouter", "Pollinations.ai", "Hugging Face", "id=\"model\""].every((token) => aiInterface.includes(token)));
+check("AI chat uses each provider’s chat API and dynamic model catalog", ["https://openrouter.ai/api/v1/chat/completions", "https://gen.pollinations.ai/v1/chat/completions", "https://router.huggingface.co/v1/chat/completions", "https://gen.pollinations.ai/text/models", "https://router.huggingface.co/v1/models"].every((url) => aiInterface.includes(url)));
+check("Pollinations uses user-authorized PKCE, not a publishable key as a bearer token", aiInterface.includes("/api/oauth/token") && aiInterface.includes("code_verifier") && aiInterface.includes("sessionStorage.setItem('dragon86.pollinations.access'"));
+check("catalog branding uses Dragon86, not the former OS brand", catalogJson.apps.every((app) => !/\bputer\b/i.test([app.name, app.sub, app.publisher, app.description].join(" "))));
 const gameAssetFiles = [emulatorCatalogApp, ps1CatalogApp].flatMap((app) => app?.files ?? []);
 check("emulator app packages contain no ROM or BIOS files", !gameAssetFiles.some((file) => /\.(?:nes|rom|bin|cue|chd|pbp|iso|bios)$/i.test(file)));
 check("catalog app file manifests resolve to shipped files", ["emulatorjs", "ps1", "tasks", "contacts"].every((id) => {
