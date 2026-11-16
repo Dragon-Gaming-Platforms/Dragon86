@@ -10,14 +10,43 @@ import { WindowManager } from "./core/wm";
 import { buildDesktop, refreshDesktops } from "./core/desktop";
 import { buildTaskbar, coreApps } from "./core/taskbar";
 import { createLauncher } from "./apps/registry";
-import { isolationReport, logInfo } from "./core/log";
+import { isolationReport, logInfo, logWarn } from "./core/log";
 import { loadFsApps, onFsAppsChange, startFsAppBridge } from "./core/fs-apps";
 import { loadDefaults, requestDefaults } from "./core/filetypes";
 import { initTrash } from "./core/trash";
 import { ensureAppShortcuts, watchAppPointers } from "./core/app-shortcuts";
 import { installDevApi } from "./core/dev-api";
+import { getSettings } from "./core/settings";
+import { startDeveloperConsole } from "./core/eruda";
+
+async function completeOpenRouterSignIn(): Promise<void> {
+  const params = new URLSearchParams(location.search);
+  if (!params.has("openrouter_callback")) return;
+  const code = params.get("code");
+  try {
+    if (!code) throw new Error("OpenRouter did not return an authorization code.");
+    const verifier = localStorage.getItem("dragon86.openrouter.verifier");
+    if (!verifier) throw new Error("The sign-in verifier is missing; please try again.");
+    const response = await fetch("https://openrouter.ai/api/v1/auth/keys", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ code, code_verifier: verifier, code_challenge_method: "S256" }),
+    });
+    if (!response.ok) throw new Error(`OpenRouter sign-in failed (${response.status}).`);
+    const payload = await response.json() as { key?: string };
+    if (!payload.key) throw new Error("OpenRouter did not return an API key.");
+    localStorage.setItem("dragon86.openrouter.key", payload.key);
+    localStorage.removeItem("dragon86.openrouter.error");
+  } catch (error) {
+    localStorage.setItem("dragon86.openrouter.error", error instanceof Error ? error.message : String(error));
+  } finally {
+    localStorage.removeItem("dragon86.openrouter.verifier");
+    history.replaceState({}, "", location.pathname);
+  }
+}
 
 async function boot(): Promise<void> {
+  await completeOpenRouterSignIn();
   /* Nothing in Dragon86 needs cross-origin isolation anymore (the in-page
      emulators run without SharedArrayBuffer); log the state every boot so
      diagnostics always show which state we're in. */
@@ -33,6 +62,7 @@ async function boot(): Promise<void> {
   };
 
   await step(15, "Loading theme…", () => applySettings());
+  if (getSettings().devConsole) void startDeveloperConsole().catch((error) => logWarn("os", "Eruda startup failed:", error));
   await step(45, "Mounting virtual filesystem…", () => initVfs());
   /* Filesystem apps have to be known before the launcher is built (the
      start menu and desktop get their entries from the registry), and the

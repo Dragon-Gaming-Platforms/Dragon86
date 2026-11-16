@@ -34,6 +34,7 @@
 
 import { logInfo, logWarn } from "../core/log";
 import { humanMB } from "../core/download";
+import { publicAssetBase } from "./public-url";
 
 /** The two architectures NetBSD ships for. A subset of MachineArch. */
 export type NetbsdArch = "arm64" | "arm32";
@@ -88,7 +89,7 @@ export function netbsdOsLabel(arch: NetbsdArch): string {
 }
 
 export function netbsdBase(arch: NetbsdArch): string {
-  return `${import.meta.env.BASE_URL}${TARGETS[arch].dir}/`;
+  return publicAssetBase(import.meta.env.BASE_URL, TARGETS[arch].dir, location.href);
 }
 
 /** The emulator's name for the disk (src/opfs_disk.js upstream). */

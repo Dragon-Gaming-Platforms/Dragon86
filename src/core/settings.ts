@@ -33,6 +33,8 @@ export interface Settings {
    * ships next to the OS. Anything else can be a full URL or a path.
    */
   storeUrl: string;
+  /** Show the locally vendored Eruda developer console at startup. */
+  devConsole: boolean;
 }
 
 const KEY = "dragon86.settings";
@@ -79,6 +81,7 @@ const DEFAULTS: Settings = {
   v86Network: "wss://relay.widgetry.org/",
   iconSize: "medium",
   storeUrl: "",
+  devConsole: false,
 };
 
 let current: Settings = load();

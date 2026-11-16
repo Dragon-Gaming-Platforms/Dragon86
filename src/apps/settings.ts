@@ -76,6 +76,8 @@ const SEARCH_INDEX: SearchHit[] = [
   { page: "storage", pageTitle: "Storage", label: "Import filesystem", keywords: "restore snapshot upload tar zenfs load backup" },
   { page: "storage", pageTitle: "Storage", label: "Factory reset", keywords: "erase wipe delete everything" },
   { page: "about", pageTitle: "About", label: "System information", keywords: "version build vendor engines" },
+  { page: "developer", pageTitle: "Developer", label: "Developer console", keywords: "eruda console debug inspect javascript" },
+  { page: "ai", pageTitle: "AI", label: "AI provider access", keywords: "assistant OpenRouter Pollinations Hugging Face model api key oauth login" },
 ];
 
 export function openSettings(win: Win, startPage?: string): void {
@@ -157,6 +159,22 @@ export function openSettings(win: Win, startPage?: string): void {
       group: "System",
       keywords: "disk space reset wipe",
       render: renderStorage,
+    },
+    {
+      id: "developer",
+      title: "Developer",
+      icon: "terminal",
+      group: "System",
+      keywords: "debug console eruda developer",
+      render: renderDeveloper,
+    },
+    {
+      id: "ai",
+      title: "AI",
+      icon: "robot",
+      group: "System",
+      keywords: "OpenRouter assistant login model",
+      render: renderAi,
     },
     {
       id: "about",
@@ -806,6 +824,55 @@ export function openSettings(win: Win, startPage?: string): void {
   }
 
   /* ---------- About ---------- */
+
+  function renderDeveloper(host: HTMLElement): void {
+    const settings = getSettings();
+    host.append(section("Developer console", "Eruda is bundled locally with Dragon86. When enabled, it loads at startup and provides browser-side console, element, network and resource inspection."));
+    const row = el("div", "settings-row");
+    row.append(el("label", undefined, "Enable Eruda developer console"));
+    const toggle = el("button", "btn sm", settings.devConsole ? "On" : "Off");
+    toggle.setAttribute("role", "switch");
+    toggle.setAttribute("aria-checked", String(settings.devConsole));
+    toggle.addEventListener("click", async () => {
+      const enabled = !getSettings().devConsole;
+      setSettings({ devConsole: enabled });
+      toggle.textContent = enabled ? "On" : "Off";
+      toggle.setAttribute("aria-checked", String(enabled));
+      if (enabled) {
+        const { startDeveloperConsole } = await import("../core/eruda");
+        await startDeveloperConsole();
+      } else {
+        const { stopDeveloperConsole } = await import("../core/eruda");
+        stopDeveloperConsole();
+      }
+    });
+    row.append(toggle);
+    host.append(row, note("Eruda runs from public/vendor/eruda; no third-party script is fetched. Reloading applies the startup preference."));
+  }
+
+  function renderAi(host: HTMLElement): void {
+    host.append(section("AI provider access", "Connect OpenRouter here, or select Pollinations.ai or Hugging Face in the Dragon86 AI app and enter that provider’s API key. OpenRouter stays in browser storage; Pollinations and Hugging Face credentials are session-scoped. Requests go directly to the selected provider."));
+    const status = el("p", "settings-blurb", localStorage.getItem("dragon86.openrouter.error") ?? (localStorage.getItem("dragon86.openrouter.key") ? "Connected to OpenRouter on this browser." : "Not connected."));
+    const connect = el("button", "btn primary", "Sign in to OpenRouter");
+    connect.addEventListener("click", async () => {
+      const bytes = crypto.getRandomValues(new Uint8Array(32));
+      const verifier = btoa(String.fromCharCode(...bytes)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+      const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(verifier));
+      const challenge = btoa(String.fromCharCode(...new Uint8Array(digest))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+      localStorage.removeItem("dragon86.openrouter.error");
+      localStorage.setItem("dragon86.openrouter.verifier", verifier);
+      const callback = `${location.origin}${location.pathname}?openrouter_callback=1`;
+      const url = new URL("https://openrouter.ai/auth");
+      url.searchParams.set("callback_url", callback);
+      url.searchParams.set("code_challenge", challenge);
+      url.searchParams.set("code_challenge_method", "S256");
+      location.assign(url.href);
+    });
+    const disconnect = el("button", "btn", "Disconnect");
+    disconnect.addEventListener("click", () => { localStorage.removeItem("dragon86.openrouter.key"); localStorage.removeItem("dragon86.openrouter.error"); status.textContent = "Not connected."; });
+    host.append(status, connect, disconnect, note("OpenRouter sign-in uses its PKCE flow. Model/API charges and provider policies are managed by your OpenRouter account."));
+
+  }
 
   function renderAbout(host: HTMLElement): void {
     host.append(section("About this machine", "What you are looking at."));
