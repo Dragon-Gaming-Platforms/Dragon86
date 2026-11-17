@@ -12,6 +12,7 @@
  *   node tools/ui-smoke/run.mjs
  */
 import { existsSync, readFileSync } from "node:fs";
+import { spawnSync } from "node:child_process";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { JSDOM } from "jsdom";
@@ -394,7 +395,7 @@ check("PS1 core evidence records pcsx_rearmed as non-threaded upstream", /pcsx_r
 check("legacy cloud app entries are retained", ["tasks", "contacts"].every((id) => catalogJson.apps.some((app) => app.id === id)));
 const flashApp = catalogJson.apps.find((app) => app.id === "flash-player");
 const aiApp = catalogJson.apps.find((app) => app.id === "dragon86-ai");
-check("Flash Player is listed as an external Ruffle demo", Boolean(flashApp?.externalUrl?.includes("ruffle.rs/demo")) && !flashApp.files?.length);
+check("Flash Player is routed through Scramjet to the Ruffle demo", Boolean(flashApp?.scramjetUrl?.includes("ruffle.rs/demo")) && !flashApp.externalUrl && !flashApp.files?.length);
 check("Dragon86 AI installs the local assistant", Boolean(aiApp?.files?.includes("index.html")) && existsSync(resolve(publicRoot, aiApp.base, "index.html")));
 const aiInterface = readFileSync(resolve(publicRoot, "system-apps/dragon86-ai/index.html"), "utf8");
 check("Dragon86 AI offers all three providers and model selection", ["OpenRouter", "Pollinations.ai", "Hugging Face", "id=\"model\""].every((token) => aiInterface.includes(token)));
@@ -1709,17 +1710,13 @@ check(
   sWin.close();
 }
 
-/* ---- External emulator catalog entries: no install, 9P mount or COI ---- */
+/* ---- Emulator catalog entries route hosted web builds through Scramjet ---- */
 const emulatorStoreIds = [
-  "vamigaweb", "vamiga", "basilisk-ii", "minivmac", "sheepshaver", "dingusppc", "pearpc",
-  "infinite-mac", "jsbeeb", "apple2js", "webmsx", "jsspeccy3", "pdp11-70",
+  "vamigaweb", "infinite-mac", "jsbeeb", "apple2js", "webmsx", "jsspeccy3", "pdp11-70", "flash-player",
 ];
-const externalEmulators = emulatorStoreIds.map((id) => catalogJson.apps.find((app) => app.id === id));
-check("all requested retro emulator projects have App Store entries", externalEmulators.every(Boolean), externalEmulators.map((app) => app?.id ?? "missing").join(", "));
-check("retro emulator entries are link-only and install no ROMs", externalEmulators.every((app) => app?.externalUrl && !app.base && !app.files?.length));
-check("retro emulator links use only HTTP(S) and open through safe new-tab links", externalEmulators.every((app) => [app?.externalUrl, app?.sourceUrl].filter(Boolean).every((value) => {
-  try { return ["https:", "http:"].includes(new URL(value).protocol); } catch { return false; }
-})));
+const proxiedEmulators = emulatorStoreIds.map((id) => catalogJson.apps.find((app) => app.id === id));
+check("browser emulators have Scramjet destinations and no external-link actions", proxiedEmulators.every((app) => app?.scramjetUrl?.startsWith("https://") && !app.externalUrl && !app.sourceUrl), proxiedEmulators.map((app) => app?.id ?? "missing").join(", "));
+check("native-only emulator source listings are not presented as launchable apps", !["vamiga", "basilisk-ii", "minivmac", "sheepshaver", "dingusppc", "pearpc"].some((id) => catalogJson.apps.some((app) => app.id === id)));
 const emulatorStore = storeWindowEl();
 const appsTab = [...(emulatorStore?.querySelectorAll(".store-tab") ?? [])].find((button) => button.textContent.includes("Apps"));
 appsTab?.click();
@@ -1729,11 +1726,16 @@ if (storeSearch) {
   storeSearch.dispatchEvent(new window.Event("input", { bubbles: true }));
 }
 const vAmigaWebCard = emulatorStore?.querySelector(".store-card");
-const vAmigaWebLink = vAmigaWebCard?.querySelector("a.btn.primary");
-check("external emulator action opens separately without COI or iframe embedding", Boolean(vAmigaWebLink?.href === "https://vamigaweb.github.io/" && vAmigaWebLink.target === "_blank" && vAmigaWebLink.rel.includes("noopener") && !vAmigaWebCard?.querySelector("iframe")), `${vAmigaWebLink?.href}; target=${vAmigaWebLink?.target}`);
+const vAmigaWebOpen = [...(vAmigaWebCard?.querySelectorAll("button") ?? [])].find((button) => button.textContent === "Open in Scramjet");
+check("App Store launches vAmigaWeb through Dragon86's Scramjet frame", Boolean(vAmigaWebOpen && !vAmigaWebCard?.querySelector("a")));
+vAmigaWebOpen?.click();
+const scramjetFrame = [...document.querySelectorAll("iframe.browser-frame")].find((frame) => {
+  try { const u = new URL(frame.src); return u.pathname.endsWith("/scramjet/") && u.searchParams.get("goto") === "https://vamigaweb.github.io/"; }
+  catch { return false; }
+});
+check("proxied emulator loads in the same-origin Scramjet app", Boolean(scramjetFrame), scramjetFrame?.src ?? "frame not found");
 vAmigaWebCard?.querySelector(".store-card-title")?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
-check("external emulator detail explicitly says no install or 9P mount", /No guest 9P mount; nothing is installed/.test(emulatorStore?.textContent ?? ""));
-check("external emulator detail has no install section", ![...(emulatorStore?.querySelectorAll("button") ?? [])].some((button) => button.textContent === "Install") && !emulatorStore?.textContent.includes("What gets installed"));
+check("proxied emulator detail explains that 9P is not mounted", /does not mount the guest 9P filesystem/.test(emulatorStore?.textContent ?? ""));
 
 /* ---- PS2 Web Recomp library: ZenFS import and isolated standalone launch ---- */
 await window.d86.fs.mkdir("/home/user/Downloads");
@@ -1744,13 +1746,14 @@ await window.d86.fs.writeBytes("/home/user/Downloads/web-sample.zip", storedZip(
   ["web-sample/ps2web.data", "data stub"],
 ]));
 await window.d86.fs.writeBytes("/home/user/Downloads/sample.iso", new Uint8Array([1, 2, 3]));
+await window.d86.fs.writeBytes("/home/user/Downloads/A Hero's.iso", new Uint8Array([4, 5, 6]));
 window.dispatchEvent(new window.CustomEvent("d86-launch-app", { detail: "ps2-web-recomp" }));
 await wait(30);
 const ps2 = document.querySelector(".ps2-app");
 check("PS2 Web Recomp is a built-in launchable app", Boolean(ps2));
-check("PS2 app explains that it imports already-recompiled builds", /native C\+\+\/Emscripten tools/.test(ps2?.textContent ?? ""));
+check("PS2 app offers a ZenFS-backed recompile workflow", /Recompile ISO/.test(ps2?.textContent ?? "") && /Linux Terminal guest/.test(ps2?.textContent ?? ""));
 check("PS2 library gets its generated .d86 pointer", await window.d86.fs.exists("/home/user/applications/ps2-web-recomp.d86"));
-ps2?.querySelector(".ps2-actions .btn.primary")?.click();
+[...(ps2?.querySelectorAll(".ps2-actions .btn") ?? [])].find((button) => button.textContent === "Import web build")?.click();
 await wait(20);
 let ps2Picker = document.querySelector(".ps2-picker");
 ps2Picker?.querySelector(".ps2-picker-row")?.click();
@@ -1772,6 +1775,30 @@ check("loading screen verifies the web build and disc", /Disc image/.test(ps2?.q
 check("loading screen offers a separate isolated game tab", /outside the Dragon86 desktop/.test(ps2?.querySelector(".ps2-ready-note")?.textContent ?? ""), `${ps2?.querySelector(".ps2-loading-screen")?.textContent}; card=${ps2?.querySelector(".ps2-game-card")?.textContent}`);
 const ps2Launch = ps2?.querySelector(".ps2-game-actions a.btn.primary");
 check("each imported game has a standalone launch URL", Boolean(ps2Launch?.href.includes("/ps2/?game=sample")) && ps2Launch?.target === "_blank", `${ps2Launch?.href}; target=${ps2Launch?.target}`);
+/* Recompile action writes a real ZenFS script and launches it in Terminal with the selected ISO path. */
+let compileLaunch = null;
+const dispatchOriginal = window.dispatchEvent.bind(window);
+window.dispatchEvent = (event) => {
+  if (event.type === "d86-launch-app" && typeof event.detail === "object" && event.detail?.id === "terminal") {
+    compileLaunch = event.detail;
+    return true;
+  }
+  return dispatchOriginal(event);
+};
+[...(ps2?.querySelectorAll(".ps2-actions .btn") ?? [])].find((button) => button.textContent === "Recompile ISO")?.click();
+await wait(20);
+const compilePicker = document.querySelector(".ps2-picker");
+[...(compilePicker?.querySelectorAll(".ps2-picker-row") ?? [])].find((row) => row.textContent.includes("A Hero's.iso"))?.click();
+compilePicker?.querySelector(".ps2-picker-footer .btn.primary")?.click();
+await wait(80);
+window.dispatchEvent = dispatchOriginal;
+check("recompile action targets the Terminal guest", compileLaunch?.id === "terminal" && compileLaunch?.scriptPath === "/home/user/PS2-Web-Recomp/recompiler/jobs/build-a-hero-s.sh");
+const compileScriptPath = "/home/user/PS2-Web-Recomp/recompiler/jobs/build-a-hero-s.sh";
+const compileScript = await window.d86.fs.readText(compileScriptPath).catch(() => "");
+check("recompile script uses the chosen ZenFS ISO and upstream port tool", compileScript.includes("/home/user/Downloads/A Hero's.iso") && compileScript.includes("scripts/port.sh") && compileScript.includes("snuri00/ps2-web-recomp"));
+check("recompile script shell-quotes paths and registers the output", compileScript.includes("DISC='/home/user/Downloads/A Hero'\\''s.iso'") && compileScript.includes('"webRoot": "web"') && compileScript.includes('"discPath": "/home/user/Downloads/A Hero\'s.iso"'));
+const scriptSyntax = spawnSync("bash", ["-n"], { input: compileScript, encoding: "utf8" });
+check("generated recompile script has valid Bash syntax", scriptSyntax.status === 0, scriptSyntax.stderr);
 const ps2Html = readFileSync(resolve(dirname(fileURLToPath(import.meta.url)), "../../ps2/index.html"), "utf8");
 const ps2Worker = readFileSync(resolve(dirname(fileURLToPath(import.meta.url)), "../../public/ps2/ps2-coi-sw.js"), "utf8");
 const ps2Launcher = readFileSync(resolve(dirname(fileURLToPath(import.meta.url)), "../../src/ps2/launcher.ts"), "utf8");

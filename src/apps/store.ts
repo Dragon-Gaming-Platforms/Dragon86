@@ -66,6 +66,8 @@ interface StoreApp {
   width?: number;
   height?: number;
   description?: string;
+  /** Catalog-only listing: open a hosted browser app through the local Scramjet proxy. */
+  scramjetUrl?: string;
   /** Catalog-only listing: open a trusted project or hosted web app in a new tab. */
   externalUrl?: string;
   externalLabel?: string;
@@ -467,7 +469,7 @@ export function openStore(win: Win): void {
         el(
           "p",
           "store-muted store-note",
-          "This catalog is a file that ships with Dragon86, not a server. There are no star ratings, review counts or download counts here — nobody is generating them, so the store does not print them. Packaged apps show their publisher, installed files and measured size; external emulator links are marked and open in a separate tab without installing anything.",
+          "This catalog ships with Dragon86. It has no star ratings or review counts. Packaged apps show their publisher, installed files and measured size; hosted browser emulators open through the built-in Scramjet proxy, without leaving the desktop or installing an engine into the Terminal.",
         ),
       );
       return;
@@ -550,7 +552,9 @@ export function openStore(win: Win): void {
     const meta = el("div", "store-card-meta");
     meta.append(el("span", undefined, app.category ?? "App"));
     if (app.local) meta.append(el("span", "store-dot", "·"), el("span", undefined, "Installed here"));
-    else if (safeExternalUrl(app.externalUrl)) {
+    else if (safeExternalUrl(app.scramjetUrl)) {
+      meta.append(el("span", "store-dot", "·"), el("span", undefined, "Scramjet proxy · no install"));
+    } else if (safeExternalUrl(app.externalUrl)) {
       meta.append(el("span", "store-dot", "·"), el("span", undefined, "External link · no install"));
     } else {
       const count = filesFor(app).length;
@@ -612,6 +616,20 @@ export function openStore(win: Win): void {
     const state = progress.get(app.id);
     const installed = installedIds.has(app.id);
     const size = large ? "" : "sm";
+
+    const scramjetUrl = safeExternalUrl(app.scramjetUrl);
+    if (scramjetUrl) {
+      const open = el("button", `btn ${size} primary`.trim(), "Open in Scramjet");
+      open.title = `Open ${app.name} inside Dragon86's proxied browser frame`;
+      open.addEventListener("click", (event) => {
+        event.stopPropagation();
+        window.dispatchEvent(new CustomEvent("d86-open-proxied-page", {
+          detail: { url: scramjetUrl, title: app.name },
+        }));
+      });
+      wrap.append(open);
+      return wrap;
+    }
 
     const externalUrl = safeExternalUrl(app.externalUrl);
     if (externalUrl) {
@@ -758,9 +776,13 @@ export function openStore(win: Win): void {
 
     const facts = el("div", "store-facts");
     const externalUrl = safeExternalUrl(app.externalUrl);
+    const scramjetUrl = safeExternalUrl(app.scramjetUrl);
     facts.append(fact("Category", app.category ?? "App"));
     facts.append(fact("Publisher", app.publisher ?? "Unknown"));
-    if (externalUrl) {
+    if (scramjetUrl) {
+      facts.append(fact("Availability", "Hosted web emulator, opened through Dragon86's Scramjet proxy"));
+      facts.append(fact("Dragon86 integration", "The proxied page is framed inside Dragon86, but it does not mount the guest 9P filesystem"));
+    } else if (externalUrl) {
       facts.append(fact("Availability", "External project or hosted page — opens in a new tab"));
       facts.append(fact("Dragon86 integration", "No guest 9P mount; nothing is installed"));
     } else {
@@ -780,7 +802,7 @@ export function openStore(win: Win): void {
     if (app.opens?.length) {
       facts.append(fact("Opens", app.opens.map((o) => `.${normExt(o)}`).join(", ")));
     }
-    if (!app.local && !externalUrl) {
+    if (!app.local && !externalUrl && !scramjetUrl) {
       /* Measured, not invented: the sum of the bytes actually downloaded. */
       const sizeFact = fact("Download", "measuring…");
       facts.append(sizeFact);
@@ -795,8 +817,10 @@ export function openStore(win: Win): void {
 
     if (app.description) content.append(el("p", "store-desc", app.description));
 
-    if (externalUrl) {
-      content.append(el("p", "store-muted store-note", "This link opens the upstream page in another tab. Dragon86 does not bundle ROMs or BIOS files, serve the emulator through an iframe, or mount its files over 9P."));
+    if (scramjetUrl) {
+      content.append(el("p", "store-muted store-note", "The hosted emulator opens inside Dragon86's Scramjet browser frame. Scramjet proxies its network requests; the emulator is not connected to ZenFS or the Terminal's 9P share."));
+    } else if (externalUrl) {
+      content.append(el("p", "store-muted store-note", "This link opens the upstream page in another tab. Dragon86 does not bundle ROMs or BIOS files, or mount its files over 9P."));
     } else {
       const files = el("div", "store-files");
       files.append(el("h3", undefined, "What gets installed"));

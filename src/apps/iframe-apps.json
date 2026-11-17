@@ -6,7 +6,7 @@
     "icon": "games",
     "width": 920,
     "height": 640,
-    "status": "Local library — imports web builds from ZenFS; playback is unavailable without cross-origin isolation"
+    "status": "Recompile ZenFS ISOs in the Linux guest or import web builds; isolated playback"
   },
   {
     "id": "preview",
