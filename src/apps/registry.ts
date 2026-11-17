@@ -13,7 +13,7 @@ import * as vfs from "../core/vfs";
 import { openFiles } from "./files";
 
 import { openPlainEditor } from "./plain-editor";
-import { openTerminal } from "./terminal";
+import { openTerminal, type TerminalOptions } from "./terminal";
 import { openSettings } from "./settings";
 import { openStore } from "./store";
 import { openViewer } from "./viewer";
@@ -59,14 +59,14 @@ export function createLauncher(wm: WindowManager) {
     openPlainEditor(win, path ?? null);
   }
 
-  function openTerminalAt(): void {
+  function openTerminalAt(options: TerminalOptions = {}): void {
     const win = wm.create({
-      title: "Terminal",
+      title: options.run ? "Terminal — PS2 recompiler" : "Terminal",
       icon: "terminal",
       width: 760,
       height: 480,
     });
-    openTerminal(win);
+    openTerminal(win, options);
   }
 
   /** Open a shell script in the Terminal, printed — never executed. */
@@ -250,9 +250,48 @@ export function createLauncher(wm: WindowManager) {
   /* The App Store's "Open" button lives in a different module and has no
      handle on this launcher. One event keeps that seam narrow: anything in
      the OS can ask it to launch an app by id. */
+  window.addEventListener("d86-open-proxied-page", (event) => {
+    const detail = (event as CustomEvent<{ url?: string; title?: string }>).detail;
+    if (!detail || typeof detail.url !== "string") return;
+    let target: URL;
+    try {
+      target = new URL(detail.url);
+    } catch {
+      logWarn("os", "ignored an invalid Scramjet destination");
+      return;
+    }
+    if (target.protocol !== "https:") {
+      logWarn("os", `refused non-HTTPS Scramjet destination ${target.href}`);
+      return;
+    }
+    const scramjet = IFRAME_APPS.find((app) => app.id === "scramjet" && app.url);
+    if (!scramjet?.url) {
+      logWarn("os", "Scramjet is not configured");
+      return;
+    }
+    const routedUrl = new URL(scramjet.url, new URL(import.meta.env.BASE_URL, window.location.origin));
+    routedUrl.searchParams.set("goto", target.href);
+    const title = typeof detail.title === "string" ? detail.title.slice(0, 80) : "Hosted emulator";
+    openIframeAppAt({
+      ...scramjet,
+      name: `${title} · Scramjet`,
+      url: `${routedUrl.pathname}${routedUrl.search}`,
+      status: `Proxied page · ${target.hostname} · Scramjet`,
+    });
+  });
+
   window.addEventListener("d86-launch-app", (event) => {
-    const id = (event as CustomEvent<string>).detail;
-    if (!id) return;
+    const detail = (event as CustomEvent<string | { id: string; scriptPath?: string }>).detail;
+    if (!detail) return;
+    if (typeof detail !== "string") {
+      if (detail.id === "terminal" && typeof detail.scriptPath === "string" && /^\/home\/user\/PS2-Web-Recomp\/recompiler\/jobs\/build-[a-z0-9-]+\.sh$/.test(detail.scriptPath)) {
+        openTerminalAt({ run: `bash '${detail.scriptPath}'` });
+        return;
+      }
+      logWarn("os", "ignored an unsupported app launch request");
+      return;
+    }
+    const id = detail;
     const open = launch[id];
     if (!open) {
       logWarn("os", `asked to launch "${id}", which is not installed any more`);

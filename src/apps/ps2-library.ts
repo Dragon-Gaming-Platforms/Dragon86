@@ -32,7 +32,7 @@ type Game = {
 
 export function openPs2Library(win: Win): void {
   const root = el("div", "app-root ps2-app");
-  const status = el("div", "app-statusbar", "Builds stay in ZenFS · gameplay opens in an isolated tab");
+  const status = el("div", "app-statusbar", "The Terminal guest uses ZenFS / through 9P · builds and discs stay in ZenFS");
   const shell = el("div", "ps2-library");
   const header = el("header", "ps2-header");
   const branding = el("div", "ps2-brand");
@@ -43,15 +43,17 @@ export function openPs2Library(win: Win): void {
   heading.append(el("p", "", "Keep your own recompiled game builds in ZenFS. Nothing is uploaded, and no copyrighted game data ships with Dragon86."));
   branding.append(heading);
   const actions = el("div", "ps2-actions");
-  const add = el("button", "btn primary", "Add recompiled build");
+  const recompile = el("button", "btn primary", "Recompile ISO");
+  recompile.prepend(icon("games"));
+  const add = el("button", "btn ghost", "Import web build");
   add.prepend(icon("archive"));
   const refresh = el("button", "btn ghost", "Refresh");
   refresh.prepend(icon("refresh"));
-  actions.append(add, refresh);
+  actions.append(recompile, add, refresh);
   header.append(branding, actions);
 
   const notice = el("div", "ps2-notice");
-  notice.innerHTML = `<strong>What this app does:</strong> import an already-built <code>.zip</code> from Dragon86 Files and keep the web build in <code>~/PS2-Web-Recomp/games/</code>. Recompilation itself uses the upstream native C++/Emscripten tools. Launch opens a separate, full-window tab with COOP/COEP scoped to <code>/ps2/</code>; the Dragon86 desktop stays non-isolated.`;
+  notice.innerHTML = `<strong>Recompile from ZenFS:</strong> choose a PS2 <code>.iso</code> and Dragon86 writes a build script into your shared filesystem, then runs it in the Linux Terminal guest over 9P. Before running, select <strong>Settings → Machine → x86-64</strong> and install <strong>Arch Linux (x86-64)</strong> from the App Store. The guest needs a working network and the CMake, Ninja, Clang/C++20 and Python toolchain; this minimal guest may need those tools provisioned first. Builds land in <code>~/PS2-Web-Recomp/games/</code> beside a link to the original ISO. Allow roughly 300 MB per game plus the Emscripten SDK. If you already have a web build, use Import instead. Launch uses its own isolated tab under <code>/ps2/</code>.`;
   const list = el("div", "ps2-game-list");
   const loading = el("div", "ps2-loading-screen");
   loading.hidden = true;
@@ -60,6 +62,7 @@ export function openPs2Library(win: Win): void {
   win.el.append(root);
 
   add.onclick = () => void openZipPicker((path, title) => void importPackage(path, title));
+  recompile.onclick = () => void openZipPicker((path) => void startRecompile(path), ".iso");
   refresh.onclick = () => void renderGames();
   void renderGames();
 
@@ -161,6 +164,29 @@ export function openPs2Library(win: Win): void {
     } finally {
       busy.close();
     }
+  }
+
+  async function startRecompile(discPath: string): Promise<void> {
+    if (!discPath.toLowerCase().endsWith(".iso")) {
+      notify({ title: "Choose a PS2 ISO", body: "The recompiler needs an .iso disc image stored in ZenFS.", icon: "close" });
+      return;
+    }
+    const title = titleFromArchive(discPath);
+    const id = await uniqueId(slug(title));
+    const jobDir = `${ROOT}/recompiler/jobs`;
+    const scriptPath = `${jobDir}/build-${id}.sh`;
+    const script = makeRecompileScript({ id, title, discPath, gameDir: `${GAMES}/${id}` });
+    try {
+      await vfs.ensureDir(jobDir);
+      await vfs.writeText(scriptPath, script);
+    } catch (error) {
+      notify({ title: "Could not prepare recompiler", body: errorText(error), icon: "close" });
+      return;
+    }
+    notify({ title: `Starting ${title} recompile`, body: "The build runs in the Linux Terminal guest. Keep the terminal open; the result will be saved in ZenFS.", icon: "games", timeout: 8000 });
+    window.parent.dispatchEvent(new CustomEvent("d86-launch-app", {
+      detail: { id: "terminal", scriptPath },
+    }));
   }
 
   async function setDisc(game: Game, path: string): Promise<void> {
@@ -310,8 +336,88 @@ export function openPs2Library(win: Win): void {
   }
 }
 
+function makeRecompileScript(input: { id: string; title: string; discPath: string; gameDir: string }): string {
+  const source = `${ROOT}/recompiler/upstream`;
+  const metadata = {
+    v: 1,
+    id: input.id,
+    name: input.title,
+    webRoot: "web",
+    entry: "web/ps2web.html",
+    discPath: input.discPath,
+    sourceArchive: `${ROOT}/recompiler/jobs/build-${input.id}.sh`,
+    installedAt: Date.now(),
+    files: 0,
+    bytes: 0,
+  };
+  return `#!/usr/bin/env bash
+set -euo pipefail
+DISC=${shellQuote(input.discPath)}
+GAME_ID=${shellQuote(input.id)}
+GAME_TITLE=${shellQuote(input.title)}
+SOURCE=${shellQuote(source)}
+DEST=${shellQuote(input.gameDir)}
+
+if [[ ! -f "$DISC" ]]; then echo "ISO not found in the ZenFS share: $DISC" >&2; exit 1; fi
+if ! command -v getconf >/dev/null || [[ "$(getconf LONG_BIT)" != 64 ]]; then
+  echo "PS2 Web Recomp needs a 64-bit Linux userland. This guest reports a non-64-bit userspace; install/use a supported 64-bit Linux environment first." >&2
+  exit 1
+fi
+if [[ -x /networking.sh ]]; then /networking.sh || echo "Network setup did not complete; continuing in case the link is already up." >&2; fi
+
+missing=()
+for tool in git cmake ninja clang python3; do command -v "$tool" >/dev/null || missing+=("$tool"); done
+if ((\${#missing[@]})); then
+  echo "Installing compiler prerequisites: \${missing[*]}"
+  if command -v pacman >/dev/null; then
+    if [[ "$(id -u)" == 0 ]]; then pacman -S --needed --noconfirm git cmake ninja clang python
+    elif command -v sudo >/dev/null; then sudo pacman -S --needed --noconfirm git cmake ninja clang python
+    else echo "Missing tools: \${missing[*]}. Install git, cmake, ninja, clang and python3, then rerun this script." >&2; exit 1; fi
+  else
+    echo "Missing tools: \${missing[*]}. Install git, CMake, Ninja, Clang/C++20 and Python 3, then rerun this script." >&2
+    exit 1
+  fi
+fi
+
+mkdir -p "$(dirname "$SOURCE")"
+if [[ -d "$SOURCE/.git" ]]; then
+  git -C "$SOURCE" pull --ff-only
+else
+  git clone https://github.com/snuri00/ps2-web-recomp.git "$SOURCE"
+fi
+cd "$SOURCE"
+echo "Starting static recompile for $GAME_TITLE; this can take a while and needs around 300 MB per game plus the Emscripten SDK."
+scripts/port.sh "$GAME_ID" "$DISC"
+WEB_BUILD="$SOURCE/build/web-$GAME_ID"
+if [[ ! -f "$WEB_BUILD/ps2web.html" ]]; then echo "Upstream build finished without build/web-$GAME_ID/ps2web.html" >&2; exit 1; fi
+if [[ -e "$DEST" ]]; then echo "Library destination already exists: $DEST (not overwriting it)" >&2; exit 1; fi
+mkdir -p "$DEST/web"
+cp -a "$WEB_BUILD/." "$DEST/web/"
+cat > "$DEST/${MANIFEST}" <<'D86_MANIFEST'
+${JSON.stringify(metadata, null, 2)}
+D86_MANIFEST
+python3 - "$DEST" <<'D86_PY'
+import json, os, pathlib, sys
+root = pathlib.Path(sys.argv[1])
+manifest_path = root / "${MANIFEST}"
+data = json.loads(manifest_path.read_text())
+files = [p for p in (root / "web").rglob("*") if p.is_file()]
+data["files"] = len(files)
+data["bytes"] = sum(p.stat().st_size for p in files)
+manifest_path.write_text(json.dumps(data, indent=2))
+D86_PY
+printf "\\nRecompile complete. Build saved to %s\\n" "$DEST/web"
+printf "Files: %s · bytes: %s\\n" "$(find "$DEST/web" -type f | wc -l)" "$(du -sb "$DEST/web" | cut -f1)"
+printf "You can close this terminal. Refresh the PS2 Web Recomp library to see the game.\\n"
+`;
+}
+
+function shellQuote(value: string): string {
+  return `'${value.replace(/'/g, "'\\''")}'`;
+}
+
 function titleFromArchive(path: string): string {
-  const base = vfs.baseName(path).replace(/\.zip$/i, "").replace(/^web[-_]/i, "").replace(/[-_]+/g, " ").trim();
+  const base = vfs.baseName(path).replace(/\.(zip|iso)$/i, "").replace(/^web[-_]/i, "").replace(/[-_]+/g, " ").trim();
   return base || "PS2 game";
 }
 

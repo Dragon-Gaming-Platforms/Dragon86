@@ -39,12 +39,13 @@ const BOLD = "\x1b[1m";
 const RESET = "\x1b[0m";
 
 export interface TerminalOptions {
-  /**
-   * A shell script to *print* into the console. Not run: nothing here feeds
-   * the guest's stdin, because a script pasted into a root shell is a
-   * command, not a document. The console is where you read it.
-   */
+  /** A shell script to *print* into the console; never executed. */
   print?: { path: string; text: string };
+  /**
+   * Run one explicitly requested command after the guest shell reports ready.
+   * Used by PS2 Web Recomp to start a script that it just wrote into ZenFS.
+   */
+  run?: string;
 }
 
 export function openTerminal(win: Win, options: TerminalOptions = {}): void {
@@ -381,6 +382,7 @@ export function openTerminal(win: Win, options: TerminalOptions = {}): void {
       term.writeln(`${DIM}Network is emulated; in the guest run /networking.sh to bring the card up.${RESET}`);
       term.writeln(`${DIM}In the guest:  git clone https://…  works,  d86-net check  tests the link.${RESET}`);
     }
+    let requestedCommandSent = false;
     const handlers = {
       onData: (data: string) => term.write(filterOutput(data)),
       onNotice: (text: string) => term.writeln(`${DIM}[engine] ${text}${RESET}`),
@@ -388,6 +390,14 @@ export function openTerminal(win: Win, options: TerminalOptions = {}): void {
         if (s === "ready") {
           setChip("online", `${osName} online · ${ARCH_LABEL[arch]}`);
           term.focus();
+          if (options.run && !requestedCommandSent) {
+            requestedCommandSent = true;
+            /* Let the shell finish printing its prompt before feeding the
+               one-shot command. The command comes from an explicit app action. */
+            setTimeout(() => {
+              if (backend) backend.write(`${options.run}\n`);
+            }, 900);
+          }
         } else {
           setChip("connecting", "Still starting…");
           term.writeln(`${RED}The machine is still booting.${RESET}`);
