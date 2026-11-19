@@ -42,12 +42,24 @@ jobs:
 
       - name: Build SuperTux for PS2 with the official PS2DEV toolchain
         run: |
+          mkdir -p dist
+          set +e
           docker run --rm \
             --volume "$GITHUB_WORKSPACE:/workspace" \
             --workdir /workspace/.build/supertux-ps2 \
             --entrypoint /bin/sh \
             ghcr.io/ps2dev/ps2dev:v2.0.0 \
-            -c 'apk add --no-cache make && make -f Makefile.ps2 clean && make -f Makefile.ps2'
+            -c 'apk add --no-cache make && make -f Makefile.ps2 clean && make -f Makefile.ps2' \
+            > dist/ps2dev-build.log 2>&1
+          result=$?
+          set -e
+          if [ "$result" -ne 0 ]; then
+            summary=$(tail -n 30 dist/ps2dev-build.log | tr '\n' ' ' | sed 's/%/%25/g; s/\r/%0D/g')
+            echo "::error::PS2DEV build failed (exit $result): $summary"
+            cat dist/ps2dev-build.log
+            exit "$result"
+          fi
+          cat dist/ps2dev-build.log
 
       - name: Package and validate the original ISO input
         env:
