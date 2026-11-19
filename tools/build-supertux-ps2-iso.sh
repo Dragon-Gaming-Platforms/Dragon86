@@ -10,7 +10,8 @@ SOURCE_SHA="${SUPER_TUX_SOURCE_SHA:-unknown}"
 for tool in genisoimage sha256sum; do
   command -v "$tool" >/dev/null || { echo "Missing required tool: $tool" >&2; exit 1; }
 done
-[[ -f "$SOURCE_DIR/Makefile.ps2" && -f "$SOURCE_DIR/COPYING" && -f "$SOURCE_DIR/AUTHORS" && -d "$SOURCE_DIR/data" ]] || {
+PATCH_FILE="$ROOT/tools/supertux-ps2-ps2sdk-ports.patch"
+[[ -f "$SOURCE_DIR/Makefile.ps2" && -f "$SOURCE_DIR/COPYING" && -f "$SOURCE_DIR/AUTHORS" && -d "$SOURCE_DIR/data" && -f "$PATCH_FILE" ]] || {
   echo "Expected a complete headshot2017/supertux-ps2 source checkout at $SOURCE_DIR" >&2
   exit 1
 }
@@ -31,6 +32,7 @@ if struct.unpack_from("<H", head, 18)[0] != 8:
 PY
 
 mkdir -p "$OUT_DIR"
+cp "$PATCH_FILE" "$OUT_DIR/SUPERTUX-PS2SDK.patch"
 staging="$(mktemp -d)"
 trap 'rm -rf "$staging"' EXIT
 cp "$SOURCE_DIR/supertux.elf" "$staging/SUPERTUX.ELF"
@@ -38,6 +40,7 @@ cp -a "$SOURCE_DIR/data" "$staging/data"
 cp "$SOURCE_DIR/COPYING" "$staging/COPYING.TXT"
 cp "$SOURCE_DIR/AUTHORS" "$staging/AUTHORS.TXT"
 cp "$SOURCE_DIR/README" "$staging/README.TXT"
+cp "$PATCH_FILE" "$staging/BUILD.PAT"
 
 cat > "$staging/SYSTEM.CNF" <<'EOF'
 BOOT2 = cdrom0:\SUPERTUX.ELF;1
@@ -51,7 +54,8 @@ SuperTux for PlayStation 2 — Dragon86 workflow sample
 This is an original PS2 disc image built from the SuperTux PS2 homebrew
 source, not a precompiled web build. The image includes SuperTux's GPL-2.0
 license and upstream attribution files. See COPYING.TXT, AUTHORS.TXT, and
-data/CREDITS.
+data/CREDITS. BUILD.PAT records Dragon86's one-line PS2SDK SDL include-path
+adjustment, required to build this revision with the pinned PS2DEV toolchain.
 
 Upstream: https://github.com/headshot2017/supertux-ps2
 Source revision: $SOURCE_SHA
@@ -96,5 +100,6 @@ printf '%s\n' \
   "SuperTux PS2 source: https://github.com/headshot2017/supertux-ps2/tree/$SOURCE_SHA" \
   "SuperTux PS2 license: GPL-2.0 (see COPYING.TXT in the ISO and source archive)" \
   "PS2DEV build environment: https://github.com/ps2dev/ps2dev/tree/v2.0.0" \
+  "Dragon86 PS2SDK SDL include-path patch is included as BUILD.PAT on the disc and in this release." \
   "The ISO is original PS2 homebrew input; it is not a PS2-Web-Recomp web build." \
   > "$OUT_DIR/NOTICE.txt"

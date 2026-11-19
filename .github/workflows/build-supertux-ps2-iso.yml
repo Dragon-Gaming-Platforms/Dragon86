@@ -5,6 +5,7 @@ on:
     paths:
       - .github/workflows/build-supertux-ps2-iso.yml
       - tools/build-supertux-ps2-iso.sh
+      - tools/supertux-ps2-ps2sdk-ports.patch
       - docs/ps2-supertux-sample.md
   workflow_dispatch:
 
@@ -39,6 +40,9 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install --no-install-recommends -y genisoimage
+
+      - name: Apply the PS2SDK SDL header include-path fix
+        run: git -C .build/supertux-ps2 apply "$GITHUB_WORKSPACE/tools/supertux-ps2-ps2sdk-ports.patch"
 
       - name: Build SuperTux for PS2 with the official PS2DEV toolchain
         run: |
@@ -121,12 +125,12 @@ jobs:
         run: |
           set -euo pipefail
           tag=supertux-ps2-sample
-          files=(dist/supertux-ps2.iso dist/SHA256SUMS dist/NOTICE.txt dist/supertux-ps2-source.tar.gz)
+          files=(dist/supertux-ps2.iso dist/SHA256SUMS dist/NOTICE.txt dist/supertux-ps2-source.tar.gz dist/SUPERTUX-PS2SDK.patch)
           notes="$RUNNER_TEMP/supertux-release-notes.md"
           cat > "$notes" <<EOF
           SuperTux PS2 homebrew ISO built from the GPL-2.0 source at https://github.com/headshot2017/supertux-ps2/tree/$SUPERTUX_SOURCE_SHA.
 
-          This release includes the original PS2 ISO input, its SHA-256 checksum, attribution and the corresponding source archive. Dragon86's PS2-Web-Recomp smoke test completed successfully for this image; that tests the conversion/build workflow, not complete game playability.
+          This release includes the original PS2 ISO input, its SHA-256 checksum, attribution, the corresponding source archive, and the small build patch. Dragon86's PS2-Web-Recomp smoke test completed successfully for this image; that tests the conversion/build workflow, not complete game playability.
 
           No commercial game image, BIOS, precompiled web build, or generated recompiler output is included.
           EOF
