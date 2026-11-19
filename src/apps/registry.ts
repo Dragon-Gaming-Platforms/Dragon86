@@ -69,7 +69,7 @@ export function createLauncher(wm: WindowManager) {
     openTerminal(win, options);
   }
 
-  /** Open a shell script in the Terminal, printed — never executed. */
+  /** Print a shell script locally after the guest boots; never send or execute it. */
   async function openScriptInTerminal(path: string): Promise<void> {
     let text = "";
     try {

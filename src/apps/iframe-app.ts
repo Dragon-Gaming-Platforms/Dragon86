@@ -43,6 +43,13 @@ import { logInfo, logWarn } from "../core/log";
 import appsJson from "./iframe-apps.json";
 import { installPuterFilesBridge, isPuterApp } from "./puter-files";
 import { openPs2Library } from "./ps2-library";
+import * as vfs from "../core/vfs";
+import { createFsResponder } from "../bridge/fs-bridge";
+import {
+  DRAKEFORGE_CHANNEL_PREFIX,
+  drakeforgeSessionUrl,
+  startDrakeforgeSession,
+} from "../bridge/drakeforge-session";
 
 export interface IframeAppDef {
   id: string;
@@ -207,36 +214,54 @@ function fileName(path: string): string {
   return path.slice(path.lastIndexOf("/") + 1);
 }
 
-/** DrakeForge owns its IDE UI. This is only a launcher for its standalone
- * route; it does not connect the terminal or claim to share OS files.
- *
- * It can only be embedded when this page is cross-origin isolated AND the
- * IDE is same-origin — BrowserPod needs SharedArrayBuffer. Dragon86 does
- * not run isolated (nothing else needs it since the CheerpX engine was
- * removed), so in practice DrakeForge opens in its own tab, where it
- * isolates itself. */
+/** DrakeForge owns its IDE UI; Dragon86 provides its scoped fs1 workspace
+ * channel. This is deliberately a separate tab: DrakeForge's route owns the
+ * isolation needed by BrowserPod, while BroadcastChannel carries only fs1. */
 function openDrakeForge(win: Win, root: HTMLElement, status: HTMLElement, def: IframeAppDef): void {
-  const url = def.url!;
   const panel = el("div", "iframe-app-error");
   const message = el("p");
-  const button = el("a", "", "Open DrakeForge in a new tab");
-  button.href = url;
-  button.target = "_blank";
-  button.rel = "noopener noreferrer";
-  status.textContent = "Standalone workspace — Dragon86 files are not connected";
-  if (window.crossOriginIsolated && new URL(url).origin === window.location.origin) {
-    const frame = document.createElement("iframe");
-    frame.className = "browser-frame";
-    frame.title = "DrakeForge";
-    frame.src = url;
-    frame.allow = "cross-origin-isolated; clipboard-read; clipboard-write; fullscreen";
-    root.append(frame, status);
-  } else {
-    message.textContent =
-      "DrakeForge opens in a separate tab (it needs an isolation this page does not carry). " +
-      "This standalone workspace does not sync Dragon86 files.";
-    panel.append(message, button);
-    root.append(panel, status);
-  }
+  const connectedLink = el("a", "", "Open connected DrakeForge in a new tab") as HTMLAnchorElement;
+  connectedLink.target = "_blank";
+  connectedLink.rel = "noopener noreferrer";
+  const standaloneLink = el("a", "", "Open standalone workspace instead") as HTMLAnchorElement;
+  standaloneLink.href = def.url!;
+  standaloneLink.target = "_blank";
+  standaloneLink.rel = "noopener noreferrer";
+  message.textContent =
+    "The connected route can read and write your Dragon86 /home/user files through fs1. " +
+    "This is a workspace bridge, not a Terminal 9P mount. The random channel name prevents " +
+    "accidental cross-talk; it is not an authorization boundary against same-origin scripts.";
+  panel.append(message, connectedLink, document.createElement("br"), standaloneLink);
+  root.append(panel, status);
   win.el.append(root);
+
+  if (typeof BroadcastChannel === "undefined" || typeof crypto.randomUUID !== "function") {
+    status.textContent = "Connected DrakeForge requires BroadcastChannel and crypto.randomUUID; use standalone instead";
+    connectedLink.hidden = true;
+    return;
+  }
+
+  let stopSession = () => {};
+  const setState = (state: "connecting" | "ready" | "fs1" | "offline") => {
+    if (state === "connecting") status.textContent = "Waiting for the connected DrakeForge tab to open…";
+    else if (state === "offline") status.textContent = "No DrakeForge handshake yet — still listening for the tab";
+    else if (state === "ready") status.textContent = "DrakeForge opened, but did not negotiate fs1";
+    else status.textContent = "Connected — Dragon86 /home/user is available over fs1";
+  };
+  const startSession = (): void => {
+    stopSession();
+    const id = crypto.randomUUID();
+    const channelName = `${DRAKEFORGE_CHANNEL_PREFIX}${id}`;
+    connectedLink.href = drakeforgeSessionUrl(id).href;
+    const channel = new BroadcastChannel(channelName);
+    stopSession = startDrakeforgeSession(channel, createFsResponder(vfs.HOME), setState);
+  };
+  startSession();
+  connectedLink.addEventListener("click", () => {
+    /* Each tab gets an isolated channel, even if the user opens DrakeForge
+       more than once from this window. The link's default action reads this
+       updated URL after the click listener returns. */
+    startSession();
+  });
+  win.setOnClose(() => stopSession());
 }

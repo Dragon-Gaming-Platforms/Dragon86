@@ -9,7 +9,7 @@
  * undefined function on boot, a menu that never appears, an install that
  * writes nothing.
  *
- *   node tools/ui-smoke/run.mjs
+ *   node --experimental-strip-types tools/ui-smoke/run.mjs
  */
 import { existsSync, readFileSync } from "node:fs";
 import { spawnSync } from "node:child_process";
@@ -18,6 +18,7 @@ import { fileURLToPath } from "node:url";
 import { JSDOM } from "jsdom";
 import { crc32 } from "node:zlib";
 import { indexedDB, IDBKeyRange, IDBFactory, IDBDatabase, IDBRequest, IDBTransaction, IDBObjectStore, IDBCursor } from "fake-indexeddb";
+import { createBootAwarePrintGate, isDistroFilesystemBootNotice } from "../../src/apps/terminal-script.ts";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const bundle = readFileSync(resolve(here, "out/os.js"), "utf8");
@@ -41,6 +42,23 @@ const dom = new JSDOM(
 
 const { window } = dom;
 const { document } = window;
+const testBroadcastChannels = [];
+window.BroadcastChannel = class {
+  constructor(name) {
+    this.name = name;
+    this.sent = [];
+    this.listeners = new Set();
+    this.closed = false;
+    testBroadcastChannels.push(this);
+  }
+  postMessage(message) { this.sent.push(message); }
+  addEventListener(type, listener) { if (type === "message") this.listeners.add(listener); }
+  removeEventListener(type, listener) { if (type === "message") this.listeners.delete(listener); }
+  close() { this.closed = true; }
+  receive(data) {
+    for (const listener of this.listeners) listener({ data });
+  }
+};
 
 /* ---- the platform bits jsdom does not have ---- */
 window.indexedDB = indexedDB;
@@ -228,15 +246,52 @@ check("desktop icons rendered", icons.length > 0, `${icons.length} icons`);
 check("App Store is on the desktop", [...icons].some((n) => n.textContent.includes("App Store")));
 check("no boot errors", errors.length === 0, errors.map(String).join(" | ").slice(0, 300));
 
-/* DrakeForge is a built-in launcher, not an engine or Store install. */
+/* DrakeForge opens its connected route in a separate tab and serves the
+   Dragon86 /home/user workspace over the channel-scoped fs1 bridge. */
 check("DrakeForge is on the desktop", [...icons].some((n) => n.textContent.includes("DrakeForge")));
+await window.d86.fs.writeText("/home/user/Documents/drakeforge-test.txt", "from Dragon86");
 window.dispatchEvent(new window.CustomEvent("d86-launch-app", { detail: "drakeforge" }));
 await tick();
 const drakeWin = [...document.querySelectorAll(".d86-window")].find((w) => w.querySelector(".title-text")?.textContent.includes("DrakeForge"));
-const drakeLink = drakeWin?.querySelector('a[target="_blank"]');
-check("DrakeForge v86 mode offers a separate tab", drakeLink?.href === "https://dragon-gaming-platforms.github.io/DrakeForge/standalone");
-check("DrakeForge honestly labels standalone files", drakeWin?.textContent.includes("not connected"));
+const drakeLink = [...(drakeWin?.querySelectorAll('a[target="_blank"]') ?? [])]
+  .find((link) => link.textContent.includes("connected DrakeForge"));
+const drakeUrl = drakeLink ? new URL(drakeLink.href) : null;
+let drakeChannel = testBroadcastChannels.at(-1);
+check("DrakeForge link targets the deployed connected route", drakeUrl?.pathname === "/DrakeForge/dragon86");
+check("the tab gets a unique scoped channel name", /^dragon86-drakeforge-[a-f0-9-]{36}$/.test(drakeUrl?.searchParams.get("channel") ?? ""));
+check("Dragon86 sends the fs1 hello on that channel", drakeChannel?.name === drakeUrl?.searchParams.get("channel") &&
+  JSON.stringify(drakeChannel?.sent[0]) === JSON.stringify({ v: 1, t: "hello", caps: ["fs1"] }));
+check("the launcher explains that fs1 is not a Terminal 9P mount", drakeWin?.textContent.includes("not a Terminal 9P mount"));
+check("DrakeForge still offers a standalone fallback", [...(drakeWin?.querySelectorAll('a[target="_blank"]') ?? [])]
+  .some((link) => link.href.endsWith("/DrakeForge/standalone")));
+const firstDrakeChannel = drakeChannel;
+drakeLink?.addEventListener("click", (event) => event.preventDefault(), { once: true });
+drakeLink?.dispatchEvent(new window.MouseEvent("click", { bubbles: true, cancelable: true }));
+const openedDrakeUrl = drakeLink ? new URL(drakeLink.href) : null;
+drakeChannel = testBroadcastChannels.at(-1);
+check("opening DrakeForge rotates to a fresh channel before navigation", firstDrakeChannel?.closed &&
+  drakeChannel !== firstDrakeChannel && drakeChannel?.name === openedDrakeUrl?.searchParams.get("channel"));
+
+drakeChannel?.receive({ v: 1, t: "ready", caps: ["fs1"] });
+await tick();
+check("the fs1 handshake updates the launcher status", drakeWin?.querySelector(".app-statusbar")?.textContent.includes("available over fs1"));
+const drakeReq = (id, op, path, extra = {}) => drakeChannel?.receive({ v: 2, t: "fs-req", via: "bc-hoster", id, op, path, ...extra });
+drakeReq(41, "read", "/Documents/drakeforge-test.txt");
+await wait(20);
+const drakeRead = drakeChannel?.sent.at(-1);
+check("DrakeForge can read a Dragon86 home file by request ID", drakeRead?.id === 41 && drakeRead.ok &&
+  new TextDecoder().decode(drakeRead.data) === "from Dragon86");
+drakeReq(42, "write", "/Documents/from-drakeforge.txt", { data: new window.Uint8Array(new TextEncoder().encode("written by DrakeForge")) });
+await wait(20);
+const drakeWriteResponse = drakeChannel?.sent.at(-1);
+const drakeWrittenText = await window.d86.fs.readText("/home/user/Documents/from-drakeforge.txt").catch((error) => `ERROR: ${error}`);
+check("DrakeForge writes flow into ZenFS", drakeWriteResponse?.id === 42 && drakeWriteResponse.ok &&
+  drakeWrittenText === "written by DrakeForge", `${JSON.stringify(drakeWriteResponse)} text=${drakeWrittenText}`);
+drakeReq(43, "read", "../../outside.txt");
+await wait(20);
+check("the fs1 share rejects paths outside /home/user", drakeChannel?.sent.at(-1)?.id === 43 && !drakeChannel.sent.at(-1).ok);
 drakeWin?.querySelector(".d86-win-btn.close")?.click();
+check("closing the DrakeForge launcher disposes its private channel", drakeChannel?.closed === true);
 
 /* icon positions: absolute, snapped to the grid */
 const first = icons[0];
@@ -1522,7 +1577,7 @@ check(
   );
 }
 
-/* ---- a .sh file: the Terminal prints it and runs nothing ---- */
+/* ---- a .sh file: the Terminal prints only after ready and never sends it ---- */
 {
   await window.d86.fs.writeText(
     "/home/user/Documents/hello.sh",
@@ -1558,15 +1613,39 @@ check(
   await wait(900);
   const termWin = [...document.querySelectorAll(".d86-window")].find((w) => w.querySelector(".xterm"));
   check("the Terminal opens for the script", Boolean(termWin));
+
+  /* Exercise the same gate used by openTerminal: readiness alone is not
+     enough. Wait for the filesystem-boot notice and for later OS output to
+     stop before printing the queued script. */
+  const simulatedPrints = [];
+  const printGate = createBootAwarePrintGate(() => simulatedPrints.push("hello.sh"), 30);
+  printGate.setReady(true); // The shell marker can arrive before boot output is drained.
+  await wait(35);
+  check("ready alone does not print before the filesystem boot notice", simulatedPrints.length === 0);
+  const filesystemBootNotice = "booting the distro from your filesystem (/)";
+  check("recognizes the filesystem boot progress message", isDistroFilesystemBootNotice(filesystemBootNotice));
+  check(
+    "recognizes the first-boot filesystem message too",
+    isDistroFilesystemBootNotice("booting the freshly unpacked distro from your filesystem (/)"),
+  );
+  printGate.setBootMessageSeen(isDistroFilesystemBootNotice(filesystemBootNotice));
+  await wait(15);
+  printGate.activity(); // More OS boot messages arrived; restart the quiet period.
+  await wait(20);
+  check("boot messages keep the script queued until output settles", simulatedPrints.length === 0);
+  await wait(20);
+  check("the queued script prints after boot output settles", simulatedPrints.join() === "hello.sh");
+  printGate.cancel();
+
   const termText = termWin?.querySelector(".xterm")?.textContent ?? "";
   check(
-    "the script is printed into the console",
+    "the script contents are visible in the Terminal",
     termText.includes("this must not run") && termText.includes("hello.sh"),
     termText.slice(-200),
   );
   check(
-    "…and labelled as printed, not run",
-    /printed, not run|nothing was executed/i.test(termText),
+    "the script is not executed when no guest is available",
+    /not sent|nothing was executed/i.test(termText),
     termText.slice(-200),
   );
 }

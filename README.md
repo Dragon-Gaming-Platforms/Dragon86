@@ -258,10 +258,11 @@ bytes. It runs as part of `npm run build`.
 
 **A `.sh` file opens in the Terminal — printed, not run.** "Open with →
 Terminal (print)" (also on the desktop's file menu) opens a Terminal window and
-writes the file into the console, with a line above and below saying what it is.
-Nothing is executed and nothing is sent to the guest: a script pasted into a
-root shell is a command, not a document. Reading a script before running it is
-the point.
+waits for the filesystem boot message, guest readiness, and two seconds with no
+new OS output before printing the file into the local console. The script
+is never sent to the guest as input, and nothing is
+executed just by opening it. If no compatible guest OS can boot, the Terminal
+still shows the script locally and does not send it to the guest.
 
 **A `.js` file can be run as a system script.** Right-click → *Run as system
 script*. It asks first — a dialog that says the file runs inside Dragon86 with
@@ -611,22 +612,15 @@ TBD by Dragon Gaming Platforms (keep ZenFS's LGPL obligations in mind when shipp
 ### DrakeForge launcher
 
 DrakeForge is a built-in app, not an engine or an App Store install. The IDE
-and its interface are maintained in the DrakeForge repository. The launcher
-opens its standalone route, `https://dragon-gaming-platforms.github.io/DrakeForge/standalone`.
-With the Engine setting on Embedded, it uses an iframe only when Dragon86 is
-cross-origin isolated and both sites share an origin; otherwise it offers a
-separate tab. Separate tab and v86 settings also offer a separate tab.
+and connected `/dragon86` route are maintained in the DrakeForge repository.
+The launcher opens that route in a separate tab with a unique
+`?channel=dragon86-drakeforge-<uuid>` BroadcastChannel and negotiates fs1 before
+serving requests. DrakeForge's `v2` `fs-req` messages are answered from
+Dragon86's `/home/user` directory; reads, writes, directory operations,
+renames and removals are whole-file filesystem operations over the fs1 bridge.
+A standalone route is also available as a fallback.
 
-DrakeForge must be deployed separately. This initial launcher does **not**
-connect Dragon86's filesystem or terminal: the standalone workspace has its own
-storage. The connected `/dragon86` route and fs1 handshake still need deployment
-and end-to-end testing before they can be integrated as an app.
-
-The connected-mode groundwork in `src/bridge/drakeforge-session.ts` is not
-wired into the launcher yet. It proposes a unique BroadcastChannel for each
-launch (`?channel=dragon86-drakeforge-<uuid>`) to avoid mixing IDE traffic
-with the existing shared CheerpX channel. DrakeForge must support that channel
-and disable its other transports for a session before this can be enabled.
-A random channel prevents accidental cross-talk, not access by malicious
-same-origin scripts. Embedding also requires actual cross-origin isolation;
-Dragon86's COI service-worker code is currently disabled by default.
+This is a workspace filesystem bridge, **not** a Terminal 9P integration and
+not an authorization boundary. The random channel name prevents accidental
+cross-talk; malicious same-origin scripts can still access it. Do not use it to
+share files with an untrusted same-origin page.

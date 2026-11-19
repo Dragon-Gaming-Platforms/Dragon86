@@ -12,8 +12,8 @@
  *      from). An installed app may ask, once, to become the default;
  *   3. the App Launcher, offered for any .html file that is not itself an
  *      installed app: it runs the page as an app for as long as it is open;
- *   4. the Terminal, offered for shell scripts: it prints the file into the
- *      console and runs nothing (apps/terminal.ts);
+ *   4. the Terminal, offered for shell scripts: it prints the file locally
+ *      after the guest is ready and never sends it as input (apps/terminal.ts);
  *   5. "App shortcut" for `.d86` files — `~/applications/scramjet.d86` and
  *      friends launch the fixed app they name (core/app-shortcuts.ts).
  *
@@ -54,7 +54,7 @@ const TEXT_EXT = new Set(
 
 const PAGE_EXT = new Set(["html", "htm"]);
 
-/** Shell scripts: the editor edits them, the Terminal prints them. */
+/** Shell scripts: the editor edits them, the Terminal prints them locally. */
 const SHELL_EXT = new Set(["sh", "bash", "zsh", "ksh", "dash", "profile", "bashrc", "zshrc"]);
 
 const FILE = `${vfs.HOME}/system/default-apps.json`;
@@ -105,10 +105,9 @@ async function save(): Promise<void> {
 
 /** `foo.d86` — a shortcut to an app that is part of the OS (core/app-shortcuts). */
 /**
- * The Terminal, as a way to open a shell script: it prints the file into the
- * console and runs nothing. Listing a script before running it is what you
- * actually want most of the time, and pasting one into a root shell is not
- * something a double-click should ever do.
+ * The Terminal, as a way to open a shell script: it prints the contents into
+ * the local console only after the guest reports ready. It never sends the
+ * file to the guest or executes it.
  */
 export function terminalOpener(): Opener {
   return { id: BUILTIN.terminal, name: "Terminal (print)", icon: "terminal", kind: "terminal" };

@@ -1,23 +1,13 @@
 /**
- * fs-bridge — Dragon86's filesystem served to DrakeForge (BrowserPod).
- *
- * This is the postMessage counterpart of p9.ts, kept solely for the
- * future DrakeForge connection — the IDE's BrowserPod engine runs in
- * another tab and cannot speak raw 9p over virtio (its filesystem
- * devices are fixed: DataDevice = JS writes / guest reads, IDBDevice =
- * guest read-write / JS reads back). So here the wire is the DrakeForge
- * session bridge itself: protocol v2 `fs-req`/`fs-res` messages, served
- * here directly from ZenFS. The guest-visible root ("/" in fs-req
- * paths) is the OS home (/home/user); the other side mounts it at
- * /home/user/shared in the guest. See docs/cheerpx-fs-protocol.md.
- *
- * File-level, not byte-range: BrowserPod's JS-facing device APIs are
- * whole-file (writeFile / readFileAsBlob), so the protocol is too.
- * Stateful handles would buy nothing here.
+ * fs-bridge — serve Dragon86's /home/user tree to the deployed DrakeForge
+ * workspace through protocol v2 fs-req/fs-res messages. This is distinct from
+ * the Terminal's 9P share: the remote workspace addresses this root as "/".
+ * The bridge is file-level (whole-file reads/writes), not byte-range. See
+ * docs/cheerpx-fs-protocol.md for the fs1 wire contract and security limits.
  */
 
 import { fs } from "@zenfs/core";
-import { logInfo } from "../core/log";
+import { logInfo } from "../core/log.ts";
 
 type Promises = typeof fs.promises;
 
