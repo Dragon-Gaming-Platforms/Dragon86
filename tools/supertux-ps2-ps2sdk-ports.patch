@@ -1,13 +1,10 @@
 diff --git a/Makefile.ps2 b/Makefile.ps2
-index 2aec299..c53f668 100644
+index 2aec299..acee61c 100644
 --- a/Makefile.ps2
 +++ b/Makefile.ps2
-@@ -1,7 +1,7 @@
- EE_OBJS = src/bitmask.o src/badguy.o src/button.o src/collision.o src/configfile.o src/gameloop.o src/gameobjs.o src/globals.o src/high_scores.o src/intro.o src/leveleditor.o src/level.o src/lispreader.o src/menu.o src/mousecursor.o src/music_manager.o src/musicref.o src/particlesystem.o src/physic.o src/player.o src/ps2_specific.o src/resources.o src/scene.o src/supertux.o src/screen.o src/setup.o src/sound.o src/special.o src/sprite_manager.o src/sprite.o src/text.o src/texture.o src/tile.o src/timer.o src/title.o src/type.o src/worldmap.o src/world.o
- EE_BIN = supertux.elf
- 
+@@ -4 +4 @@ EE_BIN = supertux.elf
 -EE_INCS = -Isrc -I$(PS2SDK)/ports/include
 +EE_INCS = -Isrc -I$(PS2SDK)/ports/include -I$(PS2SDK)/ports/include/SDL
- EE_CXXFLAGS := -DNOOPENGL
- EE_LDFLAGS = -L$(PS2SDK)/ports/lib -L$(GSKIT)/lib
- EE_LIBS = -lSDL_image -lsdlmixer -lsdl -logg -lvorbis -lcdvd -lmc -lc -lstdc++
+@@ -7 +7 @@ EE_LDFLAGS = -L$(PS2SDK)/ports/lib -L$(GSKIT)/lib
+-EE_LIBS = -lSDL_image -lsdlmixer -lsdl -logg -lvorbis -lcdvd -lmc -lc -lstdc++
++EE_LIBS = -lSDL_image -lsdlmixer -lsdl -llzma -lgskit -ldmakit -logg -lvorbis -lcdvd -lmc -lc -lstdc++

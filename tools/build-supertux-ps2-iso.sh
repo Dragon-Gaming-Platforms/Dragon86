@@ -54,8 +54,9 @@ SuperTux for PlayStation 2 — Dragon86 workflow sample
 This is an original PS2 disc image built from the SuperTux PS2 homebrew
 source, not a precompiled web build. The image includes SuperTux's GPL-2.0
 license and upstream attribution files. See COPYING.TXT, AUTHORS.TXT, and
-data/CREDITS. BUILD.PAT records Dragon86's one-line PS2SDK SDL include-path
-adjustment, required to build this revision with the pinned PS2DEV toolchain.
+data/CREDITS. BUILD.PAT records Dragon86's small PS2SDK compatibility patch:
+it adds the SDL header directory and explicit LZMA/gsKit/DMAKit links required
+by the pinned toolchain.
 
 Upstream: https://github.com/headshot2017/supertux-ps2
 Source revision: $SOURCE_SHA
