@@ -23,6 +23,7 @@ import { distroInstalled, installedDistro, DISTROS, type DistroId } from "../bri
 import * as vfs from "../core/vfs";
 import { logInfo, logWarn } from "../core/log";
 import { rememberEngine } from "./engine-viewer";
+import { createBootAwarePrintGate, isDistroFilesystemBootNotice } from "./terminal-script";
 
 const ARCH_LABEL: Record<MachineArch, string> = {
   x86_32: "x86 (32-bit)",
@@ -39,7 +40,7 @@ const BOLD = "\x1b[1m";
 const RESET = "\x1b[0m";
 
 export interface TerminalOptions {
-  /** A shell script to *print* into the console; never executed. */
+  /** Print a shell script into the local console after the guest is ready. */
   print?: { path: string; text: string };
   /**
    * Run one explicitly requested command after the guest shell reports ready.
@@ -185,24 +186,11 @@ export function openTerminal(win: Win, options: TerminalOptions = {}): void {
     return out;
   };
 
-  /* A script printed into the console: shown once, right after the console
-     is cleared for a connection, so it is not wiped by the engine's banner. */
+  /* Keep script output inside this local xterm. The gate waits for guest
+     readiness so boot output cannot race with and overwrite the script. */
   let pendingPrint = options.print ?? null;
-  const flushPrint = (): void => {
-    if (!pendingPrint) return;
-    const { path, text } = pendingPrint;
-    pendingPrint = null;
-    const name = path.slice(path.lastIndexOf("/") + 1);
-    const body = text.replace(/\r\n/g, "\n");
-    const lines = body.split("\n");
-    term.writeln("");
-    term.writeln(`${DIM}── ${path} — printed, not run ─────────────────${RESET}`);
-    for (const line of lines) term.writeln(line);
-    if (lines[lines.length - 1] === "") lines.pop();
-    term.writeln(`${DIM}── end of ${name} · ${lines.length} line(s) · nothing was executed ──${RESET}`);
-    term.writeln("");
-    setChip("offline", `Printed ${name} (not run)`);
-  };
+  let connectionGeneration = 0;
+  let activePrintGate: ReturnType<typeof createBootAwarePrintGate> | null = null;
 
   /** Honest refusal: the ARM64 machine is real, but its OS is a disk image
       in browser storage, and that image has not been installed yet. */
@@ -227,8 +215,21 @@ export function openTerminal(win: Win, options: TerminalOptions = {}): void {
     setChip("offline", `No ${ARCH_LABEL[arch]} operating system installed — see the App Store`);
   };
 
-  /** Honest refusal, the other kind: the machine is fine, but no operating
-      system has been installed yet. The distro lives in the App Store. */
+  /** Render the file into xterm's local buffer only; never send guest input. */
+  const printScriptLocally = (label: string): void => {
+    if (!pendingPrint) return;
+    const { path, text } = pendingPrint;
+    pendingPrint = null;
+    const name = path.slice(path.lastIndexOf("/") + 1);
+    const lines = text.replace(/\r\n?/g, "\n").split("\n");
+    term.writeln("");
+    term.writeln(`${DIM}── ${path} — ${label} ─────────────────${RESET}`);
+    for (const line of lines) term.writeln(line);
+    if (lines[lines.length - 1] === "") lines.pop();
+    term.writeln(`${DIM}── end of ${name} · ${lines.length} line(s) · nothing was executed ──${RESET}`);
+    term.writeln("");
+  };
+
   const noOsBanner = (arch: MachineArch) => {
     term.clear();
     term.writeln(`${BOLD}${RED}  ╔══════════════════════════════════════════╗${RESET}`);
@@ -310,6 +311,9 @@ export function openTerminal(win: Win, options: TerminalOptions = {}): void {
   });
 
   const connect = async (freshBoot = false) => {
+    const generation = ++connectionGeneration;
+    activePrintGate?.cancel();
+    activePrintGate = null;
     refreshTitle();
     const arch = getSettings().arch;
     backend?.dispose();
@@ -321,24 +325,24 @@ export function openTerminal(win: Win, options: TerminalOptions = {}): void {
       if (!(await netbsdInstalled(arch))) {
         saveStateBtn.style.display = "none";
         viewEngineBtn.style.display = "none";
-        flushPrint();
         noDistroBanner(arch);
+        printScriptLocally("printed locally; no OS installed");
         return;
       }
     } else {
       if (!(await distroInstalled(vfs.GUEST_ROOT))) {
         saveStateBtn.style.display = "none";
         viewEngineBtn.style.display = "none";
-        flushPrint();
         noOsBanner(arch);
+        printScriptLocally("printed locally; no OS installed");
         return;
       }
       const distro = await installedDistro(vfs.GUEST_ROOT);
       if (distro && !DISTROS[distro].runsOn.includes(arch)) {
         saveStateBtn.style.display = "none";
         viewEngineBtn.style.display = "none";
-        flushPrint();
         wrongArchBanner(arch, distro);
+        printScriptLocally("printed locally; incompatible OS");
         return;
       }
     }
@@ -354,7 +358,6 @@ export function openTerminal(win: Win, options: TerminalOptions = {}): void {
     );
     setChip("connecting", "Connecting…");
     term.clear();
-    flushPrint();
     const osName = arch === "arm64" ? "NetBSD" : arch === "arm32" ? "Alpine" : isRv ? "Alpine" : "Arch";
     term.writeln(`${DIM}Starting the ${ARCH_LABEL[arch]} machine (${osName}, in-page).${RESET}`);
     if (isArm) {
@@ -382,14 +385,35 @@ export function openTerminal(win: Win, options: TerminalOptions = {}): void {
       term.writeln(`${DIM}Network is emulated; in the guest run /networking.sh to bring the card up.${RESET}`);
       term.writeln(`${DIM}In the guest:  git clone https://…  works,  d86-net check  tests the link.${RESET}`);
     }
+    let bootMessageSeen = false;
+    const printGate = pendingPrint
+      ? createBootAwarePrintGate(() => {
+          if (generation !== connectionGeneration || !backend || !pendingPrint) return;
+          printScriptLocally("printed, not run");
+        })
+      : null;
+    activePrintGate = printGate;
     let requestedCommandSent = false;
     const handlers = {
-      onData: (data: string) => term.write(filterOutput(data)),
-      onNotice: (text: string) => term.writeln(`${DIM}[engine] ${text}${RESET}`),
+      onData: (data: string) => {
+        printGate?.activity();
+        term.write(filterOutput(data));
+      },
+      onNotice: (text: string) => {
+        term.writeln(`${DIM}[engine] ${text}${RESET}`);
+        const rootFsBoot = isDistroFilesystemBootNotice(text);
+        const diskOsBoot = isArm && /booting .* from its disk image/i.test(text);
+        if (!bootMessageSeen && (rootFsBoot || diskOsBoot)) {
+          bootMessageSeen = true;
+          printGate?.setBootMessageSeen(true);
+        }
+        printGate?.activity();
+      },
       onStatus: (s: "ready" | "offline") => {
         if (s === "ready") {
           setChip("online", `${osName} online · ${ARCH_LABEL[arch]}`);
           term.focus();
+          printGate?.setReady(true);
           if (options.run && !requestedCommandSent) {
             requestedCommandSent = true;
             /* Let the shell finish printing its prompt before feeding the
@@ -399,6 +423,7 @@ export function openTerminal(win: Win, options: TerminalOptions = {}): void {
             }, 900);
           }
         } else {
+          printGate?.setReady(false);
           setChip("connecting", "Still starting…");
           term.writeln(`${RED}The machine is still booting.${RESET}`);
           term.writeln(`${DIM}Keep this window open — bash appears automatically when ready, or hit Reconnect.${RESET}`);
@@ -440,6 +465,9 @@ export function openTerminal(win: Win, options: TerminalOptions = {}): void {
     offSettings?.();
     offSettings = null;
     ro.disconnect();
+    activePrintGate?.cancel();
+    activePrintGate = null;
+    ++connectionGeneration;
     backend?.dispose();
     backend = null;
     try {

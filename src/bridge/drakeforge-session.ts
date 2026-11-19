@@ -1,10 +1,8 @@
 /**
- * A private-per-launch transport for DrakeForge's existing hello/fs1 wire
- * messages. It is not enabled by the launcher until DrakeForge supports the
- * `channel` URL parameter and uses only the selected transport.
- *
- * Random channel names prevent accidental cross-talk; they are not an
- * authorization boundary against other scripts on the same origin.
+ * A private-per-launch transport for the deployed DrakeForge /dragon86 route.
+ * The route negotiates fs1 with hello/ready, then sends v2 fs-req messages on
+ * the selected channel. Random names prevent accidental cross-talk; they are
+ * not an authorization boundary against other scripts on the same origin.
  */
 import type { FsRequest, FsResponse } from "./fs-bridge";
 
@@ -29,11 +27,16 @@ export function startDrakeforgeSession(
 ): () => void {
   let closed = false;
   let ready = false;
+  let fs1 = false;
   const hello = () => channel.postMessage({ v: 1, t: "hello", caps: ["fs1"] });
   const onMessage = (event: MessageEvent): void => {
     const msg = event.data;
-    if (closed || !msg || typeof msg !== "object" || msg.via !== "bc-hoster") return;
-    if (msg.v === 2 && msg.t === "fs-req" && Number.isSafeInteger(msg.id) && typeof msg.op === "string") {
+    if (closed || !msg || typeof msg !== "object") return;
+    if (msg.v === 2 && msg.t === "fs-req" && msg.via === "bc-hoster" && Number.isSafeInteger(msg.id) && typeof msg.op === "string") {
+      if (!fs1) {
+        channel.postMessage({ v: 2, t: "fs-res", id: msg.id, ok: false, error: "fs1 is not ready" });
+        return;
+      }
       void respond(msg as FsRequest).then((res) => {
         if (!closed) channel.postMessage(res);
       }).catch((error: unknown) => {
@@ -41,10 +44,10 @@ export function startDrakeforgeSession(
       });
       return;
     }
-    if (msg.v !== 1 || msg.t !== "ready") return;
+    if (msg.v !== 1 || msg.t !== "ready" || (msg.via !== undefined && msg.via !== "bc-hoster")) return;
     ready = true;
-    const fsLive = Array.isArray(msg.caps) && msg.caps.includes("fs1");
-    onState(fsLive ? "fs1" : "ready");
+    fs1 = Array.isArray(msg.caps) && msg.caps.includes("fs1");
+    onState(fs1 ? "fs1" : "ready");
   };
   channel.addEventListener("message", onMessage as EventListener);
   onState("connecting");

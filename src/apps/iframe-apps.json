@@ -86,11 +86,11 @@
   {
     "id": "drakeforge",
     "name": "DrakeForge",
-    "sub": "Code editor and development workspace",
+    "sub": "Code editor with Dragon86 fs1 workspace sharing",
     "url": "https://dragon-gaming-platforms.github.io/DrakeForge/standalone",
     "icon": "editor",
     "width": 1000,
     "height": 700,
-    "status": "DrakeForge standalone \u2014 Dragon86 filesystem is not connected"
+    "status": "DrakeForge connected workspace — fs1, not Terminal 9P"
   }
 ]
