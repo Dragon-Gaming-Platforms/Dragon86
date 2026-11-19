@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: supertux-ps2-sample-${{ github.ref }}
@@ -107,7 +107,7 @@ jobs:
       # Keep diagnostic logs available without distributing the ISO or source
       # archive while redistribution rights for every bundled asset are unclear.
       # Generated web builds remain private to the test runner.
-      - name: Upload test inputs and diagnostics
+      - name: Upload diagnostic logs
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -117,31 +117,3 @@ jobs:
             dist/ps2dev-build.log
             .build/ps2-web-recomp/games/supertux/explore.log
             .build/ps2-web-recomp/games/supertux/entries.txt
-
-      - name: Publish verified sample ISO and source archive
-        # Set the repository variable only after rights for all game assets are documented.
-        if: success() && github.ref == 'refs/heads/main' && vars.SUPERTUX_ASSET_REDISTRIBUTION_APPROVED == 'true'
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          set -euo pipefail
-          tag=supertux-ps2-sample
-          files=(dist/supertux-ps2.iso dist/SHA256SUMS dist/NOTICE.txt dist/supertux-ps2-source.tar.gz dist/SUPERTUX-PS2SDK.patch)
-          notes="$RUNNER_TEMP/supertux-release-notes.md"
-          cat > "$notes" <<EOF
-          SuperTux PS2 homebrew ISO built from the GPL-2.0 source at https://github.com/headshot2017/supertux-ps2/tree/$SUPERTUX_SOURCE_SHA.
-
-          This release includes the original PS2 ISO input, its SHA-256 checksum, attribution, the corresponding source archive, and the small build patch. Dragon86's PS2-Web-Recomp smoke test completed successfully for this image; that tests the conversion/build workflow, not complete game playability.
-
-          No commercial game image, BIOS, precompiled web build, or generated recompiler output is included.
-          EOF
-          if gh release view "$tag" >/dev/null 2>&1; then
-            gh release upload "$tag" "${files[@]}" --clobber
-            gh release edit "$tag" --title 'SuperTux PS2 homebrew sample' --notes-file "$notes" --latest
-          else
-            gh release create "$tag" "${files[@]}" \
-              --target "$GITHUB_SHA" \
-              --title 'SuperTux PS2 homebrew sample' \
-              --notes-file "$notes" \
-              --latest
-          fi
