@@ -45,9 +45,9 @@ jobs:
           docker run --rm \
             --volume "$GITHUB_WORKSPACE:/workspace" \
             --workdir /workspace/.build/supertux-ps2 \
-            --entrypoint /bin/bash \
+            --entrypoint /bin/sh \
             ghcr.io/ps2dev/ps2dev:v2.0.0 \
-            -lc 'make -f Makefile.ps2 clean && make -f Makefile.ps2'
+            -c 'apk add --no-cache make && make -f Makefile.ps2 clean && make -f Makefile.ps2'
 
       - name: Package and validate the original ISO input
         env:
