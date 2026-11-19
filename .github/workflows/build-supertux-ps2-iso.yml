@@ -1,0 +1,129 @@
+name: Build SuperTux PS2 sample ISO
+
+on:
+  push:
+    paths:
+      - .github/workflows/build-supertux-ps2-iso.yml
+      - tools/build-supertux-ps2-iso.sh
+      - docs/ps2-supertux-sample.md
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: supertux-ps2-sample-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-recompile:
+    name: Build ISO and test PS2-Web-Recomp
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    env:
+      SUPERTUX_SOURCE_SHA: 5c6ddb17d0d893f7bc85409c0750f374e5bf137e
+      PS2_RECOMP_SHA: d8a0a452274447b8e1da984bba1a82f7716e3e8f
+    steps:
+      - name: Check out Dragon86
+        uses: actions/checkout@v4
+
+      - name: Check out the GPL-licensed SuperTux PS2 source
+        uses: actions/checkout@v4
+        with:
+          repository: headshot2017/supertux-ps2
+          ref: 5c6ddb17d0d893f7bc85409c0750f374e5bf137e
+          path: .build/supertux-ps2
+          persist-credentials: false
+
+      - name: Install ISO tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y genisoimage
+
+      - name: Build SuperTux for PS2 with the official PS2DEV toolchain
+        run: |
+          docker run --rm \
+            --volume "$GITHUB_WORKSPACE:/workspace" \
+            --workdir /workspace/.build/supertux-ps2 \
+            ghcr.io/ps2dev/ps2dev:v2.0.0 \
+            sh -lc 'make -f Makefile.ps2 clean && make -f Makefile.ps2'
+
+      - name: Package and validate the original ISO input
+        env:
+          SUPER_TUX_SOURCE_SHA: ${{ env.SUPERTUX_SOURCE_SHA }}
+        run: tools/build-supertux-ps2-iso.sh "$GITHUB_WORKSPACE/.build/supertux-ps2" "$GITHUB_WORKSPACE/dist"
+
+      - name: Prepare the exact corresponding source archive
+        run: |
+          git -C .build/supertux-ps2 archive \
+            --format=tar.gz \
+            --prefix=supertux-ps2/ \
+            "$SUPERTUX_SOURCE_SHA" > dist/supertux-ps2-source.tar.gz
+
+      - name: Check out PS2-Web-Recomp at a fixed revision
+        uses: actions/checkout@v4
+        with:
+          repository: snuri00/ps2-web-recomp
+          ref: d8a0a452274447b8e1da984bba1a82f7716e3e8f
+          path: .build/ps2-web-recomp
+          persist-credentials: false
+
+      - name: Install PS2-Web-Recomp build prerequisites
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y \
+            clang cmake ninja-build python3 python3-pip python3-venv \
+            curl unzip pkg-config git \
+            libc++-dev libc++abi-dev \
+            libasound2-dev libdbus-1-dev libglib2.0-dev libpulse-dev libudev-dev \
+            libvulkan-dev libwayland-dev libxkbcommon-dev \
+            libx11-dev libxrandr-dev libxi-dev libxcursor-dev libxinerama-dev libxfixes-dev
+
+      - name: Run the PS2-Web-Recomp ISO-to-web workflow
+        run: |
+          cd .build/ps2-web-recomp
+          scripts/port.sh supertux "$GITHUB_WORKSPACE/dist/supertux-ps2.iso" \
+            --frames 900 --rounds 1 --quick
+          test -s build/web-supertux/ps2web.html
+          find build/web-supertux -maxdepth 1 -type f -printf '%f\n' | sort
+
+      # Keep the ISO, source and compiler log available even if the recompiler
+      # discovers a game/runtime limitation. Do not upload generated web builds:
+      # those contain translated game code and remain private to the test runner.
+      - name: Upload test inputs and diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: supertux-ps2-sample-${{ github.run_number }}
+          if-no-files-found: warn
+          path: |
+            dist/*
+            .build/ps2-web-recomp/games/supertux/explore.log
+            .build/ps2-web-recomp/games/supertux/entries.txt
+
+      - name: Publish verified sample ISO and source archive
+        if: success() && github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          tag=supertux-ps2-sample
+          files=(dist/supertux-ps2.iso dist/SHA256SUMS dist/NOTICE.txt dist/supertux-ps2-source.tar.gz)
+          notes="$RUNNER_TEMP/supertux-release-notes.md"
+          cat > "$notes" <<EOF
+          SuperTux PS2 homebrew ISO built from the GPL-2.0 source at https://github.com/headshot2017/supertux-ps2/tree/$SUPERTUX_SOURCE_SHA.
+
+          This release includes the original PS2 ISO input, its SHA-256 checksum, attribution and the corresponding source archive. Dragon86's PS2-Web-Recomp smoke test completed successfully for this image; that tests the conversion/build workflow, not complete game playability.
+
+          No commercial game image, BIOS, precompiled web build, or generated recompiler output is included.
+          EOF
+          if gh release view "$tag" >/dev/null 2>&1; then
+            gh release upload "$tag" "${files[@]}" --clobber
+            gh release edit "$tag" --title 'SuperTux PS2 homebrew sample' --notes-file "$notes" --latest
+          else
+            gh release create "$tag" "${files[@]}" \
+              --target "$GITHUB_SHA" \
+              --title 'SuperTux PS2 homebrew sample' \
+              --notes-file "$notes" \
+              --latest
+          fi
