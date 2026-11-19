@@ -15,9 +15,8 @@ The build workflow is `.github/workflows/build-supertux-ps2-iso.yml`. It runs
 when that workflow (or its ISO packaging helper) is pushed, builds the PS2 ELF
 with the versioned PS2DEV toolchain, packages an ISO9660 CD image, and passes
 the image through the pinned PS2-Web-Recomp `port.sh` flow. The build and conversion check run on pushes, but ISO/source artifacts are not
-uploaded as CI artifacts. Release publication is additionally gated on the
-repository variable `SUPERTUX_ASSET_REDISTRIBUTION_APPROVED` being set to
-`true` after rights for every bundled asset are documented. The GPL-2.0 source
+uploaded as CI artifacts. Release publication is disabled until redistribution
+rights for every bundled asset are documented and reviewed; the GPL-2.0 source
 license alone does not establish those rights. Generated recompiler output is
 never published. Until that review is complete, the sample ISO download is
 withheld.
