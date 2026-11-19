@@ -104,9 +104,9 @@ jobs:
           test -s build/web-supertux/ps2web.html
           find build/web-supertux -maxdepth 1 -type f -printf '%f\n' | sort
 
-      # Keep the ISO, source and compiler log available even if the recompiler
-      # discovers a game/runtime limitation. Do not upload generated web builds:
-      # those contain translated game code and remain private to the test runner.
+      # Keep diagnostic logs available without distributing the ISO or source
+      # archive while redistribution rights for every bundled asset are unclear.
+      # Generated web builds remain private to the test runner.
       - name: Upload test inputs and diagnostics
         if: always()
         uses: actions/upload-artifact@v4
@@ -114,12 +114,13 @@ jobs:
           name: supertux-ps2-sample-${{ github.run_number }}
           if-no-files-found: warn
           path: |
-            dist/*
+            dist/ps2dev-build.log
             .build/ps2-web-recomp/games/supertux/explore.log
             .build/ps2-web-recomp/games/supertux/entries.txt
 
       - name: Publish verified sample ISO and source archive
-        if: success() && github.ref == 'refs/heads/main'
+        # Set the repository variable only after rights for all game assets are documented.
+        if: success() && github.ref == 'refs/heads/main' && vars.SUPERTUX_ASSET_REDISTRIBUTION_APPROVED == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
