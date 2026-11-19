@@ -16,6 +16,7 @@ const ROOT = `${vfs.HOME}/PS2-Web-Recomp`;
 const GAMES = `${ROOT}/games`;
 const MANIFEST = "dragon86-game.json";
 const MAX_GAMES = 100;
+const SUPERTUX_SAMPLE_ISO = "https://github.com/Dragon-Gaming-Platforms/Dragon86/releases/download/supertux-ps2-sample/supertux-ps2.iso";
 
 type Game = {
   v: 1;
@@ -40,7 +41,7 @@ export function openPs2Library(win: Win): void {
   const heading = el("div");
   heading.append(el("div", "ps2-eyebrow", "DRAGON86 · LOCAL GAME LIBRARY"));
   heading.append(el("h1", "", "PS2 Web Recomp"));
-  heading.append(el("p", "", "Keep your own recompiled game builds in ZenFS. Nothing is uploaded, and no copyrighted game data ships with Dragon86."));
+  heading.append(el("p", "", "Keep recompiled builds and personal discs in ZenFS, or start with the separately licensed SuperTux PS2 homebrew sample."));
   branding.append(heading);
   const actions = el("div", "ps2-actions");
   const recompile = el("button", "btn primary", "Recompile ISO");
@@ -53,7 +54,7 @@ export function openPs2Library(win: Win): void {
   header.append(branding, actions);
 
   const notice = el("div", "ps2-notice");
-  notice.innerHTML = `<strong>Recompile from ZenFS:</strong> choose a PS2 <code>.iso</code> and Dragon86 writes a build script into your shared filesystem, then runs it in the Linux Terminal guest over 9P. Before running, select <strong>Settings → Machine → x86-64</strong> and install <strong>Arch Linux (x86-64)</strong> from the App Store. The guest needs a working network and the CMake, Ninja, Clang/C++20 and Python toolchain; this minimal guest may need those tools provisioned first. Builds land in <code>~/PS2-Web-Recomp/games/</code> beside a link to the original ISO. Allow roughly 300 MB per game plus the Emscripten SDK. If you already have a web build, use Import instead. Launch uses its own isolated tab under <code>/ps2/</code>.`;
+  notice.innerHTML = `<strong>Open-source workflow sample:</strong> <a class="ps2-sample-download" href="${SUPERTUX_SAMPLE_ISO}" target="_blank" rel="noopener noreferrer">Download the original SuperTux PS2 ISO</a> (GPL-2.0; its release includes source, attribution, build patch and checksum). After downloading, use Dragon86 Files to upload it into ZenFS, then choose it with Recompile ISO. The ISO passed PS2-Web-Recomp's ISO-to-web CI build; this verifies the workflow, not complete gameplay compatibility. <br><br><strong>Recompile from ZenFS:</strong> choose a PS2 <code>.iso</code> and Dragon86 writes a build script into your shared filesystem, then runs it in the Linux Terminal guest over 9P. Before running, select <strong>Settings → Machine → x86-64</strong> and install <strong>Arch Linux (x86-64)</strong> from the App Store. The guest needs a working network and the CMake, Ninja, Clang/C++20 and Python toolchain; this minimal guest may need those tools provisioned first. Builds land in <code>~/PS2-Web-Recomp/games/</code> beside a link to the original ISO. Allow roughly 300 MB per game plus the Emscripten SDK. If you already have a web build, use Import instead. Launch uses its own isolated tab under <code>/ps2/</code>.`;
   const list = el("div", "ps2-game-list");
   const loading = el("div", "ps2-loading-screen");
   loading.hidden = true;
