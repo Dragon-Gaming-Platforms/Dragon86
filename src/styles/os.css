@@ -2545,6 +2545,8 @@
 .ps2-notice { padding: 12px 14px; border: 1px solid rgba(102, 145, 206, .24); border-radius: 9px; color: var(--text-secondary); background: rgba(46, 79, 123, .12); font-size: .8rem; line-height: 1.55; }
 .ps2-notice strong { color: var(--text-primary); }
 .ps2-notice code { color: #b4d2ff; font-family: var(--font-mono, monospace); }
+.ps2-notice a.ps2-sample-download { color: #b4d2ff; font-weight: 750; text-decoration: underline; text-underline-offset: 2px; }
+.ps2-notice a.ps2-sample-download:hover { color: #fff; }
 .ps2-game-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 390px), 1fr)); align-content: start; gap: 12px; }
 .ps2-game-card { display: flex; align-items: center; gap: 12px; min-width: 0; padding: 14px; border: 1px solid var(--border-color); border-radius: 11px; background: color-mix(in srgb, var(--bg-card) 92%, #1c3556); box-shadow: 0 7px 24px #0002; }
 .ps2-game-mark { display: grid; width: 54px; height: 64px; flex: none; place-items: center; border: 1px solid #49688f; border-radius: 7px 12px 12px 7px; color: #c7ddff; background: linear-gradient(145deg, #243957, #111c2d); font-size: .75rem; font-weight: 850; letter-spacing: .08em; }
