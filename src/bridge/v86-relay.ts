@@ -20,6 +20,23 @@
  * indistinguishable from "networking is broken" without a probe, so this
  * opens the socket the emulator would open and reports the outcome.
  */
+import { SHARED_WISP_V86, SHARED_WISP_WSS } from "../core/settings.ts";
+
+/** Normalize the shared WSS address to v86's explicit secure-Wisp selector. */
+export function normalizeV86Relay(raw: string): string {
+  const value = (raw || "").trim();
+  try {
+    const wss = new URL(value.replace(/^wisps:/i, "wss:"));
+    if (wss.href === SHARED_WISP_WSS) return SHARED_WISP_V86;
+  } catch { /* pass through for the normal validation/probe path */ }
+  return value;
+}
+
+/** Present the shared endpoint identically in the v86 and Scramjet settings. */
+export function displayV86Relay(raw: string): string {
+  return normalizeV86Relay(raw) === SHARED_WISP_V86 ? SHARED_WISP_WSS : raw;
+}
+
 export interface RelayProbe {
   ok: boolean;
   url: string;
@@ -29,7 +46,7 @@ export interface RelayProbe {
 }
 
 export function relayBackendName(raw: string): string {
-  const v = (raw || "").trim().toLowerCase();
+  const v = normalizeV86Relay(raw).toLowerCase();
   if (!v || v === "off" || v === "none") return "off";
   if (v.startsWith("wss://") || v.startsWith("ws://")) return "wsproxy";
   if (v.startsWith("wisps://") || v.startsWith("wisp://")) return "wisp";
@@ -40,8 +57,9 @@ export function relayBackendName(raw: string): string {
 
 export function probeRelay(rawUrl: string, timeoutMs = 8000): Promise<RelayProbe> {
   const url = (rawUrl || "").trim();
+  const relayUrl = normalizeV86Relay(url);
   const started = performance.now();
-  const backend = relayBackendName(url);
+  const backend = relayBackendName(relayUrl);
   const base = { url, backend };
 
   if (backend === "off") {
@@ -64,7 +82,7 @@ export function probeRelay(rawUrl: string, timeoutMs = 8000): Promise<RelayProbe
   }
 
   /* wisp:// is just ws:// with a different upgrade path. */
-  const wsUrl = url.replace(/^wisp:\/\//i, "ws://").replace(/^wisps:\/\//i, "wss://");
+  const wsUrl = relayUrl.replace(/^wisp:\/\//i, "ws://").replace(/^wisps:\/\//i, "wss://");
   return new Promise((resolve) => {
     let settled = false;
     const finish = (ok: boolean, message: string) => {

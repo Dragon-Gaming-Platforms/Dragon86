@@ -8,11 +8,12 @@
 
 import { el, icon } from "../core/dom";
 import { showConfirm, showInput } from "../core/dialog";
-import { probeRelay, relayBackendName } from "../bridge/v86-relay";
+import { displayV86Relay, normalizeV86Relay, probeRelay, relayBackendName } from "../bridge/v86-relay";
 import { ensureGuestRoot, guestRootInfo, installedDistro, resetGuestRoot } from "../bridge/guest-root";
 import {
   getSettings,
   setSettings,
+  SHARED_WISP_WSS,
   THEMES,
   WALLPAPERS,
   type MachineArch,
@@ -660,31 +661,52 @@ export function openSettings(win: Win, startPage?: string): void {
     row.append(reseedBtn);
     host.append(row);
 
-    host.append(section("Network", "The emulated network card inside the guest."));
-    const netRow = el("div", "settings-row");
+    host.append(section("Network", "The shared relay carries traffic for the emulated network card; it is separate from Dragon86 Files and 9P."));
+    const relayCard = el("div", "settings-relay-card");
+    const relayMark = el("div", "settings-relay-mark", "↗");
+    const relayCopy = el("div", "settings-relay-copy");
+    relayCopy.append(el("strong", undefined, "Shared secure Wisp relay"));
+    relayCopy.append(el("p", undefined, `The same WSS endpoint as Scramjet: ${SHARED_WISP_WSS}. v86 uses the secure Wisp protocol on that socket.`));
+    relayCard.append(relayMark, relayCopy, el("span", "settings-relay-badge", "WSS · Wisp"));
+    host.append(relayCard);
+
+    const netRow = el("div", "settings-row settings-relay-controls");
     netRow.dataset.setting = "v86 network";
-    netRow.append(el("label", undefined, "Relay"));
+    const relayField = el("div", "settings-relay-field");
+    const relayLabel = el("label", undefined, "WSS relay address");
     const netInput = el("input", "input");
-    netInput.placeholder = "wss://relay.widgetry.org/";
-    netInput.value = getSettings().v86Network;
-    const saveNet = el("button", "btn", "Save");
+    netInput.id = `v86-relay-url-${win.id}`;
+    relayLabel.setAttribute("for", netInput.id);
+    netInput.type = "url";
+    netInput.placeholder = SHARED_WISP_WSS;
+    netInput.setAttribute("aria-label", "WSS relay address");
+    netInput.value = displayV86Relay(getSettings().v86Network);
+    relayField.append(relayLabel, netInput);
+    const saveNet = el("button", "btn primary", "Save relay");
     saveNet.addEventListener("click", () => {
-      setSettings({ v86Network: netInput.value.trim() });
-      netInput.value = getSettings().v86Network;
+      setSettings({ v86Network: normalizeV86Relay(netInput.value.trim()) || "off" });
+      netInput.value = displayV86Relay(getSettings().v86Network);
       saveNet.textContent = "Saved ✓";
-      setTimeout(() => (saveNet.textContent = "Save"), 1400);
+      setTimeout(() => (saveNet.textContent = "Save relay"), 1400);
     });
-    const offNet = el("button", "btn", "Off");
+    const sharedNet = el("button", "btn", "Use shared");
+    sharedNet.title = "Use the same secure Wisp endpoint as Scramjet";
+    sharedNet.addEventListener("click", () => {
+      netInput.value = SHARED_WISP_WSS;
+      setSettings({ v86Network: normalizeV86Relay(SHARED_WISP_WSS) });
+    });
+    const offNet = el("button", "btn", "Network off");
     offNet.addEventListener("click", () => {
       setSettings({ v86Network: "off" });
       netInput.value = "off";
     });
-    const testNet = el("button", "btn", "Test");
-    const netResult = el("div", "settings-note");
+    const testNet = el("button", "btn", "Test connection");
+    const netResult = el("div", "settings-note settings-relay-result", "Test the relay here; network changes apply the next time the guest starts.");
     testNet.addEventListener("click", () => {
       testNet.disabled = true;
-      netResult.textContent = `Checking ${relayBackendName(getSettings().v86Network)} relay…`;
-      void probeRelay(getSettings().v86Network)
+      const relay = normalizeV86Relay(netInput.value.trim());
+      netResult.textContent = `Checking ${relayBackendName(relay)} relay…`;
+      void probeRelay(relay)
         .then((r) => {
           netResult.textContent = `${r.message} (${r.ms} ms)`;
         })
@@ -695,9 +717,9 @@ export function openSettings(win: Win, startPage?: string): void {
           testNet.disabled = false;
         });
     });
-    netRow.append(netInput, saveNet, offNet, testNet);
+    netRow.append(relayField, sharedNet, saveNet, offNet, testNet);
     host.append(netRow, netResult);
-    host.append(note("The guest only has loopback unless a relay is set. In the guest, /networking.sh brings the card up."));
+    host.append(note("Use a Wisp URL for the shared relay, or a wsproxy URL for a compatible wsproxy server. In the guest, /networking.sh brings the card up. Public relays are shared; use a server you trust."));
   }
 
   /* ---------- Storage ---------- */

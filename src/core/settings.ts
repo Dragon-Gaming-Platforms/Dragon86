@@ -19,9 +19,11 @@ export interface Settings {
    * v86 network backend. Empty/"off" = no NIC at all (the guest sees only
    * loopback). Anything else is v86's relay URL, which decides the backend by
    * scheme:
-   *   wss://host/   wsproxy  — copy.sh's own backend; DHCP comes from the proxy
-   *   wisp://host   wisp     — v86 runs the stack itself; DHCP answered locally
+   *   wss://host/   wsproxy  — wsproxy relay; DHCP comes from the proxy
+   *   wisp(s)://host wisp    — v86 runs the stack itself; DHCP answered locally
    *   fetch         in-page  — no server, but only CORS-visible traffic
+   * The shared Scramjet WSS endpoint is normalized to `wisps://` so both
+   * clients use TLS while speaking the Wisp protocol expected by that server.
    * The emulated NIC is v86's job either way; the guest only has to load its
    * driver and ask for a lease (that is what /networking.sh does).
    */
@@ -38,6 +40,10 @@ export interface Settings {
 }
 
 const KEY = "dragon86.settings";
+
+/** Shared secure Wisp endpoint used by both the Browser and v86 guest NIC. */
+export const SHARED_WISP_WSS = "wss://anura.pro/";
+export const SHARED_WISP_V86 = SHARED_WISP_WSS.replace(/^wss:/, "wisps:");
 
 export const THEMES: { id: ThemeId; name: string; swatch: string }[] = [
   { id: "dragon", name: "Dragon Red", swatch: "linear-gradient(135deg,#e60012,#4a0000)" },
@@ -75,10 +81,10 @@ const DEFAULTS: Settings = {
      installed distro today (the Arch userland), and its engine runs on
      every browser Dragon86 targets. */
   arch: "x86_32",
-  /* copy.sh's own public proxy: the same one its Arch demo uses, so the
-     guest behaves the way it does there. Rate-limited and shared — set your
-     own wisp/wsproxy URL in Settings for regular use. */
-  v86Network: "wss://relay.widgetry.org/",
+  /* Secure Wisp connection to the shared relay. `wisps://` tells v86 to
+     speak Wisp while opening the same WSS endpoint Scramjet uses. The relay
+     is public/shared; self-host a Wisp server for private use. */
+  v86Network: SHARED_WISP_V86,
   iconSize: "medium",
   storeUrl: "",
   devConsole: false,
@@ -91,7 +97,15 @@ function load(): Settings {
   try {
     const raw = localStorage.getItem(KEY);
     if (!raw) return { ...DEFAULTS };
-    return { ...DEFAULTS, ...(JSON.parse(raw) as Partial<Settings>) };
+    const saved = JSON.parse(raw) as Partial<Settings>;
+    const loaded = { ...DEFAULTS, ...saved };
+    /* Upgrade installations that still have the old public wsproxy default;
+       custom relay choices are left untouched. */
+    if (saved.v86Network === "wss://relay.widgetry.org/") {
+      loaded.v86Network = SHARED_WISP_V86;
+      localStorage.setItem(KEY, JSON.stringify(loaded));
+    }
+    return loaded;
   } catch {
     return { ...DEFAULTS };
   }

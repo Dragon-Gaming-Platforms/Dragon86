@@ -23,6 +23,8 @@ const here = dirname(fileURLToPath(import.meta.url));
 const bundle = readFileSync(resolve(here, "out/os.js"), "utf8");
 
 const css = readFileSync(resolve(here, "out/dragon86.css"), "utf8");
+const scramjetSource = readFileSync(resolve(here, "../../public/scramjet/app.js"), "utf8");
+const scramjetHtml = readFileSync(resolve(here, "../../public/scramjet/index.html"), "utf8");
 
 const dom = new JSDOM(
   `<!doctype html><html lang="en" data-theme="dragon"><head><style>${css}</style></head>
@@ -1736,6 +1738,12 @@ const scramjetFrame = [...document.querySelectorAll("iframe.browser-frame")].fin
 check("proxied emulator loads in the same-origin Scramjet app", Boolean(scramjetFrame), scramjetFrame?.src ?? "frame not found");
 vAmigaWebCard?.querySelector(".store-card-title")?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
 check("proxied emulator detail explains that 9P is not mounted", /does not mount the guest 9P filesystem/.test(emulatorStore?.textContent ?? ""));
+
+/* ---- Dragon86-owned Scramjet frontend: settings, shared Wisp, responsiveness ---- */
+check("Scramjet defaults to libcurl and the shared secure Wisp endpoint", /wisp:\s*"wss:\/\/anura\.pro\/"/.test(scramjetSource) && /transport:\s*"libcurl"/.test(scramjetSource));
+check("Scramjet migrates old default transport without overwriting later choices", /saved\.transportVersion !== 2/.test(scramjetSource) && /settings\.transport = defaults\.transport/.test(scramjetSource) && /settings\.transportVersion = 2/.test(scramjetSource));
+check("Scramjet frontend has accessible navigation and connection settings", /aria-label="URL or search"/.test(scramjetHtml) && /aria-controls="settings"/.test(scramjetHtml) && /role="status"/.test(scramjetHtml));
+check("Scramjet frontend is responsive and honors reduced-motion preferences", /@media \(max-width: 520px\)/.test(scramjetHtml) && /prefers-reduced-motion: reduce/.test(scramjetHtml));
 
 /* ---- PS2 Web Recomp library: ZenFS import and isolated standalone launch ---- */
 await window.d86.fs.mkdir("/home/user/Downloads");
