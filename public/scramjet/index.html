@@ -3,48 +3,154 @@
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="theme-color" content="#101116" />
+		<meta name="description" content="Dragon86 Browser — proxied browsing through Scramjet with configurable relay and transport." />
 		<title>Dragon86 Browser</title>
 		<style>
-			:root { color-scheme: dark; }
+			:root {
+				color-scheme: dark;
+				font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+				font-synthesis: none;
+				text-rendering: optimizeLegibility;
+				--page: #101116;
+				--surface: #171920;
+				--surface-raised: #1c1f28;
+				--surface-input: #111319;
+				--line: rgba(255,255,255,.09);
+				--line-strong: rgba(255,255,255,.15);
+				--text: #f4f5f7;
+				--muted: #9ca3b2;
+				--quiet: #6c7380;
+				--accent: #f04450;
+				--accent-soft: rgba(240,68,80,.14);
+				--ok: #55d6a0;
+				--radius: 12px;
+				--shadow: 0 18px 50px rgba(0,0,0,.25);
+			}
 			* { box-sizing: border-box; }
-			html, body { height: 100%; }
-			body {
-				margin: 0; display: flex; flex-direction: column;
-				background: #0b0e14; color: #d7dee9;
-				font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+			html, body { width: 100%; height: 100%; margin: 0; }
+			body { display: flex; flex-direction: column; overflow: hidden; background: var(--page); color: var(--text); }
+			button, input, select { font: inherit; }
+			button { color: inherit; }
+			button:focus-visible, input:focus-visible, select:focus-visible {
+				outline: 2px solid var(--accent); outline-offset: 2px;
 			}
-			header {
-				display: flex; align-items: center; gap: 6px;
-				padding: 8px; background: #11161f; border-bottom: 1px solid #232c3d;
-				flex-wrap: wrap;
+			.topbar {
+				position: relative; z-index: 2; display: grid;
+				grid-template-columns: auto minmax(220px, 1fr) auto;
+				align-items: center; gap: 20px; padding: 13px 20px;
+				background: rgba(19,21,28,.96); border-bottom: 1px solid var(--line);
+				box-shadow: 0 8px 28px rgba(0,0,0,.14);
 			}
-			button {
-				background: #171d29; color: #d7dee9; border: 1px solid #2a3448;
-				border-radius: 6px; padding: 6px 10px; cursor: pointer; font-size: 14px;
+			.brand { display: flex; align-items: center; gap: 11px; min-width: 148px; }
+			.brand-mark {
+				display: grid; place-items: center; width: 38px; height: 38px; flex: 0 0 38px;
+				border: 1px solid rgba(255,112,122,.4); border-radius: 12px;
+				background: linear-gradient(145deg, #f04a56, #9e1520 82%);
+				box-shadow: 0 5px 18px rgba(240,68,80,.24); color: #fff;
+				font-size: 17px; font-weight: 850; letter-spacing: -1px;
 			}
-			button:hover { background: #1f2735; }
-			button:disabled { opacity: .45; cursor: default; }
-			form { flex: 1; display: flex; min-width: 160px; }
-			input[type="text"], input[type="url"], select {
-				background: #0b0e14; color: #d7dee9; border: 1px solid #2a3448;
-				border-radius: 6px; padding: 7px 10px; font-size: 14px;
+			.brand-copy { min-width: 0; line-height: 1.2; }
+			.brand-copy strong { display: block; font-size: 13px; letter-spacing: .06em; }
+			.brand-copy span { display: block; margin-top: 4px; color: var(--muted); font-size: 11px; }
+			.navigation { display: flex; align-items: center; gap: 7px; min-width: 0; }
+			.nav-actions { display: flex; gap: 4px; padding: 4px; border: 1px solid var(--line); border-radius: 10px; background: #12141a; }
+			.icon-button {
+				display: inline-grid; place-items: center; width: 34px; height: 34px; padding: 0;
+				border: 1px solid transparent; border-radius: 7px; background: transparent;
+				color: var(--muted); cursor: pointer; font-size: 17px; transition: .16s ease;
 			}
-			#url { flex: 1; width: 100%; }
-			#status {
-				padding: 4px 10px; font-size: 12px; color: #8a97a9;
-				background: #0d1119; border-bottom: 1px solid #1c2331;
-				white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+			.icon-button:hover:not(:disabled) { border-color: var(--line-strong); background: var(--surface-raised); color: var(--text); }
+			.icon-button:disabled { opacity: .35; cursor: not-allowed; }
+			.address-form {
+				display: flex; align-items: center; gap: 9px; min-width: 0; height: 44px;
+				padding: 0 6px 0 13px; border: 1px solid var(--line-strong); border-radius: 11px;
+				background: var(--surface-input); transition: border-color .16s ease, box-shadow .16s ease;
 			}
-			#status.error { color: #ff8888; }
+			.address-form:focus-within { border-color: rgba(240,68,80,.72); box-shadow: 0 0 0 3px rgba(240,68,80,.12); }
+			.address-glyph { flex: 0 0 auto; color: var(--quiet); font-size: 15px; }
+			#url { width: 100%; min-width: 0; border: 0; outline: 0; background: transparent; color: var(--text); font-size: 13px; }
+			#url::placeholder { color: #707684; }
+			#url:focus-visible { outline: 0; }
+			.go-button {
+				flex: 0 0 auto; min-height: 32px; padding: 0 13px; border: 0; border-radius: 8px;
+				background: var(--accent); color: white; cursor: pointer; font-size: 12px; font-weight: 750;
+				transition: filter .15s, transform .15s;
+			}
+			.go-button:hover { filter: brightness(1.1); transform: translateY(-1px); }
+			.top-actions { display: flex; justify-content: flex-end; align-items: center; gap: 9px; }
+			.secure-badge, .settings-trigger {
+				display: inline-flex; align-items: center; gap: 7px; min-height: 36px; padding: 0 11px;
+				border: 1px solid var(--line); border-radius: 9px; background: var(--surface);
+				color: var(--muted); font-size: 11px; font-weight: 650; white-space: nowrap;
+			}
+			.secure-badge { color: #a9e8ca; border-color: rgba(85,214,160,.2); background: rgba(85,214,160,.07); }
+			.secure-badge.insecure { color: #f3c985; border-color: rgba(243,201,133,.25); background: rgba(243,201,133,.07); }
+			.secure-badge.insecure .secure-dot { background: #f3c985; box-shadow: 0 0 8px rgba(243,201,133,.5); }
+			.secure-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--ok); box-shadow: 0 0 8px rgba(85,214,160,.6); }
+			.settings-trigger { cursor: pointer; transition: .16s ease; }
+			.settings-trigger:hover, .settings-trigger[aria-expanded="true"] { color: var(--text); border-color: var(--line-strong); background: var(--surface-raised); }
+			.settings-trigger span:first-child { font-size: 15px; }
 			#settings {
-				display: none; gap: 6px; align-items: center; flex-wrap: wrap;
-				padding: 8px; background: #0d1119; border-bottom: 1px solid #1c2331;
-				font-size: 13px;
+				display: none; position: relative; z-index: 1; padding: 18px 22px 20px;
+				border-bottom: 1px solid var(--line); background: #15171e; box-shadow: var(--shadow);
 			}
-			#settings.open { display: flex; }
-			#settings input { flex: 1; min-width: 220px; }
-			main { flex: 1; display: flex; min-height: 0; }
-			iframe { flex: 1; border: 0; background: #fff; width: 100%; height: 100%; }
+			#settings.open { display: block; animation: panel-in .18s ease-out; }
+			@keyframes panel-in { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+			.settings-inner { width: min(100%, 980px); margin: 0 auto; }
+			.settings-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 15px; }
+			.settings-head h2 { margin: 0; font-size: 14px; letter-spacing: .01em; }
+			.settings-head p { margin: 4px 0 0; color: var(--muted); font-size: 11px; }
+			.settings-grid { display: grid; grid-template-columns: minmax(240px, 1.5fr) minmax(180px, .8fr) auto; align-items: end; gap: 12px; }
+			.field { display: grid; gap: 6px; min-width: 0; }
+			.field label { color: #c5c9d2; font-size: 11px; font-weight: 700; letter-spacing: .04em; }
+			.field input, .field select {
+				width: 100%; min-height: 39px; padding: 0 11px; border: 1px solid var(--line-strong);
+				border-radius: 8px; background: var(--surface-input); color: var(--text); font-size: 12px;
+			}
+			#save-settings { min-height: 39px; padding: 0 15px; border: 1px solid rgba(240,68,80,.5); border-radius: 8px; background: var(--accent-soft); color: #ff9da4; cursor: pointer; font-size: 11px; font-weight: 750; white-space: nowrap; }
+			#save-settings:hover { background: rgba(240,68,80,.23); color: #fff; }
+			.settings-foot { display: flex; align-items: flex-start; gap: 9px; margin-top: 13px; padding: 10px 12px; border: 1px solid rgba(240,68,80,.14); border-radius: 8px; background: rgba(240,68,80,.045); color: #b8bdc8; font-size: 11px; line-height: 1.55; }
+			.settings-foot b { color: #f28d95; }
+			#statusbar { display: flex; align-items: center; gap: 10px; min-height: 38px; padding: 0 20px; background: #12141a; border-bottom: 1px solid var(--line); }
+			#status-indicator { width: 7px; height: 7px; flex: 0 0 7px; border-radius: 50%; background: #7a8290; }
+			#status-indicator.ready { background: var(--ok); box-shadow: 0 0 9px rgba(85,214,160,.5); }
+			#status-indicator.error { background: #ff6d78; box-shadow: 0 0 9px rgba(255,109,120,.45); }
+			#status { min-width: 0; overflow: hidden; color: var(--muted); font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+			#status.error { color: #ff9da4; }
+			.status-spacer { flex: 1; }
+			#status-transport { color: var(--quiet); font-size: 10px; white-space: nowrap; }
+			main { position: relative; display: flex; flex: 1; min-height: 0; padding: 12px; background: radial-gradient(ellipse at 50% -15%, rgba(240,68,80,.07), transparent 50%), var(--page); }
+			#view { flex: 1; width: 100%; height: 100%; border: 1px solid var(--line); border-radius: 10px; background: #fff; box-shadow: 0 14px 45px rgba(0,0,0,.22); }
+			@media (max-width: 840px) {
+				.topbar { grid-template-columns: 1fr auto; gap: 11px 14px; padding: 11px 14px; }
+				.brand { grid-column: 1; grid-row: 1; }
+				.top-actions { grid-column: 2; grid-row: 1; }
+				.navigation { grid-column: 1 / -1; grid-row: 2; }
+				.navigation .address-form { flex: 1; }
+				.settings-grid { grid-template-columns: 1fr 1fr; }
+				#save-settings { grid-column: 1 / -1; }
+			}
+			@media (max-width: 520px) {
+				.brand { min-width: 0; }
+				.brand-copy span, .secure-badge { display: none; }
+				.top-actions { gap: 6px; }
+				.settings-trigger { padding: 0 9px; }
+				.navigation { gap: 6px; }
+				.nav-actions { gap: 0; }
+				.icon-button { width: 29px; }
+				.address-form { height: 40px; padding-left: 10px; gap: 6px; }
+				.go-button { min-height: 30px; padding: 0 9px; }
+				#settings { padding: 15px 14px; }
+				.settings-grid { grid-template-columns: 1fr; }
+				#save-settings { grid-column: auto; }
+				#statusbar { padding: 0 14px; }
+				#status-transport { display: none; }
+				main { padding: 7px; }
+			}
+			@media (prefers-reduced-motion: reduce) {
+				*, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
+			}
 		</style>
 		<!-- Scramjet runtime + controller (vendored, see VENDORED.md).
 		     Order matters: the controller asserts the runtime is loaded. -->
@@ -52,32 +158,44 @@
 		<script src="./controller/controller.api.js"></script>
 	</head>
 	<body>
-		<header>
-			<button id="back" title="Back">←</button>
-			<button id="forward" title="Forward">→</button>
-			<button id="reload" title="Reload">⟳</button>
-			<button id="home" title="Home">⌂</button>
-			<form id="go-form">
-				<input id="url" type="text" spellcheck="false" autocomplete="off"
-					placeholder="Enter a URL or search with DuckDuckGo…" />
-			</form>
-			<button id="settings-btn" title="Proxy settings">⚙</button>
+		<header class="topbar">
+			<div class="brand" aria-label="Dragon86 Browser">
+				<div class="brand-mark" aria-hidden="true">D</div>
+				<div class="brand-copy"><strong>DRAGON86</strong><span>Proxied browsing · your relay, your choice</span></div>
+			</div>
+			<div class="navigation">
+				<div class="nav-actions" aria-label="Page navigation">
+					<button class="icon-button" id="back" type="button" title="Back" aria-label="Go back">‹</button>
+					<button class="icon-button" id="forward" type="button" title="Forward" aria-label="Go forward">›</button>
+					<button class="icon-button" id="reload" type="button" title="Reload" aria-label="Reload page">↻</button>
+					<button class="icon-button" id="home" type="button" title="Home" aria-label="Go to home page">⌂</button>
+				</div>
+				<form id="go-form" class="address-form" role="search">
+					<span class="address-glyph" aria-hidden="true">⌕</span>
+					<input id="url" type="text" spellcheck="false" autocomplete="off" aria-label="URL or search" placeholder="Enter a URL or search the web" />
+					<button class="go-button" type="submit">Go</button>
+				</form>
+			</div>
+			<div class="top-actions">
+				<div class="secure-badge" id="relay-security" title="Relay connection security"><span class="secure-dot"></span><span id="relay-security-text">Secure relay</span></div>
+				<button class="settings-trigger" id="settings-btn" type="button" title="Connection settings" aria-controls="settings" aria-expanded="false"><span aria-hidden="true">⚙</span><span>Settings</span></button>
+			</div>
 		</header>
-		<div id="settings">
-			<label>Wisp server
-				<input id="wisp" type="url" spellcheck="false" />
-			</label>
-			<label>Transport
-				<select id="transport">
-					<option value="epoxy">Epoxy</option>
-					<option value="libcurl">Libcurl</option>
-				</select>
-			</label>
-			<button id="save-settings">Save &amp; reconnect</button>
-			<span>Proxy traffic goes through the Wisp server — use one you trust.</span>
-		</div>
-		<div id="status">Starting Scramjet…</div>
-		<main><iframe id="view" title="Browser view"></iframe></main>
+		<section id="settings" aria-label="Connection settings">
+			<div class="settings-inner">
+				<div class="settings-head">
+					<div><h2>Connection settings</h2><p>Choose the relay and transport used for proxied traffic.</p></div>
+				</div>
+				<div class="settings-grid">
+					<div class="field"><label for="wisp">Shared Wisp relay</label><input id="wisp" type="url" spellcheck="false" autocomplete="url" /></div>
+					<div class="field"><label for="transport">Transport protocol</label><select id="transport"><option value="libcurl">libcurl · recommended</option><option value="epoxy">Epoxy</option></select></div>
+					<button id="save-settings" type="button">Save &amp; reconnect</button>
+				</div>
+				<div class="settings-foot"><span aria-hidden="true">ⓘ</span><span><b>Privacy note:</b> your proxied traffic passes through the relay you choose. The default Wisp endpoint is public and shared with the v86 guest network. Use a relay you trust; self-hosting provides the strongest control.</span></div>
+			</div>
+		</section>
+		<div id="statusbar" role="status" aria-live="polite"><span id="status-indicator"></span><div id="status">Starting Scramjet…</div><span class="status-spacer"></span><span id="status-transport">libcurl · shared Wisp relay</span></div>
+		<main><iframe id="view" title="Proxied web page" referrerpolicy="no-referrer"></iframe></main>
 		<script type="module" src="./app.js"></script>
 	</body>
 </html>

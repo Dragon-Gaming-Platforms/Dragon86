@@ -60,6 +60,7 @@ import { createDirectFs, unionAsPromises } from "./union-fs";
 import { logInfo, logWarn } from "../core/log";
 import type { BackendHandlers, EngineScreen, TerminalBackend } from "./engine";
 import { textScreenFrom } from "./v86-screen";
+import { normalizeV86Relay } from "./v86-relay";
 
 interface V86Emulator {
   add_listener(event: string, cb: (arg: number) => void): void;
@@ -397,7 +398,7 @@ class V86Backend implements TerminalBackend {
   private netDeviceUrl(): string {
     const raw = (getSettings().v86Network || "").trim();
     if (!raw || raw.toLowerCase() === "off" || raw.toLowerCase() === "none") return "";
-    return raw;
+    return normalizeV86Relay(raw);
   }
 
   /** Progress line for the Terminal (kind of quiet: it is a chatty boot). */

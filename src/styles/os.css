@@ -1570,6 +1570,50 @@
   margin-top: 6px;
   max-width: 64ch;
 }
+.settings-relay-card {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  max-width: 720px;
+  margin: 4px 0 12px;
+  padding: 14px 16px;
+  border: 1px solid rgba(var(--theme-rgb), 0.24);
+  border-radius: 9px;
+  background: linear-gradient(115deg, rgba(var(--theme-rgb), 0.1), var(--bg-card) 58%);
+}
+.settings-relay-mark {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+  border: 1px solid rgba(var(--theme-rgb), 0.3);
+  border-radius: 10px;
+  background: rgba(var(--theme-rgb), 0.13);
+  color: var(--theme-bright);
+  font-size: 1.15rem;
+  font-weight: 800;
+}
+.settings-relay-copy { flex: 1; min-width: 0; }
+.settings-relay-copy strong { color: var(--text-primary); font-size: 0.88rem; }
+.settings-relay-copy p { margin: 3px 0 0; color: var(--text-dim); font-size: 0.78rem; line-height: 1.45; }
+.settings-relay-copy code { color: var(--theme-bright); }
+.settings-relay-badge {
+  flex: 0 0 auto;
+  padding: 4px 8px;
+  border: 1px solid rgba(85, 214, 160, 0.24);
+  border-radius: 999px;
+  background: rgba(85, 214, 160, 0.08);
+  color: #83ddb4;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: 700;
+}
+.settings-relay-controls { max-width: 900px; }
+.settings-relay-field { flex: 1 1 240px; min-width: min(100%, 220px); }
+.settings-relay-field label { display: block; margin-bottom: 5px; }
+.settings-relay-controls .input { min-width: 0; }
+.settings-relay-result { max-width: 900px; padding: 8px 10px; border-left: 2px solid rgba(var(--theme-rgb), 0.45); background: rgba(var(--theme-rgb), 0.04); }
 .settings-results {
   display: flex;
   flex-direction: column;
@@ -2597,6 +2641,13 @@
 .ps2-ready-note p { margin: 7px 0 0; color: var(--text-secondary); }
 .ps2-loader-note { max-width: 500px; margin: 0; color: var(--text-secondary); font-size: .78rem; line-height: 1.5; }
 .ps2-loader-card > small { color: var(--text-dim); overflow-wrap: anywhere; }
+@media (max-width: 700px) {
+  .settings-relay-card { align-items: flex-start; flex-wrap: wrap; }
+  .settings-relay-badge { margin-left: 49px; }
+  .settings-relay-controls { align-items: stretch; }
+  .settings-relay-field { flex-basis: 100%; }
+  .settings-relay-controls > .btn { flex: 1 1 110px; }
+}
 @media (max-width: 660px) {
   .ps2-header { align-items: flex-start; flex-direction: column; }
   .ps2-actions { width: 100%; }

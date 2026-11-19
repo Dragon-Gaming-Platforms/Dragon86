@@ -18,12 +18,21 @@ const SETTINGS_KEY = "dragon86.browser";
 
 const defaults = {
 	wisp: "wss://anura.pro/",
-	transport: "epoxy",
+	transport: "libcurl",
 	home: "https://www.google.com",
 };
 let settings = { ...defaults };
 try {
-	settings = { ...defaults, ...JSON.parse(localStorage.getItem(SETTINGS_KEY) || "{}") };
+	const saved = JSON.parse(localStorage.getItem(SETTINGS_KEY) || "{}");
+	settings = { ...defaults, ...saved };
+	/* The old default was Epoxy. Upgrade that default once, but remember
+	   explicit choices from this version and later. */
+	if (saved.transportVersion !== 2) {
+		if (saved.transport === "epoxy") settings.transport = defaults.transport;
+		settings.transportVersion = 2;
+		localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+	}
+	if (!["libcurl", "epoxy"].includes(settings.transport)) settings.transport = defaults.transport;
 } catch { /* keep defaults */ }
 
 const $ = (id) => document.getElementById(id);
@@ -34,8 +43,25 @@ const viewEl = $("view");
 function setStatus(msg, isError = false) {
 	statusEl.textContent = msg;
 	statusEl.classList.toggle("error", isError);
+	$("status-indicator").classList.toggle("error", isError);
+	$("status-indicator").classList.toggle("ready", !isError && msg === "Ready.");
 	console.log(`[D86:browser] ${msg}`);
 }
+
+function updateConnectionMeta() {
+	let host = "custom relay";
+	let secure = false;
+	try {
+		const relay = new URL(settings.wisp);
+		host = relay.host;
+		secure = relay.protocol === "wss:";
+	} catch { /* keep the friendly fallback */ }
+	$("status-transport").textContent = `${settings.transport} · ${host}`;
+	$("relay-security-text").textContent = secure ? "Secure WSS" : "Custom relay";
+	$("relay-security").classList.toggle("insecure", !secure);
+	$("relay-security").title = secure ? "Encrypted WebSocket to your selected Wisp relay" : "Your selected relay is not using secure WebSockets";
+}
+updateConnectionMeta();
 
 function normalizeInput(raw) {
 	const v = raw.trim();
@@ -139,12 +165,44 @@ $("home").addEventListener("click", () => navigate(settings.home));
 /* settings panel */
 $("wisp").value = settings.wisp;
 $("transport").value = settings.transport;
-$("settings-btn").addEventListener("click", () => $("settings").classList.toggle("open"));
-$("save-settings").addEventListener("click", () => {
-	settings.wisp = $("wisp").value.trim() || defaults.wisp;
+$("settings-btn").addEventListener("click", () => {
+	const open = !$("settings").classList.contains("open");
+	$("settings").classList.toggle("open", open);
+	$("settings-btn").setAttribute("aria-expanded", String(open));
+});
+$("transport").addEventListener("change", () => {
 	settings.transport = $("transport").value;
+	updateConnectionMeta();
+});
+$("save-settings").addEventListener("click", () => {
+	const relayInput = $("wisp").value.trim() || defaults.wisp;
+	let relay;
+	try { relay = new URL(relayInput); } catch {
+		setStatus("Enter a valid Wisp WebSocket URL.", true);
+		$("wisp").focus();
+		return;
+	}
+	if (!["wss:", "ws:"].includes(relay.protocol) || !relay.host) {
+		setStatus("Relay URL must use wss:// (recommended) or ws://.", true);
+		$("wisp").focus();
+		return;
+	}
+	settings.wisp = relay.href;
+	settings.transport = $("transport").value;
+	settings.transportVersion = 2;
 	localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
 	location.reload();
+});
+document.addEventListener("keydown", (event) => {
+	if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "l") {
+		e.preventDefault();
+		urlEl.focus();
+		urlEl.select();
+	} else if (event.key === "Escape" && $("settings").classList.contains("open")) {
+		$("settings").classList.remove("open");
+		$("settings-btn").setAttribute("aria-expanded", "false");
+		$("settings-btn").focus();
+	}
 });
 
 void init();
