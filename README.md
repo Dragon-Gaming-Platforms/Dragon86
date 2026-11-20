@@ -505,15 +505,25 @@ kept vendored but is not loaded.
 
     npm install
     npm run dev          # the OS at http://localhost:5173/Dragon86/
-    npm run build        # typecheck, the unit suites, and the Pages bundle
+    npm run build        # typecheck, unit suites, VM build, then the Pages bundle
 
-The scripts need Node 22 (the test files run with `--experimental-strip-types`,
-Node 22.6 or later). The checks:
+`npm run dev` listens on every network interface (`vite.config.ts` sets
+`host: true`, which the preview environment needs). To keep it on this
+machine, run `npx vite --host 127.0.0.1`.
 
-- `npm run build` — `tsc`, every unit suite under `tools/test-*.mjs` (among them
-  `test-fs-access` for the `@open` access rules, `test-app-sw` for the
-  service worker, `test-preview` and `test-guest-scripts`), then the production
-  bundle. CI runs it on every pull request.
+Use Node 22 (`.nvmrc` pins it; `package.json` requires 22.6 or later, because
+the test files run with `--experimental-strip-types`).
+
+The scripts:
+
+- `npm run typecheck` — `tsc --noEmit` over `src/`.
+- `npm run test:unit` — every unit suite, listed once in
+  `tools/run-unit-tests.mjs` (among them `test-fs-access` for the `@open`
+  access rules, `test-app-sw` for the service worker, `test-preview`,
+  `test-guest-scripts`). It runs them all and reports every failure together.
+  Add a new suite to that list.
+- `npm run build` — `typecheck`, `test:unit`, the VM bundle and its p9 test,
+  then the production bundle (`build:app`). CI runs it on every pull request.
 - `npm run test:ui` — boots the whole OS headlessly (jsdom) and clicks it.
 - `npm run test:vm` — boots the v86 guest for real, in Node (see below).
 - `npm run test:all` — `build` followed by `test:ui`.
