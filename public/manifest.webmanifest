@@ -1,0 +1,28 @@
+{
+  "id": "./",
+  "name": "Dragon86",
+  "short_name": "Dragon86",
+  "description": "A web OS by Dragon Gaming Platforms.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "any",
+  "background_color": "#101116",
+  "theme_color": "#101116",
+  "categories": ["utilities", "education", "games"],
+  "icons": [
+    {
+      "src": "./icons/dragon86-pwa-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/dragon86-pwa-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

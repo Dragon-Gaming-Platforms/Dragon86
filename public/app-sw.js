@@ -18,19 +18,37 @@
  * postMessage. If no window is open there is nothing to serve and it says
  * so, plainly, instead of hanging.
  *
- * Deliberately NOT done here (yet):
- *   - no Cache Storage: every read goes to the filesystem, so editing a file
- *     in the Files app and reloading the app always shows the new bytes;
- *   - no COOP/COEP stamping: that is coi-serviceworker.js's job, and its
- *     isolation half is switched off while this worker owns the scope
- *     (see the D86_COI flag there).
+ * The worker also provides the PWA shell: it refreshes the OS document from
+ * the network when possible, falls back to the last cached shell offline, and
+ * caches same-origin static shell assets. Filesystem app responses stay
+ * uncached so edits in Files appear immediately. No COOP/COEP headers are
+ * stamped here; Dragon86 no longer requires cross-origin isolation.
  */
 
 const PREFIX = "/9pf/";
 const ASK_TIMEOUT_MS = 8000;
+const CACHE_PREFIX = "dragon86-pwa-";
+const SHELL_CACHE = `${CACHE_PREFIX}v1`;
+const SCOPE_URL = new URL(self.registration.scope);
+const SCOPE_PATH = SCOPE_URL.pathname.endsWith("/") ? SCOPE_URL.pathname : `${SCOPE_URL.pathname}/`;
+const SHELL_URL = new URL("./", SCOPE_URL).href;
+const OFFLINE_HTML = `<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Dragon86 offline</title><body style="font:16px system-ui;background:#101116;color:#f4f5f7;padding:2rem"><h1>Dragon86 is offline</h1><p>The OS shell has not been cached on this device yet. Connect once, open Dragon86, then try again.</p></body>`;
+const STATIC_DESTINATIONS = new Set(["script", "style", "image", "font", "worker", "manifest"]);
+const MAX_CACHED_ASSETS = 180;
 
-self.addEventListener("install", () => self.skipWaiting());
-self.addEventListener("activate", (event) => event.waitUntil(self.clients.claim()));
+self.addEventListener("install", (event) => event.waitUntil((async () => {
+  const cache = await caches.open(SHELL_CACHE);
+  try {
+    const response = await fetch(SHELL_URL, { cache: "reload" });
+    if (response.ok) await cache.put(SHELL_URL, response.clone());
+  } catch { /* first install may be offline; activation still succeeds */ }
+  await self.skipWaiting();
+})()));
+self.addEventListener("activate", (event) => event.waitUntil((async () => {
+  const keys = await caches.keys();
+  await Promise.all(keys.filter((key) => key.startsWith(CACHE_PREFIX) && key !== SHELL_CACHE).map((key) => caches.delete(key)));
+  await self.clients.claim();
+})()));
 
 self.addEventListener("fetch", (event) => {
   const req = event.request;
@@ -42,13 +60,59 @@ self.addEventListener("fetch", (event) => {
     return;
   }
   const at = url.pathname.indexOf(PREFIX);
-  if (at === -1) return; // anything else is none of our business
-  event.respondWith(
-    serve(url.pathname.slice(at + PREFIX.length), url.search, event).catch(
-      (err) => text(500, `Dragon86 filesystem app: ${err && err.message ? err.message : err}`),
-    ),
-  );
+  if (at !== -1) {
+    event.respondWith(
+      serve(url.pathname.slice(at + PREFIX.length), url.search, event).catch(
+        (err) => text(500, `Dragon86 filesystem app: ${err && err.message ? err.message : err}`),
+      ),
+    );
+    return;
+  }
+  if (url.origin !== SCOPE_URL.origin || !url.pathname.startsWith(SCOPE_PATH)) return;
+  if (req.mode === "navigate" && (url.pathname === SCOPE_PATH || url.pathname === `${SCOPE_PATH}index.html`)) {
+    event.respondWith(loadShell(req));
+    return;
+  }
+  if (STATIC_DESTINATIONS.has(req.destination) && !url.pathname.includes("/scramjet/") && !url.pathname.includes("/ps2/")) {
+    event.respondWith(cacheStatic(req));
+  }
 });
+
+async function loadShell(request) {
+  const cache = await caches.open(SHELL_CACHE);
+  try {
+    const response = await fetch(request, { cache: "no-cache" });
+    if (response.ok) await cache.put(SHELL_URL, response.clone());
+    return response;
+  } catch {
+    return (await cache.match(SHELL_URL)) ?? new Response(OFFLINE_HTML, {
+      status: 503,
+      headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" },
+    });
+  }
+}
+
+async function cacheStatic(request) {
+  const cache = await caches.open(SHELL_CACHE);
+  const cached = await cache.match(request);
+  const network = fetch(request).then((response) => {
+    if (response.ok && response.type !== "opaque") {
+      void cache.put(request, response.clone()).then(() => trimCache(cache)).catch(() => {});
+    }
+    return response;
+  });
+  if (cached) {
+    void network.catch(() => {});
+    return cached;
+  }
+  return network;
+}
+
+async function trimCache(cache) {
+  const requests = await cache.keys();
+  const assets = requests.filter((request) => request.url !== SHELL_URL);
+  while (assets.length > MAX_CACHED_ASSETS) await cache.delete(assets.shift());
+}
 
 /**
  * Who is asking? "os" (the OS page, Preview, the file viewer), "app:<id>" (a

@@ -157,6 +157,7 @@ function createTab(raw = settings.home) {
 	iframe.title = "Proxied web page";
 	iframe.referrerPolicy = "no-referrer";
 	const tab = { id: nextTabId++, url: initialUrl, label: labelForUrl(initialUrl), iframe, frame: null };
+	attachFileBridge(tab);
 	tabs.push(tab);
 	viewportEl.append(iframe);
 	const plugins = [];
@@ -288,6 +289,224 @@ document.addEventListener("keydown", (event) => {
 		$("settings").classList.remove("open");
 		$("settings-btn").setAttribute("aria-expanded", "false");
 		$("settings-btn").focus();
+	}
+});
+
+
+/* File bridge: proxies still use the stock Scramjet runtime. The Dragon86-owned
+   browser shell maps explicit file-input and download-link actions to ZenFS. */
+const zenFs = () => {
+	try { return window.parent !== window ? window.parent.d86?.fs ?? null : null; }
+	catch { return null; }
+};
+let pendingUpload = null;
+let pickerFolder = "/home/user";
+const selectedPaths = new Set();
+
+function openPicker(input, frameWindow) {
+	if (!zenFs()) {
+		setStatus("ZenFS file access is available when Scramjet runs inside Dragon86.", true);
+		return;
+	}
+	pendingUpload = { input, frameWindow };
+	pickerFolder = "/home/user";
+	selectedPaths.clear();
+	$("picker-path").value = pickerFolder;
+	$("picker-attach").disabled = true;
+	$("picker-attach").textContent = "Choose files";
+	$("fs-picker").hidden = false;
+	$("fs-picker").setAttribute("aria-hidden", "false");
+	void renderPicker();
+}
+
+function closePicker() {
+	$("fs-picker").hidden = true;
+	$("fs-picker").setAttribute("aria-hidden", "true");
+	pendingUpload = null;
+	selectedPaths.clear();
+}
+
+async function renderPicker(path = pickerFolder) {
+	const fs = zenFs();
+	const list = $("picker-list");
+	pickerFolder = path;
+	$("picker-path").value = path;
+	list.replaceChildren();
+	try {
+		const entries = await fs.list(path);
+		if (path !== "/") {
+			const parent = document.createElement("button");
+			parent.type = "button";
+			parent.className = "picker-entry";
+			parent.textContent = "↰  Parent folder";
+			parent.addEventListener("click", () => void renderPicker(path.slice(0, path.lastIndexOf("/")) || "/"));
+			list.append(parent);
+		}
+		entries.sort((a, b) => Number(b.isDirectory) - Number(a.isDirectory) || a.name.localeCompare(b.name));
+		for (const entry of entries) {
+			if (entry.isDirectory) {
+				const button = document.createElement("button");
+				button.type = "button";
+				button.className = "picker-entry";
+				button.textContent = `📁  ${entry.name}`;
+				button.addEventListener("click", () => void renderPicker(entry.path));
+				list.append(button);
+				continue;
+			}
+			const button = document.createElement("button");
+			button.type = "button";
+			button.className = `picker-entry${selectedPaths.has(entry.path) ? " selected" : ""}`;
+			button.setAttribute("role", "option");
+			button.setAttribute("aria-selected", String(selectedPaths.has(entry.path)));
+			button.textContent = `▧  ${entry.name}`;
+			const size = document.createElement("small");
+			size.textContent = entry.size < 1024 * 1024 ? `${Math.ceil(entry.size / 1024)} KB` : `${(entry.size / 1048576).toFixed(1)} MB`;
+			button.append(size);
+			button.addEventListener("click", () => {
+				if (!pendingUpload?.input.multiple) selectedPaths.clear();
+				if (selectedPaths.has(entry.path)) selectedPaths.delete(entry.path);
+				else selectedPaths.add(entry.path);
+				void renderPicker(path);
+			});
+			list.append(button);
+		}
+		if (!entries.length) {
+			const empty = document.createElement("p");
+			empty.className = "picker-message";
+			empty.textContent = "This folder is empty.";
+			list.append(empty);
+		}
+	} catch (error) {
+		const message = document.createElement("p");
+		message.className = "picker-message";
+		message.textContent = `Could not read this folder: ${error?.message || error}`;
+		list.append(message);
+	}
+	$("picker-attach").disabled = selectedPaths.size === 0;
+	$("picker-attach").textContent = selectedPaths.size ? `Choose ${selectedPaths.size} file${selectedPaths.size === 1 ? "" : "s"}` : "Choose files";
+}
+
+async function attachSelectedFiles() {
+	const pending = pendingUpload;
+	const fs = zenFs();
+	if (!pending || !fs || !selectedPaths.size) return;
+	const paths = [...selectedPaths];
+	const input = pending.input;
+	const frameWindow = pending.frameWindow;
+	try {
+		const transfer = new frameWindow.DataTransfer();
+		for (const path of paths) {
+			const bytes = await fs.readBytes(path);
+			transfer.items.add(new frameWindow.File([bytes], path.slice(path.lastIndexOf("/") + 1)));
+		}
+		input.files = transfer.files;
+		input.dispatchEvent(new frameWindow.Event("input", { bubbles: true }));
+		input.dispatchEvent(new frameWindow.Event("change", { bubbles: true }));
+		setStatus(`Selected ${paths.length} file${paths.length === 1 ? "" : "s"} from Dragon86 Files.`);
+		closePicker();
+	} catch (error) {
+		setStatus(`Could not attach ZenFS file: ${error?.message || error}`, true);
+	}
+}
+
+function attachFileBridge(tab) {
+	tab.iframe.addEventListener("load", () => {
+		let doc;
+		let frameWindow;
+		try {
+			frameWindow = tab.iframe.contentWindow;
+			doc = tab.iframe.contentDocument;
+			if (!doc || !frameWindow || doc === document || doc.documentElement.dataset.d86FileBridge === "1") return;
+			doc.documentElement.dataset.d86FileBridge = "1";
+		} catch {
+			return; // inaccessible proxied documents retain their native behavior
+		}
+		let trustedGestureAt = 0;
+		doc.addEventListener("click", (event) => {
+			if (event.isTrusted) trustedGestureAt = Date.now();
+			const userInitiated = event.isTrusted || Date.now() - trustedGestureAt < 1500;
+			const target = event.target instanceof frameWindow.Element ? event.target : null;
+			let input = target?.closest('input[type="file"]');
+			if (!input) input = target?.closest("label")?.control ?? null;
+			if (input?.type === "file" && userInitiated && zenFs()) {
+				event.preventDefault();
+				event.stopImmediatePropagation();
+				openPicker(input, frameWindow);
+				return;
+			}
+			const anchor = target?.closest("a[href]");
+			const downloadLike = anchor && (anchor.hasAttribute("download") || /\.(?:7z|apk|csv|deb|dmg|docx?|exe|gz|iso|jar|jpg|jpeg|mp3|mp4|pdf|png|pptx?|rar|rpm|tar|tgz|txt|wav|webm|xlsx?|zip)(?:[?#]|$)/i.test(anchor.href));
+			if (downloadLike && userInitiated && zenFs()) {
+				event.preventDefault();
+				event.stopImmediatePropagation();
+				void saveDownload(tab, anchor);
+			}
+		}, true);
+		const hasDraggedFiles = (event) => Array.from(event.dataTransfer?.types ?? []).includes("Files");
+		doc.addEventListener("dragover", (event) => {
+			if (hasDraggedFiles(event) && zenFs()) {
+				event.preventDefault();
+				event.dataTransfer.dropEffect = "none";
+			}
+		}, true);
+		doc.addEventListener("drop", (event) => {
+			if (!event.isTrusted || !event.dataTransfer?.files?.length || !zenFs()) return;
+			event.preventDefault();
+			event.stopImmediatePropagation();
+			const fileInput = doc.querySelector('input[type="file"]');
+			if (fileInput) openPicker(fileInput, frameWindow);
+			else setStatus("Local file drops are disabled; use a site file picker to select a file from Dragon86 Files.", true);
+		}, true);
+	});
+}
+
+function downloadName(anchor, response) {
+	const disposition = response.headers.get("content-disposition") || "";
+	const encoded = disposition.match(/filename\*=UTF-8''([^;]+)/i)?.[1];
+	const quoted = disposition.match(/filename\s*=\s*"([^"]+)"/i)?.[1];
+	const plain = disposition.match(/filename\s*=\s*([^;]+)/i)?.[1]?.trim();
+	let name = anchor.download || quoted || plain || "";
+	if (!name && encoded) {
+		try { name = decodeURIComponent(encoded); } catch { name = encoded; }
+	}
+	if (!name) {
+		try { name = new URL(anchor.href).pathname.split("/").filter(Boolean).at(-1) || "download"; }
+		catch { name = "download"; }
+	}
+	return name.split(/[\\/]/).at(-1).replace(/[<>:"|?*\u0000-\u001f]/g, "_").trim() || "download";
+}
+
+async function saveDownload(tab, anchor) {
+	const fs = zenFs();
+	if (!fs) return;
+	try {
+		setStatus("Saving download to Dragon86 Files…");
+		const frameWindow = tab.iframe.contentWindow;
+		const response = await frameWindow.fetch(anchor.href, { credentials: "include" });
+		if (!response.ok) throw new Error(`download request failed (${response.status})`);
+		const bytes = new Uint8Array(await response.arrayBuffer());
+		const directory = "/home/user/Downloads";
+		await fs.mkdir(directory);
+		const name = downloadName(anchor, response);
+		let path = `${directory}/${name}`;
+		const extension = name.includes(".") ? name.slice(name.lastIndexOf(".")) : "";
+		const stem = extension ? name.slice(0, -extension.length) : name;
+		let suffix = 2;
+		while (await fs.exists(path)) path = `${directory}/${stem} (${suffix++})${extension}`;
+		await fs.writeBytes(path, bytes);
+		setStatus(`Saved ${path} in Dragon86 Files.`);
+		window.parent.d86?.notify?.({ title: "Download saved", body: path });
+	} catch (error) {
+		setStatus(`Could not save download to ZenFS: ${error?.message || error}`, true);
+	}
+}
+
+$("picker-cancel").addEventListener("click", closePicker);
+$("picker-attach").addEventListener("click", () => void attachSelectedFiles());
+$("picker-path").addEventListener("keydown", (event) => {
+	if (event.key === "Enter") {
+		event.preventDefault();
+		void renderPicker($("picker-path").value.trim() || "/home/user");
 	}
 });
 
