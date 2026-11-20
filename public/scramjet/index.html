@@ -50,6 +50,19 @@
 			#new-tab:hover { background: var(--surface-raised); color: var(--text); }
 			#settings { display: none; position: absolute; z-index: 10; top: 37px; right: 5px; width: min(620px, calc(100vw - 10px)); padding: 15px; border: 1px solid var(--line-strong); border-radius: 9px; background: #15171e; box-shadow: 0 15px 38px rgba(0,0,0,.42); }
 			#settings.open { display: block; animation: panel-in .14s ease-out; }
+			#fs-picker[hidden] { display: none; }
+			#fs-picker { position: fixed; z-index: 30; inset: 0; display: grid; place-items: center; padding: 16px; background: rgba(0,0,0,.7); }
+			.picker-dialog { display: flex; flex-direction: column; width: min(560px, 100%); max-height: min(600px, 90vh); padding: 15px; border: 1px solid var(--line-strong); border-radius: 10px; background: #171920; box-shadow: 0 20px 60px rgba(0,0,0,.55); }
+			.picker-dialog h2 { margin: 0; font-size: 14px; }
+			.picker-path { width: 100%; margin: 10px 0; padding: 7px 8px; border: 1px solid var(--line-strong); border-radius: 6px; background: var(--surface-input); color: var(--text); font: 11px ui-monospace, monospace; }
+			#picker-list { min-height: 120px; overflow: auto; padding: 4px; border: 1px solid var(--line); border-radius: 7px; }
+			.picker-entry { display: flex; align-items: center; gap: 8px; width: 100%; padding: 7px; border: 0; border-radius: 5px; background: transparent; color: var(--text); cursor: pointer; font-size: 11px; text-align: left; }
+			.picker-entry:hover, .picker-entry.selected { background: var(--surface-raised); }
+			.picker-entry small { margin-left: auto; color: var(--quiet); }
+			.picker-message { color: var(--muted); font-size: 11px; }
+			.picker-actions { display: flex; justify-content: flex-end; gap: 7px; margin-top: 10px; }
+			.picker-actions button { min-height: 31px; padding: 0 10px; border: 1px solid var(--line-strong); border-radius: 6px; background: var(--surface-raised); cursor: pointer; font-size: 10px; }
+			#picker-attach { border-color: rgba(240,68,80,.5); background: var(--accent-soft); color: #ff9da4; }
 			@keyframes panel-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
 			.settings-head { margin-bottom: 12px; }
 			.settings-head h2 { margin: 0; font-size: 13px; }
@@ -120,6 +133,14 @@
 			<div class="settings-foot"><b>Privacy note:</b> your proxied traffic passes through the relay you choose. The default Wisp endpoint is public and shared with the v86 guest network. Use a relay you trust; self-hosting provides the strongest control.</div>
 		</section>
 		<div id="statusbar" role="status" aria-live="polite"><span id="status-indicator"></span><div id="status">Starting Scramjet…</div><span id="status-transport"></span></div>
+		<section id="fs-picker" hidden aria-hidden="true">
+			<div class="picker-dialog" role="dialog" aria-modal="true" aria-labelledby="picker-title">
+				<h2 id="picker-title">Choose files from Dragon86</h2>
+				<input id="picker-path" class="picker-path" aria-label="Folder path" value="/home/user" />
+				<div id="picker-list" role="listbox" aria-label="Files and folders"></div>
+				<div class="picker-actions"><button id="picker-cancel" type="button">Cancel</button><button id="picker-attach" type="button" disabled>Choose files</button></div>
+			</div>
+		</section>
 		<main id="viewport" aria-label="Proxied pages"></main>
 		<script type="module" src="./app.js"></script>
 	</body>
