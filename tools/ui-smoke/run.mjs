@@ -446,8 +446,10 @@ const ps1CatalogApp = catalogJson.apps.find((app) => app.id === "ps1");
 const emulatorFrontend = readFileSync(resolve(publicRoot, "system-apps/emulatorjs/app.js"), "utf8");
 const ps1Frontend = readFileSync(resolve(publicRoot, "system-apps/ps1/app.js"), "utf8");
 const ps1CoreEvidence = readFileSync(resolve(publicRoot, "system-apps/ps1/VENDORED.md"), "utf8");
+const zenfsFileAppRegistry = readFileSync(resolve(here, "../../src/apps/zenfs-file-apps.ts"), "utf8");
+const emulatorHtml = readFileSync(resolve(publicRoot, "system-apps/emulatorjs/index.html"), "utf8");
 check("NES emulator listing and bundled test ROM are removed", !catalogJson.apps.some((app) => app.id === "nes") && !existsSync(resolve(publicRoot, "system-apps/nes/test.nes")));
-check("EmulatorJS passes a user-selected File to the core", Boolean(emulatorCatalogApp) && emulatorFrontend.includes("EJS_gameUrl = file"));
+check("EmulatorJS opens its selected game from Dragon86 ZenFS", Boolean(emulatorCatalogApp) && emulatorFrontend.includes("EJS_gameUrl = file") && zenfsFileAppRegistry.includes('\"emulatorjs\"') && emulatorHtml.includes("Choose a game from Dragon86 Files"));
 check("PS1 frontend selects PSX and explicitly disables threads", Boolean(ps1CatalogApp) && ps1Frontend.includes("const isPsxApp = true") && ps1Frontend.includes("EJS_threads = false"));
 check("PS1 core evidence records pcsx_rearmed as non-threaded upstream", /pcsx_rearmed.{0,160}not thread-required/s.test(ps1CoreEvidence));
 check("legacy cloud app entries are retained", ["tasks", "contacts"].every((id) => catalogJson.apps.some((app) => app.id === id)));
@@ -661,6 +663,25 @@ check(
   "unlocked trash shows the trashed file",
   [...filesWin.querySelectorAll(".fm-row")].some((r) => r.textContent.includes("notes.txt")),
 );
+filesWin.querySelector(".fm-side-item")?.click();
+await wait(200);
+const fileList = filesWin.querySelector(".fm-list");
+fileList.dispatchEvent(new window.MouseEvent("contextmenu", { bubbles: true, cancelable: true, clientX: 40, clientY: 40 }));
+await tick();
+check("blank Files context menu offers Upload files", [...document.querySelectorAll(".ctx-item")].some((n) => n.textContent.trim() === "Upload files"));
+document.querySelectorAll(".ctx-menu").forEach((n) => n.remove());
+const documentsRow = [...filesWin.querySelectorAll(".fm-row")].find((row) => row.textContent.includes("Documents"));
+documentsRow?.dispatchEvent(new window.MouseEvent("contextmenu", { bubbles: true, cancelable: true, clientX: 40, clientY: 40 }));
+await tick();
+check("folder context menu offers ZIP download", [...document.querySelectorAll(".ctx-item")].some((n) => n.textContent.includes("Download folder as ZIP")));
+document.querySelectorAll(".ctx-menu").forEach((n) => n.remove());
+documentsRow?.dispatchEvent(new window.MouseEvent("dblclick", { bubbles: true }));
+await wait(200);
+const welcomeRow = [...filesWin.querySelectorAll(".fm-row")].find((row) => row.textContent.includes("Welcome.txt"));
+welcomeRow?.dispatchEvent(new window.MouseEvent("contextmenu", { bubbles: true, cancelable: true, clientX: 40, clientY: 40 }));
+await tick();
+check("file context menu offers device download", [...document.querySelectorAll(".ctx-item")].some((n) => n.textContent.trim() === "Download file"));
+document.querySelectorAll(".ctx-menu").forEach((n) => n.remove());
 
 /* ---- marquee: a left-drag on empty wallpaper draws a box ---- */
 const deskEl = document.getElementById("desktop");

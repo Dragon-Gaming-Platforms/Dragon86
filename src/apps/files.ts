@@ -22,6 +22,8 @@ import { notify } from "../core/toast";
 import { refreshDesktops } from "../core/desktop";
 import { archiveBaseName, isArchiveName } from "../core/archive";
 import { extractArchive, extractDirFor } from "../core/archive-fs";
+import { createZipArchive, type ZipFile } from "../core/archive-write";
+import { downloadBlob } from "../core/fs-export";
 import { isRunnableScript, runSystemScript } from "../core/system-scripts";
 
 export interface FilesHandlers {
@@ -229,6 +231,11 @@ export function openFiles(win: Win, startPath: string, handlers: FilesHandlers):
 
     const items: CtxItem[] = [
       { label: "Open", iconHtml: icon("open").innerHTML, onClick: () => openEntry(entry) },
+      {
+        label: entry.isDirectory ? "Download folder as ZIP" : "Download file",
+        iconHtml: icon("download").innerHTML,
+        onClick: () => void downloadEntry(entry),
+      },
     ];
 
     /* Archives: unpacking is what people do with them, so it is one click,
@@ -334,6 +341,94 @@ export function openFiles(win: Win, startPath: string, handlers: FilesHandlers):
       },
     );
     return items;
+  }
+
+  function uploadDeviceFiles(): void {
+    if (inTrash(cwd)) return;
+    const destination = cwd;
+    const picker = document.createElement("input");
+    picker.type = "file";
+    picker.multiple = true;
+    Object.assign(picker.style, { position: "fixed", left: "-10000px", top: "0", width: "1px", height: "1px", opacity: "0" });
+    picker.addEventListener("change", () => {
+      const selected = Array.from(picker.files ?? []);
+      picker.remove();
+      if (selected.length) void importDeviceFiles(selected, destination);
+    }, { once: true });
+    picker.addEventListener("cancel", () => picker.remove(), { once: true });
+    document.body.append(picker);
+    picker.click();
+  }
+
+  async function importDeviceFiles(files: File[], destination: string): Promise<void> {
+    let imported = 0;
+    let skipped = 0;
+    try {
+      for (const file of files) {
+        const name = file.name;
+        if (!name || name === "." || name === ".." || name.includes("/") || name.includes("\\") || name.includes("\0")) {
+          skipped++;
+          continue;
+        }
+        const path = vfs.join(destination, name);
+        if (await vfs.exists(path)) {
+          if ((await vfs.stat(path)).isDirectory()) { skipped++; continue; }
+          if (!(await showConfirm("Replace file", `Replace “${name}” in ${destination}?`, true))) {
+            skipped++;
+            continue;
+          }
+        }
+        await vfs.writeBytes(path, new Uint8Array(await file.arrayBuffer()));
+        imported++;
+      }
+      status.textContent = `Imported ${imported} file${imported === 1 ? "" : "s"} into ${destination}${skipped ? ` · ${skipped} skipped` : ""}`;
+      if (imported) { refreshDesktops(); await render(); }
+    } catch (error) {
+      status.textContent = `Upload failed: ${(error as Error).message}`;
+      notify({ title: "Could not import files", body: (error as Error).message, icon: "info", timeout: 0 });
+    }
+  }
+
+  async function downloadEntry(entry: vfs.Entry): Promise<void> {
+    try {
+      if (!entry.isDirectory) {
+        const bytes = await vfs.readBytes(entry.path);
+        const copy = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer;
+        downloadBlob(new Blob([copy], { type: fileMime(entry.name) }), entry.name);
+        status.textContent = `Downloading ${entry.name} to your device…`;
+        return;
+      }
+      const rootName = entry.name || "folder";
+      const files: ZipFile[] = [{ path: `${rootName}/`, bytes: new Uint8Array(), isDirectory: true, modified: entry.mtime }];
+      const visit = async (dir: string, relative: string): Promise<void> => {
+        for (const child of await vfs.listDir(dir)) {
+          const zipPath = `${rootName}/${relative}${child.name}`;
+          if (child.isDirectory) {
+            files.push({ path: `${zipPath}/`, bytes: new Uint8Array(), isDirectory: true, modified: child.mtime });
+            await visit(child.path, `${relative}${child.name}/`);
+          } else {
+            files.push({ path: zipPath, bytes: await vfs.readBytes(child.path), modified: child.mtime });
+          }
+        }
+      };
+      await visit(entry.path, "");
+      const blob = createZipArchive(files);
+      downloadBlob(blob, `${rootName}.zip`);
+      status.textContent = `Downloading ${rootName}.zip (${files.length - 1} entries) to your device…`;
+    } catch (error) {
+      status.textContent = `Download failed: ${(error as Error).message}`;
+      notify({ title: `Could not download ${entry.name}`, body: (error as Error).message, icon: "info", timeout: 0 });
+    }
+  }
+
+  function fileMime(name: string): string {
+    const ext = extOf(name);
+    return ({
+      txt: "text/plain", md: "text/markdown", html: "text/html", json: "application/json", csv: "text/csv",
+      pdf: "application/pdf", png: "image/png", jpg: "image/jpeg", jpeg: "image/jpeg", gif: "image/gif",
+      webp: "image/webp", svg: "image/svg+xml", mp3: "audio/mpeg", wav: "audio/wav", mp4: "video/mp4",
+      webm: "video/webm", zip: "application/zip",
+    } as Record<string, string>)[ext] ?? "application/octet-stream";
   }
 
   async function extractInto(entry: vfs.Entry, dir: string): Promise<void> {
@@ -443,6 +538,8 @@ export function openFiles(win: Win, startPath: string, handlers: FilesHandlers):
     const items: CtxItem[] = [];
     if (!inTrash(cwd)) {
       items.push(
+        { label: "Upload files", iconHtml: icon("downloadCloud").innerHTML, onClick: uploadDeviceFiles },
+        { label: "", separator: true },
         { label: "New Folder", iconHtml: icon("folder").innerHTML, onClick: () => newFolderBtn.click() },
         { label: "New File", iconHtml: icon("text").innerHTML, onClick: () => newFileBtn.click() },
         { label: "", separator: true },

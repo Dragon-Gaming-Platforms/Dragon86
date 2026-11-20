@@ -29,10 +29,11 @@ const SUITES = [
   ["engine viewer", [...STRIP, "tools/test-engine-viewer.mjs"]],
   ["v86 relay", [...STRIP, "tools/test-v86-relay.mjs"]],
   ["archives", [...STRIP, "tools/test-archive.mjs"]],
+  ["ZIP exports", [...STRIP, "tools/test-archive-write.mjs"]],
   ["downloads", [...STRIP, "tools/test-download.mjs"]],
   ["filesystem export", [...STRIP, "tools/test-fs-export.mjs"]],
   ["filesystem import", [...STRIP, "tools/test-fs-import.mjs"]],
-  ["Puter files adapter", [...STRIP, "tools/test-puter-files.mjs"]],
+  ["ZenFS file adapter", [...STRIP, "tools/test-zenfs-files.mjs"]],
   ["public asset URLs", [...STRIP, "tools/test-public-asset-url.mjs"]],
 ];
 
