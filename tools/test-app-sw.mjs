@@ -22,7 +22,7 @@ const SRC = readFileSync(
 );
 
 /** Boot the worker; `reply` decides what the fake Dragon86 window answers. */
-function boot({ reply = null, clients = 1 } = {}) {
+function boot({ reply = null, clients = 1, docs = {} } = {}) {
   const handlers = {};
   const asked = [];
   const self = {
@@ -32,6 +32,7 @@ function boot({ reply = null, clients = 1 } = {}) {
     skipWaiting: () => {},
     clients: {
       claim: async () => {},
+      get: async (id) => (docs[id] ? { url: docs[id] } : undefined),
       matchAll: async () =>
         Array.from({ length: clients }, (_, i) => ({
           visibilityState: i === 0 ? "visible" : "hidden",
@@ -50,10 +51,12 @@ function boot({ reply = null, clients = 1 } = {}) {
   return { handlers, asked };
 }
 
-async function fetchThrough(worker, url, { method = "GET" } = {}) {
+async function fetchThrough(worker, url, { method = "GET", referrer = "", clientId = "" } = {}) {
   let promise = null;
   const event = {
-    request: new Request(url, { method }),
+    /* A plain object: Request() does not expose a settable referrer. */
+    request: { url, method, referrer },
+    clientId,
     respondWith: (p) => {
       promise = p;
     },
@@ -134,6 +137,27 @@ const body = new TextEncoder().encode("console.log(1)").buffer;
   const res = await fetchThrough(worker, APP, { method: "POST" });
   check("ignores non-GET", res === null);
 }
+
+/* 7. @open: the worker tells the page who is asking, from the referrer */
+const OPEN = "https://example.test/Dragon86/9pf/@open%2Fhome%2Fuser%2Fnotes.txt";
+const asker = async (opts) => {
+  const worker = boot({ reply: () => ({ ok: true, body }), docs: { "client-1": "https://example.test/Dragon86/9pf/evil/index.html" } });
+  await fetchThrough(worker, OPEN, opts);
+  return worker.asked[0] && worker.asked[0].from;
+};
+check("OS page asks → from=os", (await asker({ referrer: "https://example.test/Dragon86/" })) === "os");
+check("Preview asks → from=os", (await asker({ referrer: "https://example.test/Dragon86/preview/index.html" })) === "os");
+check("the file viewer asks → from=os", (await asker({ referrer: "https://example.test/Dragon86/9pf/@open%2Fhome%2Fuser%2Fa.html" })) === "os");
+check(
+  "an app's document asks → from=app:<id>",
+  (await asker({ referrer: "https://example.test/Dragon86/9pf/cheerpj/index.html" })) === "app:cheerpj",
+);
+check(
+  "the requesting client wins over a missing referrer",
+  (await asker({ clientId: "client-1" })) === "app:evil",
+);
+check("no referrer and no client → from=unknown (never guessed)", (await asker({})) === "unknown");
+check("about:client is not a referrer → unknown", (await asker({ referrer: "about:client" })) === "unknown");
 
 for (const r of results) {
   console.log(`[${r.ok ? "PASS" : "FAIL"}] ${r.name}${r.detail ? "  (" + r.detail + ")" : ""}`);

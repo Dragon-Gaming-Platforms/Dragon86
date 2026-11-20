@@ -1,0 +1,42 @@
+name: CI
+
+# Runs on every pull request. Before this, only a push to main ran the build
+# (deploy.yml), so a broken change could only be found after it had merged.
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Full history: the size guard diffs against the base branch.
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Refuse large new files
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: node tools/check-added-files.mjs "origin/$BASE_REF"
+
+      - name: Typecheck, unit suites and production build
+        run: npm run build
+
+      - name: UI smoke test (headless OS)
+        run: npm run test:ui
