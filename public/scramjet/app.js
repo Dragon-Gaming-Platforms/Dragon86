@@ -18,18 +18,18 @@ const SETTINGS_KEY = "dragon86.browser";
 
 const defaults = {
 	wisp: "wss://anura.pro/",
-	transport: "libcurl",
+	transport: "epoxy",
 	home: "https://www.google.com",
 };
 let settings = { ...defaults };
 try {
 	const saved = JSON.parse(localStorage.getItem(SETTINGS_KEY) || "{}");
 	settings = { ...defaults, ...saved };
-	/* The old default was Epoxy. Upgrade that default once, but remember
-	   explicit choices from this version and later. */
-	if (saved.transportVersion !== 2) {
-		if (saved.transport === "epoxy") settings.transport = defaults.transport;
-		settings.transportVersion = 2;
+	/* Version 3 makes Epoxy the default. Upgrade the previous default once;
+	   retain Epoxy choices and any newer explicitly saved preference. */
+	if (saved.transportVersion !== 3) {
+		if (!saved.transport || saved.transport === "libcurl") settings.transport = defaults.transport;
+		settings.transportVersion = 3;
 		localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
 	}
 	if (!["libcurl", "epoxy"].includes(settings.transport)) settings.transport = defaults.transport;
@@ -38,7 +38,15 @@ try {
 const $ = (id) => document.getElementById(id);
 const statusEl = $("status");
 const urlEl = $("url");
-const viewEl = $("view");
+const tabsEl = $("tabs");
+const viewportEl = $("viewport");
+const fullscreen = new URLSearchParams(location.search).get("fullscreen") === "1";
+if (fullscreen) document.documentElement.classList.add("fullscreen");
+
+const tabs = [];
+let activeTab = null;
+let nextTabId = 1;
+let controller = null;
 
 function setStatus(msg, isError = false) {
 	statusEl.textContent = msg;
@@ -50,16 +58,9 @@ function setStatus(msg, isError = false) {
 
 function updateConnectionMeta() {
 	let host = "custom relay";
-	let secure = false;
-	try {
-		const relay = new URL(settings.wisp);
-		host = relay.host;
-		secure = relay.protocol === "wss:";
-	} catch { /* keep the friendly fallback */ }
+	try { host = new URL(settings.wisp).host; } catch { /* friendly fallback */ }
 	$("status-transport").textContent = `${settings.transport} · ${host}`;
-	$("relay-security-text").textContent = secure ? "Secure WSS" : "Custom relay";
-	$("relay-security").classList.toggle("insecure", !secure);
-	$("relay-security").title = secure ? "Encrypted WebSocket to your selected Wisp relay" : "Your selected relay is not using secure WebSockets";
+	$("settings-btn").title = `Connection settings · ${settings.transport} · ${host}`;
 }
 updateConnectionMeta();
 
@@ -75,9 +76,6 @@ function normalizeInput(raw) {
 	return `https://duckduckgo.com/html/?q=${encodeURIComponent(v)}`;
 }
 
-let controller = null;
-let frame = null;
-
 async function makeTransport() {
 	if (settings.transport === "libcurl") {
 		const { default: LibcurlClient } = await import("./transport/libcurl.mjs");
@@ -85,6 +83,97 @@ async function makeTransport() {
 	}
 	const { default: EpoxyClient } = await import("./transport/epoxy.mjs");
 	return new EpoxyClient({ wisp: settings.wisp });
+}
+
+let utilsModule = null;
+
+function labelForUrl(url) {
+	try { return new URL(url).hostname.replace(/^www\./, "") || "New tab"; }
+	catch { return "New tab"; }
+}
+
+function renderTabs() {
+	tabsEl.replaceChildren();
+	for (const tab of tabs) {
+		const item = document.createElement("div");
+		item.className = tab === activeTab ? "tab active" : "tab";
+		const select = document.createElement("button");
+		select.type = "button";
+		select.className = "tab-select";
+		select.setAttribute("role", "tab");
+		select.setAttribute("aria-selected", String(tab === activeTab));
+		select.title = tab.url || tab.label;
+		select.textContent = tab.label;
+		select.addEventListener("click", () => activateTab(tab));
+		const close = document.createElement("button");
+		close.type = "button";
+		close.className = "tab-close";
+		close.setAttribute("aria-label", `Close ${tab.label}`);
+		close.title = `Close ${tab.label}`;
+		close.textContent = "×";
+		close.addEventListener("click", () => closeTab(tab));
+		item.append(select, close);
+		tabsEl.append(item);
+	}
+	if (!fullscreen) {
+		const add = document.createElement("button");
+		add.type = "button";
+		add.id = "new-tab";
+		add.title = "New tab (Ctrl+T)";
+		add.setAttribute("aria-label", "New tab");
+		add.textContent = "+";
+		add.addEventListener("click", () => createTab(settings.home));
+		tabsEl.append(add);
+	}
+}
+
+function activateTab(tab) {
+	if (!tabs.includes(tab)) return;
+	activeTab = tab;
+	for (const item of tabs) item.iframe.hidden = item !== tab;
+	urlEl.value = tab.url || "";
+	renderTabs();
+}
+
+function closeTab(tab) {
+	const index = tabs.indexOf(tab);
+	if (index < 0) return;
+	tab.iframe.remove();
+	tabs.splice(index, 1);
+	if (!tabs.length) {
+		activeTab = null;
+		createTab(settings.home);
+		return;
+	}
+	if (tab === activeTab) activateTab(tabs[Math.min(index, tabs.length - 1)]);
+	else renderTabs();
+}
+
+function createTab(raw = settings.home) {
+	if (!controller) return null;
+	const initialUrl = normalizeInput(raw) || settings.home;
+	const iframe = document.createElement("iframe");
+	iframe.className = "browser-frame";
+	iframe.title = "Proxied web page";
+	iframe.referrerPolicy = "no-referrer";
+	const tab = { id: nextTabId++, url: initialUrl, label: labelForUrl(initialUrl), iframe, frame: null };
+	tabs.push(tab);
+	viewportEl.append(iframe);
+	const plugins = [];
+	if (utilsModule) {
+		plugins.push(new utilsModule.UrlWatcherPlugin((url) => {
+			tab.url = url;
+			tab.label = labelForUrl(url);
+			if (activeTab === tab && document.activeElement !== urlEl) urlEl.value = url;
+			renderTabs();
+		}));
+		plugins.push(new utilsModule.HttpCachePlugin());
+	}
+	tab.frame = controller.createFrame(iframe, plugins.length ? { plugins } : undefined);
+	activateTab(tab);
+	tab.frame.go(initialUrl);
+	setStatus(`Loading ${initialUrl} …`);
+	return tab;
 }
 
 async function init() {
@@ -99,7 +188,7 @@ async function init() {
 					resolve();
 				};
 				navigator.serviceWorker.addEventListener("controllerchange", onChange);
-				setTimeout(resolve, 8000); // don't hang forever
+				setTimeout(resolve, 8000);
 			});
 		}
 		const sw = navigator.serviceWorker.controller ?? registration.active;
@@ -110,7 +199,6 @@ async function init() {
 		controller = new Controller({
 			serviceworker: sw,
 			transport: await makeTransport(),
-			/* Path corrections vs upstream defaults (site-root absolutes). */
 			config: {
 				prefix: new URL("~/sj/", BASE).pathname,
 				scramjetPath: new URL("scramjet/scramjet.js", BASE).pathname,
@@ -120,25 +208,12 @@ async function init() {
 		});
 		await controller.wait();
 
-		// Optional utils plugins (URL bar sync + HTTP cache). Non-fatal if
-		// they ever drift from the controller build: browsing still works.
-		let plugins = [];
-		try {
-			const utils = await import("./utils/scramjet-utils.mjs");
-			plugins = [
-				new utils.UrlWatcherPlugin((url) => {
-					if (document.activeElement !== urlEl) urlEl.value = url;
-				}),
-				new utils.HttpCachePlugin(),
-			];
-		} catch (err) {
-			console.warn("[D86:browser] utils plugins unavailable, continuing without:", err);
-		}
+		try { utilsModule = await import("./utils/scramjet-utils.mjs"); }
+		catch (err) { console.warn("[D86:browser] utils plugins unavailable, continuing without:", err); }
 
-		frame = controller.createFrame(viewEl, plugins.length ? { plugins } : undefined);
 		setStatus("Ready.");
 		const start = new URLSearchParams(location.search).get("goto") || settings.home;
-		navigate(start);
+		createTab(start);
 	} catch (err) {
 		console.error("[D86:browser]", err);
 		setStatus(`Failed to start: ${err?.message || err}`, true);
@@ -147,19 +222,22 @@ async function init() {
 
 function navigate(raw) {
 	const url = normalizeInput(raw);
-	if (!url || !frame) return;
+	if (!url || !activeTab?.frame) return;
+	activeTab.url = url;
+	activeTab.label = labelForUrl(url);
 	urlEl.value = url;
+	renderTabs();
 	setStatus(`Loading ${url} …`);
-	frame.go(url);
+	activeTab.frame.go(url);
 }
 
 $("go-form").addEventListener("submit", (e) => {
 	e.preventDefault();
 	navigate(urlEl.value);
 });
-$("back").addEventListener("click", () => frame?.back());
-$("forward").addEventListener("click", () => frame?.forward());
-$("reload").addEventListener("click", () => frame?.reload());
+$("back").addEventListener("click", () => activeTab?.frame?.back());
+$("forward").addEventListener("click", () => activeTab?.frame?.forward());
+$("reload").addEventListener("click", () => activeTab?.frame?.reload());
 $("home").addEventListener("click", () => navigate(settings.home));
 
 /* settings panel */
@@ -189,15 +267,23 @@ $("save-settings").addEventListener("click", () => {
 	}
 	settings.wisp = relay.href;
 	settings.transport = $("transport").value;
-	settings.transportVersion = 2;
+	settings.transportVersion = 3;
 	localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
-	location.reload();
+	const next = new URL(location.href);
+	if (activeTab?.url) next.searchParams.set("goto", activeTab.url);
+	location.assign(next.href);
 });
 document.addEventListener("keydown", (event) => {
-	if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "l") {
+	if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "l" && !fullscreen) {
 		e.preventDefault();
 		urlEl.focus();
 		urlEl.select();
+	} else if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "t" && !fullscreen) {
+		e.preventDefault();
+		createTab(settings.home);
+	} else if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "w" && !fullscreen) {
+		e.preventDefault();
+		if (activeTab) closeTab(activeTab);
 	} else if (event.key === "Escape" && $("settings").classList.contains("open")) {
 		$("settings").classList.remove("open");
 		$("settings-btn").setAttribute("aria-expanded", "false");

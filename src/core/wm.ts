@@ -24,6 +24,7 @@ export interface Win {
   close(): void;
   minimize(): void;
   toggleMaximize(): void;
+  maximize(): void;
   isMinimized(): boolean;
 }
 
@@ -156,6 +157,7 @@ export class WindowManager {
       close: () => this.close(id),
       minimize: () => this.minimize(id),
       toggleMaximize: () => this.toggleMaximize(id),
+      maximize: () => { if (!state.maximized) this.toggleMaximize(id); },
       isMinimized: () => state.minimized,
     };
     state.win = win;

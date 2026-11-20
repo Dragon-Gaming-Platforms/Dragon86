@@ -190,6 +190,12 @@ export function openIframeApp(win: Win, def: IframeAppDef, filePath?: string): v
     return;
   }
 
+  const fullscreenScramjet = def.id === "scramjet" && new URL(url).searchParams.get("fullscreen") === "1";
+  if (fullscreenScramjet) {
+    root.classList.add("scramjet-fullscreen");
+    status.hidden = true;
+  }
+
   const frame = document.createElement("iframe");
   frame.className = "browser-frame";
   frame.src = url;

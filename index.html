@@ -6,14 +6,6 @@
     <meta name="description" content="Dragon86 — a web OS by Dragon Gaming Platforms" />
     <title>Dragon86</title>
     <link rel="icon" type="image/png" href="./icons/dragon-gaming.png" />
-    <!--
-      coi-serviceworker (MIT, (c) Guido Zuidhof — see
-      third-party/coi-serviceworker.LICENSE) is kept ONLY to clean up
-      after older Dragon86 versions that registered it for cross-origin
-      isolation. Nothing needs isolation now; the inline config below
-      disables registration and forces deregistration. This must load
-      before any other script.
-    -->
     <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-S4TPLRML58"></script>
 <script>
@@ -24,24 +16,13 @@
   gtag('config', 'G-S4TPLRML58');
 </script>
     <script>
-      /* COI is permanently OFF: no engine in Dragon86 needs
-         SharedArrayBuffer anymore (the in-page emulators run without it;
-         the CheerpX engine that needed isolation was removed). The
-         coi-serviceworker script stays loaded for one reason only — its
-         page half reads shouldDeregister() and actively REMOVES any worker
-         a previous Dragon86 version registered, then reloads once to shed
-         the stamped COOP/COEP headers. Without that, returning visitors
-         would be stuck isolated forever. */
-      (function () {
-        window.coi = {
-          coepCredentialless: () => false,
-          shouldRegister: () => false,
-          shouldDeregister: () => true,
-        };
-        window.dragon86Isolation = { mode: "off", engine: "in-page" };
-      })();
+      /* COI is permanently OFF: no Dragon86 engine needs
+         SharedArrayBuffer. The filesystem-app worker takes over the site
+         scope during OS startup. Do not run coi-serviceworker's legacy
+         deregistration path here: it reloads controlled pages asynchronously,
+         which can interrupt a VM while it is booting. */
+      window.dragon86Isolation = { mode: "off", engine: "in-page" };
     </script>
-    <script src="./coi-serviceworker.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <!-- crossorigin=anonymous: under COEP require-corp, cross-origin

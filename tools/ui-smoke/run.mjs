@@ -26,6 +26,7 @@ const bundle = readFileSync(resolve(here, "out/os.js"), "utf8");
 const css = readFileSync(resolve(here, "out/dragon86.css"), "utf8");
 const scramjetSource = readFileSync(resolve(here, "../../public/scramjet/app.js"), "utf8");
 const scramjetHtml = readFileSync(resolve(here, "../../public/scramjet/index.html"), "utf8");
+const registrySource = readFileSync(resolve(here, "../../src/apps/registry.ts"), "utf8");
 
 const dom = new JSDOM(
   `<!doctype html><html lang="en" data-theme="dragon"><head><style>${css}</style></head>
@@ -1815,14 +1816,17 @@ const scramjetFrame = [...document.querySelectorAll("iframe.browser-frame")].fin
   catch { return false; }
 });
 check("proxied emulator loads in the same-origin Scramjet app", Boolean(scramjetFrame), scramjetFrame?.src ?? "frame not found");
+check("store-launched Scramjet is maximized and omits its omnibar", Boolean(scramjetFrame && new URL(scramjetFrame.src).searchParams.get("fullscreen") === "1" && scramjetFrame.closest(".d86-window")?.classList.contains("maximized") && scramjetFrame.parentElement?.querySelector(".app-statusbar")?.hidden), `${scramjetFrame?.src}; max=${scramjetFrame?.closest(".d86-window")?.className}; statusHidden=${scramjetFrame?.parentElement?.querySelector(".app-statusbar")?.hidden}`);
 vAmigaWebCard?.querySelector(".store-card-title")?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
 check("proxied emulator detail explains that 9P is not mounted", /does not mount the guest 9P filesystem/.test(emulatorStore?.textContent ?? ""));
 
-/* ---- Dragon86-owned Scramjet frontend: settings, shared Wisp, responsiveness ---- */
-check("Scramjet defaults to libcurl and the shared secure Wisp endpoint", /wisp:\s*"wss:\/\/anura\.pro\/"/.test(scramjetSource) && /transport:\s*"libcurl"/.test(scramjetSource));
-check("Scramjet migrates old default transport without overwriting later choices", /saved\.transportVersion !== 2/.test(scramjetSource) && /settings\.transport = defaults\.transport/.test(scramjetSource) && /settings\.transportVersion = 2/.test(scramjetSource));
-check("Scramjet frontend has accessible navigation and connection settings", /aria-label="URL or search"/.test(scramjetHtml) && /aria-controls="settings"/.test(scramjetHtml) && /role="status"/.test(scramjetHtml));
-check("Scramjet frontend is responsive and honors reduced-motion preferences", /@media \(max-width: 520px\)/.test(scramjetHtml) && /prefers-reduced-motion: reduce/.test(scramjetHtml));
+/* ---- Dragon86-owned Scramjet frontend: Epoxy, tabs, compact chrome, fullscreen launches ---- */
+check("Scramjet defaults to recommended Epoxy and the shared secure Wisp endpoint", /wisp:\s*"wss:\/\/anura\.pro\/"/.test(scramjetSource) && /transport:\s*"epoxy"/.test(scramjetSource) && /Epoxy · recommended/.test(scramjetHtml));
+check("Scramjet migrates the previous default to Epoxy while retaining Epoxy choices", /saved\.transportVersion !== 3/.test(scramjetSource) && /saved\.transport === "libcurl"/.test(scramjetSource) && /settings\.transportVersion = 3/.test(scramjetSource));
+check("Scramjet has accessible omnibar, settings, and tab controls", /aria-label="URL or search"/.test(scramjetHtml) && /aria-controls="settings"/.test(scramjetHtml) && /role="tablist"/.test(scramjetHtml) && /role="status"/.test(scramjetHtml));
+check("Scramjet supports independent tabs and Ctrl+T/Ctrl+W", /function createTab\(/.test(scramjetSource) && /controller\.createFrame\(iframe/.test(scramjetSource) && /key\.toLowerCase\(\) === "t"/.test(scramjetSource) && /key\.toLowerCase\(\) === "w"/.test(scramjetSource));
+check("Scramjet UI is compact, responsive, reduced-motion aware, and supports omnibar-free fullscreen", /flex: 0 0 40px/.test(scramjetHtml) && /prefers-reduced-motion: reduce/.test(scramjetHtml) && /html\.fullscreen \.topbar/.test(scramjetHtml) && /URLSearchParams\(location\.search\)\.get\("fullscreen"\)/.test(scramjetSource));
+check("App Store Scramjet launches request fullscreen mode", /searchParams\.set\("fullscreen", "1"\)/.test(registrySource) && /openIframeAppAt\([\s\S]*undefined, true\)/.test(registrySource));
 
 /* ---- PS2 Web Recomp library: ZenFS import and isolated standalone launch ---- */
 await window.d86.fs.mkdir("/home/user/Downloads");
