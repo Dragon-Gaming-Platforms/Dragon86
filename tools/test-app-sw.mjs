@@ -51,11 +51,11 @@ function boot({ reply = null, clients = 1, docs = {} } = {}) {
   return { handlers, asked };
 }
 
-async function fetchThrough(worker, url, { method = "GET", referrer = "", clientId = "" } = {}) {
+async function fetchThrough(worker, url, { method = "GET", referrer = "", clientId = "", range = null } = {}) {
   let promise = null;
   const event = {
     /* A plain object: Request() does not expose a settable referrer. */
-    request: { url, method, referrer },
+    request: { url, method, referrer, headers: new Headers(range ? { Range: range } : {}) },
     clientId,
     respondWith: (p) => {
       promise = p;
@@ -158,6 +158,60 @@ check(
 );
 check("no referrer and no client → from=unknown (never guessed)", (await asker({})) === "unknown");
 check("about:client is not a referrer → unknown", (await asker({ referrer: "about:client" })) === "unknown");
+
+/* 8. Range requests — what Safari needs before it will play media */
+{
+  const data = new TextEncoder().encode("0123456789".repeat(100)).buffer; // 1000 bytes
+  const media = () => boot({ reply: () => ({ ok: true, body: data, mime: "video/mp4" }) });
+  const MOVIE = "https://example.test/Dragon86/9pf/@open%2Fhome%2Fuser%2Fmovie.mp4";
+  const text = async (r) => new Uint8Array(await r.arrayBuffer());
+
+  let w = media();
+  let r = await fetchThrough(w, MOVIE, { range: "bytes=0-1", referrer: "https://example.test/Dragon86/preview/index.html" });
+  check("Range bytes=0-1 → 206", r && r.status === 206, `status=${r && r.status}`);
+  check("206 carries Content-Range for the bytes sent", r && r.headers.get("content-range") === "bytes 0-1/1000", r && r.headers.get("content-range"));
+  let b = r ? await text(r) : new Uint8Array();
+  check("206 body is exactly the 2 bytes asked for", b.length === 2 && b[0] === 0x30 && b[1] === 0x31, `len=${b.length}`);
+  check("206 Content-Length matches the part", r && r.headers.get("content-length") === "2", r && r.headers.get("content-length"));
+
+  w = media();
+  r = await fetchThrough(w, MOVIE, { range: "bytes=990-" });
+  check("open-ended range → 206 to the end", r && r.status === 206 && r.headers.get("content-range") === "bytes 990-999/1000", r && r.headers.get("content-range"));
+  b = r ? await text(r) : new Uint8Array();
+  check("open-ended range returns 10 bytes", b.length === 10, `len=${b.length}`);
+
+  w = media();
+  r = await fetchThrough(w, MOVIE, { range: "bytes=-5" });
+  check("suffix range → last 5 bytes", r && r.status === 206 && r.headers.get("content-range") === "bytes 995-999/1000", r && r.headers.get("content-range"));
+
+  w = media();
+  r = await fetchThrough(w, MOVIE, { range: "bytes=500-2000" });
+  check("end past the file is clipped, not refused", r && r.status === 206 && r.headers.get("content-range") === "bytes 500-999/1000", r && r.headers.get("content-range"));
+
+  w = media();
+  r = await fetchThrough(w, MOVIE, { range: "bytes=5000-" });
+  check("start past the end → 416 with the real size", r && r.status === 416 && r.headers.get("content-range") === "bytes */1000", `status=${r && r.status}`);
+
+  w = media();
+  r = await fetchThrough(w, MOVIE, { range: "bytes=0-1,4-5" });
+  check("several ranges → whole file, 200", r && r.status === 200 && (await text(r)).length === 1000);
+
+  w = media();
+  r = await fetchThrough(w, MOVIE, { range: "bytes=abc" });
+  check("malformed Range → whole file, 200", r && r.status === 200);
+
+  w = media();
+  r = await fetchThrough(w, MOVIE, { range: "bytes=9-3" });
+  check("backwards range → whole file, 200", r && r.status === 200);
+
+  w = media();
+  r = await fetchThrough(w, MOVIE);
+  check("no Range → 200 and Accept-Ranges advertised", r && r.status === 200 && r.headers.get("accept-ranges") === "bytes", r && r.headers.get("accept-ranges"));
+
+  w = media();
+  r = await fetchThrough(w, MOVIE, { range: "bytes=0-1" });
+  check("206 keeps no-store (filesystem is the source of truth)", r && r.headers.get("cache-control") === "no-store");
+}
 
 for (const r of results) {
   console.log(`[${r.ok ? "PASS" : "FAIL"}] ${r.name}${r.detail ? "  (" + r.detail + ")" : ""}`);
