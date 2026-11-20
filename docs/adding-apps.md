@@ -15,7 +15,10 @@ Rules the OS enforces:
 
 - Installed apps are served from `~/system/apps/<id>/` behind
   `9pf/<id>/…` and are **folder-isolated** by default — the app cannot read
-  outside its own folder.
+  outside its own folder. The one exception is a file the OS hands it with
+  `?file=` when the user opens that file with the app (CheerpJ reads the
+  `.jar` this way). The `9pf/@open/` route applies the same rule; see
+  `src/core/fs-access.ts`.
 - Icons: a file inside the folder (`"icon-path": "icon.svg"`), a repo image
   (`"icon": "img:icons/x.png"`), or a built-in glyph name (`"icon": "grid"`).
 - No fake statistics, ever: the store shows only what it can check (the

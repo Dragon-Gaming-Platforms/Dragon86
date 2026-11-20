@@ -33,6 +33,7 @@
 
 import { fs } from "@zenfs/core";
 import * as vfs from "./vfs";
+import { decideOpenRead, parseRequester, resolvePath, within, type Requester } from "./fs-access";
 import { logInfo, logWarn } from "./log";
 import { registerFsApps, registerTransientApp, type IframeAppDef } from "../apps/iframe-app";
 import { injectPuterFilesAdapter, isPuterApp } from "../apps/puter-files";
@@ -583,17 +584,17 @@ const MIME: Record<string, string> = {
 };
 
 /** Read one file anywhere under the OS home — the App Launcher's route. */
-async function readHomeFile(rawPath: string): Promise<ReadResult> {
-  let path = rawPath;
-  try {
-    path = decodeURIComponent(rawPath);
-  } catch {
-    /* keep it */
-  }
-  if (!path.startsWith("/")) path = `/${path}`;
-  if (!within(path, vfs.HOME) && !within(path, "/tmp")) {
-    return { ok: false, status: 403, error: `"${path}" is outside your home folder` };
-  }
+/** Read one file for the `9pf/@open/` route. The policy is in fs-access.ts. */
+async function readHomeFile(rawPath: string, requester: Requester): Promise<ReadResult> {
+  const app = requester.kind === "app" ? (loaded.get(requester.id) ?? transient.get(requester.id)) : undefined;
+  const decision = decideOpenRead({
+    rawPath,
+    home: vfs.HOME,
+    requester,
+    app: app ? { id: requester.kind === "app" ? requester.id : "", dir: app.dir, isolated: app.isolated } : undefined,
+  });
+  if (!decision.ok) return { ok: false, status: decision.status, error: decision.error };
+  const path = decision.path;
   try {
     const st = await fs.promises.stat(path);
     if (st.isDirectory()) return { ok: false, status: 404, error: `${path} is a directory` };
@@ -610,25 +611,6 @@ export function mimeFor(path: string): string {
   return MIME[ext] ?? "application/octet-stream";
 }
 
-/** Join `rel` onto `dir`, honouring `.`/`..`. Null if it escapes `/`. */
-export function resolvePath(dir: string, rel: string): string | null {
-  const parts = dir.split("/").filter(Boolean);
-  for (const seg of rel.split("/")) {
-    if (!seg || seg === ".") continue;
-    if (seg === "..") {
-      if (!parts.length) return null;
-      parts.pop();
-      continue;
-    }
-    if (seg.includes("\0")) return null;
-    parts.push(seg);
-  }
-  return `/${parts.join("/")}`;
-}
-
-const within = (path: string, root: string): boolean =>
-  path === root || path.startsWith(root.endsWith("/") ? root : `${root}/`);
-
 interface ReadResult {
   ok: boolean;
   status?: number;
@@ -643,7 +625,7 @@ async function readAppFile(appId: string, rel: string): Promise<ReadResult> {
 
   const path = resolvePath(app.dir, rel);
   if (!path) return { ok: false, status: 403, error: "path escapes the app folder" };
-  if (app.isolated ? !within(path, app.dir) : !within(path, vfs.HOME)) {
+  if (app.isolated ? !within(path, resolvePath("/", app.dir) ?? app.dir) : !within(path, vfs.HOME)) {
     return {
       ok: false,
       status: 403,
@@ -752,6 +734,7 @@ export function startFsAppBridge(): void {
       appId?: string;
       path?: string;
       file?: string;
+      from?: string;
     } | null;
     if (!data || data.type !== "d86-fs-read") return;
     const port = event.ports?.[0];
@@ -760,7 +743,7 @@ export function startFsAppBridge(): void {
       else navigator.serviceWorker.controller?.postMessage(msg);
     };
     if (data.appId === OPEN_PREFIX.slice(0, -1) || data.file) {
-      void readHomeFile(String(data.file ?? data.path ?? "")).then(reply, () =>
+      void readHomeFile(String(data.file ?? data.path ?? ""), parseRequester(data.from)).then(reply, () =>
         reply({ ok: false, status: 500, error: "the OS could not read that file" }),
       );
       return;

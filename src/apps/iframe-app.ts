@@ -44,6 +44,7 @@ import appsJson from "./iframe-apps.json";
 import { installPuterFilesBridge, isPuterApp } from "./puter-files";
 import { openPs2Library } from "./ps2-library";
 import * as vfs from "../core/vfs";
+import { grantFile } from "../core/fs-access";
 import { createFsResponder } from "../bridge/fs-bridge";
 import {
   DRAKEFORGE_CHANNEL_PREFIX,
@@ -150,7 +151,12 @@ export function resolveAppUrl(def: IframeAppDef, filePath?: string): string | nu
        wasm inside the app all resolve normally. `?file=` tells an app which
        document the user asked it to open (see apps/registry.ts). */
     const url = new URL(`9pf/${def.id}/${def.fs.entry}`, base);
-    if (filePath) url.searchParams.set("file", filePath);
+    if (filePath) {
+      url.searchParams.set("file", filePath);
+      /* The one file this app was handed may be read through @open even when
+         it lies outside an isolated app's folder (CheerpJ reads a .jar). */
+      grantFile(def.id, filePath);
+    }
     return url.href;
   }
   if (!def.url) return null;

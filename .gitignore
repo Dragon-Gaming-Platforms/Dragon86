@@ -7,8 +7,6 @@ dist/
 .cursor/
 .DS_Store
 
-# public/v86/fs.json is NOT ignored: the Vendor workflow commits the real
-# image file list there, and the app serves it from our own origin.
 
 tools/test-image-list/.out/
 
@@ -16,3 +14,7 @@ tools/test-image-list/.out/
 .harness/
 tools/vm/build/
 tools/ui-smoke/out/
+
+# Python bytecode caches.
+__pycache__/
+*.pyc
