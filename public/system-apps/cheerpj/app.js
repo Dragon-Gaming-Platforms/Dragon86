@@ -7,15 +7,15 @@
  *     (https://cjrtnc.leaningtech.com/4.3/loader.js). It is not vendored:
  *     it is tens of megabytes of their WebAssembly and they keep it hosted
  *     for exactly this use. The first Run therefore needs the network.
- *   - The jar comes from *your* filesystem. CheerpJ's /app/ mount is an
- *     HTTP mount, so the jar is handed over through the OS's own file route
- *     (`<base>9pf/@open/<path>`) — the same route the viewer uses. Nothing is
- *     copied, and the jar you pick is the jar that runs.
+ *   - The jar is chosen from Dragon86 Files through the public `d86.files`
+ *     API. The API grants that exact ZenFS path to CheerpJ and returns its
+ *     `/9pf/@open/` URL, which is mounted by CheerpJ as `/app/` without
+ *     copying the jar into a separate browser-only store.
  *   - Programs that draw a GUI get a real display (cheerpjCreateDisplay).
  *     Console-only programs print into the page's log below the display.
  *
- * The OS opens this window with `?file=<path>` when you choose "Open with →
- * CheerpJ" on a .jar (see src/apps/iframe-app.ts).
+ * The OS may open this window with `?file=<path>` from Files → Open with,
+ * or the app can use `d86.files.open()` to choose a jar directly from ZenFS.
  */
 
 (function () {
@@ -23,11 +23,10 @@
 
   var RUNTIME = "https://cjrtnc.leaningtech.com/4.3/loader.js";
 
-  var api = null;
-  try {
-    api = window.parent && window.parent !== window ? window.parent.d86 : window.d86;
-  } catch (err) {
-    api = null;
+  var api = window.d86 || window.Dragon86 || null;
+  if (!api) {
+    try { api = window.parent && window.parent !== window ? window.parent.d86 : null; }
+    catch (err) { api = null; }
   }
 
   var params = new URLSearchParams(location.search);
@@ -89,10 +88,10 @@
   }
 
   function jarUrl(path) {
-    /* /9pf/cheerpj/index.html → the OS base is three levels up from here;
-       the file route lives at <base>9pf/@open/<encoded path>. */
-    var base = new URL("../../", location.href).href;
-    return new URL("9pf/@open/" + encodeURIComponent(path), base).href;
+    if (!api || !api.files || typeof api.files.url !== "function") {
+      throw new Error("Dragon86's file API is unavailable in this app window");
+    }
+    return api.files.url(path);
   }
 
   function loadRuntime() {
@@ -158,25 +157,31 @@
     }
   }
 
-  var save = api && api.fs ? api.fs : null;
-
   async function pickJar() {
-    if (!save) {
+    if (!api || !api.files || typeof api.files.open !== "function") {
       showScreen(
-        "No filesystem",
-        "This window could not reach Dragon86's filesystem API, so it cannot read a jar.",
-        "",
+        "No Dragon86 file API",
+        "This app could not reach Dragon86's ZenFS picker, so it cannot choose a jar.",
+        "Open this app from Dragon86 Files or update the installed app.",
         true
       );
       return;
     }
-    var suggested = currentJar || (api.home + "/Downloads/");
-    var chosen = window.prompt("Path to a .jar in your files:", suggested);
-    if (!chosen) return;
-    await runJar(chosen.trim());
+    try {
+      var chosen = await api.files.open({ accept: ".jar", multiple: false });
+      if (!chosen.length) return;
+      await runJar(chosen[0].path);
+    } catch (err) {
+      showScreen("Could not open a jar", String(err && err.message ? err.message : err), "Try again from Dragon86 Files.", true);
+    }
   }
 
   runBtn.addEventListener("click", pickJar);
+  document.getElementById("fullscreen").addEventListener("click", function () {
+    if (api && api.window && typeof api.window.requestFullscreen === "function") {
+      void api.window.requestFullscreen();
+    }
+  });
 
   /* Opened with a jar already chosen (Files → Open with → CheerpJ). */
   if (currentJar) {

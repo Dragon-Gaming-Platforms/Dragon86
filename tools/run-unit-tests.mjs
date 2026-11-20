@@ -33,7 +33,7 @@ const SUITES = [
   ["downloads", [...STRIP, "tools/test-download.mjs"]],
   ["filesystem export", [...STRIP, "tools/test-fs-export.mjs"]],
   ["filesystem import", [...STRIP, "tools/test-fs-import.mjs"]],
-  ["ZenFS file adapter", [...STRIP, "tools/test-zenfs-files.mjs"]],
+  ["Dragon86 app API and ZenFS bridge", [...STRIP, "tools/test-app-bridge.mjs"]],
   ["public asset URLs", [...STRIP, "tools/test-public-asset-url.mjs"]],
 ];
 

@@ -294,8 +294,25 @@ d86.apps.launch("greeter");
 | `d86.script.path` | the file being run |
 
 Writes announce themselves, so files a script creates appear in Files and on
-the desktop without a reload. The same object is reachable from a same-origin
-app's page as `parent.d86` — that is how the Monaco Editor app saves your files.
+the desktop without a reload. Same-origin app frames also get a
+developer-facing API as `window.d86` (and `window.Dragon86`). In addition to
+the ZenFS methods above, it provides a
+Dragon86-backed file picker and controls for the owning app window:
+
+```js
+const [jar] = await d86.files.open({ accept: ".jar" });
+const response = await fetch(jar.url); // exact ZenFS path, granted to this app
+await d86.window.requestFullscreen(); // maximize this Dragon86 app window
+// Later: d86.window.exitFullscreen();
+```
+
+Use `d86.files.saveAs(name)` for a user-chosen ZenFS destination, then call the
+returned `write(blob)` method; `d86.files.save(name, blob)` is the one-call
+alternative. See [`docs/app-api.md`](docs/app-api.md) for the complete API,
+bootstrap timing, examples, and the same-origin trust boundary. Filesystem app
+pages receive it before their scripts run; fixed same-origin app pages receive
+it at iframe load and may await the `d86-ready` event. The legacy
+`parent.d86` route remains available to existing apps.
 
 ### Monaco Editor is an app now; the Text Editor is the OS's own
 
@@ -315,11 +332,15 @@ your files and it runs: GUI programs get a display (Swing/AWT draw into the
 window), console programs print below it. Once installed it offers to open
 `.jar` files, so double-clicking one in Files runs it.
 
+The app opens a `.jar` from Dragon86 Files with
+`d86.files.open({ accept: ".jar" })` and runs the authorized ZenFS path through
+the OS's `/9pf/@open/` route. It does not prompt for a raw path or keep a
+browser-only copy. The
+Fullscreen button demonstrates `d86.window.requestFullscreen()`.
+
 The honest limit: the Java runtime itself is **not vendored** — it is tens of
 megabytes of WebAssembly from Leaning Technologies — so it is loaded from
-`https://cjrtnc.leaningtech.com/4.3/loader.js` on first use. The jar, though,
-is yours: it is passed to CheerpJ through the OS's own file route
-(`9pf/@open/<path>`), not copied anywhere.
+`https://cjrtnc.leaningtech.com/4.3/loader.js` on first use.
 
 ### Fixed apps live in the filesystem too: `.d86` shortcuts
 

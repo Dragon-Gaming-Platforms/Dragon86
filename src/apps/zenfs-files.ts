@@ -5,7 +5,6 @@
  */
 import { fs } from "@zenfs/core";
 import * as vfs from "../core/vfs";
-export { injectZenFSFileAdapter, isZenFSFileApp, ZENFS_FILE_APP_IDS } from "./zenfs-file-apps";
 
 interface PickOptions {
   accept?: string;
