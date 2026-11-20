@@ -41,7 +41,8 @@ import { el } from "../core/dom";
 import type { Win } from "../core/wm";
 import { logInfo, logWarn } from "../core/log";
 import appsJson from "./iframe-apps.json";
-import { installZenFSFilesBridge, isZenFSFileApp } from "./zenfs-files";
+import { installZenFSFilesBridge } from "./zenfs-files";
+import { connectAppFrame, installAppBridge, registerAppFrame } from "./app-bridge";
 import { openPs2Library } from "./ps2-library";
 import * as vfs from "../core/vfs";
 import { grantFile } from "../core/fs-access";
@@ -173,7 +174,6 @@ export function openIframeApp(win: Win, def: IframeAppDef, filePath?: string): v
     openPs2Library(win);
     return;
   }
-  if (isZenFSFileApp(def.id)) installZenFSFilesBridge();
   const root = el("div", "app-root");
   const status = el("div", "app-statusbar");
   status.textContent = filePath ? `${fileName(filePath)} — ${def.name}` : (def.status ?? def.name);
@@ -202,7 +202,13 @@ export function openIframeApp(win: Win, def: IframeAppDef, filePath?: string): v
     status.hidden = true;
   }
 
+  /* Same-origin app frames receive the public Dragon86 API and ZenFS file
+     picker. The parse-time bootstrap in filesystem apps makes it available
+     before their scripts; the load hook covers fixed/static app pages. */
+  installZenFSFilesBridge();
+  installAppBridge();
   const frame = document.createElement("iframe");
+  registerAppFrame(frame, def.id, win, import.meta.env.BASE_URL);
   frame.className = "browser-frame";
   frame.src = url;
   frame.title = def.name;
@@ -215,6 +221,11 @@ export function openIframeApp(win: Win, def: IframeAppDef, filePath?: string): v
   frame.allow =
     def.allow ?? "clipboard-read; clipboard-write; fullscreen; gamepad";
   frame.addEventListener("load", () => {
+    try {
+      connectAppFrame(frame.contentWindow, def.id);
+    } catch (error) {
+      logWarn("os", `iframe app ${def.id} did not accept the Dragon86 API`, error);
+    }
     logInfo("os", `iframe app ${def.id} loaded: ${url}`);
   });
 

@@ -36,7 +36,7 @@ import * as vfs from "./vfs";
 import { decideOpenRead, parseRequester, resolvePath, within, type Requester } from "./fs-access";
 import { logInfo, logWarn } from "./log";
 import { registerFsApps, registerTransientApp, type IframeAppDef } from "../apps/iframe-app";
-import { injectZenFSFileAdapter, isZenFSFileApp } from "../apps/zenfs-files";
+import { injectAppBridge } from "../apps/app-bridge";
 
 /** Where the OS looks for app registries, in order (first one wins per id). */
 export const APPS_DIRS = [`${vfs.HOME}/system/apps`];
@@ -546,10 +546,11 @@ async function readAppFile(appId: string, rel: string): Promise<ReadResult> {
     const st = await fs.promises.stat(path);
     if (st.isDirectory()) return { ok: false, status: 404, error: `${rel} is a directory` };
     let bytes = await vfs.readBytes(path);
-    /* Existing devices keep their ZenFS app copy on update. Inject at serve
-       time so the adapter reaches both existing and freshly seeded apps. */
-    if (isZenFSFileApp(appId) && path === vfs.join(app.dir, app.def.fs?.entry ?? "index.html") && /\.html?$/i.test(path)) {
-      bytes = new TextEncoder().encode(injectZenFSFileAdapter(new TextDecoder().decode(bytes)));
+    /* Inject the per-app API into every filesystem app's entry document at
+       serve time, so old installs and freshly seeded apps both get it before
+       their own scripts execute. */
+    if (path === vfs.join(app.dir, app.def.fs?.entry ?? "index.html") && /\.html?$/i.test(path)) {
+      bytes = new TextEncoder().encode(injectAppBridge(new TextDecoder().decode(bytes), appId));
     }
     const copy = bytes.slice();
     return { ok: true, mime: mimeFor(path), body: copy.buffer as ArrayBuffer };
