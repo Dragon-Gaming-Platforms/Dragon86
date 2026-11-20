@@ -23,6 +23,7 @@ import { distroInstalled, installedDistro, DISTROS, type DistroId } from "../bri
 import * as vfs from "../core/vfs";
 import { logInfo, logWarn } from "../core/log";
 import { rememberEngine } from "./engine-viewer";
+import { disposeEngineNow, registerTerminalEngine, releaseTerminalEngine } from "../bridge/engine-lifecycle";
 import { createBootAwarePrintGate, isDistroFilesystemBootNotice } from "./terminal-script";
 
 const ARCH_LABEL: Record<MachineArch, string> = {
@@ -316,7 +317,7 @@ export function openTerminal(win: Win, options: TerminalOptions = {}): void {
     activePrintGate = null;
     refreshTitle();
     const arch = getSettings().arch;
-    backend?.dispose();
+    if (backend) disposeEngineNow(backend);
     backend = null;
     const isArm = arch === "arm64" || arch === "arm32";
     if (arch === "arm64" || arch === "arm32") {
@@ -440,16 +441,19 @@ export function openTerminal(win: Win, options: TerminalOptions = {}): void {
          wait forever for a screen that cannot exist. */
       const rb = getRV64Backend(handlers);
       backend = rb;
+      registerTerminalEngine(rb);
       rb.connect();
     } else if (isArm) {
       /* Same engine module as x86, but no rememberEngine: the virt board
          runs without a display here (serial console only, for now). */
       const vb = getV86Backend(handlers, freshBoot);
       backend = vb;
+      registerTerminalEngine(vb);
       vb.connect();
     } else {
       const vb = getV86Backend(handlers, freshBoot);
       backend = vb;
+      registerTerminalEngine(vb);
       rememberEngine(vb);
       vb.connect();
     }
@@ -457,10 +461,9 @@ export function openTerminal(win: Win, options: TerminalOptions = {}): void {
 
   reconnectBtn.addEventListener("click", () => void connect(true));
 
-  /* Closing the window must shut the engine down. Without this the machine
-     kept running invisibly: reopening the Terminal started a *second* emulator
-     beside the first one, both writing to the same ZenFS root, and the guest's
-     shell died on boot ("Session ended … Respawning in 2s"). */
+  /* The Terminal releases its VM claim when it closes. An Engine Viewer may
+     still own the machine; the shared lifecycle disposes only after the last
+     Terminal/Viewer window closes. */
   win.setOnClose(() => {
     offSettings?.();
     offSettings = null;
@@ -468,7 +471,7 @@ export function openTerminal(win: Win, options: TerminalOptions = {}): void {
     activePrintGate?.cancel();
     activePrintGate = null;
     ++connectionGeneration;
-    backend?.dispose();
+    if (backend) releaseTerminalEngine(backend);
     backend = null;
     try {
       term.dispose();

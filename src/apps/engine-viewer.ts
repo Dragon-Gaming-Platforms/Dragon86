@@ -36,6 +36,7 @@ import type { Win } from "../core/wm";
 import type { EngineScreen, TerminalBackend } from "../bridge/engine";
 import { rowsWithText } from "../bridge/v86-screen";
 import { scancodesForEvent, scancodesForText } from "../bridge/v86-keys";
+import { retainEngineForViewer } from "../bridge/engine-lifecycle";
 
 /** The machine last handed to the viewer, so the start menu can find one. */
 let lastEngine: TerminalBackend | null = null;
@@ -102,6 +103,8 @@ export function openEngineViewer(win: Win, backend?: TerminalBackend | null): vo
   const seq = ++viewerSeq;
   /** Take the keyboard as soon as the screen is on the page (see mount). */
   let wantsFocus = true;
+  let retainedMachine: TerminalBackend | null = null;
+  let releaseMachine: () => void = () => {};
 
   /**
    * Which machine to show: the most recently attached one (attach is the
@@ -111,6 +114,13 @@ export function openEngineViewer(win: Win, backend?: TerminalBackend | null): vo
    * not stand in for the one that was just pointed at.
    */
   const current = (): TerminalBackend | null => engineForViewer() ?? backend ?? null;
+  const syncMachineLease = (): void => {
+    const next = current();
+    if (next === retainedMachine) return;
+    releaseMachine();
+    retainedMachine = next;
+    releaseMachine = next ? retainEngineForViewer(next) : () => {};
+  };
 
   /** True when the backend still owns a live machine. */
   const running = (candidate: TerminalBackend): boolean =>
@@ -126,7 +136,7 @@ export function openEngineViewer(win: Win, backend?: TerminalBackend | null): vo
   const ELSEWHERE =
     "This machine's screen is open in another Engine Viewer window — close that one to see it here.";
   const NO_MACHINE = "No v86 machine has been started yet — open the Terminal and pick the v86 engine.";
-  const STOPPED = "That machine has stopped: its Terminal window was closed. Open a new Terminal (v86).";
+  const STOPPED = "That machine has stopped. Open a Terminal to start a new one.";
   const WAITING = "The machine is running, but its display is not readable yet — it is probably still booting.";
 
   const blankNotice = (text: string): void => {
@@ -509,6 +519,7 @@ export function openEngineViewer(win: Win, backend?: TerminalBackend | null): vo
   const tick = () => {
     if (!alive) return;
     try {
+      syncMachineLease();
       paint(look());
     } catch (err) {
       logWarn("engine-viewer", "could not read the screen", err);
@@ -540,6 +551,9 @@ export function openEngineViewer(win: Win, backend?: TerminalBackend | null): vo
 
   win.setOnClose(() => {
     alive = false;
+    releaseMachine();
+    releaseMachine = () => {};
+    retainedMachine = null;
     root.removeEventListener("keydown", onKeyDown);
     root.removeEventListener("keyup", onKeyUp);
     root.removeEventListener("paste", onPaste);

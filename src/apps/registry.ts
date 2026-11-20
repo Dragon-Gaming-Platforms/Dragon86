@@ -87,7 +87,7 @@ export function createLauncher(wm: WindowManager) {
     openTerminal(win, { print: { path, text } });
   }
 
-  function openIframeAppAt(def: IframeAppDef, filePath?: string): void {
+  function openIframeAppAt(def: IframeAppDef, filePath?: string, fullscreen = false): void {
     /* "title-template": "Preview - {file}" — the window says what it is
        showing, not just which app is showing it. */
     const title =
@@ -101,6 +101,7 @@ export function createLauncher(wm: WindowManager) {
       height: def.height ?? 600,
     });
     openIframeApp(win, def, filePath);
+    if (fullscreen) win.maximize();
   }
 
   function openSettingsAt(page?: string): void {
@@ -271,13 +272,14 @@ export function createLauncher(wm: WindowManager) {
     }
     const routedUrl = new URL(scramjet.url, new URL(import.meta.env.BASE_URL, window.location.origin));
     routedUrl.searchParams.set("goto", target.href);
+    routedUrl.searchParams.set("fullscreen", "1");
     const title = typeof detail.title === "string" ? detail.title.slice(0, 80) : "Hosted emulator";
     openIframeAppAt({
       ...scramjet,
       name: `${title} · Scramjet`,
       url: `${routedUrl.pathname}${routedUrl.search}`,
       status: `Proxied page · ${target.hostname} · Scramjet`,
-    });
+    }, undefined, true);
   });
 
   window.addEventListener("d86-launch-app", (event) => {
