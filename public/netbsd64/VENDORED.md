@@ -15,5 +15,5 @@ Built by the 'Build netbsd64 guest' workflow — not written by hand.
 - Licensing: NetBSD's BSD licenses; see /usr/share/legal in the
   image and https://www.netbsd.org/about/redistribution.html
 
-Built: 2026-11-20T03:31:09Z by GitHub Actions run 44667186633
+Built: 2026-11-20T03:41:38Z by GitHub Actions run 44668403353
 Rebuild: run the 'Build netbsd64 guest' workflow (it overwrites these files).

@@ -13,27 +13,27 @@
       {
         "file": "root.img.gz.00",
         "bytes": 94371840,
-        "sha256": "d9e6375e819c57f7ab2aa9b9ed0358ac2ba761ab68c08a8aef34161ce1619654"
+        "sha256": "4a73d715a67689a9d70e82bdeb450209fd88d49661868fb77575ed84207f8c67"
       },
       {
         "file": "root.img.gz.01",
         "bytes": 94371840,
-        "sha256": "9934d8f4072ea1c849393cf784c720398cd15a1f1b0c5ae560951d8fbf3560ee"
+        "sha256": "216ecff99f69cffb152d624f46634ffe14c28fd8cc93e3fe10545eb981337ace"
       },
       {
         "file": "root.img.gz.02",
         "bytes": 94371840,
-        "sha256": "93f0d9270687d92c4e320965dc290c56f0a2bbbf0ced5402289a84a5b1604284"
+        "sha256": "621ee5e08f85ff0d8e6502113c994dfcb64a9c8bb138415bf87346ab16229f5e"
       },
       {
         "file": "root.img.gz.03",
-        "bytes": 7706713,
-        "sha256": "53766cadf63c50c1f0b3cc457cd0375177e5ee8f90f8319ca6e453545d536614"
+        "bytes": 10678544,
+        "sha256": "24eabc9962c066e0ff372b732b505f2f4846ca268cae009a5181925af9ed1b34"
       }
     ],
-    "gzBytes": 290822233,
+    "gzBytes": 293794064,
     "rawBytes": 1342177280,
-    "rawSha256": "4bce57b5b6cd51cfb40da10554c4445220bcdabada14e257b3aa8db80cb3fd51",
+    "rawSha256": "3163a4d0bbe8cd640f975cf627f68cbdf6b493bc8aaa23005a49c08ea3233df6",
     "rootArg": "NAME=d86root"
   }
 }
