@@ -1081,7 +1081,7 @@ check(
   pathInput.dispatchEvent(new window.KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
   await wait(500);
   const names = [...filesW.querySelectorAll(".fm-row")].map((r) => r.textContent);
-  for (const id of ["preview", "scramjet", "drakeforge", "engine-viewer", "hello"]) {
+  for (const id of ["preview", "scramjet", "drakeforge", "engine-viewer"]) {
     check(
       `${id}.d86 is in ~/applications`,
       names.some((t) => t.includes(`${id}.d86`)),
@@ -1397,76 +1397,15 @@ check(
   window.d86.engine.attach(null);
 }
 
-/* ---- uninstalling an app that shipped installed ----
-   Hello is seeded into ~/system/apps by the OS itself. Uninstalling it used to
-   do nothing at all: the next load re-created the folder (writeIfMissing) and
-   re-added the registry entry, so the store kept showing it. The seeded flag in
-   user-apps.json now gates every write, so an uninstall is final — including
-   for an app nobody installed by hand. */
+/* ---- the retired Hello demo is not in the default filesystem ---- */
 {
+  const appsDir = "/home/user/system/apps";
+  const hasHelloFolder = await window.d86.fs.exists(`${appsDir}/hello`);
+  const appManifest = JSON.parse(await window.d86.fs.readText(`${appsDir}/user-apps.json`));
   const storeW = [...document.querySelectorAll(".d86-window")].find((w) => w.querySelector(".store-body"));
-  [...storeW.querySelectorAll(".store-tab")].find((b) => b.textContent.includes("Installed"))?.click();
-  await wait(500);
-  const helloCard = [...storeW.querySelectorAll(".store-card")].find((n) =>
-    n.textContent.includes("Hello"),
-  );
-  check("the store lists Hello, which ships installed", Boolean(helloCard));
-  check(
-    "a default-installed app can be uninstalled too",
-    [...(helloCard?.querySelectorAll(".store-actions .btn") ?? [])].some(
-      (b) => b.textContent.trim() === "Uninstall",
-    ),
-  );
-  [...helloCard.querySelectorAll(".store-actions .btn")]
-    .find((b) => b.textContent.trim() === "Uninstall")
-    ?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
-  await wait(300);
-  [...document.querySelectorAll(".dlg-actions .btn")]
-    .find((b) => b.textContent.trim() === "Uninstall")
-    ?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
-  await wait(700);
-  check(
-    "uninstalling it removes the card",
-    ![...storeW.querySelectorAll(".store-card")].some((n) => n.textContent.includes("Hello")),
-    [...storeW.querySelectorAll(".store-card")].map((n) => n.textContent.slice(0, 20)).join(" | "),
-  );
-  check(
-    "…and its desktop icon",
-    ![...document.querySelectorAll(".desktop-icon")].some((n) => n.textContent.trim().startsWith("Hello")),
-  );
-
-  /* The filesystem has to agree: no folder, no entry. */
-  const filesW = [...document.querySelectorAll(".d86-window")].find((w) => w.querySelector(".fm-root"));
-  const pathInput = filesW.querySelector(".fm-path-input");
-  pathInput.value = "/home/user/system/apps";
-  pathInput.dispatchEvent(new window.KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
-  await wait(400);
-  check(
-    "…and its folder",
-    ![...filesW.querySelectorAll(".fm-row")].some((r) => r.textContent.includes("hello")),
-    [...filesW.querySelectorAll(".fm-row")].map((r) => r.textContent.slice(0, 16)).join(" | "),
-  );
-  pathInput.value = "/home/user/system/apps";
-  pathInput.dispatchEvent(new window.KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
-  await wait(400);
-  const manifestRow = [...filesW.querySelectorAll(".fm-row")].find((r) =>
-    r.textContent.includes("user-apps.json"),
-  );
-  manifestRow?.dispatchEvent(new window.MouseEvent("dblclick", { bubbles: true }));
-  await wait(1500);
-  const editorWin = [...document.querySelectorAll(".d86-window")]
-    .filter((w) => w.querySelector(".editor-area"))
-    .at(-1);
-  const manifestText = editorWin?.querySelector(".editor-area")?.value ?? "";
-  check(
-    "…and its entry in user-apps.json",
-    Boolean(manifestText) && !/hello/.test(manifestText) && /"seeded": 4/.test(manifestText),
-    manifestText
-      ? manifestText.slice(0, 160)
-      : `row=${Boolean(manifestRow)} windows=${[...document.querySelectorAll(".d86-window")]
-          .map((w) => (w.querySelector(".titlebar-text")?.textContent ?? w.className).slice(0, 24))
-          .join(" / ")}`,
-  );
+  check("Hello is not installed in the default ZenFS filesystem", !hasHelloFolder);
+  check("Hello is not registered in the default app manifest", !appManifest.apps.some((app) => app.id === "hello") && appManifest.seeded === 5);
+  check("Hello is not offered in the App Store", ![...storeW.querySelectorAll(".store-card")].some((card) => card.textContent.includes("Hello")));
 }
 
 /* ---- archives: .zip / .tar / .gz unpack into ZenFS ---- */
