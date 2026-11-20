@@ -41,7 +41,7 @@ import { el } from "../core/dom";
 import type { Win } from "../core/wm";
 import { logInfo, logWarn } from "../core/log";
 import appsJson from "./iframe-apps.json";
-import { installPuterFilesBridge, isPuterApp } from "./puter-files";
+import { installZenFSFilesBridge, isZenFSFileApp } from "./zenfs-files";
 import { openPs2Library } from "./ps2-library";
 import * as vfs from "../core/vfs";
 import { grantFile } from "../core/fs-access";
@@ -173,7 +173,7 @@ export function openIframeApp(win: Win, def: IframeAppDef, filePath?: string): v
     openPs2Library(win);
     return;
   }
-  if (isPuterApp(def.id)) installPuterFilesBridge();
+  if (isZenFSFileApp(def.id)) installZenFSFilesBridge();
   const root = el("div", "app-root");
   const status = el("div", "app-statusbar");
   status.textContent = filePath ? `${fileName(filePath)} — ${def.name}` : (def.status ?? def.name);

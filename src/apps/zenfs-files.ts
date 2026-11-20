@@ -1,11 +1,11 @@
 /**
- * A narrow File System Access adapter for the vendored Puter apps. The app
- * iframe never gets to browse the host device: every open/save goes through
- * a user-visible picker backed by Dragon86's ZenFS filesystem.
+ * File-transfer adapter for same-origin apps that open or export files. An
+ * app iframe never browses the host device directly: open/save flows use a
+ * Dragon86 picker backed by ZenFS, and app downloads are saved to ZenFS.
  */
 import { fs } from "@zenfs/core";
 import * as vfs from "../core/vfs";
-export { injectPuterFilesAdapter, isPuterApp, PUTER_APP_IDS } from "./puter-files-meta";
+export { injectZenFSFileAdapter, isZenFSFileApp, ZENFS_FILE_APP_IDS } from "./zenfs-file-apps";
 
 interface PickOptions {
   accept?: string;
@@ -27,7 +27,7 @@ interface BridgeApi {
 }
 
 declare global {
-  interface Window { __d86PuterFiles?: BridgeApi }
+  interface Window { __d86ZenFSFiles?: BridgeApi }
 }
 
 
@@ -35,8 +35,8 @@ const TOKEN_PATHS = new WeakMap<Window, Map<string, string>>();
 const HOME = "/home/user";
 const DEFAULT_DIR = `${HOME}/Documents`;
 
-export function installPuterFilesBridge(): void {
-  if (window.__d86PuterFiles) return;
+export function installZenFSFilesBridge(): void {
+  if (window.__d86ZenFSFiles) return;
   const api: BridgeApi = {
     open: async (child, options = {}) => {
       assertChild(child);
@@ -73,7 +73,7 @@ export function installPuterFilesBridge(): void {
     },
     install: installInChild,
   };
-  window.__d86PuterFiles = api;
+  window.__d86ZenFSFiles = api;
 }
 
 function assertChild(child: Window): void {
@@ -279,10 +279,10 @@ function button(label: string): HTMLButtonElement {
 function installInChild(child: Window): void {
   assertChild(child);
   const cw = child as Window & typeof globalThis;
-  const w = cw as Window & { __d86PuterPatched?: boolean; showOpenFilePicker?: (opts?: unknown) => Promise<unknown[]>; showSaveFilePicker?: (opts?: unknown) => Promise<unknown> };
-  if (w.__d86PuterPatched) return;
-  w.__d86PuterPatched = true;
-  const bridge = window.__d86PuterFiles!;
+  const w = cw as Window & { __d86ZenFSPatched?: boolean; showOpenFilePicker?: (opts?: unknown) => Promise<unknown[]>; showSaveFilePicker?: (opts?: unknown) => Promise<unknown> };
+  if (w.__d86ZenFSPatched) return;
+  w.__d86ZenFSPatched = true;
+  const bridge = window.__d86ZenFSFiles!;
   const makeHandle = (picked: PickedFile) => ({
     kind: "file",
     name: picked.file.name,
