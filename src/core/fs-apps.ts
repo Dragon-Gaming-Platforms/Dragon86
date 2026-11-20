@@ -13,8 +13,8 @@
  * Each file is either `{ "apps": [ … ] }` or a bare `[ … ]`; every entry:
  *
  *     {
- *       "id": "hello",                 // also the folder name: apps/<id>/
- *       "name": "Hello",
+ *       "id": "my-app",                // also the folder name: apps/<id>/
+ *       "name": "My app",
  *       "icon": "browser",
  *       "entry": "index.html",         // default "index.html"
  *       "folder-isolated": true,       // stay inside apps/<id>/  (recommended)
@@ -232,93 +232,17 @@ async function readRegistries(dir: string): Promise<{ file: string; apps: RawApp
   return out;
 }
 
-/* ---------- the demo app, created once ---------- */
+/* ---------- the OS-owned app seed version ---------- */
 
-/** The one manifest the OS owns a share of; user edits win after seeding. */
-const BUILTIN_VERSION = 4;
+/* Increment when a one-time migration removes or adds an OS-seeded app. */
+const BUILTIN_VERSION = 5;
 
 /**
  * Apps that ship in public/system-apps/ and get copied into the FS *once*,
  * on the first boot of a new install. Nothing here is re-seeded afterwards,
- * which is what makes uninstalling one stick: the store deletes the folder
- * and the registry entry, and a later boot must not quietly put them back.
- * (NES used to be on this list; it is an App Store app now.)
+ * which is what makes uninstalling one stick.
  */
 const BUILTIN_APPS = [] as const;
-
-const BUILTIN_ENTRIES: Record<string, RawApp> = {
-  hello: {
-    id: "hello",
-    name: "Hello",
-    sub: "Filesystem app",
-    icon: "browser",
-    entry: "index.html",
-    "folder-isolated": true,
-    width: 520,
-    height: 420,
-  },
-};
-
-const DEMO_HTML = `<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Hello</title>
-<style>
-  :root { color-scheme: dark; }
-  body { margin: 0; font: 15px/1.5 system-ui, sans-serif; background: #12100f; color: #f3ece4;
-         display: grid; place-items: center; min-height: 100vh; }
-  main { padding: 24px 28px; text-align: center; }
-  h1 { font-size: 20px; margin: 0 0 6px; color: #ff5a3c; }
-  #clock { font-size: 34px; font-variant-numeric: tabular-nums; letter-spacing: 1px; }
-  p { color: #b9aea4; margin: 10px 0 0; font-size: 13px; }
-  code { color: #ffd9cf; }
-</style>
-</head>
-<body>
-<main>
-  <h1>Hello from your filesystem</h1>
-  <div id="clock">--:--:--</div>
-  <p id="fromfs">loading data.json…</p>
-  <p>These files live in <code>system/apps/hello/</code>.
-     Edit them in Files and reload this window.</p>
-</main>
-<script src="./app.js"></script>
-</body>
-</html>
-`;
-
-const DEMO_JS = `/* Loaded from the filesystem through /9pf/hello/app.js — a plain relative
-   <script src>, resolved against a real URL, exactly like any website. */
-const tick = () => {
-  document.getElementById("clock").textContent = new Date().toLocaleTimeString();
-};
-tick();
-setInterval(tick, 1000);
-
-fetch("./data.json")
-  .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
-  .then((data) => {
-    document.getElementById("fromfs").textContent =
-      data.message + " (data.json, " + Math.round(performance.now()) + " ms after load)";
-  })
-  .catch((err) => {
-    document.getElementById("fromfs").textContent = "data.json failed: " + err.message;
-  });
-`;
-
-const DEMO_DATA = JSON.stringify(
-  { message: "This line came from data.json next to the app" },
-  null,
-  2,
-);
-
-/** Write `text` only when the file is missing — never clobber an edit. */
-async function writeIfMissing(path: string, text: string): Promise<void> {
-  if (await exists(path)) return;
-  await vfs.writeText(path, text);
-}
 
 /** Copy one of the OS's bundled apps out of public/system-apps/<id>/. */
 async function seedBundledApp(id: string): Promise<void> {
@@ -329,7 +253,7 @@ async function seedBundledApp(id: string): Promise<void> {
     const res = await fetch(`${BASE}system-apps/${id}/index.json`);
     if (res.ok) files = ((await res.json()) as { files?: string[] }).files ?? [];
   } catch {
-    /* offline first run: the demo apps below still seed */
+    /* offline first run: the manifest is still initialized below */
   }
   for (const name of files) {
     const target = `${dir}/${name}`;
@@ -344,16 +268,24 @@ async function seedBundledApp(id: string): Promise<void> {
   }
 }
 
+async function removeLegacySeed(dir: string, id: string): Promise<void> {
+  const folder = `${dir}/${id}`;
+  if (!(await exists(folder))) return;
+  try {
+    await vfs.removePath(folder);
+    logInfo("os", `removed the legacy ${id} seed from system/apps`);
+  } catch (err) {
+    logWarn("os", `could not remove the legacy ${id} seed`, err);
+  }
+}
+
 /**
  * Create the apps folder on a device that has never had one, and make sure
  * `user-apps.json` mentions the bundled apps. The merge runs once per
  * BUILTIN_VERSION: after that the file is the user's, so deleting an entry
  * stays deleted.
  *
- * "Once" includes the demo files. They used to be written on *every* boot
- * with writeIfMissing, which is why uninstalling Hello (or NES) deleted the
- * folder and then got it straight back: the app was never really gone. All
- * of it now happens behind the version gate, so an uninstall is final.
+ * The version gate also runs one-time cleanup for apps removed from the OS.
  */
 async function seedApps(): Promise<void> {
   const dir = APPS_DIRS[0];
@@ -370,29 +302,25 @@ async function seedApps(): Promise<void> {
   const had = parsed.seeded ?? 0;
   if (had >= BUILTIN_VERSION) return;
   /* A manifest from before seeding existed is a fresh device; one from an
-     older build is an existing device that is being upgraded. The two want
-     different things: a fresh device gets the demo apps, an upgraded one must
-     not get anything it deliberately removed. */
+     older build is an existing device that is being upgraded. Upgrades keep
+     user-installed apps, while the versioned migrations only remove retired
+     OS-owned entries. */
   const fresh = had === 0 && !(Array.isArray(parsed.apps) && parsed.apps.length);
 
   if (had < 4) {
-    /* v4: two apps stopped being filesystem apps. Preview is a fixed page now
-       (iframe-apps.json) and NES is an App Store app, so a device seeded by
-       an older build has a folder and a registry entry for each that no
-       longer belong there. Remove them once. */
+    /* v4: Preview became a fixed page and NES left the filesystem app list. */
     parsed.apps = (Array.isArray(parsed.apps) ? parsed.apps : []).filter(
       (a) => !(a && ((a as RawApp).id === "preview" || (a as RawApp).id === "nes")),
     );
-    for (const gone of ["preview", "nes"]) {
-      const folder = `${dir}/${gone}`;
-      if (!(await exists(folder))) continue;
-      try {
-        await vfs.removePath(folder);
-        logInfo("os", `removed ${gone} from system/apps (it is not a filesystem app any more)`);
-      } catch (err) {
-        logWarn("os", `could not remove the old ${gone} folder`, err);
-      }
-    }
+    for (const gone of ["preview", "nes"]) await removeLegacySeed(dir, gone);
+  }
+  if (had < 5) {
+    /* v5: Hello was only a tutorial demo, not a useful system app. Remove its
+       old registry entry and seeded folder so upgrades match fresh installs. */
+    parsed.apps = (Array.isArray(parsed.apps) ? parsed.apps : []).filter(
+      (a) => !(a && (a as RawApp).id === "hello"),
+    );
+    await removeLegacySeed(dir, "hello");
   }
 
   if (!fresh) {
@@ -405,30 +333,9 @@ async function seedApps(): Promise<void> {
     return;
   }
 
-  await writeIfMissing(`${dir}/hello/index.html`, DEMO_HTML);
-  await writeIfMissing(`${dir}/hello/app.js`, DEMO_JS);
-  await writeIfMissing(`${dir}/hello/data.json`, DEMO_DATA);
   for (const id of BUILTIN_APPS) await seedBundledApp(id);
 
   const apps: RawApp[] = Array.isArray(parsed.apps) ? parsed.apps : [];
-  for (const [id, entry] of Object.entries(BUILTIN_ENTRIES)) {
-    const at = apps.findIndex((a) => a && (a as RawApp).id === id);
-    if (at === -1) {
-      apps.push(entry);
-      continue;
-    }
-    /* An entry installed by an older build lacks the fields added since
-       (the file types an app opens). Fill those in without touching anything
-       the user changed. */
-    const existing = apps[at] as RawApp;
-    if (!existing.opens && entry.opens) existing.opens = entry.opens;
-    if (!existing.icon && entry.icon) existing.icon = entry.icon;
-    if (!existing["icon-path"] && entry["icon-path"]) existing["icon-path"] = entry["icon-path"];
-    if (!existing["title-template"] && entry["title-template"]) {
-      existing["title-template"] = entry["title-template"];
-    }
-    if (existing.desktop === undefined && entry.desktop !== undefined) existing.desktop = entry.desktop;
-  }
   await vfs.writeText(manifest, JSON.stringify({ seeded: BUILTIN_VERSION, apps }, null, 2));
 }
 
