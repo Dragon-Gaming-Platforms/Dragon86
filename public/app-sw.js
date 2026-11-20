@@ -62,7 +62,7 @@ self.addEventListener("fetch", (event) => {
   const at = url.pathname.indexOf(PREFIX);
   if (at !== -1) {
     event.respondWith(
-      serve(url.pathname.slice(at + PREFIX.length), url.search).catch(
+      serve(url.pathname.slice(at + PREFIX.length), url.search, event).catch(
         (err) => text(500, `Dragon86 filesystem app: ${err && err.message ? err.message : err}`),
       ),
     );
@@ -114,7 +114,50 @@ async function trimCache(cache) {
   while (assets.length > MAX_CACHED_ASSETS) await cache.delete(assets.shift());
 }
 
-async function serve(rest, search) {
+/**
+ * Who is asking? "os" (the OS page, Preview, the file viewer), "app:<id>" (a
+ * filesystem app's own document) or "unknown". The page applies the access
+ * rules (src/core/fs-access.ts); this only says who is asking, and says
+ * "unknown" rather than guessing when the browser does not tell us.
+ */
+async function requesterOf(event) {
+  let docUrl = "";
+  if (event.clientId) {
+    try {
+      const client = await self.clients.get(event.clientId);
+      if (client && client.url) docUrl = client.url;
+    } catch {
+      /* fall through to the referrer */
+    }
+  }
+  if (!docUrl) {
+    const ref = event.request.referrer;
+    if (ref && ref !== "about:client") docUrl = ref;
+  }
+  if (!docUrl) return "unknown";
+  let page;
+  try {
+    page = new URL(docUrl).pathname;
+  } catch {
+    return "unknown";
+  }
+  const at = page.indexOf(PREFIX);
+  if (at === -1) return "os";
+  /* Decode the whole remainder before splitting, exactly as serve() does:
+     `@open%2Fhome…` and `@open/home…` both name the viewer. */
+  let id;
+  try {
+    id = decodeURIComponent(page.slice(at + PREFIX.length)).split("/")[0];
+  } catch {
+    return "unknown";
+  }
+  if (!id) return "unknown";
+  /* The file viewer (`@open`) is the OS's own reader, not an app. */
+  if (id === "@open") return "os";
+  return "app:" + id;
+}
+
+async function serve(rest, search, event) {
   let path = rest;
   try {
     path = decodeURIComponent(rest);
@@ -142,7 +185,7 @@ async function serve(rest, search) {
   }
 
   const answer = isFile
-    ? await ask(client, { file: sub })
+    ? await ask(client, { file: sub, from: await requesterOf(event) })
     : await ask(client, { appId, path: sub, search });
   if (!answer) return text(504, "Dragon86 did not answer in time (" + appId + "/" + sub + ")");
   if (!answer.ok) return text(answer.status || 404, answer.error || `${appId}/${sub} not found`);

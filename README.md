@@ -123,7 +123,15 @@ Each file is `{ "apps": [ … ] }` (or a bare array). One entry:
     }
 
 `folder-isolated: true` means the app cannot climb out of its own folder with
-`../` — the service worker answers 403. `false` lets it walk up as far as the
+`../` — the service worker answers 403.
+
+**What an isolated app may read.** Files outside an app's folder are reached
+through `9pf/@open/<path>`, which Preview, the viewer and CheerpJ use. That
+route is governed by `src/core/fs-access.ts`, not by the folder rule alone. An
+isolated app may read its own folder and the exact file the OS handed it with
+`?file=` (CheerpJ's `.jar`), and nothing else. The OS and non-isolated apps may
+read the home folder and `/tmp`. A request whose asker cannot be identified is
+refused. `false` lets it walk up as far as the
 OS home (`/home/user`), which is what a file viewer wants and what you should
 not give code you didn't write. Either way the app runs same-origin: an
 opaque-origin (sandboxed) frame is not controlled by a service worker, so
@@ -216,17 +224,14 @@ the nearest free cell and the arrangement is remembered per device
 highlighted; left-dragging on empty wallpaper draws a selection box, and
 right-clicking it offers *Tidy up icons* to reset the layout.
 
-### Service worker: on only when the engine needs isolation
+### Service worker: filesystem apps only
 
-COOP/COEP arrive via `coi-serviceworker.js`, and only the **embedded
-CheerpX** engine needs them. Selecting **Separate tab** or **v86** makes
-the worker remove *itself*: its page half calls
-`navigator.serviceWorker.getRegistrations()`, unregisters the worker and
-reloads once so the next document carries no COOP/COEP — no reliance on
-messaging a controller that may already be gone. Settings → System shows
-the live state ("Isolation: ON/off", "Service worker: controlling / not
-controlling"), and `tools/test-coi-deregister.mjs` (run by `npm run
-build`) asserts the contract.
+`public/app-sw.js` is the only service worker the OS registers. It answers
+`9pf/` requests for filesystem apps and files (see *Filesystem apps* above).
+Cross-origin isolation is off, so no page needs COOP/COEP headers, and the
+legacy `coi-serviceworker.js` is no longer loaded. `tools/test-coi-deregister.mjs`
+and `tools/test-startup-reload.mjs` (both run by `npm run build`) guard that
+it stays that way: a worker that reloads the page can interrupt a VM while it boots (see the note in `index.html`).
 
 ### Archives unpack themselves: .zip, .tar, .gz
 
@@ -447,7 +452,7 @@ count); Settings → **v86 filesystem** can re-unpack it if it is ever damaged.
 - **System viewer** — the built-in opener for anything no app claims: image, page, PDF, audio/video, or a hex dump
 - **Text Editor** — the OS's own editor: plain text, `Ctrl+S` saves, no dependency. It opens every text type by default
 - **Monaco Editor** — an App Store app (not installed by default): the editor behind VS Code, reading and writing the same files (see below)
-- **Terminal** — xterm.js front end. **v86 is the default engine**: an Arch userland that boots inside the page with no isolation and no hoster. CheerpX (embedded or its own tab) is still there under Settings → Engine
+- **Terminal** — xterm.js front end. **v86 is the default engine**: an Arch userland that boots inside the page, with no separate engine page to run
 - **Preview** — the default opener for pictures, sound, video, PDFs, 3D models and disc images; a fixed page (`public/preview/`), never in the App Store
 - **Engine Viewer** — the v86 machine's own display, drawn by the emulator. Reach it from the Terminal's **View Engine** button
 - **Scramjet** — web proxy (vendored at `/scramjet/`; traffic via a configurable Wisp server), a JSON-defined iframe app
@@ -470,27 +475,48 @@ optional `width`/`height`/`status`. The app appears on the desktop and in
 the start menu automatically. See `src/apps/iframe-app.ts` for details.
 - **Settings** — six themes (Dragon Red, Cyberpunk, Purple, Matrix, AMOLED, Sunset), wallpapers, engine host URL, factory reset
 
-## Architecture (the two-repo plan)
+## Architecture
 
-| Repo | Role | Isolation |
+Everything runs in one page. The OS (`src/`) is a Vite + TypeScript app — the
+window manager, desktop, Files, App Store and a ZenFS virtual filesystem —
+and the machines and apps plug into it:
+
+| Part | Where | Role |
 |---|---|---|
-| **Dragon86** (this one) | The OS: desktop, WM, ZenFS VFS, xterm.js UI | Cross-origin isolated via `coi-serviceworker`, scoped to `/Dragon86/` — an embedded frame can only get SharedArrayBuffer when the **top page** is isolated, so the OS isolates itself and the hoster inherits it |
-| **hoster** (separate) | CheerpX engine page + disk images | Cross-origin isolated via `coi-serviceworker`, scoped to its subdirectory only |
+| OS page | `src/main.ts`, `src/core/`, `src/apps/` | desktop, window manager, ZenFS, App Store |
+| Machine backends | `src/bridge/v86.ts` (x86 and ARM64/ARM32 on the vendored `public/v64/` build), `src/bridge/rv64.ts` (RISC-V 64), `src/bridge/netbsd64.ts` (disk-image OSes for the ARM machines) | the Terminal's machine, chosen in Settings → Engine → Machine architecture |
+| Engine contract | `src/bridge/engine.ts` | what the Terminal and Engine Viewer expect from any machine |
+| Guest filesystem | `src/bridge/p9.ts`, `src/bridge/guest-root.ts` | the v86 guest's `/` is the OS filesystem, served over 9p |
+| Filesystem apps | `public/app-sw.js`, `src/core/fs-apps.ts`, `src/core/fs-access.ts` | apps served from `~/system/apps/` under `/9pf/`, and who may read which file through `/9pf/@open/` |
+| DrakeForge bridge | `src/bridge/drakeforge-session.ts`, `src/bridge/fs-bridge.ts` | serves `/home/user` to the deployed DrakeForge workspace (protocol v2) |
 
-The OS embeds the hoster as a **hidden iframe** and talks to it over a versioned `postMessage` protocol (PTY byte-stream + control channel — see `src/bridge/hoster.ts`). The terminal UI never leaves the OS; the engine never touches the OS DOM.
+The one service worker that runs is `public/app-sw.js`, which owns the `9pf/`
+prefix. Cross-origin isolation is off for good: no engine needs
+SharedArrayBuffer, and `index.html` says so. `public/coi-serviceworker.js` is
+kept vendored but is not loaded.
 
 ### VFS wiring
 
-- `/home` → IndexedDB (persistent virtual hard drive), `/tmp` → in-memory
-- The shared "Linux" folder will be a `dir` mount backed by the same storage CheerpX sees — files written in the terminal show up in the Files app, without shelling out to `ls`.
+- `/` → IndexedDB (`dragon86-root`), the system root
+- `/home` → IndexedDB, your files: the virtual hard drive
+- `/tmp` → in memory, cleared on reload
 
 ## Develop
 
     npm install
     npm run dev          # the OS at http://localhost:5173/Dragon86/
-    npm run build        # typecheck + the unit checks + the Pages bundle
-    npm run test:ui      # boots the whole OS headlessly (jsdom) and clicks it
-    npm run test:vm      # boots the v86 guest for real, in Node (see below)
+    npm run build        # typecheck, the unit suites, and the Pages bundle
+
+The scripts need Node 22 (the test files run with `--experimental-strip-types`,
+Node 22.6 or later). The checks:
+
+- `npm run build` — `tsc`, every unit suite under `tools/test-*.mjs` (among them
+  `test-fs-access` for the `@open` access rules, `test-app-sw` for the
+  service worker, `test-preview` and `test-guest-scripts`), then the production
+  bundle. CI runs it on every pull request.
+- `npm run test:ui` — boots the whole OS headlessly (jsdom) and clicks it.
+- `npm run test:vm` — boots the v86 guest for real, in Node (see below).
+- `npm run test:all` — `build` followed by `test:ui`.
 
 `npm run test:ui` bundles `src/main.ts` as one script, loads it into a
 simulated page with IndexedDB, a stubbed service worker and a static file
@@ -507,18 +533,24 @@ shell, if 9p reports `no channels available` even once, or if the shell cannot
 run `git`. It is the only way to see a kernel-level v86 fault without a
 browser, and it takes about thirty seconds.
 
-
-```sh
-npm install
-npm run dev        # local dev server
-npm run build      # type-check + production build → dist/
-```
-
 ## Deploy
 
 GitHub Actions (`.github/workflows/deploy.yml`) builds and publishes to **GitHub Pages** on every push to `main`. First time: repo **Settings → Pages → Source → GitHub Actions**.
 
 > The base path is `/Dragon86/` (project site). For a custom-domain root deploy, set `PAGES_BASE=/` in the workflow's build step.
+
+### CI and repository size
+
+- `.github/workflows/ci.yml` runs on every pull request: the large-file guard,
+  `npm run build` and `npm run test:ui`.
+- The large-file guard (`tools/check-added-files.mjs`) fails a change that
+  **adds** a file over 10 MB. Files already in git are not checked. A
+  deliberate exception goes in `.large-files-allow`, one path per line.
+- The repository is large today: the NetBSD and Alpine disk images
+  (`public/netbsd64/`, `public/alpine32/`), the vendored kernels and initrds,
+  and a `.git` history of about 570 MB. New build outputs belong in a GitHub
+  Release or external storage. Moving the committed images out of git changes
+  how Pages gets them, so it is a deliberate follow-up, not part of the guard.
 
 ## Roadmap
 
@@ -531,66 +563,26 @@ GitHub Actions (`.github/workflows/deploy.yml`) builds and publishes to **GitHub
 
 ## Engine
 
-The Terminal connects to the **CheerpX-Bridge** hoster by default
-(`https://dragon-gaming-platforms.github.io/CheerpX-Bridge/`). Override it in
-**Settings → Engine** for development. First cold boot can take ~20 seconds
-(service-worker install + WASM compile + disk connect); later opens are warm
-and fast.
+The Terminal runs the machine chosen in **Settings → Engine → Machine
+architecture**. You choose the hardware; the OS picks the backend:
 
-**Engine location toggle (Settings → Engine → "Engine runs"):**
-- **Embedded** (default): hoster in a hidden iframe; Dragon86 itself is
-  cross-origin isolated via the coi-serviceworker.
-- **Separate tab**: the hoster opens as its own browser tab — engine only,
-  no terminal UI over there; the Dragon86 Terminal still renders everything
-  and talks to the tab over a `BroadcastChannel` (`dragon86-hoster-v1`,
-  same v1 messages). In this mode Dragon86's coi-serviceworker is
-  deregistered, so the OS page runs with **no COEP/COOP restrictions**.
-  Switching modes reloads the page (isolation is a document-load property).
-  ⚠️ Tab mode needs the hoster to listen on the BroadcastChannel too —
-  that's a pending CheerpX-Bridge addition; until it lands, tab mode
-  reports "still starting" while embedded mode keeps working.
+- **x86 (32-bit) and x86-64** — the vendored v64 emulator (`public/v64/`, a
+  v86 descendant) booting a small Arch Linux userland (`public/v86/`). The
+  guest's `/` **is** the OS filesystem, live in both directions: Dragon86 serves
+  9p straight from ZenFS (`src/bridge/p9.ts`), so guest writes are OS writes
+  and the reverse. The distro's own `/` is `~/v86` in Files. The Terminal's
+  **Save State** snapshots the machine to IndexedDB, and the next start resumes
+  from it. No service worker or isolation is needed for it.
+- **ARM64** — NetBSD 11.0 from a real disk image in the browser's private
+  storage (OPFS), installed from the App Store. Serial console only; log in as
+  root.
+- **ARM32** — Alpine Linux (armv7) from a disk image, installed from the App
+  Store. Serial console only.
+- **RISC-V 64** — the rv64.js emulator (`public/rv64/`), booting Alpine Linux
+  (RISC-V 64) from the App Store. Serial console only; no display device.
 
-**Shared folder (CheerpX modes):** the bridge speaks protocol v2 —
-Dragon86 advertises `caps: ["fs1"]` and serves file requests straight
-from its filesystem (guest `/home/user/shared` ↔ OS `/home/user`), the
-same live arrangement as v86's 9p share but over bridge messages
-(CheerpX's filesystem devices are whole-file JS APIs, so the wire is
-file-level too). The hoster must still mount it inside the guest; the
-contract + hoster implementation notes live in
-`docs/cheerpx-fs-protocol.md`. Until a hoster echoes `fs1`, nothing
-changes — v1 behavior, no shared folder in the CheerpX guest.
-
-- **v86 (compatibility)**: a tiny Linux (vendored v86 emulator + Arch
-  Linux 32 kernel + Arch's genuine GNU bash and coreutils, `public/v86/`)
-  boots right inside the Dragon86 page — no isolation, no hoster, no
-  service worker, so it runs in Android WebView and similar places the
-  CheerpX modes can't. Slower and smaller than CheerpX, but its
-  `/` **is** the OS virtual filesystem, live in both
-  directions: Dragon86 serves 9p straight from its own filesystem
-  (`src/bridge/p9.ts`), so guest creates/deletes/renames are OS
-  operations and vice versa — no copying, no sync step. The Terminal's
-  **Save State** button snapshots the machine to IndexedDB and the
-  next v86 start resumes from it. Isolation is OFF in this mode, same
-  as Separate tab. The distro's own `/` **is** `~/v86` — the same folder
-  you see in Files under **v86** — so anything the guest reads or edits
-  is editable from the Files app and vice versa.
-
-**Diagnostics:** the Terminal has a **Dev Console** button (Eruda, contained
-in the window). Watch the `[D86:bridge]` logs — especially the *iframe probe*
-line, which reads the embedded hoster's `crossOriginIsolated` directly.
-Isolation debugging rule: the top OS page must report
-`crossOriginIsolated: true` (after the one-time service-worker reload) before
-the engine inside the iframe can start at all.
-
-**Isolation scope (for future apps):** only the OS *document* carries
-COOP/COEP — the service worker stamps headers on navigation responses only
-and never touches subresource responses. Isolation is still a page-level
-property, so while the OS page is isolated, anything it embeds cross-origin
-must satisfy the document's COEP (`require-corp`: CORS or a
-`Cross-Origin-Resource-Policy` opt-in — the hoster does this). Apps that
-can't meet that can open as their own top-level page/popup instead. If the
-site ever moves to a host that can send real headers, the worker can be
-deleted and nothing else changes.
+Diagnostics: the Terminal has a **Dev Console** button (Eruda, contained in the
+window), and the `[D86:bridge]` log lines show what each machine is doing.
 
 ## Credits
 
