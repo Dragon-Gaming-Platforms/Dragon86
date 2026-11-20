@@ -208,7 +208,6 @@ async function showAudio(path, ext) {
   const audio = document.createElement("audio");
   audio.controls = true;
   audio.preload = "metadata";
-  audio.src = fileUrl(path);
   const wave = document.createElement("canvas");
   wave.className = "wave";
   wrap.append(art, wave, audio);
@@ -229,11 +228,22 @@ async function showAudio(path, ext) {
     setStatus(`Could not play ${baseName(path)}.`, true);
   });
 
+  /* The bytes are read once, through the OS route, and played from a blob
+     URL. Safari will not play <audio> or <video> from a response that
+     ignores Range, and a blob URL needs no range support at all. */
+  let bytes;
+  try {
+    bytes = await fetchBytes(path);
+  } catch (err) {
+    readFailed(wrap, path, err);
+    return;
+  }
+  audio.src = blobUrl(bytes, ext);
+
   /* Waveform: decode the bytes we already have and draw the peak envelope.
      Costs one pass over the file and makes "is this the track I meant?" a
      glance instead of a guess. */
   try {
-    const bytes = await fetchBytes(path);
     noteSize(bytes);
     const Ctx = window.AudioContext || window.webkitAudioContext;
     if (!Ctx) return;
@@ -242,43 +252,18 @@ async function showAudio(path, ext) {
     drawWave(wave, buffer);
     ctx.close();
   } catch {
-    /* Decoding is a bonus; the <audio> element above is the real player. */
-    wave.remove();
-  }
-}
-
-function drawWave(canvas, buffer) {
-  const dpr = Math.min(2, window.devicePixelRatio || 1);
-  const width = Math.max(240, canvas.clientWidth || 480);
-  const height = 90;
-  canvas.width = Math.floor(width * dpr);
-  canvas.height = Math.floor(height * dpr);
-  canvas.style.height = `${height}px`;
-  const g = canvas.getContext("2d");
-  g.scale(dpr, dpr);
-  const channel = buffer.getChannelData(0);
-  const step = Math.max(1, Math.floor(channel.length / width));
-  g.fillStyle = "#161a21";
-  g.fillRect(0, 0, width, height);
-  g.fillStyle = "#ff4d5a";
-  for (let x = 0; x < width; x++) {
-    let min = 1;
-    let max = -1;
-    const at = x * step;
-    for (let i = 0; i < step; i++) {
-      const v = channel[at + i] || 0;
-      if (v < min) min = v;
-      if (v > max) max = v;
-    }
-    const top = (1 - max) * (height / 2);
-    const bottom = (1 - min) * (height / 2);
-    g.fillRect(x, top, 1, Math.max(1, bottom - top));
+    /* Decoding is a bonus; the <audio> element above is the real player.
+       Say so, rather than leaving a silent gap where the waveform should be. */
+    const note = document.createElement("div");
+    note.className = "wave-missing";
+    note.textContent = "No waveform: this browser could not decode the file. Playback still works.";
+    wave.replaceWith(note);
   }
 }
 
 /* ---------- video ---------- */
 
-function showVideo(path, ext) {
+async function showVideo(path, ext) {
   toolsReset();
   const wrap = document.createElement("div");
   wrap.className = "media";
@@ -286,7 +271,6 @@ function showVideo(path, ext) {
   video.controls = true;
   video.playsInline = true;
   video.preload = "metadata";
-  video.src = fileUrl(path);
   wrap.append(video);
   el.main.append(wrap);
 
@@ -307,6 +291,41 @@ function showVideo(path, ext) {
     );
     setStatus(`Could not play ${baseName(path)}.`, true);
   });
+
+  /* Read once through the OS route, then play from a blob URL (see showAudio). */
+  let bytes;
+  try {
+    bytes = await fetchBytes(path);
+  } catch (err) {
+    readFailed(wrap, path, err);
+    return;
+  }
+  video.src = blobUrl(bytes, ext);
+}
+
+/* Blob URLs for media that Preview has read. Released when the window goes. */
+const MEDIA_MIME = {
+  mp3: "audio/mpeg", wav: "audio/wav", ogg: "audio/ogg", oga: "audio/ogg", opus: "audio/ogg",
+  flac: "audio/flac", m4a: "audio/mp4", aac: "audio/aac", weba: "audio/webm", aiff: "audio/aiff",
+  aif: "audio/aiff", mp4: "video/mp4", m4v: "video/mp4", webm: "video/webm", ogv: "video/ogg",
+  mov: "video/quicktime", mkv: "video/x-matroska", avi: "video/x-msvideo",
+};
+const blobUrls = [];
+
+function blobUrl(bytes, ext) {
+  const url = URL.createObjectURL(new Blob([bytes], { type: MEDIA_MIME[ext] || "" }));
+  blobUrls.push(url);
+  return url;
+}
+
+window.addEventListener("pagehide", () => {
+  for (const url of blobUrls.splice(0)) URL.revokeObjectURL(url);
+});
+
+function readFailed(wrap, path, err) {
+  wrap.remove();
+  panel("This file could not be read", escapeHtml((err && err.message) || err));
+  setStatus(`Could not read ${baseName(path)}.`, true);
 }
 
 /* ---------- PDF ---------- */

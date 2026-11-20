@@ -189,19 +189,63 @@ async function serve(rest, search, event) {
     : await ask(client, { appId, path: sub, search });
   if (!answer) return text(504, "Dragon86 did not answer in time (" + appId + "/" + sub + ")");
   if (!answer.ok) return text(answer.status || 404, answer.error || `${appId}/${sub} not found`);
-  return new Response(answer.body, {
-    status: 200,
-    headers: {
-      "Content-Type": answer.mime || "application/octet-stream",
-      "Content-Length": String(answer.body.byteLength),
-      /* No caching, by design: the filesystem is the source of truth. */
-      "Cache-Control": "no-store",
-      /* Apps run in a sandboxed (opaque-origin) frame, so their own module
-         scripts and fetches are CORS requests with Origin: null. */
-      "Access-Control-Allow-Origin": "*",
-      "Cross-Origin-Resource-Policy": "cross-origin",
-    },
-  });
+  const size = answer.body.byteLength;
+  const headers = {
+    "Content-Type": answer.mime || "application/octet-stream",
+    /* No caching, by design: the filesystem is the source of truth. */
+    "Cache-Control": "no-store",
+    /* Apps run in a sandboxed (opaque-origin) frame, so their own module
+       scripts and fetches are CORS requests with Origin: null. */
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Expose-Headers": "Accept-Ranges, Content-Length, Content-Range",
+    "Cross-Origin-Resource-Policy": "cross-origin",
+    "Accept-Ranges": "bytes",
+  };
+  /* Safari will not play <audio> or <video> from a response that ignores
+     Range: it asks for "bytes=0-1" first and needs a 206 back. So a single
+     range is cut from the bytes we already have, and anything else (no
+     header, several ranges, a malformed one) gets the whole file, as
+     RFC 9110 allows. */
+  const want = parseRange(event && event.request && event.request.headers ? event.request.headers.get("range") : null, size);
+  if (want.kind === "unsatisfiable") {
+    return new Response(null, { status: 416, headers: { ...headers, "Content-Range": `bytes */${size}`, "Content-Length": "0" } });
+  }
+  if (want.kind === "single") {
+    const part = answer.body.slice(want.start, want.end + 1);
+    return new Response(part, {
+      status: 206,
+      headers: { ...headers, "Content-Range": `bytes ${want.start}-${want.end}/${size}`, "Content-Length": String(part.byteLength) },
+    });
+  }
+  return new Response(answer.body, { status: 200, headers: { ...headers, "Content-Length": String(size) } });
+}
+
+/**
+ * Parse a Range header for a body of `size` bytes. Returns
+ *   { kind: "single", start, end }  — one satisfiable range, end inclusive
+ *   { kind: "unsatisfiable" }       — a valid range past the end (→ 416)
+ *   { kind: "none" }                — no header, several ranges or a malformed one (→ 200)
+ */
+function parseRange(header, size) {
+  if (!header) return { kind: "none" };
+  const m = /^bytes=(\d*)-(\d*)$/.exec(String(header).trim());
+  if (!m || (m[1] === "" && m[2] === "")) return { kind: "none" };
+  const unsat = { kind: "unsatisfiable" };
+  let start;
+  let end;
+  if (m[1] === "") {
+    /* bytes=-N: the last N bytes */
+    const n = Number(m[2]);
+    if (n === 0 || size === 0) return unsat;
+    start = Math.max(0, size - n);
+    end = size - 1;
+  } else {
+    start = Number(m[1]);
+    if (m[2] !== "" && Number(m[2]) < start) return { kind: "none" };
+    if (start >= size) return unsat;
+    end = m[2] === "" ? size - 1 : Math.min(Number(m[2]), size - 1);
+  }
+  return { kind: "single", start, end };
 }
 
 /** Any open Dragon86 window can answer; prefer one that is visible. */

@@ -109,7 +109,7 @@ ${body}
 }
 
 function iframeBody(name: string, url: string, allow?: string): string {
-  return `<iframe src="${url}" title="${name}" style="border:0;display:block;width:100vw;height:100vh" allow="${allow ?? "clipboard-read; clipboard-write; fullscreen; gamepad"}"></iframe>`;
+  return `<iframe src="${url}" title="${name}" style="border:0;display:block;width:100vw;height:100vh;height:100dvh" allow="${allow ?? "clipboard-read; clipboard-write; fullscreen; gamepad"}"></iframe>`;
 }
 
 /**

@@ -724,6 +724,57 @@ export function openSettings(win: Win, startPage?: string): void {
 
   /* ---------- Storage ---------- */
 
+  /**
+   * Whether the browser may keep this origin's storage (IndexedDB, OPFS, Cache)
+   * under pressure. Safari can purge script-written storage after 7 days of
+   * no use unless the origin is persistent or installed to the Home Screen, so
+   * on Safari the answer is shown as a warning. Asking is a user action: the
+   * browser may show a prompt, so we never ask at boot.
+   */
+  function renderPersistence(): HTMLElement {
+    const row = el("div", "settings-row");
+    row.dataset.setting = "Keep disk in this browser";
+    const note = el("div", "settings-note", "Checking whether the browser keeps this disk…");
+    const btn = el("button", "btn", "Ask the browser to keep this disk");
+    btn.hidden = true;
+    const isSafari = /Safari\//.test(navigator.userAgent) && !/Chrome|Chromium|Android|CriOS|FxiOS|Edg\//.test(navigator.userAgent);
+    const paint = (persisted: boolean | null): void => {
+      if (persisted === null) {
+        note.textContent = "This browser does not say whether it keeps this disk.";
+        return;
+      }
+      if (persisted) {
+        note.textContent = "The browser will keep this disk. It will not clear it to free space.";
+        btn.hidden = true;
+        return;
+      }
+      btn.hidden = false;
+      note.textContent = isSafari
+        ? "Safari may delete this disk after 7 days without a visit unless you add Dragon86 to your Home Screen. Export a snapshot regularly as a backup."
+        : "The browser may clear this disk when space is low. Export a snapshot regularly as a backup.";
+      if (isSafari) note.classList.add("warn");
+    };
+    btn.addEventListener("click", async () => {
+      btn.disabled = true;
+      try {
+        const granted = await navigator.storage?.persist?.();
+        paint(granted === true ? true : await persistedOrNull());
+        if (granted === false) note.textContent = "The browser said no. Export snapshots as a backup.";
+      } catch {
+        note.textContent = "The browser would not change this setting.";
+      } finally {
+        btn.disabled = false;
+      }
+    });
+    async function persistedOrNull(): Promise<boolean | null> {
+      const p = await navigator.storage?.persisted?.();
+      return typeof p === "boolean" ? p : null;
+    }
+    row.append(note, btn);
+    void persistedOrNull().then(paint, () => paint(null));
+    return row;
+  }
+
   function renderStorage(host: HTMLElement): void {
     host.append(section("Disk", "Your files live in this browser's IndexedDB — no account, no server."));
     const usage = el("div", "settings-note", "Measuring…");
@@ -751,6 +802,8 @@ export function openSettings(win: Win, startPage?: string): void {
         usage.textContent = "This browser does not report disk usage.";
       }
     })();
+
+    host.append(renderPersistence());
 
     host.append(section("Snapshots", "Take the whole filesystem with you — or bring one back."));
     const exportRow = el("div", "settings-row");

@@ -364,6 +364,17 @@ check(
     "the app reads the file through the 9pf route",
     /9pf\/@open/.test(appSource),
   );
+  /* Safari will not play media from a service-worker response without
+     Range support, so audio and video are played from a blob URL. */
+  check(
+    "audio and video play from a blob URL (Safari-safe)",
+    /audio\.src = blobUrl\(/.test(appSource) && /video\.src = blobUrl\(/.test(appSource) &&
+      !/(audio|video)\.src = fileUrl\(/.test(appSource),
+  );
+  check(
+    "blob URLs are released when the window goes",
+    /pagehide/.test(appSource) && /revokeObjectURL/.test(appSource),
+  );
   dom.window.close();
 }
 
