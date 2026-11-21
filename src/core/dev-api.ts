@@ -34,6 +34,9 @@
  *   d86.engine.screen()         → {cols,rows,lines} | null  the live VGA text
  *
  *   d86.open(path)              → void            open a file the way the OS would
+ *   d86.openScramjet(url)       → void            open an HTTPS URL in Scramjet
+ *   d86.openScramjetWindow(url)→ void            open it in a separate window
+ *   d86.openScramjetWebview(url)→ void            fullscreen Scramjet webview
  *   d86.notify({ title, body }) → void            a toast in the corner
  *   d86.log(...args)            → void            console, tagged [D86:script]
  *   d86.script.path             the file being run (only while it runs)
@@ -98,6 +101,12 @@ export interface D86Api {
     screen(): EngineScreen | null;
   };
   open(path: string): void;
+  /** Open an HTTPS URL in a normal Scramjet browser window. */
+  openScramjet(url: string): void;
+  /** Open an HTTPS URL in a separate Scramjet window. */
+  openScramjetWindow(url: string): void;
+  /** Open an HTTPS URL in the fullscreen Scramjet webview. */
+  openScramjetWebview(url: string): void;
   notify(opts: { title: string; body?: string; icon?: string; timeout?: number }): void;
   log(...args: unknown[]): void;
 }
@@ -113,6 +122,12 @@ export function resolveScriptPath(path: string): string {
 }
 
 let installed: D86Api | null = null;
+
+function requestScramjet(url: string, mode: "window" | "new-window" | "webview"): void {
+  window.dispatchEvent(new CustomEvent("d86-open-proxied-page", {
+    detail: { url: String(url ?? ""), mode },
+  }));
+}
 
 /**
  * A script that writes files should see them appear in Files and on the
@@ -209,6 +224,9 @@ export function installDevApi(hooks: { launch: (id: string) => void; open: (path
       screen: () => engineForViewer()?.getScreen?.() ?? null,
     },
     open: (path) => hooks.open(resolveScriptPath(path)),
+    openScramjet: (url) => requestScramjet(url, "window"),
+    openScramjetWindow: (url) => requestScramjet(url, "new-window"),
+    openScramjetWebview: (url) => requestScramjet(url, "webview"),
     notify: (opts) =>
       notify({ title: String(opts?.title ?? "Script"), body: opts?.body, icon: opts?.icon, timeout: opts?.timeout ?? 5000 }),
     log: (...args) => {

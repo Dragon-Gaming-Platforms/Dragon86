@@ -453,6 +453,8 @@ check("NES emulator listing and bundled test ROM are removed", !catalogJson.apps
 check("EmulatorJS opens its selected game from Dragon86 ZenFS", Boolean(emulatorCatalogApp) && emulatorFrontend.includes("EJS_gameUrl = file") && emulatorHtml.includes("Choose a game from Dragon86 Files"));
 check("CheerpJ opens jars with the public ZenFS picker and granted @open URL", cheerpjFrontend.includes('api.files.open({ accept: ".jar"') && cheerpjFrontend.includes("api.files.url(path)") && appBridgeSource.includes("grantFile(context.appId, item.path)"));
 check("apps can request and exit Dragon86-window fullscreen through the public API", appBridgeSource.includes("requestFullscreen: async ()") && appBridgeSource.includes("exitFullscreen: ()") && cheerpjFrontend.includes("api.window.requestFullscreen()"));
+const devApiSource = readFileSync(resolve(here, "../../src/core/dev-api.ts"), "utf8");
+check("Dragon86 API exposes normal, separate-window, and fullscreen Scramjet URL methods", ["openScramjet(url: string)", "openScramjetWindow(url: string)", "openScramjetWebview(url: string)", 'requestScramjet(url, "webview")'].every((token) => devApiSource.includes(token)) && registrySource.includes('detail.mode === "webview"'));
 check("PS1 frontend selects PSX and explicitly disables threads", Boolean(ps1CatalogApp) && ps1Frontend.includes("const isPsxApp = true") && ps1Frontend.includes("EJS_threads = false"));
 check("PS1 core evidence records pcsx_rearmed as non-threaded upstream", /pcsx_rearmed.{0,160}not thread-required/s.test(ps1CoreEvidence));
 check("legacy cloud app entries are retained", ["tasks", "contacts"].every((id) => catalogJson.apps.some((app) => app.id === id)));
@@ -460,6 +462,12 @@ const flashApp = catalogJson.apps.find((app) => app.id === "flash-player");
 const aiApp = catalogJson.apps.find((app) => app.id === "dragon86-ai");
 check("Flash Player is routed through Scramjet to the Ruffle demo", Boolean(flashApp?.scramjetUrl?.includes("ruffle.rs/demo")) && !flashApp.externalUrl && !flashApp.files?.length);
 check("Dragon86 AI installs the local assistant", Boolean(aiApp?.files?.includes("index.html")) && existsSync(resolve(publicRoot, aiApp.base, "index.html")));
+const requestedHostedApps = ["thumby-emulator", "thumby-color-emulator", "ti84-online", "turbowarp-editor", "turbowarp-packager", "youtube"].map((id) => catalogJson.apps.find((app) => app.id === id));
+check("requested hosted integrations are HTTPS Scramjet catalog entries", requestedHostedApps.every((app) => app?.scramjetUrl?.startsWith("https://") && !app.externalUrl && !app.files?.length));
+check("Thumby Color and TI listings disclose unavailable local firmware/emulation and jailbreak limits", /does not claim to emulate Thumby Color/.test(requestedHostedApps[1]?.description ?? "") && /No jailbreak is installed/.test(requestedHostedApps[2]?.description ?? ""));
+const calculatorHtml = readFileSync(resolve(publicRoot, "system-apps/calculator/index.html"), "utf8");
+const calculatorJs = readFileSync(resolve(publicRoot, "system-apps/calculator/app.js"), "utf8");
+check("calculator includes accessible scientific mode and DEG/RAD trigonometry", calculatorHtml.includes('aria-controls="scientific-pad"') && calculatorHtml.includes('id="angle-mode"') && ["sin", "sqrt", "factorial", "log"].every((name) => calculatorJs.includes(`${name}:`)));
 const aiInterface = readFileSync(resolve(publicRoot, "system-apps/dragon86-ai/index.html"), "utf8");
 check("Dragon86 AI offers all three providers and model selection", ["OpenRouter", "Pollinations.ai", "Hugging Face", "id=\"model\""].every((token) => aiInterface.includes(token)));
 check("AI chat uses each provider’s chat API and dynamic model catalog", ["https://openrouter.ai/api/v1/chat/completions", "https://gen.pollinations.ai/v1/chat/completions", "https://router.huggingface.co/v1/chat/completions", "https://gen.pollinations.ai/text/models", "https://router.huggingface.co/v1/models"].every((url) => aiInterface.includes(url)));
@@ -1790,7 +1798,8 @@ check("Scramjet has accessible omnibar, settings, and tab controls", /aria-label
 check("Scramjet supports independent tabs and Ctrl+T/Ctrl+W", /function createTab\(/.test(scramjetSource) && /controller\.createFrame\(iframe/.test(scramjetSource) && /key\.toLowerCase\(\) === "t"/.test(scramjetSource) && /key\.toLowerCase\(\) === "w"/.test(scramjetSource));
 check("Scramjet uploads selected ZenFS files and saves explicit downloads to ZenFS", /input\[type="file"\]/.test(scramjetSource) && /fs\.readBytes\(path\)/.test(scramjetSource) && /hasAttribute\("download"\)/.test(scramjetSource) && /fs\.writeBytes\(path, bytes\)/.test(scramjetSource));
 check("Scramjet UI is compact, responsive, reduced-motion aware, and supports omnibar-free fullscreen", /flex: 0 0 40px/.test(scramjetHtml) && /prefers-reduced-motion: reduce/.test(scramjetHtml) && /html\.fullscreen \.topbar/.test(scramjetHtml) && /URLSearchParams\(location\.search\)\.get\("fullscreen"\)/.test(scramjetSource));
-check("App Store Scramjet launches request fullscreen mode", /searchParams\.set\("fullscreen", "1"\)/.test(registrySource) && /openIframeAppAt\([\s\S]*undefined, true\)/.test(registrySource));
+check("App Store Scramjet launches request fullscreen mode", /searchParams\.set\("fullscreen", "1"\)/.test(registrySource) && /detail\.mode === "webview" \|\| !detail\.mode/.test(registrySource) && /openIframeAppAt\([\s\S]*undefined, fullscreen\)/.test(registrySource));
+check("Scramjet API reuses its regular window and can open another one", /apiScramjetWindow\?\.el\.isConnected/.test(registrySource) && /detail\.mode === "window" \|\| newWindow/.test(registrySource));
 
 /* ---- PS2 Web Recomp library: ZenFS import and isolated standalone launch ---- */
 await window.d86.fs.mkdir("/home/user/Downloads");

@@ -2056,8 +2056,8 @@
         "icon.svg"
       ],
       "width": 340,
-      "height": 470,
-      "description": "A pocket calculator: add, subtract, multiply and divide, plus percent, sign flip and clear. Tap the buttons or use the number keys, Enter for equals and Escape to clear. It keeps twelve digits on screen, then switches to precision notation. Deliberately dull — a calculator that wants to be clever is a calculator that lies.",
+      "height": 620,
+      "description": "An offline pocket calculator with a scientific keypad: arithmetic, percent, sign flip, DEG/RAD trig, inverse trig, square root, powers, reciprocal, logarithms, exponentials, absolute value and factorial. Tap Scientific to reveal the extra keys. Keyboard input supports digits, arithmetic, Enter for equals and Escape to clear; recent results are kept in browser storage.",
       "icon-path": "icon.svg"
     },
     {
@@ -2298,6 +2298,66 @@
       "width": 900,
       "height": 680,
       "description": "A Dragon86 AI chat interface with OpenRouter, Pollinations.ai, and Hugging Face Inference Providers. Choose a provider and model from its live model list, then chat. OpenRouter uses the Settings sign-in; Pollinations uses user-approved PKCE authorization with a budget/expiry, and Hugging Face tokens are kept for the current tab session. Requests go directly to the chosen provider; model availability, terms, and usage costs are controlled by each provider."
+    },
+    {
+      "id": "thumby-emulator",
+      "name": "Thumby Emulator",
+      "sub": "Open TinyCircuits’ official Thumby editor and emulator",
+      "category": "Emulators",
+      "publisher": "TinyCircuits · official web editor",
+      "icon": "games",
+      "scramjetUrl": "https://code.thumby.us/",
+      "description": "Launches TinyCircuits’ official Thumby code editor in Scramjet. Its browser workspace includes the classic Thumby emulator for testing MicroPython projects. No games or firmware are bundled; use projects you own or have permission to use. This is a hosted editor integration, not a locally bundled emulator."
+    },
+    {
+      "id": "thumby-color-emulator",
+      "name": "Thumby Color Workbench",
+      "sub": "TinyCircuits Color programming resources",
+      "category": "Emulators",
+      "publisher": "TinyCircuits · hosted tool",
+      "icon": "games",
+      "scramjetUrl": "https://code.thumby.us/",
+      "description": "Opens TinyCircuits’ hosted Thumby editor and programming workspace. A separately licensed, browser-ready Thumby Color emulator was not available to bundle, so this shortcut does not claim to emulate Thumby Color; use it for the hosted tool and consult TinyCircuits’ current Color resources. No firmware or games are bundled."
+    },
+    {
+      "id": "ti84-online",
+      "name": "TI-84 Style Graphing Calculator",
+      "sub": "Third-party hosted graphing calculator",
+      "category": "Education",
+      "publisher": "Third-party hosted service",
+      "icon": "calculator",
+      "scramjetUrl": "https://ti84procalc.com/",
+      "description": "Opens the third-party TI-84-style graphing calculator site in Scramjet. Dragon86 does not bundle Texas Instruments firmware or ROMs and does not claim TI endorsement. No jailbreak is installed: no legally redistributable, browser-ready TI emulator or jailbreak package was established for bundling."
+    },
+    {
+      "id": "turbowarp-editor",
+      "name": "TurboWarp Studio",
+      "sub": "Scratch-compatible project editor and runner",
+      "category": "Creation",
+      "publisher": "TurboWarp · hosted tool",
+      "icon": "editor",
+      "scramjetUrl": "https://turbowarp.org/editor",
+      "description": "Open the TurboWarp Scratch-compatible editor in Scramjet to create or run projects. TurboWarp is a separate hosted tool; Dragon86 does not bundle Scratch project content."
+    },
+    {
+      "id": "turbowarp-packager",
+      "name": "TurboWarp Packager",
+      "sub": "Package TurboWarp projects for web and desktop",
+      "category": "Creation",
+      "publisher": "TurboWarp · hosted tool",
+      "icon": "box",
+      "scramjetUrl": "https://packager.turbowarp.org/",
+      "description": "Open TurboWarp Packager in Scramjet. It provides the hosted interface to package Scratch-compatible projects; it is not a Dragon86-local recompiler and no project files are bundled."
+    },
+    {
+      "id": "youtube",
+      "name": "YouTube",
+      "sub": "YouTube in the fullscreen Scramjet webview",
+      "category": "Web",
+      "publisher": "Google · hosted website",
+      "icon": "browser",
+      "scramjetUrl": "https://www.youtube.com/",
+      "description": "Opens YouTube.com in Dragon86’s maximized Scramjet webview. YouTube, account access, availability and content are provided by Google and remain subject to its terms."
     }
   ]
 }
