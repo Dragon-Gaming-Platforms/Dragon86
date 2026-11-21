@@ -67,6 +67,22 @@ blob)` is also available when an app needs to write to a token returned by its
 open picker. These operations write to ZenFS; they do not trigger a device
 browser download.
 
+## Open URLs through Scramjet
+
+Apps and system scripts can request a proxied HTTPS URL without constructing
+Scramjet routes themselves:
+
+```js
+d86.openScramjet("https://example.com/");          // regular app window
+d86.openScramjetWindow("https://example.com/");    // separate window
+d86.openScramjetWebview("https://example.com/");   // maximized webview
+```
+
+All three methods validate and route through Dragon86's Scramjet app and its
+configured Wisp relay. The URL must be HTTPS; the app title is derived from its
+hostname. `openScramjetWebview` maximizes the Dragon86 window, not browser-level
+fullscreen. These methods return immediately; they do not await page load.
+
 ## Owning Dragon86 app window
 
 Apps can request that their Dragon86 window be maximized, without asking the

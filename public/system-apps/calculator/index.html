@@ -19,7 +19,12 @@
   }
   #expr { font-size: 12px; color: #7d858f; min-height: 14px; overflow: hidden; white-space: nowrap; }
   #value { font-size: 34px; font-variant-numeric: tabular-nums; letter-spacing: 1px; overflow: hidden; }
-  .pad { flex: 1; display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+  .pad { flex: 1; display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; min-height: 210px; }
+  #scientific-toggle { align-self: flex-start; padding: 8px 12px; font-size: 13px; }
+  #scientific-pad { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; min-height: 168px; }
+  #scientific-pad[hidden] { display: none; }
+  #scientific-pad button { font-size: 13px; }
+  #scientific-pad button.mode { color: #9aa4ae; }
   button {
     border: 1px solid #2a2e36; border-radius: 8px; background: #16191f; color: #eef1f4;
     font: 600 17px/1 system-ui, sans-serif; cursor: pointer; padding: 0;
@@ -34,6 +39,14 @@
   <div id="out">
     <div id="expr"></div>
     <div id="value">0</div>
+  </div>
+  <button id="scientific-toggle" type="button" aria-expanded="false" aria-controls="scientific-pad">Scientific ▾</button>
+  <div id="scientific-pad" hidden>
+    <button class="mode" id="angle-mode" type="button" aria-label="Angle mode DEG">DEG</button>
+    <button data-sci="sin">sin</button><button data-sci="cos">cos</button><button data-sci="tan">tan</button><button data-sci="asin">sin⁻¹</button>
+    <button data-sci="acos">cos⁻¹</button><button data-sci="atan">tan⁻¹</button><button data-sci="sqrt">√</button><button data-sci="square">x²</button><button data-sci="reciprocal">1/x</button>
+    <button data-sci="ln">ln</button><button data-sci="log">log</button><button data-sci="exp">eˣ</button><button data-sci="abs">|x|</button><button data-sci="factorial">n!</button>
+    <button data-sci="pi">π</button><button data-sci="e">e</button>
   </div>
   <div class="pad">
     <button class="fn" data-k="C">AC</button>

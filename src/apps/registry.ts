@@ -8,7 +8,7 @@
  * it directly.
  */
 
-import type { WindowManager } from "../core/wm";
+import type { Win, WindowManager } from "../core/wm";
 import * as vfs from "../core/vfs";
 import { openFiles } from "./files";
 
@@ -34,6 +34,7 @@ import { logInfo, logWarn } from "../core/log";
 import { TRASH, unlockTrash } from "../core/trash";
 
 export function createLauncher(wm: WindowManager) {
+  let apiScramjetWindow: Win | null = null;
   function openFilesAt(path?: string): void {
     const win = wm.create({
       title: "Files",
@@ -87,7 +88,7 @@ export function createLauncher(wm: WindowManager) {
     openTerminal(win, { print: { path, text } });
   }
 
-  function openIframeAppAt(def: IframeAppDef, filePath?: string, fullscreen = false): void {
+  function openIframeAppAt(def: IframeAppDef, filePath?: string, fullscreen = false): Win {
     /* "title-template": "Preview - {file}" — the window says what it is
        showing, not just which app is showing it. */
     const title =
@@ -102,6 +103,7 @@ export function createLauncher(wm: WindowManager) {
     });
     openIframeApp(win, def, filePath);
     if (fullscreen) win.maximize();
+    return win;
   }
 
   function openSettingsAt(page?: string): void {
@@ -252,7 +254,7 @@ export function createLauncher(wm: WindowManager) {
      handle on this launcher. One event keeps that seam narrow: anything in
      the OS can ask it to launch an app by id. */
   window.addEventListener("d86-open-proxied-page", (event) => {
-    const detail = (event as CustomEvent<{ url?: string; title?: string }>).detail;
+    const detail = (event as CustomEvent<{ url?: string; title?: string; mode?: "window" | "new-window" | "webview" }>).detail;
     if (!detail || typeof detail.url !== "string") return;
     let target: URL;
     try {
@@ -272,14 +274,26 @@ export function createLauncher(wm: WindowManager) {
     }
     const routedUrl = new URL(scramjet.url, new URL(import.meta.env.BASE_URL, window.location.origin));
     routedUrl.searchParams.set("goto", target.href);
-    routedUrl.searchParams.set("fullscreen", "1");
-    const title = typeof detail.title === "string" ? detail.title.slice(0, 80) : "Hosted emulator";
-    openIframeAppAt({
+    const fullscreen = detail.mode === "webview" || !detail.mode;
+    if (fullscreen) routedUrl.searchParams.set("fullscreen", "1");
+    if (detail.mode === "window" && apiScramjetWindow?.el.isConnected) {
+      const frame = apiScramjetWindow.el.querySelector<HTMLIFrameElement>("iframe.browser-frame");
+      if (frame) {
+        apiScramjetWindow.setTitle(`${target.hostname} · Scramjet`);
+        apiScramjetWindow.focus();
+        frame.src = routedUrl.href;
+        return;
+      }
+    }
+    const title = typeof detail.title === "string" ? detail.title.slice(0, 80) : target.hostname;
+    const newWindow = detail.mode === "new-window";
+    const openedWindow = openIframeAppAt({
       ...scramjet,
-      name: `${title} · Scramjet`,
+      name: `${title} · Scramjet${newWindow ? " · New window" : ""}`,
       url: `${routedUrl.pathname}${routedUrl.search}`,
       status: `Proxied page · ${target.hostname} · Scramjet`,
-    }, undefined, true);
+    }, undefined, fullscreen);
+    if (detail.mode === "window" || newWindow) apiScramjetWindow = openedWindow;
   });
 
   window.addEventListener("d86-launch-app", (event) => {
