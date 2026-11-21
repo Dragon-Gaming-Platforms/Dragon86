@@ -16,6 +16,7 @@ const STRIP = ["--experimental-strip-types"];
 /** [label, node arguments]. Run with the repo root as the working directory. */
 const SUITES = [
   ["scramjet app: syntax", ["--check", "public/scramjet/app.js"]],
+  ["Scramjet v2 vendor and controller integration", ["tools/test-scramjet-vendor.mjs"]],
   ["CSS variables", ["tools/check-css-vars.mjs"]],
   ["startup reload worker", ["tools/test-startup-reload.mjs"]],
   ["engine lifecycle", [...STRIP, "tools/test-engine-lifecycle.mjs"]],

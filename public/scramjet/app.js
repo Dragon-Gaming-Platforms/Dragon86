@@ -1,10 +1,10 @@
 /* Dragon86 Browser — minimal Scramjet front end.
  *
  * Vendored pieces (see VENDORED.md):
- *   ./scramjet/scramjet.js + scramjet.wasm   @mercuryworkshop/scramjet@2.0.67-alpha.2
- *   ./controller/controller.{api,inject,sw}.js @mercuryworkshop/scramjet-controller@0.0.14
- *   ./transport/{epoxy,libcurl}.mjs          epoxy-transport@3.0.1 / libcurl-transport@2.0.5
- *   ./utils/scramjet-utils.mjs              @mercuryworkshop/scramjet-utils@0.0.3
+ *   ./scramjet/scramjet.js + scramjet.wasm   @mercuryworkshop/scramjet@2.1.0
+ *   ./controller/controller.{api,inject,sw}.js @mercuryworkshop/scramjet-controller@0.1.0
+ *   ./transport/{epoxy,libcurl}.mjs          epoxy-transport@3.0.2 / libcurl-transport@2.0.6
+ *   ./utils/scramjet-utils.mjs              @mercuryworkshop/scramjet-utils@0.0.3 (v2 compat patch)
  *
  * ALL paths are computed from this page's own directory. The upstream demo
  * hardcodes site-root paths ("/scramjet/scramjet.js", "/controller/...",
@@ -77,12 +77,18 @@ function normalizeInput(raw) {
 }
 
 async function makeTransport() {
+	let transport;
 	if (settings.transport === "libcurl") {
-		const { default: LibcurlClient } = await import("./transport/libcurl.mjs");
-		return new LibcurlClient({ wisp: settings.wisp });
+		const { default: LibcurlTransport } = await import("./transport/libcurl.mjs");
+		transport = new LibcurlTransport({ wisp: settings.wisp });
+	} else {
+		const { default: EpoxyTransport } = await import("./transport/epoxy.mjs");
+		transport = new EpoxyTransport({ wisp: settings.wisp });
 	}
-	const { default: EpoxyClient } = await import("./transport/epoxy.mjs");
-	return new EpoxyClient({ wisp: settings.wisp });
+	/* v2 transports initialize their WASM/client explicitly; do this before
+	   Controller hands them requests from the service worker. */
+	await transport.init();
+	return transport;
 }
 
 let utilsModule = null;
